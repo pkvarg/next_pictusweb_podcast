@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  overflow-x: hidden;
+  background-color: #2e2236;
+  color: white;
+  font-size: 25px;
+}
+
+.hero-gradient {
+  background-image: linear-gradient(
+    to bottom,
+    #0f0109,
+    #1b0817,
+    #210e24,
+    #241333,
+    #221a44,
+    #272254,
+    #2b2a64,
+    #2e3375,
+    #463d87,
+    #5e4898,
+    #7752a9,
+    #915cb9
+  );
+}
+
+.second-gradient {
+  background-image: linear-gradient(
+    to top,
+    #0f0109,
+    #1b0817,
+    #210e24,
+    #241333,
+    #221a44,
+    #272254,
+    #2b2a64,
+    #2e3375,
+    #463d87,
+    #5e4898,
+    #7752a9,
+    #915cb9
+  );
+}

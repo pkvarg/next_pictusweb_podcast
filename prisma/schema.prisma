@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url =  env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Blog {
+  id        String   @id @default(uuid())
+  title     String   
+  category     String  
+  media     String  
+  text     String  
+  upcoming     Boolean
+  english     Boolean  
+  link     String  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+   deleted Boolean?
+  
+}
+
+model Podcast {
+  id        String   @id @default(uuid())
+  title String
+  description String?
+  textPrompt String
+  voiceType String?
+  imagePrompt String?
+  audioPath String
+  imagePath String?
+  category     String?  
+  english     Boolean? 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted Boolean @default(false)
+  published Boolean @default(false)
+  
+  }
+
+  model UsedImages {
+  id        String   @id @default(uuid())
+  podcastTitle     String?   
+  imagePath     String  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reallyUsed Boolean?
+  
+}
+
+model UsedPodcasts {
+  id        String   @id @default(uuid())
+  podcastTitle     String?   
+  audioPath     String  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reallyUsed Boolean?
+}
+
+

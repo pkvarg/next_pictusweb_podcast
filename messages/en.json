@@ -1,0 +1,71 @@
+{
+  "Home": {
+    "navbarOffer": "Offer",
+    "navbarProjects": "Projects",
+    "navbarContact": "Contact",
+    "navbarHome": "Home",
+    "navbarAbout": "About",
+    "heroTitle1": "Webs.",
+    "heroTitle2": "Eshops. Blogs.",
+    "heroTitle3": "Modern technologies.",
+
+    "offerTitle": "Do you need...",
+    "offer1": "A modern website?",
+    "offer2": "A microsite?",
+    "offer3": "Modernization of your old web?",
+    "offer4": "A Web portal?",
+    "offer1desc": "We'll make you a firstclass web with a modern design usig the newest technologies.",
+    "offer2desc": "Do you want to present a product, a service or just forward a webpage? The solution is a lowcost microwebsite.",
+    "offer3desc": "Do you have an old web? We offer you a redesign and content update so that your web will keep up with the trends.",
+    "offer4desc": "We'll make you a complex web with custom content administration and advanced features.",
+    "offerButton": "Get a quote",
+
+    "ourProjectsTitle": "Projects",
+    "ourProjectsIoana": "Simple presentational web of a designer",
+    "ourProjectsPrud": "Modern book eshop",
+    "ourProjectsDvl": "Presentational web of a carpenter",
+    "ourProjectsBlog": "Editable blog with custom admin menu",
+    "ourProjectsKatol": "Educational web",
+    "ourProjectsEstate": "Real estate calculator",
+    "ourProjectsLibro": "Custom social network with Pusher chat",
+    "ourProjectsChurch": "Church web with admin menu",
+
+    "reviewsTitle": "Testimonials",
+    "reviewsIoana": "Peter succeeded to make me a website with professionalism promptitude, good quality and reasonable price. I am very happy with the result. Thank you Peter ❤️.",
+    "reviewsTom": "Cooperation with Peter is excellent, great communication and result. He enjoys his job, does it honestly and thoroughly. I definitely count on him in my next projects.",
+    "reviewsLeo": "I have been working with Peter for many years in different areas and I am always pleased by his friendly approach and willingness to help. Thank you.",
+    "reviewsMich": "If you are looking for someone reliable and smart, Peter is your man. I am very satisfied with his work and recommend working with him.",
+    "reviewsSam": "Excellent cooperation, easy understanding of my requests and comments, flexible for options that were subject to my decision.",
+
+    "reviewsDesignationMich": "Real Estate Agent",
+    "reviewsDesignationSam": "Author",
+
+    "getInTouch": "Do you want to find out more?",
+    "getInTouchButton": "Get in touch!",
+
+    "contactTitle": "Send us a message",
+    "contactName": "Name",
+    "contactSubject": "Subject",
+    "contactEmail": "Email",
+    "contactPhone": "Phone",
+    "contactMessage": "Your message",
+    "contactAgree": "I agree to",
+    "contactGdpr": "process my data",
+    "gdpr1": "We do not store the data provided by you in any database.",
+    "gdpr2": "The email will only be used to respond to your message.",
+    "contactSend": "Send",
+    "contactError": "Not sent! Contact us via info@pictusweb.sk, please.",
+    "contactError2": "Error! Write to info@pictusweb.sk, please.",
+    "contactSuccess": "Message successfully sent!",
+
+    "contactAboutTitle": "About us",
+    "contactAboutAccount": "Banking Contact IBAN:",
+    "contactAboutSR": "Slovakia",
+    "contactAboutReg1": "Pictusweb Ltd. is registered",
+    "contactAboutReg2": "in the commercial register of the Nitra District Court:",
+    "contactAboutReg3": "Department: Ltd. Insert number: 57457/N",
+    "contactAboutReg4": "The company is not a VAT payer.",
+
+    "cookies": "This page only uses analytical cookies that are necessary for the website to function. We do not use functional or marketing cookies."
+  }
+}

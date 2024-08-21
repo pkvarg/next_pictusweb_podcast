@@ -1,0 +1,85 @@
+{
+  "Home": {
+    "navbarOffer": "Ponuka",
+    "navbarProjects": "Projekty",
+    "navbarContact": "Kontakt",
+    "navbarHome": "Domov",
+    "navbarAbout": "O firme",
+
+    "heroTitle1": "Weby.",
+    "heroTitle2": "Eshopy. Blogy.",
+    "heroTitle3": "Moderné technológie.",
+
+    "offerTitle": "Potrebujete...",
+    "offer1": "Moderný web?",
+    "offer2": "Mikrostránku?",
+    "offer3": "Modernizáciu starého webu?",
+    "offer4": "Web portál?",
+    "offer1desc": "Vytvoríme Vám prvotriedny web s moderný dizajnom za použitia najmodernejších technológií.",
+    "offer2desc": "Chcete len predstaviť produkt, službu či iba presmerovať stránku? Riešením je jednoduchá lacná mikrostránka.",
+    "offer3desc": "Máte starý web? Ponúkame redizajn a aktualizáciu obsahu, aby aj Váš web kráčal s dobou.",
+    "offer4desc": "Vytvoríme Vám komplexný web s vlastnou správou obsahu a pokročilými funkciami.",
+    "offerButton": "Cenová ponuka",
+
+    "servicesTitle": "Weby, ktoré Vám prinesú úspech",
+    "servicesLogoTitle": "Jedinečné logo",
+    "servicesLogoDesc": "Logo pre web, emailový podpis či vizitku. Jedinečné. Vaše.",
+    "servicesStyleTitle": "Štýl podľa vkusu",
+    "servicesStyleDesc": "Prezentujete služby, hobby alebo vážny biznis? Na štýle záleží.",
+    "servicesNonStopTitle": "Non-stop prevádzka",
+    "servicesNonStopDesc": "Rýchly a spoľahlivý web fungujúci na PC, mobile aj tablete. Non-stop.",
+    "servicesAwayTitle": "Nie ste na príjme?",
+    "servicesAwayDesc": "Formulár Vám zabezbečí, že správy od zákazníkov prídu vždy do Vašej e-pošty.",
+
+    "projectsTitle": "Projekty",
+    "projectsDetails": "Detaily",
+
+    "ourProjectsTitle": "Projekty",
+    "ourProjectsIoana": "Prezentačný web dizajnérky",
+    "ourProjectsPrud": "Moderný knižný eshop",
+    "ourProjectsDvl": "Prezentačný web služieb",
+    "ourProjectsBlog": "Editovateľý blog s admin rozhraním",
+    "ourProjectsKatol": "Edukačný web",
+    "ourProjectsEstate": "Realitná kalkulačka",
+    "ourProjectsLibro": "Sociálna sieť na mieru",
+    "ourProjectsChurch": "Cirkevný web s admin rozhraním",
+
+    "reviewsTitle": "Recenzie",
+    "reviewsIoana": "Peter mi dokázal vytvoriť web profesionálne, promptne, kvalitne a za rozumnú cenu. S výsledkom som veľmi spokojná. Ďakujem Peter ❤️.",
+    "reviewsTom": "Spolupráca s Petrom je výborná, skvelá komunikácia a výsledok. Práca ho baví, robí ju poctivo a dôkladne. Určite s ním počítam pri svojich ďalších projektoch.",
+    "reviewsLeo": "S Petrom spolupracujem už dlhé roky v rôznych oblastiach a vždy ma poteší jeho priateľský prístup a ochota pomôcť. Ďakujem.",
+    "reviewsMich": "Pokiaľ hľadáte niekoho spoľahlivého a šikovného, Peter je Váš človek. Som veľmi spokojný s jeho prácou a odporúčam spoluprácu s ním.",
+    "reviewsSam": "Výborná spolupráca, ľahké pochopenie mojich požiadaviek a pripomienok, flexibilita pri možnostiach, ktoré boli predmetom môjho rozhodnutia.",
+
+    "reviewsDesignationMich": "Real Estate Agent",
+    "reviewsDesignationSam": "Author",
+
+    "getInTouch": "Potrebujete viac informácií?",
+    "getInTouchButton": "Napíšte nám!",
+
+    "contactTitle": "Napíšte nám správu",
+    "contactName": "Meno",
+    "contactSubject": "Predmet",
+    "contactEmail": "Email",
+    "contactPhone": "Telefón",
+    "contactMessage": "Vaša správa",
+    "contactAgree": "Súhlasím so",
+    "contactGdpr": "spracovaním údajov",
+    "gdpr1": "Vami poskytnuté údaje neuchovávame v žiadnej databáze.",
+    "gdpr2": "Email bude použitý len na odpoveď na Vašu správu.",
+    "contactSend": "Odoslať",
+    "contactError": "Neodoslané! Napíšte nám na info@pictusweb.sk, prosím.",
+    "contactError2": "Chyba! Napíšte nám na info@pictusweb.sk, prosím.",
+    "contactSuccess": "Vaša správa bola úspešne odoslaná!",
+
+    "contactAboutTitle": "O nás",
+    "contactAboutAccount": "Číslo účtu IBAN:",
+    "contactAboutSR": "Slovensko",
+    "contactAboutReg1": "Spoločnosť Pictusweb, s.r.o. je zapísaná",
+    "contactAboutReg2": "v obchodnom registri okresného súdu Nitra:",
+    "contactAboutReg3": "Oddiel: Sro Vložka číslo: 57457/N",
+    "contactAboutReg4": "Firma nie je platcom DPH.",
+
+    "cookies": "Táto stránka používa len analytické a pre fungovanie webu nevyhnutné cookies. Nepoužívame funkčné ani marketingové cookies."
+  }
+}
