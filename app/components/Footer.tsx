@@ -35,7 +35,7 @@ const Footer = () => {
               <Link
                 className='font-extrabold text-white'
                 href={
-                  page !== 'contact' ? `${locale}/contact/#about` : `#about`
+                  page !== 'contact' ? `/${locale}/contact/#about` : `#about`
                 }
               >
                 O firme
@@ -43,7 +43,7 @@ const Footer = () => {
 
               <a
                 className='font-extrabold text-white'
-                href={page !== 'contact' ? `${locale}/contact/#gdpr` : `#gdpr`}
+                href={page !== 'contact' ? `/${locale}/contact/#gdpr` : `#gdpr`}
               >
                 GDPR
               </a>
@@ -51,7 +51,7 @@ const Footer = () => {
                 className='font-extrabold text-white'
                 href={
                   page !== 'contact'
-                    ? `${locale}/contact/#trade-rules`
+                    ? `/${locale}/contact/#trade-rules`
                     : `#trade-rules`
                 }
               >

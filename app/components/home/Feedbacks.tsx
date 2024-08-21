@@ -94,15 +94,15 @@ const Feedbacks: React.FC = () => {
     },
   ]
   return (
-    <div className={`lg:mx-[2.5%] pt-[125px] lg:pt-12 rounded-[20px]`}>
-      <div className={`rounded-2xl ${styles.padding} min-h-[300px]`}>
+    <div className={`lg:mx-[15.5%] pt-[125px] lg:pt-[50px] rounded-[20px]`}>
+      <div className={`rounded-2xl min-h-[200px]`}>
         <motion.div
           variants={staggerContainer(0.1, 0.3)}
           initial='hidden'
           whileInView='show'
           viewport={{ once: false, amount: 0.25 }}
         >
-          <h1 className='text-[35px] text-center'>
+          <h1 className='text-[35px] text-center my-16'>
             <TypingText title={t('reviewsTitle')} />
           </h1>
         </motion.div>

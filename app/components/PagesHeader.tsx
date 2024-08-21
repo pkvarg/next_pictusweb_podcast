@@ -66,7 +66,7 @@ const PagesHeader = () => {
             <ul className='text-[22.5px] lg:text-[1.5rem] justify-center space-y-4 md:flex md:space-x-6 md:space-y-0'>
               <li>
                 <Link
-                  href={`${locale}/#projects`}
+                  href={`/${locale}/#projects`}
                   className='hover:text-[#0388f4]'
                 >
                   {t('navbarProjects')}
@@ -75,7 +75,7 @@ const PagesHeader = () => {
 
               <li>
                 <Link
-                  href={`${locale}/contact`}
+                  href={`/${locale}/contact`}
                   className='hover:text-[#0388f4]'
                 >
                   {t('navbarContact')}
