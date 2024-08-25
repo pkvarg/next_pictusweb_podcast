@@ -89,7 +89,7 @@ const Contact = () => {
   return (
     <>
       <div className=' h-8 lg:scroll-mt-14' id='contact'></div>
-      <div className='pt-8 lg:pt-16 pb-10 text-[25px] text-white'>
+      <div className='pt-8 lg:pt-16 pb-10 text-[25px] text-white font-light'>
         <h1 className='text-[30px] lg:text-[35px] text-white text-center lg:pt-0 py-4'>
           {t('contactTitle')}
         </h1>

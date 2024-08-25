@@ -26,7 +26,7 @@ const PreviewAudio: React.FC<PreviewAudioProps> = ({ audioPath }) => {
       <audio ref={audioRef} src={audioPath} />
       {/* <p className='text-white'>{audioPath}</p> */}
       <button
-        className='cursor-pointer hover:text-green-500 bg-orange-500 py-[5px] my-4 px-4 rounded-xl'
+        className='cursor-pointer hover:text-green-500 bg-orange-500 px-4 py-2 rounded-xl'
         onClick={handlePlay}
       >
         {isPlaying ? 'Pause' : 'Play Audio'}

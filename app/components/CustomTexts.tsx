@@ -12,7 +12,7 @@ interface TitleTextProps {
 export const TypingText: React.FC<TypingTextProps> = ({ title }) => (
   <motion.p
     variants={textContainer}
-    className={`font-normal text-secondary-white`}
+    className={`font-light text-secondary-white`}
   >
     {Array.from(title).map((letter, index) => (
       <motion.span variants={textVariant2} key={index}>
@@ -27,7 +27,7 @@ export const TitleText: React.FC<TitleTextProps> = ({ title }) => (
     variants={textVariant2}
     initial='hidden'
     whileInView='show'
-    //className={textStyles}
+    className='font-light'
   >
     {title}
   </motion.h2>

@@ -29,7 +29,7 @@ const Podcast = async () => {
     <>
       <div className='hero-gradient flex flex-col justify-center items-center min-h-screen'>
         <PagesHeader />
-        <h1 className='text-[30px] text-center py-8'>Podcasts</h1>
+        <h1 className='text-[30px] text-center py-8 font-light'>Podcasts</h1>
         <div className='grid grid-cols-3 gap-8 justify-center my-8'>
           {podcasts.map((podcast) => (
             <div key={podcast.id}>

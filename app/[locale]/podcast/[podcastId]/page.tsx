@@ -2,7 +2,6 @@
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { getSinglePodcast } from '../../admin/_actions/podcastActions'
-import Image from 'next/image'
 import PodcastDetailPlayer from '@/app/components/podcast/PodcastDetailPlayer'
 import PagesHeader from '@/app/components/PagesHeader'
 import Footer from '@/app/components/Footer'
@@ -23,6 +22,7 @@ interface Podcast {
 const SinglePodcast = () => {
   const { podcastId } = useParams()
   const [podcast, setPodcast] = useState<Podcast | null>(null)
+
   const getPodcast = async () => {
     if (podcastId) {
       const singlePodcast = await getSinglePodcast(podcastId.toString())
@@ -43,10 +43,10 @@ const SinglePodcast = () => {
   return (
     <>
       <PagesHeader />
-      <section className='flex flex-col mx-4 lg:mx-[10%] py-4'>
-        <header className='mt-9 flex items-center justify-between'>
-          <h1 className='text-20 font-bold text-white-1'>Currenty Playing</h1>
-          {/* <figure className='flex gap-3'>
+      <section className='flex flex-col mx-4 lg:mx-[10%] py-4 font-light'>
+        {/* <header className='mt-9 flex items-center justify-between'>
+          <h1 className='text-20 font-light text-white-1'>Currenty Playing</h1>
+          <figure className='flex gap-3'>
         <Image
           src='/icons/headphone.svg'
           width={24}
@@ -54,8 +54,8 @@ const SinglePodcast = () => {
           alt='headphone'
         />
         
-      </figure> */}
-        </header>
+      </figure>
+        </header> */}
 
         {podcast && (
           <PodcastDetailPlayer
@@ -72,24 +72,22 @@ const SinglePodcast = () => {
           />
         )}
 
-        <p className='text-[#a7a7a8] text-16 pb-8 pt-[45px] font-medium max-md:text-center'>
+        <p className='text-[#a7a7a8] text-16 pb-8 pt-[45px] max-md:text-center'>
           {podcast?.description}
         </p>
 
         <div className='flex flex-col gap-8'>
           <div className='flex flex-col gap-4'>
-            <h1 className='text-18 font-bold text-white-1'>Transcript</h1>
-            <p className='text-16 font-light text-[#a7a7a8] text-justify'>
+            <h1 className='text-18 text-white-1'>Transcript</h1>
+            <p className='text-16 text-[#a7a7a8] text-justify'>
               {podcast?.textPrompt}
             </p>
           </div>
           <div className='flex flex-col gap-4'>
             {podcast?.imagePrompt && (
               <>
-                <h1 className='text-18 font-bold text-white-1'>Image Prompt</h1>
-                <p className='text-16 font-light text-[#a7a7a8]'>
-                  {podcast?.imagePrompt}
-                </p>
+                <h1 className='text-18 text-white-1'>Image Prompt</h1>
+                <p className='text-16 text-[#a7a7a8]'>{podcast?.imagePrompt}</p>
               </>
             )}
           </div>

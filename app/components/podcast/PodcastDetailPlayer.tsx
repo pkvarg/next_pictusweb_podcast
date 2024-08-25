@@ -55,14 +55,14 @@ const PodcastDetailPlayer = ({
         />
         <div className='flex w-full flex-col gap-5 max-md:items-center md:gap-9'>
           <article className='flex flex-col gap-2 max-md:items-center'>
-            <h1 className='text-32 font-extrabold tracking-[-0.32px] text-white-1'>
+            <h1 className='text-32 font-normal tracking-[-0.32px] text-white-1'>
               {title}
             </h1>
           </article>
 
           <Button
             onClick={handlePlay}
-            className='text-[25px] w-full max-w-[250px] bg-orange-500 text-white rounded-xl'
+            className='text-[25px] w-full max-w-[250px] bg-orange-500 text-white rounded-xl font-normal'
           >
             <Image
               src='/icons/Play.svg'

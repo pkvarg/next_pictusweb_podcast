@@ -6,7 +6,7 @@ const TradeRules = () => {
   return (
     <div
       id='trade-rules'
-      className='mx-4 lg:mx-10 text-[20px] lg:text-[22.5px] text-justify flex flex-col gap-4'
+      className='mx-4 lg:mx-10 text-[20px] lg:text-[22.5px] text-justify flex flex-col gap-4 font-light'
     >
       <h2
         onClick={() => setOpenTradeRules((prev) => !prev)}

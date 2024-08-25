@@ -69,7 +69,7 @@ export default async function AllPodcasts() {
                   </>
                 )}
 
-                <p className='text-[20px]'>
+                <p className='text-[20px] my-4'>
                   Description: {podcast.description}
                 </p>
 
@@ -77,7 +77,9 @@ export default async function AllPodcasts() {
 
                 <p
                   className={
-                    podcast.english ? 'text-green-500' : 'text-red-500'
+                    podcast.english
+                      ? 'text-green-500 my-4'
+                      : 'text-red-500 my-4'
                   }
                 >
                   English: {podcast.english ? 'true' : 'false'}

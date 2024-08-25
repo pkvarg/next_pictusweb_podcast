@@ -31,18 +31,21 @@ const PublishButton: React.FC<Publish> = ({ published, podcastId }) => {
 
   return (
     <>
-      <button
-        onClick={changePublishStatus}
-        className={
-          published
-            ? 'my-8 py-1 px-8 bg-orange-900 text-white rounded-xl'
-            : 'my-8 py-1 px-8  bg-green-500 text-white rounded-xl'
-        }
-      >
-        {published ? 'Unpublish' : 'Publish'}
-      </button>
-      {message && (
-        <p className='text-green-600 text-[15px] bg-white'>{message}</p>
+      {message ? (
+        <p className='text-green-600 text-[15px] my-2 px-4 bg-white'>
+          {message}
+        </p>
+      ) : (
+        <button
+          onClick={changePublishStatus}
+          className={
+            published
+              ? 'my-8 py-1 px-8 bg-orange-900 text-white rounded-xl'
+              : 'my-8 py-1 px-8  bg-green-500 text-white rounded-xl'
+          }
+        >
+          {published ? 'Unpublish' : 'Publish'}
+        </button>
       )}
     </>
   )

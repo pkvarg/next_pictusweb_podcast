@@ -63,12 +63,12 @@ const AdminNavbar = () => {
                 <li>
                   <Link href={`/${locale}/admin/ai`}>AI</Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link href={`/${locale}/admin/audio`}>Audio</Link>
-                </li>
+                </li> */}
                 <li>
                   <Link href={`/${locale}/admin/styledAudio`}>
-                    Styled Audio Create Podcast
+                    Create Podcast
                   </Link>
                 </li>
 

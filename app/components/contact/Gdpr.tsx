@@ -6,7 +6,7 @@ const Gdpr = () => {
   return (
     <div
       id='gdpr'
-      className='mx-4 lg:mx-12 lg:py-4 py-6 text-justify flex flex-col gap-4 text-[20px] lg:text-[22.5px]'
+      className='mx-4 lg:mx-12 lg:py-4 py-6 text-justify flex flex-col gap-4 text-[20px] lg:text-[22.5px] font-light'
     >
       <h1
         onClick={() => setOpenGdpr((prev) => !prev)}

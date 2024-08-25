@@ -24,11 +24,15 @@ interface Podcast extends PodcastData {
   id: string
 }
 
-export async function createSpeech(podcastTitle: string, inputText: string) {
+export async function createSpeech(
+  podcastTitle: string,
+  voiceType: any,
+  inputText: string
+) {
   try {
     const mp3 = await openai.audio.speech.create({
       model: 'tts-1',
-      voice: 'alloy',
+      voice: voiceType,
       input: inputText,
     })
 

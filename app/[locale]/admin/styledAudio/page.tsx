@@ -28,7 +28,7 @@ const StyledAudio = () => {
   const [file, setFile] = useState<File | null>(null)
   // State to hold the preview URL of the selected file
   const [previewUrl, setPreviewUrl] = useState<string>('')
-
+  const [isSubmittingText, setIsSubmittingText] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [imagePrompt, setImagePrompt] = useState<string>('')
@@ -158,13 +158,13 @@ const StyledAudio = () => {
 
   const generateAudio = async (e: any) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    const audio = await createSpeech(podcastTitle, textPrompt)
+    setIsSubmittingText(true)
+    const audio = await createSpeech(podcastTitle, voiceType, textPrompt)
     console.log('aud', audio)
     if (audio && audio.frontendPath) {
       setAudioPath(audio.frontendPath)
     }
-    setIsSubmitting(false)
+    setIsSubmittingText(false)
   }
 
   return (
@@ -232,12 +232,17 @@ const StyledAudio = () => {
           />
 
           <div className='flex flex-row gap-4 justify-start items-center'>
-            <button
-              onClick={generateAudio}
-              className='bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer'
-            >
-              Generate
-            </button>
+            {isSubmittingText ? (
+              <Loader size={60} className='animate-spin ' />
+            ) : (
+              <button
+                onClick={generateAudio}
+                className='bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer'
+              >
+                Generate
+              </button>
+            )}
+
             {audioPath && (
               <div className='mt-[15px]'>
                 <PreviewAudio audioPath={audioPath as string} />

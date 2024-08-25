@@ -5,15 +5,18 @@ import About from '../../components/contact/About'
 import Gdpr from '../../components/contact/Gdpr'
 import TradeRules from '../../components/contact/TradeRules'
 import Footer from '@/app/components/Footer'
+import { getLocale } from 'next-intl/server'
 
-const ContactPage = () => {
+const ContactPage = async () => {
+  const locale = await getLocale()
   return (
     <div className='hero-gradient'>
       <PagesHeader />
       <Contact />
       <About />
       <Gdpr />
-      <TradeRules />
+      {locale === 'sk' && <TradeRules />}
+
       <Footer />
     </div>
   )

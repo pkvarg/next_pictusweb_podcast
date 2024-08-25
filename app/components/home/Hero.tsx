@@ -22,7 +22,7 @@ const Hero = () => {
         className={`${styles.innerWidth} mx-auto flex lg:flex-row flex-col gap-8 lg:py-[100px] py-[50px]`}
       >
         <div className='flex flex-col justify-left'>
-          <h1 className='text-white text-[45px] lg:text-[5rem]'>
+          <h1 className='text-white text-[45px] lg:text-[75px]'>
             <TypingText title={title1} />
           </h1>
           <h1 className='text-white text-[45px] lg:text-[50px] mb-[2rem]'>

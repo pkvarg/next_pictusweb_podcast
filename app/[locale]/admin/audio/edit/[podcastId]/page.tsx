@@ -88,7 +88,7 @@ const EditPodcast = () => {
 
   const handleVoiceType = (value: string) => {
     setVoiceType(value)
-    console.log('hvt', voiceType)
+
     setTimeout(() => {
       const audio = document.getElementById('voiceAudio') as HTMLAudioElement
       if (audio) {
@@ -165,7 +165,7 @@ const EditPodcast = () => {
   const generateAudio = async (e: any) => {
     e.preventDefault()
     setIsSubmitting(true)
-    const audio = await createSpeech(podcastTitle, textPrompt)
+    const audio = await createSpeech(podcastTitle, voiceType, textPrompt)
     console.log('aud', audio)
     if (audio && audio.frontendPath) {
       setAudioPath(audio.frontendPath)
@@ -271,18 +271,14 @@ const EditPodcast = () => {
           <div className='flex flex-row gap-4 justify-start items-center'>
             <button
               onClick={generateAudio}
-              className='bg-orange-500 px-4 py-1 rounded-xl mt-4 cursor-pointer'
+              className='bg-orange-500 px-4 py-2 rounded-xl cursor-pointer'
             >
               Generate
             </button>
             {isSubmitting && (
               <Loader size={60} className='animate-spin ml-[45%] mt-4' />
             )}
-            {audioPath && (
-              <div className='mt-[19px]'>
-                <PreviewAudio audioPath={audioPath as string} />
-              </div>
-            )}
+            {audioPath && <PreviewAudio audioPath={audioPath as string} />}
           </div>
           <label htmlFor='category' className='text-[25px] py-4'>
             Category
