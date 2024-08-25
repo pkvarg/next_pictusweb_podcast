@@ -15,7 +15,7 @@ const PodcastPlayer = () => {
   const [duration, setDuration] = useState(0)
   const [isMuted, setIsMuted] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
-  const { audio } = useAudio()
+  const { audio, setAudio, setScrollToPlayer } = useAudio()
 
   const togglePlayPause = () => {
     if (audioRef.current?.paused) {
@@ -93,6 +93,11 @@ const PodcastPlayer = () => {
     setIsPlaying(false)
   }
 
+  const hide = () => {
+    setAudio(undefined)
+    setScrollToPlayer(false)
+  }
+
   return (
     <div
       className={cn('sticky bottom-0 left-0 flex size-full flex-col', {
@@ -101,11 +106,17 @@ const PodcastPlayer = () => {
     >
       {/* change the color for indicator inside the Progress component in ui folder */}
       <Progress
-        value={(currentTime / duration) * 100 + 1}
+        value={(currentTime / duration) * 100}
         className='w-full'
         max={duration}
       />
       <section className='glassmorphism-black flex h-[130px] w-full items-center justify-between px-4 max-md:justify-center max-md:gap-5 md:px-12 bg-black'>
+        <p
+          onClick={hide}
+          className='absolute top-2 right-[0.5%] text-red-500 cursor-pointer'
+        >
+          x
+        </p>
         <audio
           ref={audioRef}
           src={audio?.audioPath}

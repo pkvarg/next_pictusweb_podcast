@@ -11,10 +11,7 @@ import {
   createSpeech,
 } from '@/app/[locale]/admin/_actions/podcastActions'
 import PreviewAudio from '@/lib/PreviewAudio'
-<<<<<<< Updated upstream
-=======
 import AudioBack from './../../../components/admin/AdminBack'
->>>>>>> Stashed changes
 
 const StyledAudio = () => {
   const { toast } = useToast()
@@ -23,10 +20,8 @@ const StyledAudio = () => {
   const [description, setDescription] = useState<string>('')
 
   const [openOwnImg, setOpenOwnImage] = useState<boolean>(false)
-<<<<<<< Updated upstream
+
   const [media, setMedia] = useState('')
-=======
->>>>>>> Stashed changes
 
   const [openAiImg, setOpenAiImage] = useState<boolean>(false)
 
@@ -94,29 +89,6 @@ const StyledAudio = () => {
       return
     }
     setIsSubmitting(true)
-    // const audio = await createSpeech(podcastTitle, textPrompt)
-    // console.log('aud', audio)
-    // if (audio && audio.frontendPath) {
-    //   setAudioPath(audio.frontendPath)
-
-    // // save file to server
-    // if (file) {
-    //   try {
-    //     const formdata = new FormData()
-    //     if (file) formdata.append('files', file)
-
-    //     const requestOptions = { method: 'POST', body: formdata }
-
-    //     const response = await fetch('/api/podcastOwnImg', requestOptions)
-    //     const result = await response.json()
-    //     console.log('returned', result)
-    //     setImagePath(result.data)
-    //     setPreviewUrl(result.data)
-    //     console.log('imagePath', result.data)
-    //   } catch (error) {
-    //     console.log('hs', error)
-    //   }
-    // }
 
     const formData = new FormData()
     formData.append('title', podcastTitle)
@@ -138,11 +110,7 @@ const StyledAudio = () => {
 
   const handleVoiceType = (value: string) => {
     setVoiceType(value)
-<<<<<<< Updated upstream
-    console.log('hvt', voiceType)
-=======
 
->>>>>>> Stashed changes
     setTimeout(() => {
       const audio = document.getElementById('voiceAudio') as HTMLAudioElement
       if (audio) {
@@ -201,10 +169,8 @@ const StyledAudio = () => {
 
   return (
     <div className='flex flex-col gap-2 justify-center items-center py-16 w-full bg-[#0f1114] text-white  px-4 lg:px-[10%]'>
-<<<<<<< Updated upstream
-=======
       <AudioBack />
->>>>>>> Stashed changes
+
       <h1>Create Podcast</h1>
       <form>
         <label className='text-16 font-bold text-white'>Title</label>
@@ -311,7 +277,6 @@ const StyledAudio = () => {
           </span>
         </label>
 
-<<<<<<< Updated upstream
         <div className='flex flex-col gap-2 my-4'>
           <p
             onClick={() => setOpenOwnImage((prev) => !prev)}
@@ -353,11 +318,8 @@ const StyledAudio = () => {
               <p className='mt-8'>{imagePath}</p>
             </div>
           )}
+        </div>
 
-          <p
-            onClick={() => setOpenAiImage((prev) => !prev)}
-            className='cursor-pointer hover:text-blue-500'
-=======
         <div className='flex flex-col lg:flex-row gap-4 my-4 text-orange-500'>
           <p
             onClick={() => setOpenOwnImage((prev) => !prev)}
@@ -368,18 +330,11 @@ const StyledAudio = () => {
           <p
             onClick={() => setOpenAiImage((prev) => !prev)}
             className='cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4'
->>>>>>> Stashed changes
           >
             Use AI to create an Image
           </p>
         </div>
 
-<<<<<<< Updated upstream
-        {openAiImg && (
-          <div className='flex flex-col relative bg-[#2e2236] mt-8'>
-            <textarea
-              className='text-black text-[18px] pl-2 w-[100%] mt-2 h-[300px]'
-=======
         {openOwnImg && (
           <div className='flex flex-col relative my-8'>
             <input
@@ -418,7 +373,6 @@ const StyledAudio = () => {
           <div className='flex flex-col relative  mt-8'>
             <textarea
               className='bg-[#15181c] text-[25px] pl-2 w-[100%] h-[300px]'
->>>>>>> Stashed changes
               value={imagePrompt}
               onChange={(e) => setImagePrompt(e.target.value)}
               placeholder='Enter promt for AI image creation'
@@ -429,11 +383,8 @@ const StyledAudio = () => {
             ) : (
               <button
                 onClick={handleGetAiImage}
-<<<<<<< Updated upstream
-                className='mt-4 hover:text-blue-500'
-=======
+                // className='mt-4 hover:text-blue-500'
                 className='bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer w-max'
->>>>>>> Stashed changes
               >
                 Get AI Image from Prompt
               </button>
@@ -443,11 +394,8 @@ const StyledAudio = () => {
 
         {previewUrl && (
           <Image
-<<<<<<< Updated upstream
-            className='my-4 w-[150px] h-auto'
-=======
+            // className='my-4 w-[150px] h-auto'
             className='my-4 w-[250px] h-auto'
->>>>>>> Stashed changes
             src={previewUrl}
             alt={podcastTitle}
             width={50}

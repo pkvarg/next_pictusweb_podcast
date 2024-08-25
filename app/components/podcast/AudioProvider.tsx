@@ -10,6 +10,8 @@ interface AudioProps {
 interface AudioContextType {
   audio: AudioProps | undefined
   setAudio: React.Dispatch<React.SetStateAction<AudioProps | undefined>>
+  scrollToPlayer: boolean
+  setScrollToPlayer: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 import { usePathname } from 'next/navigation'
@@ -19,6 +21,7 @@ const AudioContext = createContext<AudioContextType | undefined>(undefined)
 
 const AudioProvider = ({ children }: { children: React.ReactNode }) => {
   const [audio, setAudio] = useState<AudioProps | undefined>()
+  const [scrollToPlayer, setScrollToPlayer] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -28,7 +31,9 @@ const AudioProvider = ({ children }: { children: React.ReactNode }) => {
   console.log('aud prov', audio)
 
   return (
-    <AudioContext.Provider value={{ audio, setAudio }}>
+    <AudioContext.Provider
+      value={{ audio, setAudio, scrollToPlayer, setScrollToPlayer }}
+    >
       {children}
     </AudioContext.Provider>
   )
