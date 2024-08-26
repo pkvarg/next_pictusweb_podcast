@@ -28,8 +28,6 @@ const AudioProvider = ({ children }: { children: React.ReactNode }) => {
     if (pathname === '/create-podcast') setAudio(undefined)
   }, [pathname])
 
-  console.log('aud prov', audio)
-
   return (
     <AudioContext.Provider
       value={{ audio, setAudio, scrollToPlayer, setScrollToPlayer }}
