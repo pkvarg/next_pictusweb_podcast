@@ -8,8 +8,12 @@ import { AiOutlineDelete } from 'react-icons/ai'
 import { Loader } from 'lucide-react'
 import {
   create,
-  createSpeech,
+  //createSpeech,
 } from '@/app/[locale]/admin/_actions/podcastActions'
+import { createOpenAiSpeech } from '../_actions/podcastOpenAiActions'
+import { createAzureSpeech } from '../_actions/podcastAzureActions'
+import { createElevenlabsSpeech } from '../_actions/podcastElevenlabsActions'
+
 import PreviewAudio from '@/lib/PreviewAudio'
 import AudioBack from './../../../components/admin/AdminBack'
 
@@ -39,9 +43,23 @@ const StyledAudio = () => {
   const [category, setCategory] = useState<string>('faith')
   const [english, setEnglish] = useState<boolean>(false)
   const [message, setMessage] = useState('')
+  const [voiceProvider, setVoiceProvider] = useState('')
 
-  const voiceCategories = ['alloy', 'shimmer', 'nova', 'echo', 'fable', 'onyx']
+  const openaiVoices = ['alloy', 'shimmer', 'nova', 'echo', 'fable', 'onyx']
+  const azureVoices = ['Lukas', 'Viktoria']
+  const elevenlabsVoices = [
+    'Andrej',
+    'Karol',
+    'Leo',
+    'Juraj',
+    'Peter',
+    'Liam',
+    'Erik',
+  ]
+
   const [voiceType, setVoiceType] = useState<string | null>(null)
+
+  const [voiceCategs, setVoiceCategs] = useState<string[]>(openaiVoices)
 
   useEffect(() => {
     if (openOwnImg) {
@@ -51,6 +69,16 @@ const StyledAudio = () => {
       setOpenOwnImage(false)
     }
   }, [openOwnImg, openAiImg])
+
+  useEffect(() => {
+    if (voiceProvider === 'openai') {
+      setVoiceCategs(openaiVoices)
+    } else if (voiceProvider === 'azure') {
+      setVoiceCategs(azureVoices)
+    } else if (voiceProvider === 'elevenlabs') {
+      setVoiceCategs(elevenlabsVoices)
+    }
+  }, [voiceProvider])
 
   const handleGetAiImage = async (e: any) => {
     e.preventDefault()
@@ -159,12 +187,36 @@ const StyledAudio = () => {
   const generateAudio = async (e: any) => {
     e.preventDefault()
     setIsSubmittingText(true)
-    const audio = await createSpeech(podcastTitle, voiceType, textPrompt)
-    console.log('aud', audio)
-    if (audio && audio.frontendPath) {
-      setAudioPath(audio.frontendPath)
+    if (voiceProvider === 'openai') {
+      const audio = await createOpenAiSpeech(
+        podcastTitle,
+        voiceType,
+        textPrompt
+      )
+      console.log('aud', audio)
+      if (audio && audio.frontendPath) {
+        setAudioPath(audio.frontendPath)
+      }
+      setIsSubmittingText(false)
+    } else if (voiceProvider === 'azure') {
+      const audio = await createAzureSpeech(podcastTitle, voiceType, textPrompt)
+      console.log('aud', audio)
+      if (audio && audio.frontendPath) {
+        setAudioPath(audio.frontendPath)
+      }
+      setIsSubmittingText(false)
+    } else if (voiceProvider === 'elevenlabs') {
+      const audio = await createElevenlabsSpeech(
+        podcastTitle,
+        voiceType,
+        textPrompt
+      )
+      console.log('aud', audio)
+      if (audio && audio.frontendPath) {
+        setAudioPath(audio.frontendPath)
+      }
+      setIsSubmittingText(false)
     }
-    setIsSubmittingText(false)
   }
 
   return (
@@ -184,6 +236,37 @@ const StyledAudio = () => {
 
         <div className='flex flex-col gap-2.5 my-8'>
           <label className='text-16 font-bold text-white'>
+            Select AI Voice Provider
+          </label>
+
+          <div className='flex flex-row gap-4 justify-start items-center my-4'>
+            <Image
+              src={'/tech/openai-logo.webp'}
+              width={250}
+              height={250}
+              alt='openai'
+              onClick={() => setVoiceProvider('openai')}
+              className='w-[50px] cursor-pointer'
+            />
+            <Image
+              src={'/tech/azure-logo.webp'}
+              width={250}
+              height={250}
+              alt='azureai'
+              onClick={() => setVoiceProvider('azure')}
+              className='w-[50px] cursor-pointer'
+            />
+            <Image
+              src={'/tech/eleven-labs-logo.webp'}
+              width={250}
+              height={250}
+              alt='elevenlabsai'
+              onClick={() => setVoiceProvider('elevenlabs')}
+              className='w-[50px] cursor-pointer rounded-full'
+            />
+          </div>
+
+          <label className='text-16 font-bold text-white'>
             Select AI Voice
           </label>
 
@@ -194,7 +277,7 @@ const StyledAudio = () => {
             value={voiceType || 'choose voice'}
             onChange={(e) => handleVoiceType(e.target.value)}
           >
-            {voiceCategories.map((category) => (
+            {voiceCategs?.map((category: string) => (
               <option
                 key={category}
                 value={category}
@@ -206,7 +289,11 @@ const StyledAudio = () => {
           </select>
 
           {voiceType && (
-            <audio src={`/${voiceType}.mp3`} autoPlay className='hidden' />
+            <audio
+              src={`/podcast/voices/${voiceType}.mp3`}
+              autoPlay
+              className='hidden'
+            />
           )}
         </div>
 

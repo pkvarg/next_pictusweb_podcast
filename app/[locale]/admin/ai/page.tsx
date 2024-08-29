@@ -1,20 +1,38 @@
 'use client'
 import AdminBack from '@/app/components/admin/AdminBack'
 import React from 'react'
-import azureTts from '../_actions/podcastAzureActions'
+import { createAzureSpeech } from '../_actions/podcastAzureActions'
+import { createElevenlabsSpeech } from '../_actions/podcastElevenlabsActions'
+import { voices } from '../_actions/podcastElevenlabsActions'
 
 const AI = () => {
   const start = async () => {
-    const text =
-      'Ahoj Lukáš neurálny nie rodovo neutrálny ani nereálny slovenský ľubozvučný slovák.'
+    const voiceType = 'Lukas'
+    const text = `Dobrý deň ja som ${voiceType}, hovorím po slovensky.`
+    const podcastTitle = 'azureTitul'
 
-    await azureTts(text)
+    await createAzureSpeech(podcastTitle, voiceType, text)
+  }
+  const startEleven = async () => {
+    //const voiceType = 'Karol'
+    const voiceType = 'Jessica'
+    const text = `Dobrý deň ja som ${voiceType}, hovorím po slovensky.`
+    const podcastTitle = '11labs'
+
+    await createElevenlabsSpeech(podcastTitle, voiceType, text)
+  }
+  const getVoices = async () => {
+    await voices()
   }
   return (
     <div>
       <AdminBack />
       <h1 className='text-center'>AI</h1>
-      <button onClick={() => start()}>Start TTS</button>
+      <button onClick={() => start()}>Start Azure TTS</button>
+      <br />
+      <button onClick={() => startEleven()}>Start Elevenlabs</button>
+      <br />
+      <button onClick={() => getVoices()}>Get Elevenlabs voices</button>
     </div>
   )
 }
