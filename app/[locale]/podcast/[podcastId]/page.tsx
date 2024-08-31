@@ -4,7 +4,9 @@ import React, { useEffect, useState } from 'react'
 import { getSinglePodcast } from '../../admin/_actions/podcastActions'
 import PodcastDetailPlayer from '@/app/components/podcast/PodcastDetailPlayer'
 import PagesHeader from '@/app/components/PagesHeader'
+import NeedPodcast from '@/app/components/NeedPodcast'
 import Footer from '@/app/components/Footer'
+import { useTranslations } from 'next-intl'
 
 interface Podcast {
   id: string
@@ -15,11 +17,13 @@ interface Podcast {
   audioPath: string
   imagePath: string
   category: string
+  voiceType: string
   english: boolean
   published: boolean
 }
 
 const SinglePodcast = () => {
+  const t = useTranslations('Home')
   const { podcastId } = useParams()
   const [podcast, setPodcast] = useState<Podcast | null>(null)
 
@@ -44,19 +48,6 @@ const SinglePodcast = () => {
     <>
       <PagesHeader />
       <section className='flex flex-col mx-4 lg:mx-[10%] py-4 font-light'>
-        {/* <header className='mt-9 flex items-center justify-between'>
-          <h1 className='text-20 font-light text-white-1'>Currenty Playing</h1>
-          <figure className='flex gap-3'>
-        <Image
-          src='/icons/headphone.svg'
-          width={24}
-          height={24}
-          alt='headphone'
-        />
-        
-      </figure>
-        </header> */}
-
         {podcast && (
           <PodcastDetailPlayer
             id={podcast.id}
@@ -72,13 +63,16 @@ const SinglePodcast = () => {
           />
         )}
 
-        <p className='text-[#a7a7a8] text-16 pb-8 pt-[45px] max-md:text-center'>
-          {podcast?.description}
+        <p className='text-[#a7a7a8] text-16 pt-[45px]'>
+          {t('podcastDescription')} {podcast?.description}
+        </p>
+        <p className='text-[#a7a7a8] capitalize'>
+          {t('podcastVoice')} {podcast?.voiceType}
         </p>
 
-        <div className='flex flex-col gap-8'>
+        <div className='flex flex-col gap-8 mt-4'>
           <div className='flex flex-col gap-4'>
-            <h1 className='text-18 text-white-1'>Transcript</h1>
+            <h1 className='text-18 text-white-1'>Transcript:</h1>
             <p className='text-16 text-[#a7a7a8] text-justify'>
               {podcast?.textPrompt}
             </p>
@@ -93,6 +87,7 @@ const SinglePodcast = () => {
           </div>
         </div>
       </section>
+      <NeedPodcast />
       <Footer />
     </>
   )

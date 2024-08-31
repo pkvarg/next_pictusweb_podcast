@@ -85,8 +85,7 @@ const Header = () => {
                   href={`${locale}/podcast`}
                   className='hover:text-[#0388f4]'
                 >
-                  Podcast
-                  {/* {t('navbarProjects')} */}
+                  {t('podcastsTitle')}
                 </Link>
               </li>
 

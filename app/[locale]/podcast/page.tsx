@@ -3,8 +3,10 @@ import PagesHeader from '@/app/components/PagesHeader'
 import PodcastImage from '@/app/components/podcast/GoToSinglePodcast'
 import db from '@/db/db'
 import React from 'react'
+import { getLocale } from 'next-intl/server'
 
 const Podcast = async () => {
+  const locale = await getLocale()
   const podcasts = await db.podcast.findMany({
     select: {
       id: true,
@@ -29,8 +31,11 @@ const Podcast = async () => {
     <>
       <div className='hero-gradient flex flex-col justify-center items-center min-h-screen'>
         <PagesHeader />
-        <h1 className='text-[30px] text-center py-8 font-light'>Podcasts</h1>
-        <div className='grid grid-cols-3 gap-8 justify-center my-8'>
+        <h1 className='text-[30px] text-center py-8 font-light'>
+          {locale === 'en' ? 'AI Podcasts' : 'AI podcasty'}
+        </h1>
+
+        <div className='grid lg:grid-cols-3 gap-8 justify-center my-8'>
           {podcasts.map((podcast) => (
             <div key={podcast.id}>
               <PodcastImage
@@ -41,8 +46,9 @@ const Podcast = async () => {
 
               <div className='ml-4 mt-2'>
                 <p className='text-[18px]'>{podcast.title}</p>
-                <p className='text-[16px] text-gray-300'>
-                  {podcast.description}
+                <p className='text-[16px] text-gray-300 capitalize'>
+                  {locale === 'en' ? 'Category' : 'Kategória'} :{' '}
+                  {podcast.category}
                 </p>
               </div>
             </div>

@@ -25,13 +25,13 @@ const Hero = () => {
           <h1 className='text-white text-[45px] lg:text-[75px]'>
             <TypingText title={title1} />
           </h1>
-          <h1 className='text-white text-[45px] lg:text-[50px] mb-[2rem]'>
+          <h1 className='text-white text-[40px] lg:text-[50px] mb-[2rem]'>
             <TypingText title={title2} />
           </h1>
 
-          <div className='text-white text-[30px] lg:text-[40px]'>
+          <h1 className='text-white -mt-6 text-[30px] lg:text-[40px]'>
             <TitleText title={title3} />
-          </div>
+          </h1>
         </div>
       </motion.div>
       <div className='lg:w-[100%]'>

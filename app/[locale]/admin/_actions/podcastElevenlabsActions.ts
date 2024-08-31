@@ -16,9 +16,11 @@ const Liam = 'TX3LPaxmHKxFdv7VOQHJ'
 //const Karolina = 'XB0fDUnXU5powFXDhCwa'
 //const Alica = 'Xb7hH8MSUJpSbSDYk0k2'
 //const Matilda = 'XrExE9yKIg1WjnnlVkGX'
+
 //const Wiliam = 'bIHbv24MWmeRgasZH58o'
 //const Jessica = 'cgSgspJ2msm6clMCkdW9'
 const Jessica = 'cgSgspJ2msm6clMCkdW9'
+
 const Erik = 'cjVigY5qzO86Huf0OWal'
 //const Christofer = 'iP95p4xoKVk53GoZ742B'
 //const Brian = 'nPczCjzI2devNBz1zQrb'
@@ -33,8 +35,8 @@ export async function createElevenlabsSpeech(
 ) {
   const voiceId = voiceType === 'andrej' ? Andrej : 'karol' ? Karol : Jessica
 
-  const model = 'eleven_multilingual_v2'
-  //const model = 'eleven_turbo_v2_5'
+  //const model = 'eleven_multilingual_v2'
+  const model = 'eleven_turbo_v2_5'
 
   try {
     // Convert text to speech
@@ -44,6 +46,7 @@ export async function createElevenlabsSpeech(
       text: inputText,
       //model_id: 'eleven_turbo_v2_5',
       model_id: model,
+
       voice_settings: {
         stability: 0.1,
         similarity_boost: 0.3,
@@ -73,7 +76,7 @@ export async function createElevenlabsSpeech(
   }
 }
 
-// get voices Names 1 * 2
+// get voices Names 1
 // export async function voices() {
 //   const keys = process.env.ELEVEN_KEY
 //   const url = 'https://api.elevenlabs.io/v1/voices'
@@ -98,6 +101,7 @@ export async function createElevenlabsSpeech(
 //   }
 // }
 
+// get voices Names  2
 export async function voices() {
   const apiKey = process.env.ELEVEN_KEY!
   const url = 'https://api.elevenlabs.io/v1/voices'

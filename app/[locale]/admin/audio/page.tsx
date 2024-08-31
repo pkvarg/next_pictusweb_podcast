@@ -33,7 +33,7 @@ const Audio = () => {
   const [imagePath, setImagePath] = useState<string>('')
   const [aiImage, setAiImage] = useState('')
 
-  const [category, setCategory] = useState<string>('faith')
+  const [category, setCategory] = useState<string>('life')
   const [english, setEnglish] = useState<boolean>(false)
   const [message, setMessage] = useState('')
 
@@ -224,9 +224,9 @@ const Audio = () => {
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
-          <option value='faith'>Faith</option>
+          <option value='life'>Life</option>
           <option value='tech'>Tech</option>
-          <option value='other'>Other</option>
+          <option value='random'>Random</option>
         </select>
 
         <label className='text-white'>

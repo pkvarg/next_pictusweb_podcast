@@ -31,7 +31,7 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
     animate={{ x: 0 }}
     transition={{ duration: 3 }}
     viewport={{ once: true, amount: 0.25 }}
-    className='p-6 rounded-3xl xs:w-[320px] w-full bg-gray-800'
+    className='p-6 rounded-3xl xs:w-[320px] lg:mt-0 lg:mb-0 w-full bg-gray-800'
   >
     <div className='mt-1'>
       <p className='text-white tracking-wider text-[22.5px]'>"{testimonial}"</p>
@@ -94,7 +94,7 @@ const Feedbacks: React.FC = () => {
     },
   ]
   return (
-    <div className={`lg:mx-[15.5%] pt-[125px] lg:pt-[50px] rounded-[20px]`}>
+    <div className={`lg:mx-[15.5%] pt-[70px] lg:pt-[50px] rounded-[20px]`}>
       <div className={`rounded-2xl min-h-[200px]`}>
         <motion.div
           variants={staggerContainer(0.1, 0.3)}
@@ -102,12 +102,12 @@ const Feedbacks: React.FC = () => {
           whileInView='show'
           viewport={{ once: false, amount: 0.25 }}
         >
-          <h1 className='text-[35px] text-center my-16'>
+          <h1 className='text-[35px] text-center lg:mt-16 lg:mb-16'>
             <TypingText title={t('reviewsTitle')} />
           </h1>
         </motion.div>
       </div>
-      <div className={`-mt-40 lg:-mt-20 pb-14 mx-4  flex flex-col  gap-4`}>
+      <div className={`-mt-20 lg:-mt-20 lg:pb-14 mx-4  flex flex-col  gap-4`}>
         {testimonials.map((testimonial, index) => (
           <FeedbackCard key={testimonial.name} index={index} {...testimonial} />
         ))}

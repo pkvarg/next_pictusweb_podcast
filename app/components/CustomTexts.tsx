@@ -23,12 +23,12 @@ export const TypingText: React.FC<TypingTextProps> = ({ title }) => (
 )
 
 export const TitleText: React.FC<TitleTextProps> = ({ title }) => (
-  <motion.h2
+  <motion.p
     variants={textVariant2}
     initial='hidden'
     whileInView='show'
     className='font-light'
   >
     {title}
-  </motion.h2>
+  </motion.p>
 )

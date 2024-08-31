@@ -7,8 +7,8 @@
     "navbarHome": "Home",
     "navbarAbout": "About",
     "heroTitle1": "Webs.",
-    "heroTitle2": "Eshops. Blogs.",
-    "heroTitle3": "Modern technologies.",
+    "heroTitle2": "Eshops. Blogs. Podcasts.",
+    "heroTitle3": "Ai Services.",
 
     "offerTitle": "Do you need...",
     "offer1": "A modern website?",
@@ -43,6 +43,16 @@
 
     "getInTouch": "Do you want to find out more?",
     "getInTouchButton": "Get in touch!",
+
+    "podcastsTitle": "Podcasts",
+    "podcastsFilter": "Filter by",
+    "podcastsLanguage": "Podcasts",
+    "podcastsLife": "Life stories",
+    "podcastsTech": "Tech",
+    "podcastDescription": "Description:",
+    "podcastVoice": "Voice:",
+    "podcastNeedPodcast": "Save your voice.",
+    "podcastNeedPodcastAction": "Run your own AI podcast!",
 
     "contactTitle": "Send us a message",
     "contactName": "Name",

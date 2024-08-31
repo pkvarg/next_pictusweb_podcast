@@ -37,7 +37,7 @@ const Offer = () => {
                 src='/service-check.webp'
                 alt='service'
               />
-              <h3 className='text-[2rem] mt-[18px]'>{t('offer2')}</h3>
+              <h3 className='text-[2rem] -mt-8 lg:mt-[18px]'>{t('offer2')}</h3>
             </div>
             <div>
               <p className='text-[1.5rem] -mt-8 lg:mt-0'>{t('offer2desc')}</p>
@@ -54,10 +54,13 @@ const Offer = () => {
                 src='/service-check.webp'
                 alt='service'
               />
-              <h3 className='text-[2rem] mt-[18px]'> {t('offer3')}</h3>
+              <h3 className='text-[2rem] -mt-24 lg:mt-[18px]'>
+                {' '}
+                {t('offer3')}
+              </h3>
             </div>
             <div>
-              <p className='text-[1.5rem] -mt-8 lg:mt-0'>{t('offer3desc')}</p>
+              <p className='text-[1.5rem] -mt-12 lg:mt-0'>{t('offer3desc')}</p>
             </div>
             <div className='flex flex-row items-center gap-3'>
               <img
@@ -65,7 +68,7 @@ const Offer = () => {
                 src='/service-check.webp'
                 alt='service'
               />
-              <h3 className='text-[2rem] mt-[18px]'> {t('offer4')}</h3>
+              <h3 className='text-[2rem] -mt-8 lg:mt-[18px]'> {t('offer4')}</h3>
             </div>
             <div>
               <p className='text-[1.5rem] -mt-8 lg:mt-0'>{t('offer4desc')}</p>

@@ -40,7 +40,7 @@ const StyledAudio = () => {
   const [imagePath, setImagePath] = useState<string>('')
   const [aiImage, setAiImage] = useState('')
 
-  const [category, setCategory] = useState<string>('faith')
+  const [category, setCategory] = useState<string>('life')
   const [english, setEnglish] = useState<boolean>(false)
   const [message, setMessage] = useState('')
   const [voiceProvider, setVoiceProvider] = useState('')
@@ -281,9 +281,10 @@ const StyledAudio = () => {
               <option
                 key={category}
                 value={category}
-                className='capitalize w-full px-16 !text-white bg-[#15181c]'
+                className='w-full px-16 !text-white bg-[#15181c]'
               >
-                {category}
+                {category.charAt(0).toUpperCase() +
+                  category.slice(1).toLowerCase()}
               </option>
             ))}
           </select>
@@ -350,11 +351,11 @@ const StyledAudio = () => {
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
-          <option value='faith' className='focus:bg-orange-500'>
-            Faith
+          <option value='life' className='focus:bg-orange-500'>
+            Life
           </option>
           <option value='tech'>Tech</option>
-          <option value='other'>Other</option>
+          <option value='random'>Random</option>
         </select>
 
         <label className='text-white'>

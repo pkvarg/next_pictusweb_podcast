@@ -8,8 +8,8 @@
     "navbarAbout": "O firme",
 
     "heroTitle1": "Weby.",
-    "heroTitle2": "Eshopy. Blogy.",
-    "heroTitle3": "Moderné technológie.",
+    "heroTitle2": "Eshopy. Blogy. Podcasty.",
+    "heroTitle3": "Ai služby.",
 
     "offerTitle": "Potrebujete...",
     "offer1": "Moderný web?",
@@ -52,11 +52,17 @@
     "reviewsMich": "Pokiaľ hľadáte niekoho spoľahlivého a šikovného, Peter je Váš človek. Som veľmi spokojný s jeho prácou a odporúčam spoluprácu s ním.",
     "reviewsSam": "Výborná spolupráca, ľahké pochopenie mojich požiadaviek a pripomienok, flexibilita pri možnostiach, ktoré boli predmetom môjho rozhodnutia.",
 
-    "reviewsDesignationMich": "Real Estate Agent",
-    "reviewsDesignationSam": "Author",
+    "reviewsDesignationMich": "Realitný maklér",
+    "reviewsDesignationSam": "Autor",
 
     "getInTouch": "Potrebujete viac informácií?",
     "getInTouchButton": "Napíšte nám!",
+
+    "podcastsTitle": "Podcasty",
+    "podcastDescription": "Popis:",
+    "podcastVoice": "Hlas:",
+    "podcastNeedPodcast": "Šetrite si svoj hlas.",
+    "podcastNeedPodcastAction": "Rozbehnite svoj vlastný AI podcast!",
 
     "contactTitle": "Napíšte nám správu",
     "contactName": "Meno",
