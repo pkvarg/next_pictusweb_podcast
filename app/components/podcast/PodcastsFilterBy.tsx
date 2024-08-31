@@ -2,6 +2,7 @@
 import React from 'react'
 
 const PodcastsFilterBy = () => {
+  console.log('added clg in pod filter by')
   return (
     <div className='flex flex-row'>
       <p>Filtrovat by</p>
