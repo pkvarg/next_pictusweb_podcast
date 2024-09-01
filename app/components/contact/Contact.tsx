@@ -111,7 +111,7 @@ const Contact = () => {
                       {t('contactName')}
                     </label>
                     <input
-                      className='form-control rounded-xl pl-2'
+                      className='form-control rounded-xl pl-2 text-[#2e2236]'
                       type='text'
                       name='user_name'
                       value={name}
@@ -123,7 +123,7 @@ const Contact = () => {
                       {t('contactEmail')}
                     </label>
                     <input
-                      className='form-control rounded-xl pl-2'
+                      className='form-control rounded-xl pl-2 text-[#2e2236]'
                       type='email'
                       name='user_email'
                       value={email}
@@ -135,7 +135,7 @@ const Contact = () => {
                       {t('contactPhone')}
                     </label>
                     <input
-                      className='form-control rounded-xl pl-2'
+                      className='form-control rounded-xl pl-2 text-[#2e2236]'
                       type='text'
                       name='user_phone'
                       value={phone}
@@ -199,7 +199,7 @@ const Contact = () => {
                   onChange={(e) => setPasswordGroupTwo(e.target.value)}
                 />
                 <button
-                  className='text-[25px] bg-violet mt-10 pt-[5px] rounded-xl border border-white hover:text-[#2e2236] hover:bg-white'
+                  className='text-[25px] bg-violet mt-10 pt-[5px] rounded-xl border border-white hover:bg-green-500'
                   type='submit'
                   value='Send'
                 >
