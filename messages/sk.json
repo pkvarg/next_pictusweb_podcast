@@ -8,8 +8,8 @@
     "navbarAbout": "O firme",
 
     "heroTitle1": "Weby.",
-    "heroTitle2": "Eshopy. Blogy. Podcasty.",
-    "heroTitle3": "Ai služby.",
+    "heroTitle2": "Eshopy. Blogy.",
+    "heroTitle3": "Podcasty. Ai služby.",
 
     "offerTitle": "Potrebujete...",
     "offer1": "Moderný web?",
@@ -88,6 +88,7 @@
     "contactAboutReg3": "Oddiel: Sro Vložka číslo: 57457/N",
     "contactAboutReg4": "Firma nie je platcom DPH.",
 
-    "cookies": "Táto stránka používa len analytické a pre fungovanie webu nevyhnutné cookies. Nepoužívame funkčné ani marketingové cookies."
+    "cookies": "Táto stránka používa len analytické a pre fungovanie webu nevyhnutné cookies. Nepoužívame funkčné ani marketingové cookies.",
+    "cookiesDisagree": "Nesúhlasím"
   }
 }

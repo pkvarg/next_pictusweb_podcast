@@ -7,8 +7,8 @@
     "navbarHome": "Home",
     "navbarAbout": "About",
     "heroTitle1": "Webs.",
-    "heroTitle2": "Eshops. Blogs. Podcasts.",
-    "heroTitle3": "Ai Services.",
+    "heroTitle2": "Eshops. Blogs.",
+    "heroTitle3": "Podcasts. Ai Services.",
 
     "offerTitle": "Do you need...",
     "offer1": "A modern website?",
@@ -78,6 +78,7 @@
     "contactAboutReg3": "Department: Ltd. Insert number: 57457/N",
     "contactAboutReg4": "The company is not a VAT payer.",
 
-    "cookies": "This page only uses analytical cookies that are necessary for the website to function. We do not use functional or marketing cookies."
+    "cookies": "This page only uses analytical cookies that are necessary for the website to function. We do not use functional or marketing cookies.",
+    "cookiesDisagree": "I do not agree"
   }
 }

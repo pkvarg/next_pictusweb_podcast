@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import axios from 'axios'
+import CookieConsent from 'react-cookie-consent'
 
 const Footer = () => {
   const t = useTranslations('Home')
@@ -12,8 +14,65 @@ const Footer = () => {
   const path = usePathname()
   const page = path.slice(4)
 
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+
+  const increaseVisitorsDeclined = async () => {
+    const { data } = await axios.put(
+      `https://api.pictusweb.com/api/visitors/pic/increase`,
+      // `http://localhost:2000/api/visitors/pic/increase`,
+      config
+    )
+    console.log('vstrsDec:', data.visitorsDeclined)
+  }
+
+  const increaseVisitorsAgreed = async () => {
+    const { data } = await axios.put(
+      `https://api.pictusweb.com/api/visitors/pic/agree/increase`,
+      // `http://localhost:2000/api/visitors/pic/agree/increase`,
+      config
+    )
+    console.log('vstrsAgr:', data.visitorsAgreed)
+  }
+
   return (
     <div className='mx-8 mt-16'>
+      <CookieConsent
+        location='bottom'
+        style={{
+          background: '#834daf',
+          color: '#ffffff',
+          fontSize: '19px',
+          textAlign: 'start',
+        }}
+        buttonStyle={{
+          background: '#1d9f2f',
+          color: '#fff',
+          fontSize: '18px',
+          paddingTop: '5px',
+        }}
+        buttonText='OK'
+        expires={365}
+        enableDeclineButton
+        onDecline={() => {
+          increaseVisitorsDeclined()
+        }}
+        declineButtonStyle={{
+          background: 'red',
+          color: '#fff',
+          fontSize: '18px',
+          paddingTop: '5px',
+        }}
+        declineButtonText={t('cookiesDisagree')}
+        onAccept={() => {
+          increaseVisitorsAgreed()
+        }}
+      >
+        {t('cookies')}
+      </CookieConsent>
       <motion.footer
         variants={footerVariants}
         initial='hidden'

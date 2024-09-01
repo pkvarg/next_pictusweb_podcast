@@ -7,6 +7,7 @@ import AudioProvider from '@/app/components/podcast/AudioProvider'
 import { cn } from '@/lib/utils'
 import { Toaster } from '@/components/ui/toaster'
 import PodcastPlayer from '@/app/components/podcast/PodcastPlayer'
+import ScrollToTop from '@/app/components/ScrollToTop'
 
 const inter = Yanone_Kaffeesatz({ subsets: ['latin'] })
 
@@ -60,6 +61,7 @@ export default async function RootLayout({
             {children}
             <Toaster />
             <PodcastPlayer />
+            <ScrollToTop />
           </body>
         </AudioProvider>
       </html>
