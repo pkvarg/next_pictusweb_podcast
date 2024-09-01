@@ -15,12 +15,11 @@ interface PodcastDetailPlayerProps {
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { useAudio } from './AudioProvider'
-
 import LoaderSpinner from '@/app/components/LoaderSpinner'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
+
 
 const PodcastDetailPlayer = ({
   id,

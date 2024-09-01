@@ -7,6 +7,7 @@ import PagesHeader from '@/app/components/PagesHeader'
 import NeedPodcast from '@/app/components/NeedPodcast'
 import Footer from '@/app/components/Footer'
 import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 
 interface Podcast {
   id: string
@@ -24,7 +25,7 @@ interface Podcast {
 
 const SinglePodcast = () => {
   const t = useTranslations('Home')
-  const { podcastId } = useParams()
+  const { podcastId, locale } = useParams()
   const [podcast, setPodcast] = useState<Podcast | null>(null)
 
   const getPodcast = async () => {
@@ -47,7 +48,11 @@ const SinglePodcast = () => {
   return (
     <>
       <PagesHeader />
+
       <section className='flex flex-col mx-4 lg:mx-[10%] py-4 font-light'>
+        <Link href={`/${locale}/podcast`} className='hover:text-[#0388f4]'>
+          {t('podcastsBack')}
+        </Link>
         {podcast && (
           <PodcastDetailPlayer
             id={podcast.id}
