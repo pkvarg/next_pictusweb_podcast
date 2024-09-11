@@ -33,6 +33,7 @@ const StyledAudio = () => {
   // State to hold the preview URL of the selected file
   const [previewUrl, setPreviewUrl] = useState<string>('')
   const [isSubmittingText, setIsSubmittingText] = useState(false)
+  const [isSubmittingImage, setIsSubmittingImage] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [imagePrompt, setImagePrompt] = useState<string>('')
@@ -90,7 +91,7 @@ const StyledAudio = () => {
         title: podcastTitle,
         prompt: imagePrompt,
       }
-      setIsSubmitting(true)
+      setIsSubmittingImage(true)
       const response = await fetch('/api/podcastAiImg', {
         method: 'POST',
         headers: {
@@ -101,7 +102,8 @@ const StyledAudio = () => {
       const result = await response.json()
       console.log('returned', result)
 
-      setIsSubmitting(false)
+      setIsSubmittingImage(false)
+      setIsSubmittingImage(false)
       setImagePath(result.data)
       setPreviewUrl(result.data as string)
     }
@@ -291,7 +293,7 @@ const StyledAudio = () => {
 
           {voiceType && (
             <audio
-              src={`/podcast/voices/${voiceType}.mp3`}
+              src={`/voices/${voiceType}.mp3`}
               autoPlay
               className='hidden'
             />
@@ -471,7 +473,7 @@ const StyledAudio = () => {
               placeholder='Enter promt for AI image creation'
             />
 
-            {isSubmitting ? (
+            {isSubmittingImage ? (
               <Loader size={60} className='animate-spin ml-[45%] mt-4' />
             ) : (
               <button

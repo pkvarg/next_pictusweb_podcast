@@ -20,8 +20,12 @@ export async function createAzureSpeech(
 
   const frontendPath = `/podcast/mp3s/${podcastTitle}_${timestamp}.mp3`
 
+  // const speechFile = path.resolve(
+  //   `./public/podcast/mp3s/${podcastTitle}_${timestamp}.mp3`
+  // )
+
   const speechFile = path.resolve(
-    `./public/podcast/mp3s/${podcastTitle}_${timestamp}.mp3`
+    `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
   )
 
   const voice =

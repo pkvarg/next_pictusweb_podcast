@@ -127,7 +127,7 @@ const PodcastPlayer = () => {
         <div className='flex items-center gap-4 max-md:hidden'>
           <Link href={`/podcast/${audio?.id}`}>
             <Image
-              src={audio?.imagePath! || '/icons/player1.png'}
+              src={audio?.imagePath || '/icons/player1.png'}
               width={64}
               height={64}
               alt='player1'

@@ -5,6 +5,7 @@ import path from 'path'
 import OpenAI from 'openai'
 import { Readable } from 'stream'
 import { getTimeStamp } from '@/lib/timestamp'
+import { uploadFirebase } from '@/app/[locale]/admin/_actions/uploadToFirebase'
 
 const openai = new OpenAI()
 
@@ -55,12 +56,10 @@ export async function POST(req: NextRequest) {
     const timestamp = getTimeStamp()
 
     const filePath = path.resolve(
-      `./public/podcast/images/${title}_${timestamp}.png`
+      `./storage/podcast_images/${title}_${timestamp}.png`
     )
 
-    const frontendPath = `/podcast/images/${title}_${timestamp}.png`
-
-    console.log('frontP', frontendPath)
+    //const frontendPath = `/podcast/images/${title}_${timestamp}.png`
 
     buffer &&
       fs.writeFile(filePath, Buffer.from(buffer), (err) => {
@@ -70,6 +69,10 @@ export async function POST(req: NextRequest) {
           console.log('Image saved successfully to', filePath)
         }
       })
+
+    const contentType = 'image/png'
+
+    const frontendPath = await uploadFirebase(title, buffer, contentType)
 
     return NextResponse.json({ status: 'success', data: frontendPath })
   } catch (e: any) {

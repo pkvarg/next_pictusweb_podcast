@@ -5,6 +5,7 @@ import { promisify } from 'util'
 import { getTimeStamp } from '@/lib/timestamp'
 import { CloudCog } from 'lucide-react'
 import { log } from 'console'
+import { uploadFirebase } from '@/app/[locale]/admin/_actions/uploadToFirebase'
 const pump = promisify(pipeline)
 
 function readableStreamToNodeReadable(
@@ -36,15 +37,26 @@ export async function POST(req: NextRequest) {
     // Type guard to ensure fileEntry is a File
     if (fileEntry && fileEntry instanceof File) {
       const timestamp = getTimeStamp()
-      const filePath = `./public/podcast/images/${timestamp}_${fileEntry.name}`
+      const filePath = `./storage/podcast_images/${timestamp}_${fileEntry.name}`
       const nodeReadableStream = readableStreamToNodeReadable(
         fileEntry.stream()
       )
 
       // eslint-disable-next-line
-      await pump(nodeReadableStream, fs.createWriteStream(filePath))
+      const buffer = await pump(
+        nodeReadableStream,
+        fs.createWriteStream(filePath)
+      )
 
-      const frontendPath = `/podcast/images/${timestamp}_${fileEntry.name}`
+      // const frontendPath = `/podcast/images/${timestamp}_${fileEntry.name}`
+
+      const contentType = 'image/png'
+
+      const frontendPath = await uploadFirebase(
+        fileEntry.name,
+        fileEntry,
+        contentType
+      )
 
       return NextResponse.json({ status: 'success', data: frontendPath })
     } else {

@@ -3,6 +3,7 @@ import { getTimeStamp } from '@/lib/timestamp'
 import OpenAI from 'openai'
 import fs from 'fs'
 import path from 'path'
+import { uploadFirebase } from './uploadToFirebase'
 
 const openai = new OpenAI()
 
@@ -20,15 +21,24 @@ export async function createOpenAiSpeech(
 
     const timestamp = getTimeStamp()
 
-    const frontendPath = `/podcast/mp3s/${podcastTitle}_${timestamp}.mp3`
+    // **** change paths!!!!
 
     const speechFile = path.resolve(
-      `./public/podcast/mp3s/${podcastTitle}_${timestamp}.mp3`
+      `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
     )
 
+    console.log('speechfileX', speechFile)
+
     const buffer = Buffer.from(await mp3.arrayBuffer())
+
+    // *** implement upload to Firebase external function to be used for all providers
     await fs.promises.writeFile(speechFile, buffer)
-    return { frontendPath }
+
+    const contentType = 'audio/mpeg'
+
+    const frontendPath = await uploadFirebase(podcastTitle, buffer, contentType)
+
+    return { frontendPath } // Return the Firebase URL
   } catch (error) {
     console.log(error)
   }
