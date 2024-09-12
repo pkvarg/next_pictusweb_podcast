@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         fs.createWriteStream(filePath)
       )
 
-      // const frontendPath = `/podcast/images/${timestamp}_${fileEntry.name}`
+      // nmn const frontendPath = `/podcast/images/${timestamp}_${fileEntry.name}`
 
       const contentType = 'image/png'
 
