@@ -4,6 +4,7 @@ import PodcastImage from '@/app/components/podcast/GoToSinglePodcast'
 import db from '@/db/db'
 import React from 'react'
 import { getLocale } from 'next-intl/server'
+import NeedPodcast from '@/app/components/NeedPodcast'
 
 const Podcast = async () => {
   const locale = await getLocale()
@@ -54,6 +55,7 @@ const Podcast = async () => {
             </div>
           ))}
         </div>
+        <NeedPodcast></NeedPodcast>
         <div className='w-full'>
           <Footer />
         </div>

@@ -105,11 +105,8 @@ export async function createElevenlabsSpeech(
   }
 
   const voiceId = getVoiceId(voiceType)
-  // Choose voice ID based on voiceType
-  //const voiceId = voiceType === 'andrej' ? Andrej : voiceType === 'karol' ? Karol : Jessica
-  const model = 'eleven_multilingual_v2'
 
-  console.log('voice', voiceType, 'voiceId', voiceId)
+  const model = 'eleven_multilingual_v2'
 
   try {
     // Convert text to speech using ElevenLabs API

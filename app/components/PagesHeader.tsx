@@ -31,7 +31,7 @@ const PagesHeader = () => {
                 {navbar ? (
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
-                    className='w-10 h-10'
+                    className='w-7 h-7'
                     viewBox='0 0 20 20'
                     fill='currentColor'
                   >
@@ -44,7 +44,7 @@ const PagesHeader = () => {
                 ) : (
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
-                    className='w-10 h-10'
+                    className='w-7 h-7'
                     fill='none'
                     viewBox='0 0 24 24'
                     stroke='currentColor'

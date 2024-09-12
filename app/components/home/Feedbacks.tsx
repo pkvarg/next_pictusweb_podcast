@@ -34,7 +34,7 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
     className='p-6 rounded-3xl xs:w-[320px] lg:mt-0 lg:mb-0 w-full bg-gray-800'
   >
     <div className='mt-1'>
-      <p className='text-white tracking-wider text-[22.5px]'>"{testimonial}"</p>
+      <p className='text-white tracking-wider text-[20px]'>"{testimonial}"</p>
 
       <div className='mt-7 flex flex-row justify-end mr-[5%] items-center gap-8 text-[#93A7B7]'>
         <p className='font-medium text-[18px]'>
