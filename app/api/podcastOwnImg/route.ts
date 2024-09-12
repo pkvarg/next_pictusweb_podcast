@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     // Type guard to ensure fileEntry is a File
     if (fileEntry && fileEntry instanceof File) {
       const timestamp = getTimeStamp()
-      const filePath = `./storage/podcast_images/${timestamp}_${fileEntry.name}`
+      const filePath = `./storage/podcast_images/${fileEntry.name}`
       const nodeReadableStream = readableStreamToNodeReadable(
         fileEntry.stream()
       )

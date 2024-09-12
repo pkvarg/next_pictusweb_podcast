@@ -27,8 +27,6 @@ export async function createOpenAiSpeech(
       `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
     )
 
-    console.log('speechfileX', speechFile)
-
     const buffer = Buffer.from(await mp3.arrayBuffer())
 
     // *** implement upload to Firebase external function to be used for all providers

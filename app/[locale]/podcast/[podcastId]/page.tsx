@@ -43,7 +43,7 @@ const SinglePodcast = () => {
 
   useEffect(() => {
     getPodcast()
-  }, [])
+  }, [getPodcast])
 
   return (
     <>
