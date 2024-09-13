@@ -6,7 +6,6 @@ const AdminAIBalance = () => {
   const startDate = '2024-01-01'
   const endDate = '2024-12-31'
 
-  console.log('keya', apiKey)
   useEffect(() => {
     const getMyAIBalance = async () => {
       try {
@@ -18,7 +17,6 @@ const AdminAIBalance = () => {
             },
           }
         )
-        console.log('res', res)
       } catch (error) {
         console.log('errorai', error)
       }

@@ -1,6 +1,6 @@
 'use client'
 import { useParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { getSinglePodcast } from '../../admin/_actions/podcastActions'
 import PodcastDetailPlayer from '@/app/components/podcast/PodcastDetailPlayer'
 import PagesHeader from '@/app/components/PagesHeader'
@@ -28,7 +28,7 @@ const SinglePodcast = () => {
   const { podcastId, locale } = useParams()
   const [podcast, setPodcast] = useState<Podcast | null>(null)
 
-  const getPodcast = async () => {
+  const getPodcast = useCallback(async () => {
     if (podcastId) {
       const singlePodcast = await getSinglePodcast(podcastId.toString())
 
@@ -39,7 +39,7 @@ const SinglePodcast = () => {
         } as Podcast)
       }
     }
-  }
+  }, [podcastId]) // memoize based on podcastId
 
   useEffect(() => {
     getPodcast()

@@ -31,8 +31,6 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
     const fileEntry = formData.getAll('files')[0]
-    console.log('own file', fileEntry)
-    //process.exit
 
     // Type guard to ensure fileEntry is a File
     if (fileEntry && fileEntry instanceof File) {

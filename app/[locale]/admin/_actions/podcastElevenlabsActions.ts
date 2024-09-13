@@ -207,8 +207,6 @@ export async function voices() {
       id: voice.voice_id,
     }))
 
-    console.log('voiceIds', voiceIds)
-
     return voiceIds
   } catch (error) {
     console.error('Error fetching voices:', error)

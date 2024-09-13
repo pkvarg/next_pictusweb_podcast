@@ -79,6 +79,8 @@
     "contactAboutReg4": "The company is not a VAT payer.",
 
     "cookies": "This page only uses analytical cookies that are necessary for the website to function. We do not use functional or marketing cookies.",
-    "cookiesDisagree": "I do not agree"
+    "cookiesDisagree": "I do not agree",
+
+    "counterVisitors": "Visitors count"
   }
 }

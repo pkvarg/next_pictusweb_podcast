@@ -66,4 +66,10 @@ model UsedPodcasts {
   reallyUsed Boolean?
 }
 
+  model VisitorsCounter {
+  id String   @id @default(uuid())
+  count Int @default(0)
+  updatedAt DateTime @updatedAt
+  }
+
 

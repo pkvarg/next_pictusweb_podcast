@@ -217,8 +217,6 @@ export async function changePodcastPublishStatus(
       published: !published,
     }
 
-    console.log('try data', data)
-
     await db.podcast.update({
       where: {
         id: data.id,

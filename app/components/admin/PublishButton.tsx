@@ -14,7 +14,7 @@ const PublishButton: React.FC<Publish> = ({ published, podcastId }) => {
   const changePublishStatus = async (e: any) => {
     e.preventDefault()
     setNewPublishStatus(!published)
-    console.log('new', newPublishStatus)
+
     try {
       const formData = new FormData()
       formData.append('id', podcastId)

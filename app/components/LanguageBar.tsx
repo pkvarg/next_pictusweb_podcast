@@ -11,8 +11,6 @@ const LanguageBar = () => {
 
   const path = pathname.slice(4)
 
-  //console.log('pp', extractedPath)
-
   const handleLanguage = (lang: string) => {
     router.replace(`/${lang}/${path}`)
   }

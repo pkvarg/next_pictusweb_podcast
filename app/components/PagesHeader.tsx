@@ -13,8 +13,6 @@ const PagesHeader = () => {
   const path = usePathname()
   const page = path.slice(4)
 
-  console.log('pg Header', path, page)
-
   return (
     <nav id='navbar' className='w-full text-white bg-transparent'>
       <div className='justify-between px-4 mx-auto md:items-center md:flex md:px-8'>

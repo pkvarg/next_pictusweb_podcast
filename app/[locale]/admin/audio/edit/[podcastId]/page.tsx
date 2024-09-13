@@ -4,7 +4,6 @@ import { useParams } from 'next/navigation'
 import {
   getSinglePodcast,
   editSinglePodcast,
-  createSpeech,
 } from '../../../_actions/podcastActions'
 import DeletePodcastButton from './../../../../../components/admin/DeletePodcastButton'
 
@@ -14,6 +13,9 @@ import Image from 'next/image'
 import { Loader } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import PreviewAudio from '@/lib/PreviewAudio'
+import { createAzureSpeech } from '../../../_actions/podcastAzureActions'
+import { createElevenlabsSpeech } from '../../../_actions/podcastElevenlabsActions'
+import { createOpenAiSpeech } from '../../../_actions/podcastOpenAiActions'
 
 interface Podcast {
   id: string
@@ -26,6 +28,7 @@ interface Podcast {
   category: string
   english: boolean
   published: boolean
+  voiceType: string
 }
 
 const EditPodcast = () => {
@@ -45,9 +48,25 @@ const EditPodcast = () => {
   const [openAiImg, setOpenAiImage] = useState<boolean>(false)
   const [imagePrompt, setImagePrompt] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmittingText, setIsSubmittingText] = useState(false)
   const [isSubmittingImage, setIsSubmittingImage] = useState(false)
-  const voiceCategories = ['alloy', 'shimmer', 'nova', 'echo', 'fable', 'onyx']
-  const [voiceType, setVoiceType] = useState<string | null>(null)
+  const [voiceProvider, setVoiceProvider] = useState('')
+
+  const openaiVoices = ['alloy', 'shimmer', 'nova', 'echo', 'fable', 'onyx']
+  const azureVoices = ['Lukas', 'Viktoria']
+  const elevenlabsVoices = [
+    'Andrej',
+    'Karol',
+    'Leo',
+    'Juraj',
+    'Peter',
+    'Liam',
+    'Erik',
+  ]
+
+  const [voiceType, setVoiceType] = useState<string>('')
+
+  const [voiceCategs, setVoiceCategs] = useState<string[]>(openaiVoices)
   const [textPrompt, setTextPrompt] = useState<string>('')
 
   // State to hold the preview URL of the selected file
@@ -83,6 +102,7 @@ const EditPodcast = () => {
       setPreviewUrl(podcast.imagePath)
       setDescription(podcast.description || '')
       setEnglish(podcast.english)
+      setVoiceType(podcast.voiceType)
     }
   }, [podcast, podcastId])
 
@@ -96,6 +116,16 @@ const EditPodcast = () => {
       }
     }, 100)
   }
+
+  useEffect(() => {
+    if (voiceProvider === 'openai') {
+      setVoiceCategs(openaiVoices)
+    } else if (voiceProvider === 'azure') {
+      setVoiceCategs(azureVoices)
+    } else if (voiceProvider === 'elevenlabs') {
+      setVoiceCategs(elevenlabsVoices)
+    }
+  }, [voiceProvider])
 
   const handleGetAiImage = async (e: any) => {
     e.preventDefault()
@@ -116,7 +146,6 @@ const EditPodcast = () => {
         body: JSON.stringify(data), // Convert the data object to a JSON string
       })
       const result = await response.json()
-      console.log('returned', result)
 
       setIsSubmittingImage(false)
       setImagePath(result.data)
@@ -134,8 +163,6 @@ const EditPodcast = () => {
         setPreviewUrl(reader.result as string)
       }
 
-      //setFile(selectedFile)
-      console.log('media4', e.target.files[0])
       try {
         const formdata = new FormData()
         formdata.append('files', e.target.files[0])
@@ -144,9 +171,8 @@ const EditPodcast = () => {
 
         const response = await fetch('/api/podcastOwnImg', requestOptions)
         const result = await response.json()
-        console.log('returned', result)
+
         setImagePath(result.data)
-        console.log('imagePath', imagePath)
       } catch (error) {
         console.log('hs', error)
       }
@@ -164,26 +190,67 @@ const EditPodcast = () => {
 
   const generateAudio = async (e: any) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    const audio = await createSpeech(podcastTitle, voiceType, textPrompt)
-    console.log('aud', audio)
-    if (audio && audio.frontendPath) {
-      setAudioPath(audio.frontendPath)
+    setIsSubmittingText(true)
+    try {
+      if (voiceProvider === 'openai') {
+        const audio = await createOpenAiSpeech(
+          podcastTitle,
+          voiceType,
+          textPrompt
+        )
+
+        if (audio && audio.frontendPath) {
+          setAudioPath(audio.frontendPath)
+        }
+        setIsSubmittingText(false)
+      } else if (voiceProvider === 'azure') {
+        const audio = await createAzureSpeech(
+          podcastTitle,
+          voiceType,
+          textPrompt
+        )
+
+        if (audio && audio.frontendPath) {
+          setAudioPath(audio.frontendPath)
+        }
+        setIsSubmittingText(false)
+      } else if (voiceProvider === 'elevenlabs') {
+        const audio = await createElevenlabsSpeech(
+          podcastTitle,
+          voiceType,
+          textPrompt
+        )
+
+        if (audio && audio.frontendPath) {
+          setAudioPath(audio.frontendPath)
+        }
+        setIsSubmittingText(false)
+      }
+    } catch (error) {
+      setIsSubmittingText(false)
+      console.log('error', error)
+      setMessage('error')
     }
-    setIsSubmitting(false)
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!podcastTitle || !textPrompt) {
+      toast({
+        title: 'Title and Input Text must not be empty.',
+        variant: 'destructive',
+      })
+      return
+    }
+    setIsSubmitting(true)
 
     try {
-      // const mediaUrl = await handleFileUpload()
-
       const formData = new FormData()
       formData.append('id', id)
       formData.append('title', podcastTitle)
       formData.append('description', description)
       formData.append('textPrompt', textPrompt)
+      formData.append('voiceType', voiceType)
       formData.append('imagePrompt', imagePrompt)
       formData.append('audioPath', audioPath)
       formData.append('imagePath', imagePath)
@@ -192,6 +259,7 @@ const EditPodcast = () => {
 
       startTransition(async () => {
         const result = await editSinglePodcast(formData)
+        setIsSubmitting(false)
         setMessage(result.message)
       })
     } catch (error) {
@@ -232,6 +300,8 @@ const EditPodcast = () => {
               placeholder='Description...'
             />
 
+            <p className='mt-8'>VoiceType: {voiceType}</p>
+
             <label htmlFor='aitexttospeech' className='text-[25px] mt-4'>
               AI Prompt to convert to speech
             </label>
@@ -241,6 +311,37 @@ const EditPodcast = () => {
               onChange={(e) => setTextPrompt(e.target.value)}
               placeholder='Enter text to convert to speech'
             />
+
+            <label className='text-16 font-bold text-white mt-8'>
+              Select AI Voice Provider
+            </label>
+
+            <div className='flex flex-row gap-4 justify-start items-center my-4'>
+              <Image
+                src={'/tech/openai-logo.webp'}
+                width={250}
+                height={250}
+                alt='openai'
+                onClick={() => setVoiceProvider('openai')}
+                className='w-[50px] cursor-pointer'
+              />
+              <Image
+                src={'/tech/azure-logo.webp'}
+                width={250}
+                height={250}
+                alt='azureai'
+                onClick={() => setVoiceProvider('azure')}
+                className='w-[50px] cursor-pointer'
+              />
+              <Image
+                src={'/tech/eleven-labs-logo.webp'}
+                width={250}
+                height={250}
+                alt='elevenlabsai'
+                onClick={() => setVoiceProvider('elevenlabs')}
+                className='w-[50px] cursor-pointer rounded-full'
+              />
+            </div>
 
             <label className='text-16 font-bold text-white'>
               Select AI Voice
@@ -253,32 +354,44 @@ const EditPodcast = () => {
               value={voiceType || 'choose voice'}
               onChange={(e) => handleVoiceType(e.target.value)}
             >
-              {voiceCategories.map((category) => (
+              {voiceCategs?.map((category: string) => (
                 <option
                   key={category}
                   value={category}
-                  className='capitalize w-full px-16 !text-white bg-[#15181c]'
+                  className='w-full px-16 !text-white bg-[#15181c]'
                 >
-                  {category}
+                  {category.charAt(0).toUpperCase() +
+                    category.slice(1).toLowerCase()}
                 </option>
               ))}
             </select>
 
             {voiceType && (
-              <audio src={`/${voiceType}.mp3`} autoPlay className='hidden' />
+              <audio
+                src={`/voices/${voiceType}.mp3`}
+                autoPlay
+                className='hidden'
+              />
             )}
           </div>
+
           <div className='flex flex-row gap-4 justify-start items-center'>
-            <button
-              onClick={generateAudio}
-              className='bg-orange-500 px-4 py-2 rounded-xl cursor-pointer'
-            >
-              Generate
-            </button>
-            {isSubmitting && (
-              <Loader size={60} className='animate-spin ml-[45%] mt-4' />
+            {isSubmittingText ? (
+              <Loader size={60} className='animate-spin ' />
+            ) : (
+              <button
+                onClick={generateAudio}
+                className='bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer'
+              >
+                Generate
+              </button>
             )}
-            {audioPath && <PreviewAudio audioPath={audioPath as string} />}
+
+            {audioPath && (
+              <div className='mt-[15px]'>
+                <PreviewAudio audioPath={audioPath as string} />
+              </div>
+            )}
           </div>
           <label htmlFor='category' className='text-[25px] py-4'>
             Category
@@ -309,58 +422,57 @@ const EditPodcast = () => {
             </span>
           </label>
 
-          <div className='flex flex-col gap-2 my-4'>
+          <div className='flex flex-col lg:flex-row gap-4 my-4 text-orange-500'>
             <p
               onClick={() => setOpenOwnImage((prev) => !prev)}
-              className='cursor-pointer hover:text-blue-500'
+              className='cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4'
             >
               Upload your own Image
             </p>
-
-            {openOwnImg && (
-              <div className='flex flex-col relative my-8'>
-                <input
-                  type='file'
-                  id='image'
-                  onChange={handleFileChange}
-                  style={{ display: 'none' }}
-                />
-                <div className='flex flex-row'>
-                  <button
-                    type='button'
-                    className='border border-white w-[36px] h-[36px] 100 flex items-center justify-center cursor-pointer'
-                  >
-                    <label htmlFor='image'>
-                      <Image src='/plus.png' alt='' width={16} height={16} />
-                    </label>
-                  </button>
-                  <button
-                    type='button'
-                    className='ml-16 border border-white w-[36px] h-[36px] 100 flex items-center justify-center cursor-pointer'
-                  >
-                    <label htmlFor='image'>
-                      <AiOutlineDelete
-                        className='text-red-700'
-                        onClick={removeFile}
-                      />
-                    </label>
-                  </button>
-                </div>
-
-                {/* <p className='mt-8'>{imagePath}</p> */}
-              </div>
-            )}
-
             <p
               onClick={() => setOpenAiImage((prev) => !prev)}
-              className='cursor-pointer hover:text-blue-500'
+              className='cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4'
             >
               Use AI to create an Image
             </p>
           </div>
 
+          {openOwnImg && (
+            <div className='flex flex-col relative my-8'>
+              <input
+                type='file'
+                id='image'
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              <div className='flex flex-row ml-4'>
+                <button
+                  type='button'
+                  className='border border-white w-[36px] h-[36px] 100 flex items-center justify-center cursor-pointer'
+                >
+                  <label htmlFor='image'>
+                    <Image src='/plus.png' alt='' width={16} height={16} />
+                  </label>
+                </button>
+                <button
+                  type='button'
+                  className='ml-16 border border-white w-[36px] h-[36px] 100 flex items-center justify-center cursor-pointer'
+                >
+                  <label htmlFor='image'>
+                    <AiOutlineDelete
+                      className='text-red-700'
+                      onClick={removeFile}
+                    />
+                  </label>
+                </button>
+              </div>
+
+              {/* <p className='mt-8'>{imagePath}</p> */}
+            </div>
+          )}
+
           {openAiImg && (
-            <div className='flex flex-col relative bg-[#2e2236] mt-8'>
+            <div className='flex flex-col relative  mt-8'>
               <textarea
                 className='bg-[#15181c] text-[25px] pl-2 w-[100%] h-[300px]'
                 value={imagePrompt}
@@ -373,7 +485,7 @@ const EditPodcast = () => {
               ) : (
                 <button
                   onClick={handleGetAiImage}
-                  className='bg-orange-500 px-4 py-1 rounded-xl mt-4 cursor-pointer w-max'
+                  className='bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer w-max'
                 >
                   Get AI Image from Prompt
                 </button>
@@ -383,11 +495,12 @@ const EditPodcast = () => {
 
           {previewUrl && (
             <Image
-              className='w-[250px] my-8'
+              // className='my-4 w-[150px] h-auto'
+              className='my-4 w-[250px] h-auto'
               src={previewUrl}
               alt={podcastTitle}
-              width={250}
-              height={250}
+              width={50}
+              height={50}
             />
           )}
 

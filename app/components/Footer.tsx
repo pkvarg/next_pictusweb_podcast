@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import axios from 'axios'
+import { updateVisitors } from '@/lib/visitorsCounter'
 import CookieConsent from 'react-cookie-consent'
 
 const Footer = () => {
@@ -14,28 +14,8 @@ const Footer = () => {
   const path = usePathname()
   const page = path.slice(4)
 
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }
-
-  const increaseVisitorsDeclined = async () => {
-    const { data } = await axios.put(
-      `https://api.pictusweb.com/api/visitors/pic/increase`,
-      // `http://localhost:2000/api/visitors/pic/increase`,
-      config
-    )
-    console.log('vstrsDec:', data.visitorsDeclined)
-  }
-
-  const increaseVisitorsAgreed = async () => {
-    const { data } = await axios.put(
-      `https://api.pictusweb.com/api/visitors/pic/agree/increase`,
-      // `http://localhost:2000/api/visitors/pic/agree/increase`,
-      config
-    )
-    console.log('vstrsAgr:', data.visitorsAgreed)
+  const increaseVisitors = async () => {
+    await updateVisitors()
   }
 
   return (
@@ -52,23 +32,27 @@ const Footer = () => {
           background: '#1d9f2f',
           color: '#fff',
           fontSize: '18px',
-          paddingTop: '5px',
+          paddingTop: '9px',
+          paddingLeft: '40px',
+          paddingRight: '40px',
+          borderRadius: '20px',
         }}
         buttonText='OK'
         expires={365}
         enableDeclineButton
         onDecline={() => {
-          increaseVisitorsDeclined()
+          increaseVisitors()
         }}
         declineButtonStyle={{
           background: 'red',
           color: '#fff',
           fontSize: '18px',
-          paddingTop: '5px',
+          paddingTop: '7.5px',
+          borderRadius: '20px',
         }}
         declineButtonText={t('cookiesDisagree')}
         onAccept={() => {
-          increaseVisitorsAgreed()
+          increaseVisitors()
         }}
       >
         {t('cookies')}

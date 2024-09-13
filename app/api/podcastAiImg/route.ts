@@ -31,8 +31,6 @@ function readableStreamToNodeReadable(
 export async function POST(req: NextRequest) {
   const { title, prompt } = await req.json()
 
-  console.log('fff', title, prompt)
-
   try {
     const resAi = await openai.images.generate({
       model: 'dall-e-3',
