@@ -50,7 +50,10 @@ const SinglePodcast = () => {
       <PagesHeader />
 
       <section className='flex flex-col mx-4 lg:mx-[10%] py-4 font-light'>
-        <Link href={`/${locale}/podcast`} className='hover:text-[#0388f4]'>
+        <Link
+          href={`/${locale}/podcast`}
+          className='hover:text-[#0388f4] py-2 w-auto'
+        >
           {t('podcastsBack')}
         </Link>
         {podcast && (

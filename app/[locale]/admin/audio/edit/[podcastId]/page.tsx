@@ -120,10 +120,13 @@ const EditPodcast = () => {
   useEffect(() => {
     if (voiceProvider === 'openai') {
       setVoiceCategs(openaiVoices)
+      handleVoiceType('alloy')
     } else if (voiceProvider === 'azure') {
       setVoiceCategs(azureVoices)
+      handleVoiceType('Lukas')
     } else if (voiceProvider === 'elevenlabs') {
       setVoiceCategs(elevenlabsVoices)
+      handleVoiceType('Karol')
     }
   }, [voiceProvider])
 
@@ -275,7 +278,7 @@ const EditPodcast = () => {
         <form
           onSubmit={handleSubmit}
           method='post'
-          className='relative flex flex-col mx-2 lg:mx-[35%] mt-16'
+          className='relative flex flex-col mx-2 lg:mx-[25%] mt-16'
         >
           <input type='hidden' name='id' value={podcast.id} />
 
@@ -300,8 +303,6 @@ const EditPodcast = () => {
               placeholder='Description...'
             />
 
-            <p className='mt-8'>VoiceType: {voiceType}</p>
-
             <label htmlFor='aitexttospeech' className='text-[25px] mt-4'>
               AI Prompt to convert to speech
             </label>
@@ -311,6 +312,8 @@ const EditPodcast = () => {
               onChange={(e) => setTextPrompt(e.target.value)}
               placeholder='Enter text to convert to speech'
             />
+
+            <p className='mt-8'>VoiceType: {voiceType}</p>
 
             <label className='text-16 font-bold text-white mt-8'>
               Select AI Voice Provider
@@ -343,28 +346,32 @@ const EditPodcast = () => {
               />
             </div>
 
-            <label className='text-16 font-bold text-white'>
-              Select AI Voice
-            </label>
+            {voiceProvider !== '' && (
+              <div className='flex flex-col'>
+                <label className='text-16 font-bold text-white'>
+                  Select AI Voice
+                </label>
 
-            <select
-              id='category'
-              name='category'
-              className='mt-2 bg-[#15181c]'
-              value={voiceType || 'choose voice'}
-              onChange={(e) => handleVoiceType(e.target.value)}
-            >
-              {voiceCategs?.map((category: string) => (
-                <option
-                  key={category}
-                  value={category}
-                  className='w-full px-16 !text-white bg-[#15181c]'
+                <select
+                  id='category'
+                  name='category'
+                  className='mt-2 bg-[#15181c]'
+                  value={voiceType || 'choose voice'}
+                  onChange={(e) => handleVoiceType(e.target.value)}
                 >
-                  {category.charAt(0).toUpperCase() +
-                    category.slice(1).toLowerCase()}
-                </option>
-              ))}
-            </select>
+                  {voiceCategs?.map((category: string) => (
+                    <option
+                      key={category}
+                      value={category}
+                      className='w-full px-16 !text-white bg-[#15181c]'
+                    >
+                      {category.charAt(0).toUpperCase() +
+                        category.slice(1).toLowerCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {voiceType && (
               <audio

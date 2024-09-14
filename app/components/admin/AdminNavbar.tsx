@@ -70,9 +70,9 @@ const AdminNavbar = () => {
                   <Link href={`/${locale}/admin/audio`}>Create Podcast</Link>
                 </li>
 
-                <li>
+                {/* <li>
                   <Link href={`/${locale}/admin/video`}>Video</Link>
-                </li>
+                </li> */}
 
                 {/* <li>
                   <Link href={`/${locale}/admin/blogs`}>Blogs</Link>

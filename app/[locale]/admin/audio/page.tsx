@@ -70,10 +70,13 @@ const Audio = () => {
   useEffect(() => {
     if (voiceProvider === 'openai') {
       setVoiceCategs(openaiVoices)
+      handleVoiceType('alloy')
     } else if (voiceProvider === 'azure') {
       setVoiceCategs(azureVoices)
+      handleVoiceType('Lukas')
     } else if (voiceProvider === 'elevenlabs') {
       setVoiceCategs(elevenlabsVoices)
+      handleVoiceType('Karol')
     }
   }, [voiceProvider])
 
@@ -111,6 +114,7 @@ const Audio = () => {
         title: 'Title and Input Text must not be empty.',
         variant: 'destructive',
       })
+      alert('Title and Input Text must not be empty.')
       return
     }
     setIsSubmitting(true)
@@ -179,6 +183,14 @@ const Audio = () => {
 
   const generateAudio = async (e: any) => {
     e.preventDefault()
+    if (!podcastTitle || !textPrompt) {
+      toast({
+        title: 'Title and Input Text must not be empty.',
+        variant: 'destructive',
+      })
+
+      return
+    }
     setIsSubmittingText(true)
     if (voiceProvider === 'openai') {
       const audio = await createOpenAiSpeech(
