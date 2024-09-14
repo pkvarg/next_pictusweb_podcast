@@ -1,8 +1,5 @@
 import React from 'react'
 import db from '@/db/db'
-import EditBlogButton from './EditBlogButton'
-import DeleteBlogButton from './DeleteBlogButton'
-import RefreshButton from './RefreshButton'
 import EditPodcastButton from './EditPodcastButton'
 import DeletePodcastButton from './DeletePodcastButton'
 import Image from 'next/image'
@@ -32,7 +29,6 @@ export default async function AllPodcasts() {
 
   return (
     <div className='mt-8'>
-      <RefreshButton />
       <h1 className='text-[30px] text-center text-white'>
         All Podcasts ({podcasts.length})
       </h1>
@@ -87,6 +83,7 @@ export default async function AllPodcasts() {
               </div>
               <div className='flex flex-row gap-8 mt-4 py-2'>
                 <PublishButton
+                  key={podcast.published.toString()} // This ensures that PublishButton re-renders when `published` changes
                   published={podcast.published}
                   podcastId={podcast.id}
                 />

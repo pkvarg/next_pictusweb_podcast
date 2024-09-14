@@ -208,7 +208,6 @@ export async function changePodcastPublishStatus(
   'use server'
 
   try {
-    // Retrieve the current values from formData
     const id = formData.get('id')?.toString() || ''
     const published = formData.get('published') === 'true'
 

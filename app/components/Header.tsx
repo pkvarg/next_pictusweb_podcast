@@ -23,9 +23,12 @@ const Header = () => {
       <div className='justify-between px-4 mx-auto md:items-center md:flex md:px-8'>
         <div className='mb-0 lg:mb-2'>
           <div className='flex items-center justify-between py-3 md:py-5 md:block'>
-            <a className='text-[22.5px] lg:text-[22.5px] font-light' href='/'>
+            <Link
+              className='text-[22.5px] lg:text-[22.5px] font-light'
+              href='/'
+            >
               &#60;&#47;&#62; PICTUSWEB development
-            </a>
+            </Link>
             <div className='md:hidden'>
               <button
                 className='p-2 text-white rounded-md outline-none focus:border-gray-400 focus:border'

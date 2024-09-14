@@ -9,16 +9,14 @@ interface Publish {
 
 const PublishButton: React.FC<Publish> = ({ published, podcastId }) => {
   const [message, setMessage] = useState('')
-  const [newPublishStatus, setNewPublishStatus] = useState<boolean>(false)
 
   const changePublishStatus = async (e: any) => {
     e.preventDefault()
-    setNewPublishStatus(!published)
 
     try {
       const formData = new FormData()
       formData.append('id', podcastId)
-      formData.append('publish', newPublishStatus.toString())
+      formData.append('published', published.toString())
 
       startTransition(async () => {
         const result = await changePodcastPublishStatus(formData)

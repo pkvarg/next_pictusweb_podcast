@@ -58,15 +58,11 @@ export async function createElevenlabsSpeech(
       },
     })
 
-    console.log('11111', mp3Stream)
-
     const timestamp = getTimeStamp()
 
     const speechFile = path.resolve(
       `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
     )
-
-    const frontendPath = ''
 
     // Write the stream data to a file
     const writeStream = fs.createWriteStream(speechFile)
@@ -77,6 +73,15 @@ export async function createElevenlabsSpeech(
       writeStream.on('finish', resolve)
       writeStream.on('error', reject)
     })
+
+    // Read the MP3 file into a buffer so it can be uploaded to Firebase
+    const buffer = fs.readFileSync(speechFile)
+
+    // Define content type for Firebase (MP3 file)
+    const contentType = 'audio/mpeg'
+
+    // Upload the MP3 file to Firebase and get the URL
+    const frontendPath = await uploadFirebase(podcastTitle, buffer, contentType)
 
     // Return the path to the frontend
     return { frontendPath }
