@@ -62,6 +62,8 @@ const EditPodcast = () => {
     'Peter',
     'Liam',
     'Erik',
+    'Jessica',
+    'Lily',
   ]
 
   const [voiceType, setVoiceType] = useState<string>('')
@@ -506,8 +508,8 @@ const EditPodcast = () => {
               className='my-4 w-[250px] h-auto'
               src={previewUrl}
               alt={podcastTitle}
-              width={50}
-              height={50}
+              width={250}
+              height={250}
             />
           )}
 

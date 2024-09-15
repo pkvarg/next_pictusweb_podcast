@@ -30,32 +30,32 @@ export default async function RootLayout({
   return (
     <NextIntlClientProvider messages={messages}>
       <html lang={params.locale} className='!scroll-smooth'>
-        {/* <head>
-          <meta property='title' content='Cirkev v Bratislave' />
+        <head>
+          <meta property='title' content='Pictusweb development' />
           <meta
             property='description'
-            content='miestna cirkev, cirkev v Bratislave'
+            content='Tvorba webstránok, blogy, podcasty, eshopy, Ai služby'
           />
 
-          <meta property='og:title' content='Cirkev v Bratislave' />
+          <meta property='og:title' content='Pictusweb development' />
           <meta
             property='og:description'
-            content='miestna cirkev, cirkev v Bratislave'
+            content='Tvorba webstránok, blogy, podcasty, eshopy, Ai služby'
           />
           <meta property='og:type' content='website' />
-          <meta property='og:site_name' content='miestnacirkev.sk' />
-          <meta property='og:url' content='https://www.miestnacirkev' />
+          <meta property='og:site_name' content='pictusweb.sk' />
+          <meta property='og:url' content='https://www.pictusweb.sk' />
 
           <meta
             property='og:image'
-            content='https://www.miestnacirkev.sk/vineyardmeta.webp'
+            content='https://www.pictusweb.sk/pictusweb.webp'
           />
           <meta property='og:image:type' content='png' />
           <meta property='og:image:width' content='400' />
           <meta property='og:image:height' content='400' />
-          <meta property='og:image:alt' content='miestnacirkev.sk' />
+          <meta property='og:image:alt' content='pictusweb.sk' />
           <meta property='fb:app_id' content='627076731624225' />
-        </head> */}
+        </head>
         <AudioProvider>
           <body className={cn(inter.className)}>
             {children}

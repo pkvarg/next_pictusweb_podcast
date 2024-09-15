@@ -16,19 +16,20 @@ const Leo = 'FGY2WhTYpPnrIDTdsKH5'
 const Juraj = 'JBFqnCBsd6RMkjVDRZzb'
 const Peter = 'N2lVS1w4EtoT3dr4eOWO'
 const Liam = 'TX3LPaxmHKxFdv7VOQHJ'
-//const Karolina = 'XB0fDUnXU5powFXDhCwa'
-//const Alica = 'Xb7hH8MSUJpSbSDYk0k2'
-//const Matilda = 'XrExE9yKIg1WjnnlVkGX'
+const Karolina = 'XB0fDUnXU5powFXDhCwa'
+const Alica = 'Xb7hH8MSUJpSbSDYk0k2'
+const Matilda = 'XrExE9yKIg1WjnnlVkGX'
+const Lily = 'pFZP5JQG7iQjIQuC4Bku'
 
 //const Wiliam = 'bIHbv24MWmeRgasZH58o'
-//const Jessica = 'cgSgspJ2msm6clMCkdW9'
+
 const Jessica = 'cgSgspJ2msm6clMCkdW9'
 
 const Erik = 'cjVigY5qzO86Huf0OWal'
 //const Christofer = 'iP95p4xoKVk53GoZ742B'
 //const Brian = 'nPczCjzI2devNBz1zQrb'
 //const Daniel = 'onwK4e9ZLuTAKqWW03F9'
-//const Lily = 'pFZP5JQG7iQjIQuC4Bku'
+
 //const Billy = 'pqHfZKP75CvOlQylNhV4'
 
 // this was ok before adding firebase
@@ -37,7 +38,29 @@ export async function createElevenlabsSpeech(
   voiceType: any,
   inputText: string
 ) {
-  const voiceId = Liam
+  function getVoiceId(voiceType: string): string {
+    // Create a mapping between the voiceType and voiceId
+    const voiceMap: { [key: string]: string } = {
+      andrej: Andrej,
+      karol: Karol,
+      sara: Sara,
+      leo: Leo,
+      juraj: Juraj,
+      peter: Peter,
+      liam: Liam,
+      erik: Erik,
+      jessica: Jessica,
+      karolina: Karolina,
+      alica: Alica,
+      matilda: Matilda,
+      lily: Lily,
+    }
+
+    // Return the corresponding voiceId or handle undefined voiceTypes
+    return voiceMap[voiceType.toLowerCase()] || ''
+  }
+
+  const voiceId = getVoiceId(voiceType)
 
   const model = 'eleven_multilingual_v2'
   //const model = 'eleven_turbo_v2_5'

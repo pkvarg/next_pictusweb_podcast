@@ -52,6 +52,8 @@ const Audio = () => {
     'Peter',
     'Liam',
     'Erik',
+    'Jessica',
+    'Lily',
   ]
 
   const [voiceType, setVoiceType] = useState<string>('')

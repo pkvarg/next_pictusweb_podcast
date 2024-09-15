@@ -19,6 +19,7 @@ export default async function AllPodcasts() {
       category: true,
       english: true,
       published: true,
+      voiceType: true,
     },
     where: {
       deleted: false,
@@ -68,6 +69,8 @@ export default async function AllPodcasts() {
                 <p className='text-[20px] my-4'>
                   Description: {podcast.description}
                 </p>
+
+                <p className='text-[20px] my-4'>Voice: {podcast.voiceType}</p>
 
                 <PreviewAudio audioPath={podcast.audioPath as string} />
 
