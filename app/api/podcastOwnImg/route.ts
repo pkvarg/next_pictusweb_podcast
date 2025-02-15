@@ -8,9 +8,7 @@ import { log } from 'console'
 import { uploadFirebase } from '@/app/[locale]/admin/_actions/uploadToFirebase'
 const pump = promisify(pipeline)
 
-function readableStreamToNodeReadable(
-  readableStream: ReadableStream
-): Readable {
+function readableStreamToNodeReadable(readableStream: ReadableStream): Readable {
   const reader = readableStream.getReader()
   const nodeReadable = new Readable({
     async read() {
@@ -36,25 +34,18 @@ export async function POST(req: NextRequest) {
     if (fileEntry && fileEntry instanceof File) {
       const timestamp = getTimeStamp()
       const filePath = `./storage/podcast_images/${fileEntry.name}`
-      const nodeReadableStream = readableStreamToNodeReadable(
-        fileEntry.stream()
-      )
+      const nodeReadableStream = readableStreamToNodeReadable(fileEntry.stream())
 
       // eslint-disable-next-line
-      const buffer = await pump(
-        nodeReadableStream,
-        fs.createWriteStream(filePath)
-      )
+      const buffer = await pump(nodeReadableStream, fs.createWriteStream(filePath))
 
       // nmn const frontendPath = `/podcast/images/${timestamp}_${fileEntry.name}`
 
-      const contentType = 'image/png'
+      const contentType = 'image/webp'
 
-      const frontendPath = await uploadFirebase(
-        fileEntry.name,
-        fileEntry,
-        contentType
-      )
+      const frontendPath = await uploadFirebase(fileEntry.name, fileEntry, contentType)
+
+      console.log('frontendpath', frontendPath)
 
       return NextResponse.json({ status: 'success', data: frontendPath })
     } else {

@@ -2,16 +2,12 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '@/firebaseConfig' // Import the initialized storage
 import { getTimeStamp } from '@/lib/timestamp'
 
-export async function uploadFirebase(
-  podcastTitle: string,
-  buffer: any,
-  contentType: string
-) {
+export async function uploadFirebase(podcastTitle: string, buffer: any, contentType: string) {
   // Firebase storage path (in your Firebase storage bucket)
   console.log('speechfileXFR', buffer)
 
   const timestamp = getTimeStamp()
-  const firebaseStoragePath = `podcast/${podcastTitle}_${timestamp}`
+  const firebaseStoragePath = `podcast/${timestamp}${podcastTitle}`
 
   // Create a reference to the file in Firebase storage
   const storageRef = ref(storage, firebaseStoragePath)
