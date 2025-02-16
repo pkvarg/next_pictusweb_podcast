@@ -21,7 +21,19 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'firebasestorage.googleapis.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'pictusweb.sk',
+      },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/storage/:path*',
+        destination: '/public/storage/:path*', // Serve from the mapped directory
+      },
+    ]
   },
 }
 
