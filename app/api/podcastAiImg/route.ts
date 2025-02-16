@@ -9,9 +9,7 @@ import { uploadFirebase } from '@/app/[locale]/admin/_actions/uploadToFirebase'
 
 const openai = new OpenAI()
 
-function readableStreamToNodeReadable(
-  readableStream: ReadableStream
-): Readable {
+function readableStreamToNodeReadable(readableStream: ReadableStream): Readable {
   const reader = readableStream.getReader()
   const nodeReadable = new Readable({
     async read() {
@@ -47,20 +45,24 @@ export async function POST(req: NextRequest) {
     //   ],
     // }
 
-    const imageUrl = resAi.data[0].url
-    const response = imageUrl && (await fetch(imageUrl))
-    const buffer = response && (await response.arrayBuffer())
+    const imageUrl = resAi.data[0]?.url
+    const response = imageUrl ? await fetch(imageUrl) : null
+    const arrayBuffer = response ? await response.arrayBuffer() : null
 
-    const timestamp = getTimeStamp()
+    if (arrayBuffer) {
+      const timestamp = getTimeStamp()
+      const fileName = `${title}_${timestamp}.png`
+      const filePath = path.resolve(`public/storage/podcast_images/${fileName}`)
+      const frontendPath = `/storage/podcast_images/${fileName}`
 
-    const filePath = path.resolve(
-      `./storage/podcast_images/${title}_${timestamp}.png`
-    )
+      // Ensure the directory exists
+      fs.mkdirSync(path.dirname(filePath), { recursive: true })
 
-    //const frontendPath = `/podcast/images/${title}_${timestamp}.png`
+      // Convert ArrayBuffer to Buffer
+      const buffer = new Uint8Array(arrayBuffer)
 
-    buffer &&
-      fs.writeFile(filePath, Buffer.from(buffer), (err) => {
+      // Write file to the public directory
+      fs.writeFile(filePath, buffer, (err) => {
         if (err) {
           console.error('Error saving image:', err)
         } else {
@@ -68,11 +70,36 @@ export async function POST(req: NextRequest) {
         }
       })
 
-    const contentType = 'image/png'
+      // If using Firebase, uncomment this:
+      // const frontendPath = await uploadFirebase(title, buffer, contentType);
 
-    const frontendPath = await uploadFirebase(title, buffer, contentType)
+      return NextResponse.json({ status: 'success', data: frontendPath })
+    }
 
-    return NextResponse.json({ status: 'success', data: frontendPath })
+    // const imageUrl = resAi.data[0].url
+    // const response = imageUrl && (await fetch(imageUrl))
+    // const buffer = response && (await response.arrayBuffer())
+
+    // const timestamp = getTimeStamp()
+
+    // const filePath = path.resolve(`./storage/podcast_images/${title}_${timestamp}.png`)
+
+    // const frontendPath = `/podcast/images/${title}_${timestamp}.png`
+
+    // buffer &&
+    //   fs.writeFile(filePath, Buffer.from(buffer), (err) => {
+    //     if (err) {
+    //       console.error('Error saving image:', err)
+    //     } else {
+    //       console.log('Image saved successfully to', filePath)
+    //     }
+    //   })
+
+    // const contentType = 'image/png'
+
+    // //const frontendPath = await uploadFirebase(title, buffer, contentType)
+
+    // return NextResponse.json({ status: 'success', data: frontendPath })
   } catch (e: any) {
     console.error('Error saving image:', e)
     return NextResponse.json({ status: 'fail', data: e.message })
