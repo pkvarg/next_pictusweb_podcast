@@ -126,7 +126,7 @@ const Projects: React.FC = () => {
         },
       ],
       image: 'bible_blog.webp',
-      website: 'https://blog.pictusweb.site/',
+      website: 'https://bible-blog.pictusweb.sk/',
     },
     {
       name: 'katolickaviera.sk',
@@ -231,26 +231,20 @@ const Projects: React.FC = () => {
             scale: 1,
             speed: 450,
           }}
-          className='bg-gray-900 p-5 rounded-2xl sm:w-[360px] w-full'
+          className="bg-gray-900 p-5 rounded-2xl sm:w-[360px] w-full"
         >
-          <div className='relative w-full h-[230px]'>
-            <img
-              src={image}
-              alt='project_image'
-              className='w-full h-full rounded-2xl'
-            />
+          <div className="relative w-full h-[230px]">
+            <img src={image} alt="project_image" className="w-full h-full rounded-2xl" />
           </div>
 
-          <div className='mt-5'>
+          <div className="mt-5">
             <div onClick={() => window.open(website, '_blank')}>
-              <h3 className='text-white font-medium text-[30px] cursor-pointer'>
-                {name}
-              </h3>
+              <h3 className="text-white font-medium text-[30px] cursor-pointer">{name}</h3>
             </div>
-            <p className='mt-2 text-[#93A7B7] text-[20px]'>{description}</p>
+            <p className="mt-2 text-[#93A7B7] text-[20px]">{description}</p>
           </div>
 
-          <div className='mt-4 flex flex-wrap gap-2'>
+          <div className="mt-4 flex flex-wrap gap-2">
             {tags.map((tag) => (
               <Image
                 key={`${name}-${tag.name}`}
@@ -271,23 +265,18 @@ const Projects: React.FC = () => {
     <>
       <motion.div
         variants={staggerContainer(0.1, 0.3)}
-        initial='hidden'
-        whileInView='show'
+        initial="hidden"
+        whileInView="show"
         viewport={{ once: false, amount: 0.25 }}
       >
-        <h1 id='projects' className='lg:scroll-mt-14 text-[35px] text-center'>
+        <h1 id="projects" className="lg:scroll-mt-14 text-[35px] text-center">
           <TypingText title={t('ourProjectsTitle')} />
         </h1>
       </motion.div>
 
-      <div className='mt-4 lg:mt-20 flex justify-center flex-wrap gap-2 lg:gap-12 mx-4'>
+      <div className="mt-4 lg:mt-20 flex justify-center flex-wrap gap-2 lg:gap-12 mx-4">
         {projects.map((project, index) => (
-          <ProjectCard
-            key={`project-${index}`}
-            index={index}
-            {...project}
-            className='opacity-1'
-          />
+          <ProjectCard key={`project-${index}`} index={index} {...project} className="opacity-1" />
         ))}
       </div>
     </>
