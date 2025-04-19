@@ -25,6 +25,17 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'pictusweb.sk',
       },
+      {
+        protocol: 'https',
+        hostname: 'hono-api.pictusweb.com',
+        pathname: '/api/upload/pictusweb/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3013',
+        pathname: '/api/upload/pictusweb/**',
+      },
     ],
   },
   async rewrites() {

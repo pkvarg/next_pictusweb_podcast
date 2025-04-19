@@ -9,49 +9,46 @@ const openai = new OpenAI()
 
 export async function createOpenAiSpeech(podcastTitle: string, voiceType: any, inputText: string) {
   try {
-    const mp3 = await openai.audio.speech.create({
+    const mp3Response = await openai.audio.speech.create({
       model: 'tts-1',
       voice: voiceType,
       input: inputText,
     })
 
+    // Get the audio data as an ArrayBuffer
+    const arrayBuffer = await mp3Response.arrayBuffer()
+
     const timestamp = getTimeStamp()
+    const filename = `${podcastTitle}_${timestamp}.mp3`
 
-    // **** change paths!!!!
+    const apiUrl =
+      process.env.NODE_ENV === 'development'
+        ? `http://localhost:3013/api/namedupload/pictusweb/${filename}`
+        : `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
 
-    const fileName = `${podcastTitle}_${timestamp}.mp3`
-    const speechFile = path.resolve(`public/storage/mp3s/${fileName}`)
+    // Send the audio data
+    const uploadResponse = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'audio/mpeg',
+      },
+      body: arrayBuffer,
+    })
 
-    // Ensure the directory exists before writing the file
-    fs.mkdirSync(path.dirname(speechFile), { recursive: true })
+    if (!uploadResponse.ok) {
+      console.error('Upload failed with status:', uploadResponse.status)
+      const errorText = await uploadResponse.text().catch(() => 'Could not read error response')
+      console.error('Error details:', errorText)
+      throw new Error('Nepodarilo sa nahrať súbor')
+    }
 
-    // Convert ArrayBuffer to Uint8Array for compatibility with fs.writeFile
-    const buffer = new Uint8Array(await mp3.arrayBuffer())
+    const data = await uploadResponse.json()
+    console.log('Upload response data:', data)
+    const frontendPath = data.imageUrl
 
-    // Write the MP3 file
-    await fs.promises.writeFile(speechFile, buffer)
-
-    const contentType = 'audio/mpeg'
-
-    // Upload to Firebase (if needed)
-    const frontendPath = await uploadFirebase(podcastTitle, buffer, contentType)
+    console.log('front', frontendPath)
 
     return { frontendPath }
-
-    // const speechFile = path.resolve(
-    //   `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
-    // )
-
-    // const buffer = Buffer.from(await mp3.arrayBuffer())
-
-    // // *** implement upload to Firebase external function to be used for all providers
-    // await fs.promises.writeFile(speechFile, buffer)
-
-    // const contentType = 'audio/mpeg'
-
-    // const frontendPath = await uploadFirebase(podcastTitle, buffer, contentType)
-
-    // return { frontendPath } // Return the Firebase URL
   } catch (error) {
     console.log(error)
   }

@@ -24,37 +24,35 @@ interface Podcast extends PodcastData {
   id: string
 }
 
-export async function createSpeech(
-  podcastTitle: string,
-  voiceType: any,
-  inputText: string
-) {
-  try {
-    const mp3 = await openai.audio.speech.create({
-      model: 'tts-1',
-      voice: voiceType,
-      input: inputText,
-    })
+// export async function createSpeech(
+//   podcastTitle: string,
+//   voiceType: any,
+//   inputText: string
+// ) {
+//   try {
+//     const mp3 = await openai.audio.speech.create({
+//       model: 'tts-1',
+//       voice: voiceType,
+//       input: inputText,
+//     })
 
-    const timestamp = getTimeStamp()
+//     const timestamp = getTimeStamp()
 
-    const frontendPath = `/podcast/mp3s/${podcastTitle}_${timestamp}.mp3`
+//     const frontendPath = `/podcast/mp3s/${podcastTitle}_${timestamp}.mp3`
 
-    const speechFile = path.resolve(
-      `./public/podcast/mp3s/${podcastTitle}_${timestamp}.mp3`
-    )
+//     const speechFile = path.resolve(
+//       `./public/podcast/mp3s/${podcastTitle}_${timestamp}.mp3`
+//     )
 
-    const buffer = Buffer.from(await mp3.arrayBuffer())
-    await fs.promises.writeFile(speechFile, buffer)
-    return { frontendPath }
-  } catch (error) {
-    console.log(error)
-  }
-}
+//     const buffer = Buffer.from(await mp3.arrayBuffer())
+//     await fs.promises.writeFile(speechFile, buffer)
+//     return { frontendPath }
+//   } catch (error) {
+//     console.log(error)
+//   }
+// }
 
-export async function create(
-  formData: FormData
-): Promise<{ success: boolean; message: string }> {
+export async function create(formData: FormData): Promise<{ success: boolean; message: string }> {
   'use server'
 
   try {
@@ -144,7 +142,7 @@ export async function getSinglePodcast(podcastId: string): Promise<{
 }
 
 export async function deleteSinglePodcast(
-  podcastId: string
+  podcastId: string,
 ): Promise<{ success: boolean; message: string }> {
   const data = {
     deleted: true,
@@ -165,7 +163,7 @@ export async function deleteSinglePodcast(
 }
 
 export async function editSinglePodcast(
-  formData: FormData
+  formData: FormData,
 ): Promise<{ success: boolean; message: string }> {
   'use server'
 
@@ -203,7 +201,7 @@ export async function editSinglePodcast(
 }
 
 export async function changePodcastPublishStatus(
-  formData: FormData
+  formData: FormData,
 ): Promise<{ success: boolean; message: string }> {
   'use server'
 

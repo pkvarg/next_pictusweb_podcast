@@ -36,7 +36,7 @@ const Erik = 'cjVigY5qzO86Huf0OWal'
 export async function createElevenlabsSpeech(
   podcastTitle: string,
   voiceType: any,
-  inputText: string
+  inputText: string,
 ) {
   function getVoiceId(voiceType: string): string {
     // Create a mapping between the voiceType and voiceId
@@ -81,30 +81,67 @@ export async function createElevenlabsSpeech(
       },
     })
 
+    console.log('mp3 stream', mp3Stream)
+
+    // Convert the stream to a buffer
+    const chunks: Uint8Array[] = []
+    for await (const chunk of mp3Stream) {
+      chunks.push(chunk)
+    }
+    const buffer = Buffer.concat(chunks)
+
     const timestamp = getTimeStamp()
+    const filename = `${podcastTitle}_${timestamp}.mp3`
 
-    const speechFile = path.resolve(
-      `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
-    )
+    const apiUrl =
+      process.env.NODE_ENV === 'development'
+        ? `http://localhost:3013/api/namedupload/pictusweb/${filename}`
+        : `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
 
-    // Write the stream data to a file
-    const writeStream = fs.createWriteStream(speechFile)
-    mp3Stream.pipe(writeStream)
-
-    // Wait for the file to be fully written
-    await new Promise((resolve, reject) => {
-      writeStream.on('finish', resolve)
-      writeStream.on('error', reject)
+    // Send the buffer data
+    const uploadResponse = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'audio/mpeg', // Correct content type for MP3
+      },
+      body: buffer,
     })
 
-    // Read the MP3 file into a buffer so it can be uploaded to Firebase
-    const buffer = fs.readFileSync(speechFile)
+    if (!uploadResponse.ok) {
+      console.error('Upload failed with status:', uploadResponse.status)
+      const errorText = await uploadResponse.text().catch(() => 'Could not read error response')
+      console.error('Error details:', errorText)
+      throw new Error('Nepodarilo sa nahrať súbor')
+    }
 
-    // Define content type for Firebase (MP3 file)
-    const contentType = 'audio/mpeg'
+    const data = await uploadResponse.json()
 
-    // Upload the MP3 file to Firebase and get the URL
-    const frontendPath = await uploadFirebase(podcastTitle, buffer, contentType)
+    const frontendPath = data.imageUrl
+
+    console.log('front', frontendPath)
+
+    // const speechFile = path.resolve(
+    //   `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
+    // )
+
+    // // Write the stream data to a file
+    // const writeStream = fs.createWriteStream(speechFile)
+    // mp3Stream.pipe(writeStream)
+
+    // // Wait for the file to be fully written
+    // await new Promise((resolve, reject) => {
+    //   writeStream.on('finish', resolve)
+    //   writeStream.on('error', reject)
+    // })
+
+    // // Read the MP3 file into a buffer so it can be uploaded to Firebase
+    // const buffer = fs.readFileSync(speechFile)
+
+    // // Define content type for Firebase (MP3 file)
+    // const contentType = 'audio/mpeg'
+
+    // // Upload the MP3 file to Firebase and get the URL
+    // const frontendPath = await uploadFirebase(podcastTitle, buffer, contentType)
 
     // Return the path to the frontend
     return { frontendPath }
@@ -235,7 +272,7 @@ export async function voices() {
 
     // Filter for Slovak female voices
     const slovakFemaleVoices = voices.filter(
-      (voice: any) => voice.language === 'sk-SK' && voice.gender === 'female'
+      (voice: any) => voice.language === 'sk-SK' && voice.gender === 'female',
     )
 
     // Extract and return voice IDs
