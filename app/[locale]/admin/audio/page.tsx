@@ -163,16 +163,36 @@ const Audio = () => {
         const formdata = new FormData()
         formdata.append('file', e.target.files[0])
 
-        const requestOptions = { method: 'POST', body: formdata }
+        const apiUrl = 'https://hono-api.pictusweb.com/api/upload/pictusweb'
 
-        const response = await fetch('/api/podcastOwnImg', requestOptions)
+        console.log('apiUrl', apiUrl)
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          body: formdata,
+        })
+
+        console.log('response', response)
+
+        if (!response.ok) {
+          throw new Error('Nepodarilo sa nahrať súbor')
+        }
+
         const result = await response.json()
 
-        console.log('result own file', result)
+        const frontendPath = result.imageUrl
 
-        setImagePath(result.data)
+        // const requestOptions = { method: 'POST', body: formdata }
+
+        // const response = await fetch('/api/podcastOwnImg', requestOptions)
+        // const result = await response.json()
+
+        // console.log('result own file', result)
+
+        // setImagePath(result.data)
+        setImagePath(frontendPath)
       } catch (error) {
-        console.log('hs', error)
+        console.log('frontend own image', error)
       }
     } else {
       setFile(null)
@@ -413,7 +433,7 @@ const Audio = () => {
           </p>
         </div>
 
-        {openOwnImg && (
+        {/* {openOwnImg && (
           <div className="flex flex-col relative my-8">
             <input type="file" id="image" onChange={handleFileChange} style={{ display: 'none' }} />
             <div className="flex flex-row ml-4">
@@ -437,7 +457,7 @@ const Audio = () => {
 
             <p className="mt-8">{imagePath}</p>
           </div>
-        )}
+        )} */}
 
         {openAiImg && (
           <div className="flex flex-col relative  mt-8">
@@ -471,7 +491,6 @@ const Audio = () => {
               width={550}
               height={550}
             />
-            <p className="mt-8">{previewUrl}</p>
           </>
         )}
 
