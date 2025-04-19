@@ -168,6 +168,8 @@ const Audio = () => {
         const response = await fetch('/api/podcastOwnImg', requestOptions)
         const result = await response.json()
 
+        console.log('result own file', result)
+
         setImagePath(result.data)
       } catch (error) {
         console.log('hs', error)
@@ -433,7 +435,7 @@ const Audio = () => {
               </button>
             </div>
 
-            {/* <p className='mt-8'>{imagePath}</p> */}
+            <p className="mt-8">{imagePath}</p>
           </div>
         )}
 
