@@ -1,3 +1,4 @@
+'use server'
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import { pipeline, Readable } from 'stream'
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
       const timestamp = getTimeStamp()
 
       const apiUrl =
-        process.env.NEXT_PUBLIC_NODE_ENV === 'development'
+        process.env.NODE_ENV === 'development'
           ? 'http://localhost:3013/api/upload/pictusweb'
           : 'https://hono-api.pictusweb.com/api/upload/pictusweb'
 
