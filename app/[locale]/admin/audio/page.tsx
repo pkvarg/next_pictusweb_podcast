@@ -462,14 +462,17 @@ const Audio = () => {
         )}
 
         {previewUrl && (
-          <Image
-            // className='my-4 w-[150px] h-auto'
-            className="my-4 w-[250px] h-auto"
-            src={previewUrl}
-            alt={podcastTitle}
-            width={550}
-            height={550}
-          />
+          <>
+            <Image
+              // className='my-4 w-[150px] h-auto'
+              className="my-4 w-[250px] h-auto"
+              src={previewUrl}
+              alt={podcastTitle}
+              width={550}
+              height={550}
+            />
+            <p className="mt-8">{previewUrl}</p>
+          </>
         )}
 
         {isSubmitting ? (

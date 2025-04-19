@@ -31,8 +31,12 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData()
     const fileEntry = formData.getAll('file')[0]
 
+    console.log('here in post')
+
     // Type guard to ensure fileEntry is a File
     if (fileEntry && fileEntry instanceof File) {
+      console.log('here in fileEntry')
+
       const timestamp = getTimeStamp()
 
       // const apiUrl =
@@ -49,7 +53,7 @@ export async function POST(req: NextRequest) {
         body: formData,
       })
 
-      // console.log('response', response)
+      console.log('response', response)
 
       if (!response.ok) {
         throw new Error('Nepodarilo sa nahrať súbor')
@@ -57,28 +61,9 @@ export async function POST(req: NextRequest) {
 
       const data = await response.json()
 
-      //console.log('data', data)
+      console.log('data', data)
 
       const frontendPath = data.imageUrl
-
-      // const fileName = `${timestamp}_${fileEntry.name}`
-      // const filePath = `public/storage/podcast_images/${fileName}`
-      // const frontendPath = `/storage/podcast_images/${fileName}`
-
-      // const nodeReadableStream = readableStreamToNodeReadable(fileEntry.stream())
-
-      // // Ensure the directory exists before writing the file
-      // fs.mkdirSync('public/storage/podcast_images', { recursive: true })
-
-      // // Save the file
-      // await pump(nodeReadableStream, fs.createWriteStream(filePath))
-
-      // const contentType = 'image/webp'
-
-      // If using Firebase, uncomment:
-      // const frontendPath = await uploadFirebase(fileName, fileEntry, contentType);
-
-      //console.log('frontendPath', frontendPath)
 
       return NextResponse.json({ status: 'success', data: frontendPath })
     } else {
