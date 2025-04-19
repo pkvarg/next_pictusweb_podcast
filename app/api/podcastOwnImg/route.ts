@@ -35,11 +35,11 @@ export async function POST(req: NextRequest) {
       const timestamp = getTimeStamp()
 
       const apiUrl =
-        process.env.NODE_ENV === 'development'
+        process.env.NEXT_PUBLIC_NODE_ENV === 'development'
           ? 'http://localhost:3013/api/upload/pictusweb'
           : 'https://hono-api.pictusweb.com/api/upload/pictusweb'
 
-      //console.log('apiUrl', apiUrl)
+      console.log('apiUrl', apiUrl)
 
       const response = await fetch(apiUrl, {
         method: 'POST',
