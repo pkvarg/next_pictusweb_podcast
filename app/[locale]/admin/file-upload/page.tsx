@@ -63,7 +63,7 @@ const FileUpload = () => {
         ? 'http://localhost:3013/api/upload/pictusweb'
         : 'https://hono-api.pictusweb.com/api/upload/pictusweb'
 
-    console.log('apiUrl', apiUrl)
+    //console.log('apiUrl', apiUrl)
 
     try {
       const response = await fetch(apiUrl, {

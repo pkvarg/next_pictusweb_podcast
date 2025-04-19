@@ -165,14 +165,10 @@ const Audio = () => {
 
         const apiUrl = 'https://hono-api.pictusweb.com/api/upload/pictusweb'
 
-        console.log('apiUrl', apiUrl)
-
         const response = await fetch(apiUrl, {
           method: 'POST',
           body: formdata,
         })
-
-        console.log('response', response)
 
         if (!response.ok) {
           throw new Error('Nepodarilo sa nahrať súbor')
@@ -182,17 +178,9 @@ const Audio = () => {
 
         const frontendPath = result.imageUrl
 
-        // const requestOptions = { method: 'POST', body: formdata }
-
-        // const response = await fetch('/api/podcastOwnImg', requestOptions)
-        // const result = await response.json()
-
-        // console.log('result own file', result)
-
-        // setImagePath(result.data)
         setImagePath(frontendPath)
       } catch (error) {
-        console.log('frontend own image', error)
+        console.log('frontend own image error', error)
       }
     } else {
       setFile(null)
@@ -232,7 +220,7 @@ const Audio = () => {
       setIsSubmittingText(false)
     } else if (voiceProvider === 'elevenlabs') {
       const audio = await createElevenlabsSpeech(podcastTitle, voiceType, textPrompt)
-      console.log('aud', audio)
+      //console.log('aud', audio)
       if (audio && audio.frontendPath) {
         setAudioPath(audio.frontendPath)
       }

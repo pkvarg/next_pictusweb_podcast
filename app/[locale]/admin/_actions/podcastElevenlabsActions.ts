@@ -8,7 +8,7 @@ import { uploadFirebase } from './uploadToFirebase'
 
 const client = new ElevenLabsClient({ apiKey: process.env.ELEVEN_KEY })
 
-console.log('client', client)
+//console.log('client', client)
 const Andrej = 'bYqmvVkXUBwLwYpGHGz3'
 const Karol = 'IKne3meq5aSn9XLyUdCD'
 const Sara = 'EXAVITQu4vr4xnSDxMaL'
@@ -81,7 +81,7 @@ export async function createElevenlabsSpeech(
       },
     })
 
-    console.log('mp3 stream', mp3Stream)
+    //console.log('mp3 stream', mp3Stream)
 
     // Convert the stream to a buffer
     const chunks: Uint8Array[] = []
@@ -118,7 +118,7 @@ export async function createElevenlabsSpeech(
 
     const frontendPath = data.imageUrl
 
-    console.log('front', frontendPath)
+    //console.log('front', frontendPath)
 
     // const speechFile = path.resolve(
     //   `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`

@@ -43,10 +43,10 @@ export async function createOpenAiSpeech(podcastTitle: string, voiceType: any, i
     }
 
     const data = await uploadResponse.json()
-    console.log('Upload response data:', data)
+    //console.log('Upload response data:', data)
     const frontendPath = data.imageUrl
 
-    console.log('front', frontendPath)
+    //console.log('front', frontendPath)
 
     return { frontendPath }
   } catch (error) {
