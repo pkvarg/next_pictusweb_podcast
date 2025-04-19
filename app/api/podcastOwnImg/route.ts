@@ -35,10 +35,12 @@ export async function POST(req: NextRequest) {
     if (fileEntry && fileEntry instanceof File) {
       const timestamp = getTimeStamp()
 
-      const apiUrl =
-        process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3013/api/upload/pictusweb'
-          : 'https://hono-api.pictusweb.com/api/upload/pictusweb'
+      // const apiUrl =
+      //   process.env.NODE_ENV === 'development'
+      //     ? 'http://localhost:3013/api/upload/pictusweb'
+      //     : 'https://hono-api.pictusweb.com/api/upload/pictusweb'
+
+      const apiUrl = 'https://hono-api.pictusweb.com/api/upload/pictusweb'
 
       console.log('apiUrl', apiUrl)
 
