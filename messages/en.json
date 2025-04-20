@@ -80,6 +80,18 @@
 
     "cookies": "This page only uses analytical cookies that are necessary for the website to function. We do not use functional or marketing cookies.",
 
-    "counterVisitors": "Visitors count"
+    "counterVisitors": "Visitors count",
+    "cookiesDisagree": "Disagree",
+    "servicesTitle": "Websites that bring you success",
+    "servicesLogoTitle": "Unique logo",
+    "servicesLogoDesc": "Logo for web, email signature or business card. Unique. Yours.",
+    "servicesStyleTitle": "Style according to taste",
+    "servicesStyleDesc": "Are you presenting services, hobby or serious business? Style matters.",
+    "servicesNonStopTitle": "Non-stop operation",
+    "servicesNonStopDesc": "Fast and reliable website working on PC, mobile and tablet. Non-stop.",
+    "servicesAwayTitle": "Not available?",
+    "servicesAwayDesc": "The form ensures that messages from customers always come to your email.",
+    "projectsTitle": "Projects",
+    "projectsDetails": "Details"
   }
 }
