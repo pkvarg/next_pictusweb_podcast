@@ -1,27 +1,60 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-
 import { useTranslations } from 'next-intl'
-import { getVisitors } from '@/lib/visitorsCounter'
+import axios from 'axios'
+
+export interface Stats {
+  id: string
+  count: number
+  bots: number
+  visitors: number
+  emails: number
+  lastBot_at: Date
+  lastVisitor_at: Date
+  lastEmail_at: Date
+}
 
 const Counter = () => {
   const t = useTranslations('Home')
-  const [count, setCount] = useState(0)
+  const [countVisitors, setCountVisitors] = useState(0)
+  const [countBots, setCountBots] = useState(0)
+  const [countEmails, setCountEmails] = useState(0)
+
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+
+  const apiUrl = 'https://hono-api.pictusweb.com/api/stats/pictuswebsk'
+  //const apiUrl = 'http://localhost:3013/api/stats/pictuswebsk'
 
   useEffect(() => {
-    const visitorsCount = async () => {
-      const data = await getVisitors()
-      if (data.count?.count) setCount(data.count.count)
+    const getStats = async () => {
+      try {
+        const { data } = await axios.get(apiUrl, config)
+        setCountBots(data.bots)
+        setCountVisitors(data.visitors)
+        setCountEmails(data.emails)
+      } catch (err) {
+        console.error('Error fetching bots:', err)
+      }
     }
-    visitorsCount()
+
+    getStats()
   }, [])
 
   return (
-    <div className='m-4 text-yellow-300 text-[30px]'>
-      <h1 className='text-center'>
-        {' '}
-        {t('counterVisitors')}: {count}
-      </h1>
+    <div className="m-4 text-yellow-300 text-[30px] flex flex-col gap-2 text-center">
+      <p>
+        {t('counterVisitors')}: {countVisitors}
+      </p>
+      <p>
+        {t('counterBots')}: {countBots}
+      </p>
+      <p>
+        {t('counterEmails')}: {countEmails}
+      </p>
     </div>
   )
 }
