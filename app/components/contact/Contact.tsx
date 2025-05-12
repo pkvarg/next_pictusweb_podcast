@@ -51,7 +51,7 @@ const Contact = () => {
   }
 
   const increaseEmails = async () => {
-    const apiUrl = 'https://hono-api.pictusweb.com/api/emails/pictusweb.sk/increase'
+    const apiUrl = 'https://hono-api.pictusweb.com/api/emails/pictuswebsk/increase'
     //const apiUrl = 'http://localhost:3013/api/emails/pictuswebsk/increase'
     try {
       const { data } = await axios.put(apiUrl, {}, config)
