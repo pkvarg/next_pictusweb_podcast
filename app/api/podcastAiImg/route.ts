@@ -5,7 +5,6 @@ import path from 'path'
 import OpenAI from 'openai'
 import { Readable } from 'stream'
 import { getTimeStamp } from '@/lib/timestamp'
-//import { uploadFirebase } from '@/app/[locale]/admin/_actions/uploadToFirebase'
 
 const openai = new OpenAI()
 

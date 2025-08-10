@@ -6,17 +6,20 @@ import Feedbacks from '../components/home/Feedbacks'
 import Footer from '../components/Footer'
 import Offer from '../components/home/Offer'
 import GetInTouch from '../components/GetInTouch'
+import NewServicesSlider from '../components/home/NewServicesSlider'
 
 const Home = () => {
   return (
     <>
-      <div className='text-white text-[25px] hero-gradient'>
+      <div className="text-white text-[25px] hero-gradient">
         <Header />
+
         <Hero />
+        <NewServicesSlider />
         <Offer />
         <Projects />
       </div>
-      <div className='second-gradient'>
+      <div className="second-gradient">
         <Feedbacks />
         <GetInTouch />
         <Footer />

@@ -3,7 +3,6 @@ import { getTimeStamp } from '@/lib/timestamp'
 import * as sdk from 'microsoft-cognitiveservices-speech-sdk'
 //import path from 'path'
 //import fs from 'fs'
-//import { uploadFirebase } from './uploadToFirebase'
 
 const subscriptionKey = process.env.AZURE_TTS_1!
 const serviceRegion = process.env.AZURE_TTS_REGION!

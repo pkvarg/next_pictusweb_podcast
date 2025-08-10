@@ -3,7 +3,6 @@ import { getTimeStamp } from '@/lib/timestamp'
 import OpenAI from 'openai'
 import fs from 'fs'
 import path from 'path'
-import { uploadFirebase } from './uploadToFirebase'
 
 const openai = new OpenAI()
 

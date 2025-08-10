@@ -4,7 +4,7 @@ import axios from 'axios'
 import { getTimeStamp } from '@/lib/timestamp'
 import fs from 'fs'
 import path from 'path'
-import { uploadFirebase } from './uploadToFirebase'
+//import { uploadFirebase } from './uploadToFirebase'
 
 const client = new ElevenLabsClient({ apiKey: process.env.ELEVEN_KEY })
 
@@ -104,7 +104,7 @@ export async function createElevenlabsSpeech(
       headers: {
         'Content-Type': 'audio/mpeg', // Correct content type for MP3
       },
-      body: buffer,
+      body: new Uint8Array(buffer),
     })
 
     if (!uploadResponse.ok) {
@@ -118,142 +118,11 @@ export async function createElevenlabsSpeech(
 
     const frontendPath = data.imageUrl
 
-    //console.log('front', frontendPath)
-
-    // const speechFile = path.resolve(
-    //   `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
-    // )
-
-    // // Write the stream data to a file
-    // const writeStream = fs.createWriteStream(speechFile)
-    // mp3Stream.pipe(writeStream)
-
-    // // Wait for the file to be fully written
-    // await new Promise((resolve, reject) => {
-    //   writeStream.on('finish', resolve)
-    //   writeStream.on('error', reject)
-    // })
-
-    // // Read the MP3 file into a buffer so it can be uploaded to Firebase
-    // const buffer = fs.readFileSync(speechFile)
-
-    // // Define content type for Firebase (MP3 file)
-    // const contentType = 'audio/mpeg'
-
-    // // Upload the MP3 file to Firebase and get the URL
-    // const frontendPath = await uploadFirebase(podcastTitle, buffer, contentType)
-
-    // Return the path to the frontend
     return { frontendPath }
   } catch (error) {
     console.error('Error generating speech:', error)
   }
 }
-
-// export async function createElevenlabsSpeech(
-//   podcastTitle: string,
-//   voiceType: any,
-//   inputText: string
-// ) {
-//   function getVoiceId(voiceType: string): string {
-//     // Create a mapping between the voiceType and voiceId
-//     const voiceMap: { [key: string]: string } = {
-//       andrej: Andrej,
-//       karol: Karol,
-//       sara: Sara,
-//       leo: Leo,
-//       juraj: Juraj,
-//       peter: Peter,
-//       liam: Liam,
-//       jessica: Jessica,
-//       erik: Erik,
-//     }
-
-//     // Return the corresponding voiceId or handle undefined voiceTypes
-//     return voiceMap[voiceType.toLowerCase()] || ''
-//   }
-
-//   const voiceId = getVoiceId(voiceType)
-
-//   //const model = 'eleven_multilingual_v2'
-//   const model = 'eleven_turbo_v2_5'
-
-//   try {
-//     // Convert text to speech using ElevenLabs API
-//     const mp3Stream = await client.textToSpeech.convert(voiceId, {
-//       optimize_streaming_latency: ElevenLabs.OptimizeStreamingLatency.Zero,
-//       output_format: ElevenLabs.OutputFormat.Mp32205032,
-//       text: inputText,
-//       model_id: model,
-//       voice_settings: {
-//         stability: 0.1,
-//         similarity_boost: 0.3,
-//         style: 0.2,
-//       },
-//     })
-
-//     console.log('11labs', mp3Stream)
-
-//     return
-
-//     const timestamp = getTimeStamp()
-
-//     // Define local file path for saving the MP3
-//     const speechFile = path.resolve(
-//       `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
-//     )
-
-//     // Write the stream data to a local MP3 file
-//     const writeStream = fs.createWriteStream(speechFile)
-//     mp3Stream.pipe(writeStream)
-
-//     // Wait for the file to finish writing
-//     await new Promise((resolve, reject) => {
-//       writeStream.on('finish', resolve)
-//       writeStream.on('error', reject)
-//     })
-
-//     // Read the MP3 file into a buffer so it can be uploaded to Firebase
-//     const buffer = fs.readFileSync(speechFile)
-
-//     // Define content type for Firebase (MP3 file)
-//     const contentType = 'audio/mpeg'
-
-//     // Upload the MP3 file to Firebase and get the URL
-//     const frontendPath = await uploadFirebase(podcastTitle, buffer, contentType)
-
-//     // Return the Firebase URL and local file path
-//     return { frontendPath, localPath: speechFile }
-//   } catch (error) {
-//     console.error('Error generating speech:', error)
-//     throw error // Rethrow error for proper error handling
-//   }
-// }
-
-// get voices Names 1
-// export async function voices() {
-//   const keys = process.env.ELEVEN_KEY
-//   const url = 'https://api.elevenlabs.io/v1/voices'
-//   const headers = {
-//     Accept: 'application/json',
-//     'xi-api-key': keys,
-//   }
-
-//   try {
-//     const response = await axios.get(url, { headers })
-
-//     // Ensure data is accessed correctly
-//     const data = response.data
-
-//     // Loop through the voices and print their details
-//     for (const voice of data['voices']) {
-//       console.log(`${voice['name']}; ${voice['voice_id']}`)
-//     }
-//     return null
-//   } catch (error) {
-//     console.error('Error fetching voices:', error)
-//   }
-// }
 
 // get voices Names  2
 export async function voices() {

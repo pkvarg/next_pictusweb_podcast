@@ -1,49 +1,89 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import React from 'react'
+import React, { useState } from 'react'
 import { usePathname } from 'next/navigation'
-import Image from 'next/image'
+import { Globe, ChevronDown } from 'lucide-react'
 
 const LanguageBar = () => {
   const router = useRouter()
-
   const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false)
 
   const path = pathname.slice(4)
+  const currentLang = pathname.slice(1, 3)
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇬🇧', label: 'EN' },
+    { code: 'sk', name: 'Slovenčina', flag: '🇸🇰', label: 'SK' },
+    { code: 'hu', name: 'Magyar', flag: '🇭🇺', label: 'HU' },
+  ]
 
   const handleLanguage = (lang: string) => {
     router.replace(`/${lang}/${path}`)
+    setIsOpen(false)
   }
 
-  return (
-    <div className='flex flex-row gap-3 items-center mt-[0px]'>
-      <button
-        className='hover:text-[#0388f4]'
-        onClick={() => handleLanguage('en')}
-      >
-        EN
-        {/* <Image
-          className='w-[3rem] md:w-[3rem] lg:w-[2rem]'
-          src='/english.webp'
-          alt='english'
-          height={20}
-          width={20}
-        /> */}
-      </button>
+  const currentLanguage = languages.find((lang) => lang.code === currentLang) || languages[0]
 
-      <button
-        className='hover:text-[#0388f4]'
-        onClick={() => handleLanguage('sk')}
-      >
-        SK
-        {/* <Image
-          className='w-[3rem] md:w-[3rem] lg:w-[2rem]'
-          src='/slovak.webp'
-          alt='slovak'
-          height={20}
-          width={20}
-        /> */}
-      </button>
+  return (
+    <div className="">
+      {/* Desktop version - horizontal */}
+      <div className="hidden md:flex flex-row gap-1 items-center rounded-full px-2 py-1 border border-purple-500/20">
+        {languages.map((lang) => (
+          <button
+            key={lang.code}
+            className={`px-3 py-0 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+              currentLang === lang.code
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                : 'text-gray-300 hover:text-white hover:bg-white/10'
+            }`}
+            onClick={() => handleLanguage(lang.code)}
+          >
+            <span className="text-base">{lang.flag}</span>
+            <span>{lang.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Mobile version - dropdown */}
+      <div className="md:hidden relative">
+        <button
+          className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-3 py-2 border border-purple-500/20 hover:bg-white/10 transition-all duration-200"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <Globe className="w-4 h-4 text-purple-400" />
+          <span className="text-base">{currentLanguage.flag}</span>
+          <span className="text-sm font-medium">{currentLanguage.label}</span>
+          <ChevronDown
+            className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full right-0 mt-2 bg-gray-900/95 backdrop-blur-md rounded-2xl border border-purple-500/30 shadow-2xl overflow-hidden z-50 min-w-[160px]">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                className={`w-full px-4 py-3 text-left flex items-center gap-3 transition-all duration-200 ${
+                  currentLang === lang.code
+                    ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-white border-l-2 border-purple-500'
+                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                }`}
+                onClick={() => handleLanguage(lang.code)}
+              >
+                <span className="text-lg">{lang.flag}</span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">{lang.label}</span>
+                  <span className="text-xs text-gray-400">{lang.name}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Click outside to close */}
+      {isOpen && <div className="fixed inset-0 z-40 md:hidden" onClick={() => setIsOpen(false)} />}
     </div>
   )
 }
