@@ -4,13 +4,13 @@ import { isValidPassword } from './lib/isValidPassword'
 
 // Create the internationalization middleware
 const intlMiddleware = createIntlMiddleware({
-  locales: ['en', 'sk'],
+  locales: ['en', 'sk', 'hu'],
   defaultLocale: 'sk',
 })
 
 export async function middleware(req: NextRequest) {
   // Check if the request is for the admin route
-  if (req.nextUrl.pathname.match(/^\/(en|sk)?\/admin/)) {
+  if (req.nextUrl.pathname.match(/^\/(en|sk|hu)?\/admin/)) {
     if (!(await isAuthenticated(req))) {
       return new NextResponse('Unauthorized', {
         status: 401,
@@ -24,24 +24,18 @@ export async function middleware(req: NextRequest) {
 }
 
 async function isAuthenticated(req: NextRequest) {
-  const authHeader =
-    req.headers.get('authorization') || req.headers.get('Authorization')
+  const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
 
   if (authHeader == null) return false
 
-  const [username, password] = Buffer.from(authHeader.split(' ')[1], 'base64')
-    .toString()
-    .split(':')
+  const [username, password] = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':')
 
   return (
     username === process.env.ADMIN_USERNAME &&
-    (await isValidPassword(
-      password,
-      process.env.HASHED_ADMIN_PASSWORD as string
-    ))
+    (await isValidPassword(password, process.env.HASHED_ADMIN_PASSWORD as string))
   )
 }
 
 export const config = {
-  matcher: ['/', '/(sk|en)/:path*', '/admin/:path*', '/(sk|en)/admin/:path*'],
+  matcher: ['/', '/(sk|en|hu)/:path*', '/admin/:path*', '/(sk|en|hu)/admin/:path*'],
 }

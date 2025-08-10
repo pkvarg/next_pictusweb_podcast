@@ -28,11 +28,11 @@ const LanguageBar = () => {
   return (
     <div className="">
       {/* Desktop version - horizontal */}
-      <div className="hidden md:flex flex-row gap-1 items-center rounded-full px-2 py-1 border border-purple-500/20">
+      <div className="hidden md:flex flex-row gap-1 items-center rounded-full px-2 py-0 border border-purple-500/20">
         {languages.map((lang) => (
           <button
             key={lang.code}
-            className={`px-3 py-0 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+            className={`px-3 py-0 rounded-full text-[20px] font-medium transition-all duration-200 flex items-center gap-2 ${
               currentLang === lang.code
                 ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
                 : 'text-gray-300 hover:text-white hover:bg-white/10'

@@ -1,11 +1,9 @@
 'use client'
 import React, { useState } from 'react'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { Link } from '@/i18n/routing'
 
 const AdminNavbar = () => {
   const [navbar, setNavbar] = useState(false)
-  const { locale } = useParams()
 
   return (
     <header>
@@ -61,28 +59,28 @@ const AdminNavbar = () => {
             >
               <ul className="justify-center items-center space-y-8 md:flex md:space-x-6 md:space-y-0 text-[30px] lg:text-[25px] text-red-500">
                 <li>
-                  <Link href={`/${locale}/admin/ai`}>AI</Link>
+                  <Link href={`/admin/ai`}>AI</Link>
                 </li>
                 {/* <li>
-                  <Link href={`/${locale}/admin/audio`}>Audio</Link>
+                  <Link href={`/admin/audio`}>Audio</Link>
                 </li> */}
                 <li>
-                  <Link href={`/${locale}/admin/audio`}>Create Podcast</Link>
+                  <Link href={`/admin/audio`}>Create Podcast</Link>
                 </li>
                 <li>
-                  <Link href={`/${locale}/admin/file-upload`}>File Upload</Link>
+                  <Link href={`/admin/file-upload`}>File Upload</Link>
                 </li>
 
                 {/* <li>
-                  <Link href={`/${locale}/admin/video`}>Video</Link>
+                  <Link href={`/admin/video`}>Video</Link>
                 </li> */}
 
                 {/* <li>
-                  <Link href={`/${locale}/admin/blogs`}>Blogs</Link>
+                  <Link href={`/admin/blogs`}>Blogs</Link>
                 </li> */}
 
                 {/* <li>
-                  <Link href={`/${locale}/admin/announcements`}>Oznamy</Link>
+                  <Link href={`/admin/announcements`}>Oznamy</Link>
                 </li> */}
 
                 {/* <li

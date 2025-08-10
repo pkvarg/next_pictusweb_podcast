@@ -1,6 +1,6 @@
 'use client'
-import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
+import { Link } from '@/i18n/routing'
 
 interface PodcastImageProps {
   imagePath: string
@@ -8,29 +8,18 @@ interface PodcastImageProps {
   id: string
 }
 
-const PodcastImage: React.FC<PodcastImageProps> = ({
-  imagePath,
-  title,
-  id,
-}) => {
-  const router = useRouter()
-  const { locale } = useParams()
-
-  const handleClick = () => {
-    router.push(`/${locale}/podcast/${id}`)
-  }
-
+const PodcastImage: React.FC<PodcastImageProps> = ({ imagePath, title, id }) => {
   return (
-    <div className='cursor-pointer' onClick={handleClick}>
+    <Link href={`/podcast/${id}`} className="cursor-pointer">
       <Image
         src={imagePath || '/icons/headphones.svg'}
         alt={title}
-        className='w-[300px] h-[300px] object-cover rounded-xl'
+        className="w-[300px] h-[300px] object-cover rounded-xl"
         width={250}
         height={250}
         priority
       />
-    </div>
+    </Link>
   )
 }
 

@@ -1,7 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import LanguageBar from './LanguageBar'
 import { useTranslations } from 'next-intl'
 
@@ -9,7 +8,6 @@ const Header = () => {
   const [navbar, setNavbar] = useState(false)
   const [isSticky, setIsSticky] = useState(false)
   const t = useTranslations('Home')
-  const { locale } = useParams()
 
   return (
     <nav
@@ -72,24 +70,24 @@ const Header = () => {
           >
             <ul className="text-[22.5px] lg:text-[22.5px] font-light justify-center space-y-4 md:flex md:space-x-6 md:space-y-0">
               <li>
-                <Link href={`${locale}/automatizations/vehicles`} className="hover:text-[#0388f4]">
+                <Link href={`/automatizations/vehicles`} className="hover:text-[#0388f4]">
                   {t('navbarAutomatizations')}
                 </Link>
               </li>
               <li>
-                <Link href={`${locale}/#projects`} className="hover:text-[#0388f4]">
+                <Link href={`/#projects`} className="hover:text-[#0388f4]">
                   {t('navbarProjects')}
                 </Link>
               </li>
 
               <li>
-                <Link href={`${locale}/podcast`} className="hover:text-[#0388f4]">
+                <Link href={`/podcast`} className="hover:text-[#0388f4]">
                   {t('podcastsTitle')}
                 </Link>
               </li>
 
               <li>
-                <Link href={`${locale}/contact`} className="hover:text-[#0388f4]">
+                <Link href={`/contact`} className="hover:text-[#0388f4]">
                   {t('navbarContact')}
                 </Link>
               </li>

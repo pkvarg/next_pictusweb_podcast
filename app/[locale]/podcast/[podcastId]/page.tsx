@@ -7,7 +7,7 @@ import PagesHeader from '@/app/components/PagesHeader'
 import NeedPodcast from '@/app/components/NeedPodcast'
 import Footer from '@/app/components/Footer'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 
 interface Podcast {
   id: string
@@ -25,7 +25,7 @@ interface Podcast {
 
 const SinglePodcast = () => {
   const t = useTranslations('Home')
-  const { podcastId, locale } = useParams()
+  const { podcastId } = useParams()
   const [podcast, setPodcast] = useState<Podcast | null>(null)
 
   const getPodcast = useCallback(async () => {
@@ -49,11 +49,8 @@ const SinglePodcast = () => {
     <>
       <PagesHeader />
 
-      <section className='flex flex-col mx-4 lg:mx-[10%] py-4 font-light'>
-        <Link
-          href={`/${locale}/podcast`}
-          className='hover:text-[#0388f4] py-2 w-auto'
-        >
+      <section className="flex flex-col mx-4 lg:mx-[10%] py-4 font-light">
+        <Link href={`/podcast`} className="hover:text-[#0388f4] py-2 w-auto">
           {t('podcastsBack')}
         </Link>
         {podcast && (
@@ -71,25 +68,23 @@ const SinglePodcast = () => {
           />
         )}
 
-        <p className='text-[#a7a7a8] text-16 pt-[45px]'>
+        <p className="text-[#a7a7a8] text-16 pt-[45px]">
           {t('podcastDescription')} {podcast?.description}
         </p>
-        <p className='text-[#a7a7a8] capitalize'>
+        <p className="text-[#a7a7a8] capitalize">
           {t('podcastVoice')} {podcast?.voiceType}
         </p>
 
-        <div className='flex flex-col gap-8 mt-4'>
-          <div className='flex flex-col gap-4'>
-            <h1 className='text-18 text-white-1'>Transcript:</h1>
-            <p className='text-16 text-[#a7a7a8] text-justify'>
-              {podcast?.textPrompt}
-            </p>
+        <div className="flex flex-col gap-8 mt-4">
+          <div className="flex flex-col gap-4">
+            <h1 className="text-18 text-white-1">Transcript:</h1>
+            <p className="text-16 text-[#a7a7a8] text-justify">{podcast?.textPrompt}</p>
           </div>
-          <div className='flex flex-col gap-4'>
+          <div className="flex flex-col gap-4">
             {podcast?.imagePrompt && (
               <>
-                <h1 className='text-18 text-white-1'>Image Prompt</h1>
-                <p className='text-16 text-[#a7a7a8]'>{podcast?.imagePrompt}</p>
+                <h1 className="text-18 text-white-1">Image Prompt</h1>
+                <p className="text-16 text-[#a7a7a8]">{podcast?.imagePrompt}</p>
               </>
             )}
           </div>
