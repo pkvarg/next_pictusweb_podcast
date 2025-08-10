@@ -141,6 +141,36 @@
 
     "learnMore": "Tudjon meg többet"
   },
+  "Podcasts": {
+    "podcastHeroTitle1": "AI",
+    "podcastHeroTitle2": "Podcast megoldások",
+    "podcastHeroSubtitle": "Alakítsa át blogját interaktív podcasttá",
+
+    "serviceCard1Title": "📝 Blog + AI",
+    "serviceCard1Description": "Az Ön blogja podcasttá válik. Ne pazarolja az időt felvétellel, az AI megteszi Ön helyett a megadott szöveg alapján.",
+    "serviceCard2Title": "🎙️ Több hang",
+    "serviceCard2Description": "Válasszon olyan AI hangok közül, amelyek megfelelnek márkája tónusának. Professzionális, közvetlen vagy tekintélyes.",
+    "serviceCard3Title": "🌐 Több nyelv",
+    "serviceCard3Description": "Érje el a globális közönséget erőfeszítés nélkül.",
+
+    "examplesSectionTitle": "Fedezze fel",
+    "examplesSectionTitleHighlight": "Podcast példáinkat",
+
+    "filterCategoryLabel": "Kategória",
+    "filterLanguageLabel": "Nyelv",
+    "filterAllCategories": "Összes",
+    "filterAllLanguages": "Minden nyelv",
+    "filterSlovak": "Szlovák",
+    "filterEnglish": "Angol",
+
+    "podcastCategoryLabel": "Kategória:",
+    "languageIndicatorSlovak": "🇸🇰 Szlovák",
+    "languageIndicatorEnglish": "🇬🇧 Angol",
+
+    "noResultsTitle": "Nem találhatók podcastok",
+    "noResultsDescription": "Próbálja meg módosítani a szűrőket több eredmény megtekintéséhez",
+    "noPodcastsFound": "Nem találhatók podcastok"
+  },
   "Automatizations": {
     "heroTitle1": "Automatikus",
     "heroTitle2": "értesítések",

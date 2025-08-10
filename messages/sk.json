@@ -141,6 +141,36 @@
 
     "learnMore": "Zistiť viac"
   },
+  "Podcasts": {
+    "podcastHeroTitle1": "AI",
+    "podcastHeroTitle2": "Podcast riešenia",
+    "podcastHeroSubtitle": "Premeňte svoj blog na interaktívny podcast",
+
+    "serviceCard1Title": "📝 Blog + AI",
+    "serviceCard1Description": "Váš blog sa stane podcastom. Nestrácajte čas nahrávaním, AI to urobí za vás podľa Vami zadaného textu.",
+    "serviceCard2Title": "🎙️ Viac hlasov",
+    "serviceCard2Description": "Vyberte si z AI hlasov, ktoré zodpovedajú tónu vašej značky. Profesionálne, neformálne alebo autoritatívne.",
+    "serviceCard3Title": "🌐 Viac jazykov",
+    "serviceCard3Description": "Oslovte globálne publikum bez námahy.",
+
+    "examplesSectionTitle": "Preskúmajte naše",
+    "examplesSectionTitleHighlight": "Podcast príklady",
+
+    "filterCategoryLabel": "Kategória",
+    "filterLanguageLabel": "Jazyk",
+    "filterAllCategories": "Všetky",
+    "filterAllLanguages": "Všetky jazyky",
+    "filterSlovak": "Slovenčina",
+    "filterEnglish": "Angličtina",
+
+    "podcastCategoryLabel": "Kategória:",
+    "languageIndicatorSlovak": "🇸🇰 Slovenčina",
+    "languageIndicatorEnglish": "🇬🇧 Angličtina",
+
+    "noResultsTitle": "Žiadne podcasty sa nenašli",
+    "noResultsDescription": "Skúste upraviť filtre, aby ste videli viac výsledkov",
+    "noPodcastsFound": "Žiadne podcasty sa nenašli"
+  },
   "Automatizations": {
     "heroTitle1": "Automatické",
     "heroTitle2": "upozornenia",

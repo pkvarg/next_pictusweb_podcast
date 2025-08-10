@@ -137,6 +137,36 @@
 
     "learnMore": "Learn more"
   },
+  "Podcasts": {
+    "podcastHeroTitle1": "AI",
+    "podcastHeroTitle2": "Podcast Solutions",
+    "podcastHeroSubtitle": "Turn your blog into an interactive podcast",
+
+    "serviceCard1Title": "📝 Blog + AI",
+    "serviceCard1Description": "Your blog becomes a podcast. Don't waste time recording, AI will do it for you based on your text input.",
+    "serviceCard2Title": "🎙️ Multiple Voices",
+    "serviceCard2Description": "Choose from AI voices that match your brand tone. Professional, casual, or authoritative.",
+    "serviceCard3Title": "🌐 Multiple Languages",
+    "serviceCard3Description": "Reach global audiences effortlessly.",
+
+    "examplesSectionTitle": "Explore our",
+    "examplesSectionTitleHighlight": "Podcast examples",
+
+    "filterCategoryLabel": "Category",
+    "filterLanguageLabel": "Language",
+    "filterAllCategories": "All",
+    "filterAllLanguages": "All languages",
+    "filterSlovak": "Slovak",
+    "filterEnglish": "English",
+
+    "podcastCategoryLabel": "Category:",
+    "languageIndicatorSlovak": "🇸🇰 Slovak",
+    "languageIndicatorEnglish": "🇬🇧 English",
+
+    "noResultsTitle": "No podcasts found",
+    "noResultsDescription": "Try adjusting your filters to see more results",
+    "noPodcastsFound": "No podcasts found"
+  },
   "Automatizations": {
     "heroTitle1": "Automatic",
     "heroTitle2": "notifications",
