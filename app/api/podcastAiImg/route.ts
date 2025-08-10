@@ -53,10 +53,11 @@ export async function POST(req: NextRequest) {
       const timestamp = getTimeStamp()
       const filename = `${title}_${timestamp}.png`
 
-      const apiUrl =
-        process.env.NODE_ENV === 'development'
-          ? `http://localhost:3013/api/namedupload/pictusweb/${filename}`
-          : `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
+      // const apiUrl =
+      //   process.env.NODE_ENV === 'development'
+      //     ? `http://localhost:3013/api/namedupload/pictusweb/${filename}`
+      //     : `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
+      const apiUrl = `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
 
       // Send the raw arrayBuffer directly instead of using FormData
       const uploadResponse = await fetch(apiUrl, {

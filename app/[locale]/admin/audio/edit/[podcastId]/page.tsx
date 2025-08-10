@@ -13,6 +13,7 @@ import PreviewAudio from '@/lib/PreviewAudio'
 import { createAzureSpeech } from '../../../_actions/podcastAzureActions'
 import { createElevenlabsSpeech } from '../../../_actions/podcastElevenlabsActions'
 import { createOpenAiSpeech } from '../../../_actions/podcastOpenAiActions'
+import AdminBack from '@/app/components/admin/AdminBack'
 
 interface Podcast {
   id: string
@@ -171,7 +172,7 @@ const EditPodcast = () => {
         formdata.append('file', e.target.files[0])
 
         const apiUrl = 'https://hono-api.pictusweb.com/api/upload/pictusweb'
-        //const apiUrl = 'http://localhost:3013/api/upload/pictusweb'
+        // const apiUrl = 'http://localhost:3013/api/upload/pictusweb'
 
         console.log('api url edit', apiUrl)
 
@@ -279,251 +280,256 @@ const EditPodcast = () => {
   return (
     <AdminLayout>
       <div className="space-y-8">
+        <AdminBack />
         <div>
           <h1 className="text-3xl font-bold text-white">Edit Podcast</h1>
           <p className="mt-2 text-gray-400">Modify your existing podcast content and settings</p>
         </div>
 
         <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-      {podcast ? (
-        <form
-          onSubmit={handleSubmit}
-          method="post"
-          className="relative flex flex-col mx-2 lg:mx-[25%] mt-16"
-        >
-          <input type="hidden" name="id" value={podcast.id} />
-
-          <label className="text-16 font-bold text-white">Title</label>
-          <input
-            className="bg-[#15181c] pl-2 w-full"
-            type="text"
-            value={podcastTitle}
-            onChange={(e) => setPodcastTitle(e.target.value)}
-            placeholder="Enter Podcast title"
-          />
-
-          <div className="flex flex-col gap-2.5 my-8">
-            <label htmlFor="description" className="text-[25px] mt-4">
-              Description
-            </label>
-            <textarea
-              className="bg-[#15181c] mt-4 pl-1 w-full"
-              name="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Description..."
-            />
-
-            <label htmlFor="aitexttospeech" className="text-[25px] mt-4">
-              AI Prompt to convert to speech
-            </label>
-            <textarea
-              className="bg-[#15181c] text-[25px] pl-2 w-[100%] mt-2 h-[300px]"
-              value={textPrompt}
-              onChange={(e) => setTextPrompt(e.target.value)}
-              placeholder="Enter text to convert to speech"
-            />
-
-            <p className="mt-8">VoiceType: {voiceType}</p>
-
-            <label className="text-16 font-bold text-white mt-8">Select AI Voice Provider</label>
-
-            <div className="flex flex-row gap-4 justify-start items-center my-4">
-              <Image
-                src={'/tech/openai-logo.webp'}
-                width={250}
-                height={250}
-                alt="openai"
-                onClick={() => setVoiceProvider('openai')}
-                className="w-[50px] cursor-pointer"
-              />
-              <Image
-                src={'/tech/azure-logo.webp'}
-                width={250}
-                height={250}
-                alt="azureai"
-                onClick={() => setVoiceProvider('azure')}
-                className="w-[50px] cursor-pointer"
-              />
-              <Image
-                src={'/tech/eleven-labs-logo.webp'}
-                width={250}
-                height={250}
-                alt="elevenlabsai"
-                onClick={() => setVoiceProvider('elevenlabs')}
-                className="w-[50px] cursor-pointer rounded-full"
-              />
-            </div>
-
-            {voiceProvider !== '' && (
-              <div className="flex flex-col">
-                <label className="text-16 font-bold text-white">Select AI Voice</label>
-
-                <select
-                  id="category"
-                  name="category"
-                  className="mt-2 bg-[#15181c]"
-                  value={voiceType || 'choose voice'}
-                  onChange={(e) => handleVoiceType(e.target.value)}
-                >
-                  {voiceCategs?.map((category: string) => (
-                    <option
-                      key={category}
-                      value={category}
-                      className="w-full px-16 !text-white bg-[#15181c]"
-                    >
-                      {category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {voiceType && <audio src={`/voices/${voiceType}.mp3`} autoPlay className="hidden" />}
-          </div>
-
-          <div className="flex flex-row gap-4 justify-start items-center">
-            {isSubmittingText ? (
-              <Loader size={60} className="animate-spin " />
-            ) : (
-              <button
-                onClick={generateAudio}
-                className="bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer"
-              >
-                Generate
-              </button>
-            )}
-
-            {audioPath && (
-              <div className="mt-[15px]">
-                <PreviewAudio audioPath={audioPath as string} />
-              </div>
-            )}
-          </div>
-          <label htmlFor="category" className="text-[25px] py-4">
-            Category
-          </label>
-          <select
-            id="category"
-            name="category"
-            className="mt-2 text-white bg-[#15181c] w-full"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="life" className="focus:bg-orange-500">
-              Life
-            </option>
-            <option value="tech">Tech</option>
-            <option value="random">Random</option>
-          </select>
-
-          <label className="text-white mt-4">
-            <input
-              name="english"
-              type="checkbox"
-              checked={english}
-              onChange={(e) => setEnglish(e.target.checked)}
-            />
-            <span className="pl-2">Is this to be displayed on the english webpage?</span>
-          </label>
-
-          <div className="flex flex-col lg:flex-row gap-4 my-4 text-orange-500">
-            <p
-              onClick={() => setOpenOwnImage((prev) => !prev)}
-              className="cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4"
+          {podcast ? (
+            <form
+              onSubmit={handleSubmit}
+              method="post"
+              className="relative flex flex-col mx-2 lg:mx-[25%] mt-16"
             >
-              Upload your own Image
-            </p>
-            <p
-              onClick={() => setOpenAiImage((prev) => !prev)}
-              className="cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4"
-            >
-              Use AI to create an Image
-            </p>
-          </div>
+              <input type="hidden" name="id" value={podcast.id} />
 
-          {openOwnImg && (
-            <div className="flex flex-col relative my-8">
+              <label className="text-16 font-bold text-white">Title</label>
               <input
-                type="file"
-                id="image"
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
+                className="bg-[#15181c] pl-2 w-full"
+                type="text"
+                value={podcastTitle}
+                onChange={(e) => setPodcastTitle(e.target.value)}
+                placeholder="Enter Podcast title"
               />
-              <div className="flex flex-row ml-4">
-                <button
-                  type="button"
-                  className="border border-white w-[36px] h-[36px] 100 flex items-center justify-center cursor-pointer"
-                >
-                  <label htmlFor="image">
-                    <Image src="/plus.png" alt="Add image file" width={16} height={16} />
-                  </label>
-                </button>
-                <button
-                  type="button"
-                  className="ml-16 border border-white w-[36px] h-[36px] 100 flex items-center justify-center cursor-pointer"
-                >
-                  <label htmlFor="image">
-                    <AiOutlineDelete className="text-red-700" onClick={removeFile} />
-                  </label>
-                </button>
+
+              <div className="flex flex-col gap-2.5 my-8">
+                <label htmlFor="description" className="text-[25px] mt-4">
+                  Description
+                </label>
+                <textarea
+                  className="bg-[#15181c] mt-4 pl-1 w-full"
+                  name="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Description..."
+                />
+
+                <label htmlFor="aitexttospeech" className="text-[25px] mt-4">
+                  AI Prompt to convert to speech
+                </label>
+                <textarea
+                  className="bg-[#15181c] text-[25px] pl-2 w-[100%] mt-2 h-[300px]"
+                  value={textPrompt}
+                  onChange={(e) => setTextPrompt(e.target.value)}
+                  placeholder="Enter text to convert to speech"
+                />
+
+                <p className="mt-8">VoiceType: {voiceType}</p>
+
+                <label className="text-16 font-bold text-white mt-8">
+                  Select AI Voice Provider
+                </label>
+
+                <div className="flex flex-row gap-4 justify-start items-center my-4">
+                  <Image
+                    src={'/tech/openai-logo.webp'}
+                    width={250}
+                    height={250}
+                    alt="openai"
+                    onClick={() => setVoiceProvider('openai')}
+                    className="w-[50px] cursor-pointer"
+                  />
+                  <Image
+                    src={'/tech/azure-logo.webp'}
+                    width={250}
+                    height={250}
+                    alt="azureai"
+                    onClick={() => setVoiceProvider('azure')}
+                    className="w-[50px] cursor-pointer"
+                  />
+                  <Image
+                    src={'/tech/eleven-labs-logo.webp'}
+                    width={250}
+                    height={250}
+                    alt="elevenlabsai"
+                    onClick={() => setVoiceProvider('elevenlabs')}
+                    className="w-[50px] cursor-pointer rounded-full"
+                  />
+                </div>
+
+                {voiceProvider !== '' && (
+                  <div className="flex flex-col">
+                    <label className="text-16 font-bold text-white">Select AI Voice</label>
+
+                    <select
+                      id="category"
+                      name="category"
+                      className="mt-2 bg-[#15181c]"
+                      value={voiceType || 'choose voice'}
+                      onChange={(e) => handleVoiceType(e.target.value)}
+                    >
+                      {voiceCategs?.map((category: string) => (
+                        <option
+                          key={category}
+                          value={category}
+                          className="w-full px-16 !text-white bg-[#15181c]"
+                        >
+                          {category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {voiceType && (
+                  <audio src={`/voices/${voiceType}.mp3`} autoPlay className="hidden" />
+                )}
               </div>
 
-              <p className="mt-8">{imagePath}</p>
-              {updatedImagePath && <p className="mt-8">Updated Path {updatedImagePath}</p>}
-            </div>
-          )}
+              <div className="flex flex-row gap-4 justify-start items-center">
+                {isSubmittingText ? (
+                  <Loader size={60} className="animate-spin " />
+                ) : (
+                  <button
+                    onClick={generateAudio}
+                    className="bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer"
+                  >
+                    Generate
+                  </button>
+                )}
 
-          {openAiImg && (
-            <div className="flex flex-col relative  mt-8">
-              <textarea
-                className="bg-[#15181c] text-[25px] pl-2 w-[100%] h-[300px]"
-                value={imagePrompt}
-                onChange={(e) => setImagePrompt(e.target.value)}
-                placeholder="Enter promt for AI image creation"
-              />
+                {audioPath && (
+                  <div className="mt-[15px]">
+                    <PreviewAudio audioPath={audioPath as string} />
+                  </div>
+                )}
+              </div>
+              <label htmlFor="category" className="text-[25px] py-4">
+                Category
+              </label>
+              <select
+                id="category"
+                name="category"
+                className="mt-2 text-white bg-[#15181c] w-full"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="life" className="focus:bg-orange-500">
+                  Life
+                </option>
+                <option value="tech">Tech</option>
+                <option value="random">Random</option>
+              </select>
 
-              {isSubmittingImage ? (
-                <Loader size={60} className="animate-spin ml-[45%] mt-4" />
-              ) : (
-                <button
-                  onClick={handleGetAiImage}
-                  className="bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer w-max"
+              <label className="text-white mt-4">
+                <input
+                  name="english"
+                  type="checkbox"
+                  checked={english}
+                  onChange={(e) => setEnglish(e.target.checked)}
+                />
+                <span className="pl-2">Is this to be displayed on the english webpage?</span>
+              </label>
+
+              <div className="flex flex-col lg:flex-row gap-4 my-4 text-orange-500">
+                <p
+                  onClick={() => setOpenOwnImage((prev) => !prev)}
+                  className="cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4"
                 >
-                  Get AI Image from Prompt
-                </button>
+                  Upload your own Image
+                </p>
+                <p
+                  onClick={() => setOpenAiImage((prev) => !prev)}
+                  className="cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4"
+                >
+                  Use AI to create an Image
+                </p>
+              </div>
+
+              {openOwnImg && (
+                <div className="flex flex-col relative my-8">
+                  <input
+                    type="file"
+                    id="image"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                  <div className="flex flex-row ml-4">
+                    <button
+                      type="button"
+                      className="border border-white w-[36px] h-[36px] 100 flex items-center justify-center cursor-pointer"
+                    >
+                      <label htmlFor="image">
+                        <Image src="/plus.png" alt="Add image file" width={16} height={16} />
+                      </label>
+                    </button>
+                    <button
+                      type="button"
+                      className="ml-16 border border-white w-[36px] h-[36px] 100 flex items-center justify-center cursor-pointer"
+                    >
+                      <label htmlFor="image">
+                        <AiOutlineDelete className="text-red-700" onClick={removeFile} />
+                      </label>
+                    </button>
+                  </div>
+
+                  <p className="mt-8">{imagePath}</p>
+                  {updatedImagePath && <p className="mt-8">Updated Path {updatedImagePath}</p>}
+                </div>
               )}
+
+              {openAiImg && (
+                <div className="flex flex-col relative  mt-8">
+                  <textarea
+                    className="bg-[#15181c] text-[25px] pl-2 w-[100%] h-[300px]"
+                    value={imagePrompt}
+                    onChange={(e) => setImagePrompt(e.target.value)}
+                    placeholder="Enter promt for AI image creation"
+                  />
+
+                  {isSubmittingImage ? (
+                    <Loader size={60} className="animate-spin ml-[45%] mt-4" />
+                  ) : (
+                    <button
+                      onClick={handleGetAiImage}
+                      className="bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer w-max"
+                    >
+                      Get AI Image from Prompt
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {previewUrl && (
+                <Image
+                  // className='my-4 w-[150px] h-auto'
+                  className="my-4 w-[250px] h-auto"
+                  src={previewUrl}
+                  alt={podcastTitle}
+                  width={250}
+                  height={250}
+                />
+              )}
+
+              <button
+                className="my-4 py-2 bg-green-400 text-white rounded-xl"
+                type="submit"
+                disabled={isPending}
+              >
+                {isPending ? '...Editing...' : 'Edit'}
+              </button>
+              {message && (
+                <p className="my-8 text-center bg-yellow-500 text-white text-[25px]">{message}</p>
+              )}
+              <DeletePodcastButton podcastId={podcast.id} />
+            </form>
+          ) : (
+            <div className="text-center py-12">
+              <h1 className="text-white text-lg">Loading...</h1>
             </div>
           )}
-
-          {previewUrl && (
-            <Image
-              // className='my-4 w-[150px] h-auto'
-              className="my-4 w-[250px] h-auto"
-              src={previewUrl}
-              alt={podcastTitle}
-              width={250}
-              height={250}
-            />
-          )}
-
-          <button
-            className="my-4 py-2 bg-green-400 text-white rounded-xl"
-            type="submit"
-            disabled={isPending}
-          >
-            {isPending ? '...Editing...' : 'Edit'}
-          </button>
-          {message && (
-            <p className="my-8 text-center bg-yellow-500 text-white text-[25px]">{message}</p>
-          )}
-          <DeletePodcastButton podcastId={podcast.id} />
-        </form>
-      ) : (
-        <div className="text-center py-12">
-          <h1 className="text-white text-lg">Loading...</h1>
-        </div>
-      )}
         </div>
       </div>
     </AdminLayout>

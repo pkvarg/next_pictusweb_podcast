@@ -93,10 +93,11 @@ export async function createElevenlabsSpeech(
     const timestamp = getTimeStamp()
     const filename = `${podcastTitle}_${timestamp}.mp3`
 
-    const apiUrl =
-      process.env.NODE_ENV === 'development'
-        ? `http://localhost:3013/api/namedupload/pictusweb/${filename}`
-        : `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
+    // const apiUrl =
+    //   process.env.NODE_ENV === 'development'
+    //     ? `http://localhost:3013/api/namedupload/pictusweb/${filename}`
+    //     : `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
+    const apiUrl = `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
 
     // Send the buffer data
     const uploadResponse = await fetch(apiUrl, {
@@ -104,7 +105,8 @@ export async function createElevenlabsSpeech(
       headers: {
         'Content-Type': 'audio/mpeg', // Correct content type for MP3
       },
-      body: new Uint8Array(buffer),
+      //body: new Uint8Array(buffer),
+      body: buffer,
     })
 
     if (!uploadResponse.ok) {

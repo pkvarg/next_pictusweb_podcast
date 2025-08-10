@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Link } from '@/i18n/routing'
 import { usePathname } from 'next/navigation'
-import { Home, Mic, Brain, Upload, BarChart3, Menu, X, Headphones } from 'lucide-react'
+import { Home, Mic, Brain, Upload, BarChart3, Menu, X, Headphones, LogOut } from 'lucide-react'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -18,11 +18,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       href: '/admin',
       icon: BarChart3,
     },
-    {
-      name: 'AI Services',
-      href: '/admin/ai',
-      icon: Brain,
-    },
+    // {
+    //   name: 'AI Services',
+    //   href: '/admin/ai',
+    //   icon: Brain,
+    // },
     {
       name: 'Create Podcast',
       href: '/admin/audio',
@@ -40,6 +40,24 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       return pathname === '/en/admin' || pathname === '/sk/admin' || pathname === '/hu/admin'
     }
     return pathname.includes(href)
+  }
+
+  const handleLogout = () => {
+    // For Basic Auth, we need to send an invalid request to clear credentials
+    fetch('/api/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + btoa('invalid:invalid'),
+      },
+    })
+      .then(() => {
+        // Redirect to admin page which will trigger re-authentication
+        window.location.href = '/'
+      })
+      .catch(() => {
+        // Even if the request fails, redirect to clear the session
+        window.location.href = '/'
+      })
   }
 
   return (
@@ -100,6 +118,15 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                 <span className="hidden lg:block">Back to Website</span>
               </Link>
 
+              {/* Logout - Desktop */}
+              <button
+                onClick={handleLogout}
+                className="hidden sm:flex items-center text-sm text-gray-400 hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span className="hidden lg:block">Logout</span>
+              </button>
+
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -139,7 +166,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                   </Link>
                 )
               })}
-              
+
               {/* Mobile Back to Website */}
               <Link
                 href="/"
@@ -148,15 +175,22 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                 <Home className="mr-3 h-5 w-5" />
                 Back to Website
               </Link>
+
+              {/* Mobile Logout */}
+              <button
+                onClick={handleLogout}
+                className="flex items-center px-4 py-3 text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors w-full"
+              >
+                <LogOut className="mr-3 h-5 w-5" />
+                Logout
+              </button>
             </nav>
           </div>
         )}
       </header>
 
       {/* Main content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {children}
-      </main>
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">{children}</main>
     </div>
   )
 }
