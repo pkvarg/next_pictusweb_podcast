@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Yanone_Kaffeesatz } from 'next/font/google'
 import './globals.css'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
+import { getMessages, getTranslations } from 'next-intl/server'
 import AudioProvider from '@/app/components/podcast/AudioProvider'
 import { cn } from '@/lib/utils'
 import { Toaster } from '@/components/ui/toaster'
@@ -11,9 +11,37 @@ import ScrollToTop from '@/app/components/ScrollToTop'
 
 const inter = Yanone_Kaffeesatz({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'Pictusweb',
-  description: 'Web development',
+export async function generateMetadata({ params }: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'Home' })
+
+  return {
+    title: t('metaTitle'),
+    description: t('metaDescription'),
+    openGraph: {
+      title: t('ogTitle'),
+      description: t('ogDescription'),
+      type: 'website',
+      siteName: 'pictusweb.sk',
+      url: 'https://www.pictusweb.sk',
+      images: [{
+        url: 'https://www.pictusweb.sk/pictusweb.webp',
+        width: 400,
+        height: 400,
+        alt: 'pictusweb.sk',
+      }],
+    },
+    alternates: {
+      canonical: `https://www.pictusweb.sk/${locale}`,
+      languages: {
+        'en': 'https://www.pictusweb.sk/en',
+        'sk': 'https://www.pictusweb.sk/sk',
+        'hu': 'https://www.pictusweb.sk/hu',
+      },
+    },
+  }
 }
 
 export async function generateStaticParams() {
@@ -25,34 +53,15 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode
-  params: Promise<{ lang: 'en-US' | 'sk' | 'hu' }>
+  params: Promise<{ locale: 'en' | 'sk' | 'hu' }>
 }>) {
+  const { locale } = await params
   const messages = await getMessages()
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <html lang={(await params).lang} className="!scroll-smooth">
+      <html lang={locale} className="!scroll-smooth">
         <head>
-          <meta property="title" content="Pictusweb development" />
-          <meta
-            property="description"
-            content="Tvorba webstránok, blogy, podcasty, eshopy, Ai služby"
-          />
-
-          <meta property="og:title" content="Pictusweb development" />
-          <meta
-            property="og:description"
-            content="Tvorba webstránok, blogy, podcasty, eshopy, Ai služby"
-          />
-          <meta property="og:type" content="website" />
-          <meta property="og:site_name" content="pictusweb.sk" />
-          <meta property="og:url" content="https://www.pictusweb.sk" />
-
-          <meta property="og:image" content="https://www.pictusweb.sk/pictusweb.webp" />
-          <meta property="og:image:type" content="png" />
-          <meta property="og:image:width" content="400" />
-          <meta property="og:image:height" content="400" />
-          <meta property="og:image:alt" content="pictusweb.sk" />
           <meta property="fb:app_id" content="627076731624225" />
         </head>
         <AudioProvider>

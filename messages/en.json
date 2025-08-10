@@ -108,7 +108,11 @@
     "servicesAwayTitle": "Not available?",
     "servicesAwayDesc": "The form ensures that messages from customers always come to your email.",
     "projectsTitle": "Projects",
-    "projectsDetails": "Details"
+    "projectsDetails": "Details",
+    "metaTitle": "Pictusweb - Web Development & AI Services",
+    "metaDescription": "Web development, blogs, podcasts, e-shops, AI services. Professional websites with modern design using cutting-edge technologies.",
+    "ogTitle": "Pictusweb - Web Development & AI Services",
+    "ogDescription": "Web development, blogs, podcasts, e-shops, AI services. Professional websites with modern design using cutting-edge technologies."
   },
   "NewsSlider": {
     "newServicesLabel": "New services",

@@ -451,7 +451,7 @@ const EditPodcast = () => {
                   className="border border-white w-[36px] h-[36px] 100 flex items-center justify-center cursor-pointer"
                 >
                   <label htmlFor="image">
-                    <Image src="/plus.png" alt="" width={16} height={16} />
+                    <Image src="/plus.png" alt="Add image file" width={16} height={16} />
                   </label>
                 </button>
                 <button

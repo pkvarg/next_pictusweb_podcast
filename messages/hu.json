@@ -112,7 +112,11 @@
     "podcastsFilter": "Szűrés szerint",
     "podcastsLanguage": "Podcastok",
     "podcastsLife": "Élettörténetek",
-    "podcastsTech": "Tech"
+    "podcastsTech": "Tech",
+    "metaTitle": "Pictusweb - Weboldal készítés és AI szolgáltatások",
+    "metaDescription": "Weboldal készítés, blogok, podcastok, webshopok, AI szolgáltatások. Professzionális weboldalak modern dizajnnal a legmodernebbtech nológiák használatával.",
+    "ogTitle": "Pictusweb - Weboldal készítés és AI szolgáltatások",
+    "ogDescription": "Weboldal készítés, blogok, podcastok, webshopok, AI szolgáltatások. Professzionális weboldalak modern dizajnnal a legmodernebbtech nológiák használatával."
   },
   "NewsSlider": {
     "newServicesLabel": "Új szolgáltatások",
