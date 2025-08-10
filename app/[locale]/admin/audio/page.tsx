@@ -11,7 +11,7 @@ import { createAzureSpeech } from '../_actions/podcastAzureActions'
 import { createElevenlabsSpeech } from '../_actions/podcastElevenlabsActions'
 
 import PreviewAudio from '@/lib/PreviewAudio'
-import AudioBack from './../../../components/admin/AdminBack'
+import AdminLayout from '@/app/components/admin/AdminLayout'
 
 const Audio = () => {
   const { toast } = useToast()
@@ -229,10 +229,15 @@ const Audio = () => {
   }
 
   return (
-    <div className="flex flex-col gap-2 justify-center items-center py-16 w-full bg-[#0f1114] text-white  px-4 lg:px-[10%]">
-      <AudioBack />
+    <AdminLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Create Podcast</h1>
+          <p className="mt-2 text-gray-400">Generate AI-powered podcasts from your text content</p>
+        </div>
 
-      <h1>Create Podcast</h1>
+        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6"
+      >
       <form>
         <label className="text-16 font-bold text-white">Title</label>
         <input
@@ -493,7 +498,9 @@ const Audio = () => {
           </button>
         )}
       </form>
-    </div>
+        </div>
+      </div>
+    </AdminLayout>
   )
 }
 

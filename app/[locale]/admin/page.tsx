@@ -1,19 +1,16 @@
-import AdminNavbar from '@/app/components/admin/AdminNavbar'
+import AdminLayout from '@/app/components/admin/AdminLayout'
+import AdminDashboard from '@/app/components/admin/AdminDashboard'
 import AllPodcasts from '@/app/components/admin/AllPodcasts'
-import Counter from '@/app/components/admin/Counter'
-import RefreshButton from '@/app/components/admin/RefreshButton'
 import React from 'react'
 
 const Admin = () => {
   return (
-    <div>
-      <AdminNavbar />
-
-      <h1 className='text-center'>Admin</h1>
-      <Counter />
-      <RefreshButton />
-      <AllPodcasts />
-    </div>
+    <AdminLayout>
+      <AdminDashboard />
+      <div className="mt-8">
+        <AllPodcasts />
+      </div>
+    </AdminLayout>
   )
 }
 

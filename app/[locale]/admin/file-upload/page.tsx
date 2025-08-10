@@ -1,8 +1,8 @@
 'use client'
 import { useState, useRef, ChangeEvent } from 'react'
-import Link from 'next/link'
 import React from 'react'
 import Image from 'next/image'
+import AdminLayout from '@/app/components/admin/AdminLayout'
 
 const FileUpload = () => {
   const [loading, setLoading] = useState<boolean>(false)
@@ -92,11 +92,12 @@ const FileUpload = () => {
     }
   }
   return (
-    <div className="container mx-auto py-8">
-      <Link href={'/sk/admin'} className="text-white text-[30px] text-center cursor-pointer">
-        Naspäť
-      </Link>
-      <h1 className="text-2xl font-bold mb-6 text-center">File Upload</h1>
+    <AdminLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white">File Upload</h1>
+          <p className="mt-2 text-gray-400">Upload and manage media files for your podcasts</p>
+        </div>
       <div className="p-6 border border-black rounded-lg shadow-md max-w-md mx-auto bg-[#3B3A3A]">
         <h2 className="text-xl text-white font-bold mb-4">Nahrať súbor</h2>
 
@@ -170,7 +171,8 @@ const FileUpload = () => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   )
 }
 

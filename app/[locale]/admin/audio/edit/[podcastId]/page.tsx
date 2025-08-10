@@ -5,7 +5,7 @@ import { getSinglePodcast, editSinglePodcast } from '../../../_actions/podcastAc
 import DeletePodcastButton from './../../../../../components/admin/DeletePodcastButton'
 
 import { AiOutlineDelete } from 'react-icons/ai'
-import AudioBack from './../../../../../components/admin/AdminBack'
+import AdminLayout from '@/app/components/admin/AdminLayout'
 import Image from 'next/image'
 import { Loader } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
@@ -277,9 +277,14 @@ const EditPodcast = () => {
   }
 
   return (
-    <div className="text-white text-[25px] flex flex-col gap-2 justify-center items-center my-8">
-      <AudioBack />
-      <h1 className="text-yellow-300">Edit Single Podcast</h1>
+    <AdminLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Edit Podcast</h1>
+          <p className="mt-2 text-gray-400">Modify your existing podcast content and settings</p>
+        </div>
+
+        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
       {podcast ? (
         <form
           onSubmit={handleSubmit}
@@ -515,9 +520,13 @@ const EditPodcast = () => {
           <DeletePodcastButton podcastId={podcast.id} />
         </form>
       ) : (
-        <h1>...Loading</h1>
+        <div className="text-center py-12">
+          <h1 className="text-white text-lg">Loading...</h1>
+        </div>
       )}
-    </div>
+        </div>
+      </div>
+    </AdminLayout>
   )
 }
 
