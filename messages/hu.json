@@ -12,6 +12,7 @@
     "footerCategory1": "Szolgáltatások",
     "footerCategory2": "Rólunk",
     "footerCategory3": "Kapcsolat",
+    "footerForClients": "Ügyfeleknek",
 
     "navbarOffer": "Ajánlat",
     "navbarAutomatizations": "Automatizálás",
@@ -284,7 +285,31 @@
     "usernamePlaceholder": "Adja meg felhasználónevét",
     "passwordPlaceholder": "Adja meg jelszavát",
     "signIn": "Bejelentkezés",
+    "signInWithGoogle": "Folytatás Google-lel",
+    "signInWithGitHub": "Folytatás GitHub-bal",
+    "orDivider": "vagy",
     "invalidCredentials": "Érvénytelen felhasználónév vagy jelszó",
     "loginError": "Hiba történt a bejelentkezés során"
+  },
+  "Client": {
+    "welcomeTitle": "Üdvözöljük az ügyfélterületen",
+    "welcomeSubtitle": "Kezelje projektjeit és szolgáltatásait",
+    "dashboardTitle": "Áttekintés",
+    "projectsTitle": "Az Ön projektjei",
+    "servicesTitle": "Elérhető szolgáltatások",
+    "supportTitle": "Támogatás",
+    "noProjectsMessage": "Még nincsenek projektjei.",
+    "contactSupport": "Kapcsolat a támogatással",
+    "logOut": "Kijelentkezés"
+  },
+  "Error": {
+    "accessDenied": "Hozzáférés megtagadva",
+    "accessDeniedMessage": "Sajnos, az Ön e-mail címe nem jogosult hozzáférni ehhez az alkalmazáshoz.",
+    "contactAdmin": "Kérjük, lépjen kapcsolatba az adminisztrátorral, ha úgy gondolja, hogy ez hiba.",
+    "backToHome": "Vissza a főoldalra",
+    "adminEmail": "Adminisztrátor: info@pictusweb.sk",
+    "authError": "Hitelesítési hiba történt.",
+    "errorLabel": "Hiba:",
+    "tryAgain": "Próbálja újra"
   }
 }

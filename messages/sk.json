@@ -12,6 +12,7 @@
     "footerCategory1": "Služby",
     "footerCategory2": "O nás",
     "footerCategory3": "Kontakt",
+    "footerForClients": "Pre klientov",
 
     "navbarOffer": "Ponuka",
     "navbarAutomatizations": "Automatizácie",
@@ -278,13 +279,37 @@
   },
   "Auth": {
     "loginTitle": "Pictusweb Admin",
-    "loginSubtitle": "Prihlásenie do administrácie",
+    "loginSubtitle": "Klientska zóna",
     "username": "Používateľské meno",
     "password": "Heslo",
     "usernamePlaceholder": "Zadajte používateľské meno",
     "passwordPlaceholder": "Zadajte heslo",
     "signIn": "Prihlásiť",
+    "signInWithGoogle": "Pokračovať s Google",
+    "signInWithGitHub": "Pokračovať s GitHub",
+    "orDivider": "alebo",
     "invalidCredentials": "Neplatné používateľské meno alebo heslo",
     "loginError": "Nastala chyba pri prihlasovaní"
+  },
+  "Client": {
+    "welcomeTitle": "Vitajte v klientskej zóne",
+    "welcomeSubtitle": "Spravujte svoje projekty a služby",
+    "dashboardTitle": "Prehľad",
+    "projectsTitle": "Vaše projekty",
+    "servicesTitle": "Dostupné služby",
+    "supportTitle": "Podpora",
+    "noProjectsMessage": "Zatiaľ nemáte žiadne projekty.",
+    "contactSupport": "Kontaktovať podporu",
+    "logOut": "Odhlásiť"
+  },
+  "Error": {
+    "accessDenied": "Prístup zamietnutý",
+    "accessDeniedMessage": "Prepáčte, vaša emailová adresa nie je autorizovaná na prístup do tejto aplikácie.",
+    "contactAdmin": "Kontaktujte administrátora, ak si myslíte, že ide o chybu.",
+    "backToHome": "Späť na domovskú stránku",
+    "adminEmail": "Administrátor: info@pictusweb.sk",
+    "authError": "Nastala chyba pri autentifikácii.",
+    "errorLabel": "Chyba:",
+    "tryAgain": "Skúsiť znovu"
   }
 }

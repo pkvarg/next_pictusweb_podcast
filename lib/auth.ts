@@ -2,6 +2,7 @@
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
+import GitHubProvider from 'next-auth/providers/github'
 import { isValidPassword } from './isValidPassword'
 
 // Extend the built-in session types
@@ -23,6 +24,7 @@ declare module 'next-auth' {
   }
 }
 
+
 // Initialize NextAuth with configuration
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
@@ -31,12 +33,40 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: '/login',
+    error: '/sk/auth/error', // Default to Slovak, but NextAuth will handle this
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id
-        token.role = user.role
+        token.role = user.role || 'user' // Default to 'user' for OAuth providers
+        token.email = user.email
+
+        // Check if OAuth user is authorized
+        if (account?.provider && account.provider !== 'credentials') {
+          const clientUsernames = process.env.CLIENT_USERNAMES
+          let allowedEmails: string[] = []
+          
+          if (clientUsernames) {
+            try {
+              // Parse the array string from environment variable
+              allowedEmails = JSON.parse(clientUsernames)
+            } catch (error) {
+              console.error('Failed to parse CLIENT_USERNAMES:', error)
+              allowedEmails = []
+            }
+          }
+
+          // Add admin username to allowed list
+          if (process.env.ADMIN_USERNAME) {
+            allowedEmails.push(process.env.ADMIN_USERNAME)
+          }
+
+          // Check if user email is in allowed list
+          if (!allowedEmails.includes(user.email || '')) {
+            throw new Error('ACCESS_DENIED')
+          }
+        }
       }
       return token
     },
@@ -44,6 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token) {
         session.user.id = token.id as string
         session.user.role = token.role as string
+        session.user.email = token.email as string
       }
       return session
     },
@@ -52,6 +83,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
     CredentialsProvider({
       name: 'Admin Login',
@@ -76,7 +111,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return {
             id: '1',
             name: 'Admin',
-            email: 'admin@pictusweb.com',
+            email: credentials.username as string,
             role: 'admin',
           }
         }

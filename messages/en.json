@@ -12,6 +12,7 @@
     "footerCategory1": "Services",
     "footerCategory2": "About Us",
     "footerCategory3": "Contact",
+    "footerForClients": "For Clients",
 
     "navbarOffer": "Offer",
     "navbarAutomatizations": "Automatizations",
@@ -280,7 +281,31 @@
     "usernamePlaceholder": "Enter your username",
     "passwordPlaceholder": "Enter your password",
     "signIn": "Sign In",
+    "signInWithGoogle": "Continue with Google",
+    "signInWithGitHub": "Continue with GitHub",
+    "orDivider": "or",
     "invalidCredentials": "Invalid username or password",
     "loginError": "An error occurred during login"
+  },
+  "Client": {
+    "welcomeTitle": "Welcome to Your Client Area",
+    "welcomeSubtitle": "Manage your projects and services",
+    "dashboardTitle": "Dashboard",
+    "projectsTitle": "Your Projects",
+    "servicesTitle": "Available Services",
+    "supportTitle": "Support",
+    "noProjectsMessage": "You don't have any projects yet.",
+    "contactSupport": "Contact Support",
+    "logOut": "Log Out"
+  },
+  "Error": {
+    "accessDenied": "Access Denied",
+    "accessDeniedMessage": "Sorry, your email address is not authorized to access this application.",
+    "contactAdmin": "Please contact the administrator if you believe this is an error.",
+    "backToHome": "Back to Home",
+    "adminEmail": "Administrator: info@pictusweb.sk",
+    "authError": "An authentication error occurred.",
+    "errorLabel": "Error:",
+    "tryAgain": "Try Again"
   }
 }

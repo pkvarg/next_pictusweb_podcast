@@ -149,6 +149,19 @@ const Footer = () => {
                 <li>💬 WhatsApp: +421 904 798 505</li>
               </ul>
             </div>
+            <div>
+              <h3 className="font-semibold mb-4 text-white">{t('footerForClients')}</h3>
+              <ul className="space-y-2 text-xl font-thin text-gray-400">
+                <li>
+                  <Link
+                    href="/client"
+                    className="hover:text-purple-300 transition-colors"
+                  >
+                    {t('footerForClients')}
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </motion.footer>

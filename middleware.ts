@@ -8,17 +8,55 @@ const intlMiddleware = createIntlMiddleware({
   defaultLocale: 'sk',
 })
 
-// List of routes that require authentication  
-const protectedRoutes = ['/admin', '/en/admin', '/sk/admin', '/hu/admin']
+// Routes that require authentication
+const protectedRoutes = [
+  '/admin',
+  '/en/admin',
+  '/sk/admin',
+  '/hu/admin',
+  '/client',
+  '/en/client',
+  '/sk/client',
+  '/hu/client',
+]
+// Routes that require admin role
+const adminRoutes = ['/admin', '/en/admin', '/sk/admin', '/hu/admin']
+// Routes that should not be processed by auth middleware
+const publicRoutes = ['/auth/error', '/en/auth/error', '/sk/auth/error', '/hu/auth/error']
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth
-  const isProtectedRoute = protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
+  const userEmail = req.auth?.user?.email
 
+  const isProtectedRoute = protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
+  const isAdminRoute = adminRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
+  const isPublicRoute = publicRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
+
+  // Extract locale from the path or default to 'sk'
+  const locale = req.nextUrl.pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
+
+  // Skip auth processing for public routes (like error pages)
+  if (isPublicRoute) {
+    return intlMiddleware(req)
+  }
+
+  // Redirect to login if not authenticated
   if (isProtectedRoute && !isLoggedIn) {
-    // Extract locale from the path or default to 'sk'
-    const locale = req.nextUrl.pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
     return NextResponse.redirect(new URL(`/${locale}/auth/login`, req.url))
+  }
+
+  // Check admin access - only allow if user email matches ADMIN_USERNAME
+  if (isAdminRoute && isLoggedIn && userEmail !== process.env.ADMIN_USERNAME) {
+    return NextResponse.redirect(new URL(`/${locale}`, req.url))
+  }
+
+  // Redirect admin user from client to admin area
+  if (
+    req.nextUrl.pathname.match(/^\/(en|sk|hu)?\/client/) &&
+    isLoggedIn &&
+    userEmail === process.env.ADMIN_USERNAME
+  ) {
+    return NextResponse.redirect(new URL(`/${locale}/admin`, req.url))
   }
 
   // Apply internationalization middleware

@@ -67,6 +67,14 @@ const PagesHeader = () => {
             }`}
           >
             <ul className="text-[22.5px] lg:text-[22.5px] font-light justify-center space-y-4 md:flex md:space-x-6 md:space-y-0">
+              {page !== 'automatizations/vehicles' && (
+                <li>
+                  <Link href={`/automatizations/vehicles`} className="hover:text-[#0388f4]">
+                    {t('navbarAutomatizations')}
+                  </Link>
+                </li>
+              )}
+
               {page !== 'podcast' && (
                 <li>
                   <Link href={`/podcast`} className="hover:text-[#0388f4]">
