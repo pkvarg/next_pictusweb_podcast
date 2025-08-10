@@ -16,45 +16,44 @@ export const metadata: Metadata = {
   description: 'Web development',
 }
 
+export async function generateStaticParams() {
+  return [{ lang: 'en-US' }, { lang: 'sk' }, { lang: 'hu' }]
+}
+
 export default async function RootLayout({
   children,
   params,
 }: Readonly<{
   children: React.ReactNode
-  params: {
-    locale: string
-  }
+  params: Promise<{ lang: 'en-US' | 'sk' | 'hu' }>
 }>) {
   const messages = await getMessages()
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <html lang={params.locale} className='!scroll-smooth'>
+      <html lang={(await params).lang} className="!scroll-smooth">
         <head>
-          <meta property='title' content='Pictusweb development' />
+          <meta property="title" content="Pictusweb development" />
           <meta
-            property='description'
-            content='Tvorba webstránok, blogy, podcasty, eshopy, Ai služby'
+            property="description"
+            content="Tvorba webstránok, blogy, podcasty, eshopy, Ai služby"
           />
 
-          <meta property='og:title' content='Pictusweb development' />
+          <meta property="og:title" content="Pictusweb development" />
           <meta
-            property='og:description'
-            content='Tvorba webstránok, blogy, podcasty, eshopy, Ai služby'
+            property="og:description"
+            content="Tvorba webstránok, blogy, podcasty, eshopy, Ai služby"
           />
-          <meta property='og:type' content='website' />
-          <meta property='og:site_name' content='pictusweb.sk' />
-          <meta property='og:url' content='https://www.pictusweb.sk' />
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content="pictusweb.sk" />
+          <meta property="og:url" content="https://www.pictusweb.sk" />
 
-          <meta
-            property='og:image'
-            content='https://www.pictusweb.sk/pictusweb.webp'
-          />
-          <meta property='og:image:type' content='png' />
-          <meta property='og:image:width' content='400' />
-          <meta property='og:image:height' content='400' />
-          <meta property='og:image:alt' content='pictusweb.sk' />
-          <meta property='fb:app_id' content='627076731624225' />
+          <meta property="og:image" content="https://www.pictusweb.sk/pictusweb.webp" />
+          <meta property="og:image:type" content="png" />
+          <meta property="og:image:width" content="400" />
+          <meta property="og:image:height" content="400" />
+          <meta property="og:image:alt" content="pictusweb.sk" />
+          <meta property="fb:app_id" content="627076731624225" />
         </head>
         <AudioProvider>
           <body className={cn(inter.className)}>
