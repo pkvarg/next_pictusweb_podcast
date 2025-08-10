@@ -271,5 +271,16 @@
     "ctaSubtitle2": "First month is completely free.",
     "ctaButton1": "Order free demo",
     "ctaButton2": "Send info by email"
+  },
+  "Auth": {
+    "loginTitle": "Pictusweb Admin",
+    "loginSubtitle": "Sign in to access the admin panel",
+    "username": "Username",
+    "password": "Password",
+    "usernamePlaceholder": "Enter your username",
+    "passwordPlaceholder": "Enter your password",
+    "signIn": "Sign In",
+    "invalidCredentials": "Invalid username or password",
+    "loginError": "An error occurred during login"
   }
 }

@@ -1,0 +1,88 @@
+// auth.ts
+import NextAuth from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
+import { isValidPassword } from './isValidPassword'
+
+// Extend the built-in session types
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string
+      email: string
+      name: string
+      role?: string
+    }
+  }
+
+  interface User {
+    id: string
+    email: string
+    name: string
+    role?: string
+  }
+}
+
+// Initialize NextAuth with configuration
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  pages: {
+    signIn: '/login',
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.role = user.role
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string
+        session.user.role = token.role as string
+      }
+      return session
+    },
+  },
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    CredentialsProvider({
+      name: 'Admin Login',
+      credentials: {
+        username: { label: 'Username', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          return null
+        }
+
+        // Check against environment variables
+        if (
+          credentials.username === process.env.ADMIN_USERNAME &&
+          process.env.HASHED_ADMIN_PASSWORD &&
+          (await isValidPassword(
+            credentials.password as string,
+            process.env.HASHED_ADMIN_PASSWORD as string,
+          ))
+        ) {
+          return {
+            id: '1',
+            name: 'Admin',
+            email: 'admin@pictusweb.com',
+            role: 'admin',
+          }
+        }
+
+        return null
+      },
+    }),
+  ],
+})

@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { Toaster } from '@/components/ui/toaster'
 import PodcastPlayer from '@/app/components/podcast/PodcastPlayer'
 import ScrollToTop from '@/app/components/ScrollToTop'
+import AuthSessionProvider from '@/app/components/SessionProvider'
 
 const inter = Yanone_Kaffeesatz({ subsets: ['latin'] })
 
@@ -64,14 +65,16 @@ export default async function RootLayout({
         <head>
           <meta property="fb:app_id" content="627076731624225" />
         </head>
-        <AudioProvider>
-          <body className={cn(inter.className)}>
-            {children}
-            <Toaster />
-            <PodcastPlayer />
-            <ScrollToTop />
-          </body>
-        </AudioProvider>
+        <AuthSessionProvider>
+          <AudioProvider>
+            <body className={cn(inter.className)}>
+              {children}
+              <Toaster />
+              <PodcastPlayer />
+              <ScrollToTop />
+            </body>
+          </AudioProvider>
+        </AuthSessionProvider>
       </html>
     </NextIntlClientProvider>
   )

@@ -275,5 +275,16 @@
     "ctaSubtitle2": "Prvý mesiac je kompletne zdarma.",
     "ctaButton1": "Objednať ukážku zdarma",
     "ctaButton2": "Poslať informácie emailom"
+  },
+  "Auth": {
+    "loginTitle": "Pictusweb Admin",
+    "loginSubtitle": "Prihlásenie do administrácie",
+    "username": "Používateľské meno",
+    "password": "Heslo",
+    "usernamePlaceholder": "Zadajte používateľské meno",
+    "passwordPlaceholder": "Zadajte heslo",
+    "signIn": "Prihlásiť",
+    "invalidCredentials": "Neplatné používateľské meno alebo heslo",
+    "loginError": "Nastala chyba pri prihlasovaní"
   }
 }

@@ -275,5 +275,16 @@
     "ctaSubtitle2": "Az első hónap teljesen ingyenes.",
     "ctaButton1": "Ingyenes bemutató rendelése",
     "ctaButton2": "Információ küldése emailben"
+  },
+  "Auth": {
+    "loginTitle": "Pictusweb Admin",
+    "loginSubtitle": "Bejelentkezés az adminisztrációba",
+    "username": "Felhasználónév",
+    "password": "Jelszó",
+    "usernamePlaceholder": "Adja meg felhasználónevét",
+    "passwordPlaceholder": "Adja meg jelszavát",
+    "signIn": "Bejelentkezés",
+    "invalidCredentials": "Érvénytelen felhasználónév vagy jelszó",
+    "loginError": "Hiba történt a bejelentkezés során"
   }
 }

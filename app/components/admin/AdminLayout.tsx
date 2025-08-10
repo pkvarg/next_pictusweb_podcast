@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { Link } from '@/i18n/routing'
 import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { Home, Mic, Brain, Upload, BarChart3, Menu, X, Headphones, LogOut } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -43,21 +44,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   const handleLogout = () => {
-    // For Basic Auth, we need to send an invalid request to clear credentials
-    fetch('/api/logout', {
-      method: 'POST',
-      headers: {
-        Authorization: 'Basic ' + btoa('invalid:invalid'),
-      },
-    })
-      .then(() => {
-        // Redirect to admin page which will trigger re-authentication
-        window.location.href = '/'
-      })
-      .catch(() => {
-        // Even if the request fails, redirect to clear the session
-        window.location.href = '/'
-      })
+    signOut({ callbackUrl: '/' })
   }
 
   return (
