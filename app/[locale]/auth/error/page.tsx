@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import { AlertTriangle, Home, Mail } from 'lucide-react'
 import PagesHeader from '@/app/components/PagesHeader'
+import Footer from '@/app/components/Footer'
 
 export default function AuthErrorPage() {
   const searchParams = useSearchParams()
@@ -13,9 +14,9 @@ export default function AuthErrorPage() {
   const isAccessDenied = error === 'ACCESS_DENIED'
 
   return (
-    <>
+    <section className="bg-gradient-to-br from-purple-900 via-slate-900 to-black">
       <PagesHeader />
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center px-4">
+      <div className="min-h-screen  flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           {/* Error Icon */}
           <div className="text-center mb-8">
@@ -55,7 +56,9 @@ export default function AuthErrorPage() {
               <div className="space-y-6">
                 <div className="text-center">
                   <p className="text-gray-300 mb-4">{t('authError')}</p>
-                  <p className="text-gray-400 text-sm">{t('errorLabel')} {error}</p>
+                  <p className="text-gray-400 text-sm">
+                    {t('errorLabel')} {error}
+                  </p>
                 </div>
 
                 <div className="flex justify-center">
@@ -71,6 +74,7 @@ export default function AuthErrorPage() {
           </div>
         </div>
       </div>
-    </>
+      <Footer />
+    </section>
   )
 }
