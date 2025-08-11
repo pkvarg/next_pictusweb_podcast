@@ -5,6 +5,7 @@ import { staggerContainer } from '@/lib/motion'
 import { TitleText, TypingText } from '../CustomTexts'
 import { useTranslations } from 'next-intl'
 import { styles } from '@/lib/styles'
+import Image from 'next/image'
 
 const Hero = () => {
   const t = useTranslations('Home')
@@ -35,10 +36,13 @@ const Hero = () => {
         </div>
       </motion.div>
       <div className='lg:w-[100%]'>
-        <img
+        <Image
           className='w-[100%] ml-auto lg:mt-0 mt-[6rem]'
           src='/hero-builders.webp'
           alt='hero'
+          width={800}
+          height={600}
+          priority
         />
       </div>
     </main>

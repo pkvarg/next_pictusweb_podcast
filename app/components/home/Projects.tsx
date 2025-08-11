@@ -234,7 +234,7 @@ const Projects: React.FC = () => {
           className="bg-gray-900 p-5 rounded-2xl sm:w-[360px] w-full"
         >
           <div className="relative w-full h-[230px]">
-            <img src={image} alt="project_image" className="w-full h-full rounded-2xl" />
+            <Image src={`/${image}`} alt="project_image" className="w-full h-full rounded-2xl object-cover" width={360} height={230} />
           </div>
 
           <div className="mt-5">

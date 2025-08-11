@@ -81,6 +81,7 @@ const Audio = () => {
       setVoiceCategs(elevenlabsVoices)
       handleVoiceType('Karol')
     }
+    // eslint-disable-next-line
   }, [voiceProvider])
 
   const handleGetAiImage = async (e: any) => {

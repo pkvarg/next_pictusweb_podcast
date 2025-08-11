@@ -1,5 +1,5 @@
 import React from 'react'
-import Contact from '../../components/contact/Contact'
+import ContactWrapper from '../../components/contact/ContactWrapper'
 import PagesHeader from '../../components/PagesHeader'
 import About from '../../components/contact/About'
 import Gdpr from '../../components/contact/Gdpr'
@@ -12,7 +12,7 @@ const ContactPage = async () => {
   return (
     <div className="bg-gradient-to-br from-purple-900 via-slate-900 to-black">
       <PagesHeader />
-      <Contact />
+      <ContactWrapper />
       <About />
       <Gdpr />
       {locale === 'sk' && <TradeRules />}

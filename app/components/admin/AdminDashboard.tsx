@@ -40,7 +40,7 @@ const AdminDashboard = () => {
         <div>
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
           <p className="mt-2 text-gray-400">
-            Welcome back! Here's what's happening with your podcasts.
+            Welcome back! Here&apos;s what&apos;s happening with your podcasts.
           </p>
         </div>
         <RefreshButton />

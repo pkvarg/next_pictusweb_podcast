@@ -22,7 +22,7 @@ const AdminAIBalance = () => {
       }
     }
     getMyAIBalance()
-  }, [])
+  }, [apiKey, startDate, endDate])
   return <div>AdminAIBalance</div>
 }
 

@@ -8,7 +8,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   eslint: {
-    ignoreDuringBuilds: true, // Ignore ESLint during production builds
+    ignoreDuringBuilds: false, // Ignore ESLint during production builds
   },
 
   images: {

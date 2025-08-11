@@ -89,6 +89,7 @@ const EditPodcast = () => {
 
   useEffect(() => {
     getPodcast()
+    // eslint-disable-next-line
   }, [])
 
   useEffect(() => {
@@ -129,6 +130,7 @@ const EditPodcast = () => {
       setVoiceCategs(elevenlabsVoices)
       handleVoiceType('Karol')
     }
+    // eslint-disable-next-line
   }, [voiceProvider])
 
   const handleGetAiImage = async (e: any) => {

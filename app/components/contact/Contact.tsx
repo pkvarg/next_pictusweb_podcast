@@ -1,11 +1,11 @@
 'use client'
-import React, { useRef, useState, useEffect, Suspense } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import Message from './Message'
 import axios from 'axios'
 import { useTranslations } from 'next-intl'
 import { useParams, useSearchParams } from 'next/navigation'
 
-const ContactForm = () => {
+const Contact = () => {
   const t = useTranslations('Home')
   const { locale } = useParams()
   const searchParams = useSearchParams()
@@ -19,9 +19,13 @@ const ContactForm = () => {
   const [phone, setPhone] = useState('')
 
   useEffect(() => {
-    const subject = searchParams.get('subject')
-    if (subject) {
-      setMailMessage(decodeURIComponent(subject))
+    try {
+      const subject = searchParams.get('subject')
+      if (subject) {
+        setMailMessage(decodeURIComponent(subject))
+      }
+    } catch (error) {
+      console.error('Error reading search params:', error)
     }
   }, [searchParams])
 
@@ -261,14 +265,6 @@ const ContactForm = () => {
         </div>
       </div>
     </>
-  )
-}
-
-const Contact = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ContactForm />
-    </Suspense>
   )
 }
 

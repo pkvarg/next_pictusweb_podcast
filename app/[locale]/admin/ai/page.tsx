@@ -104,7 +104,7 @@ const AI = () => {
               <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
               <div>
                 <h3 className="font-medium text-white">Azure TTS</h3>
-                <p className="text-sm text-gray-400">Microsoft's neural voice synthesis with Slovak language support</p>
+                <p className="text-sm text-gray-400">Microsoft&apos;s neural voice synthesis with Slovak language support</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">

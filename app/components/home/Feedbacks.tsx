@@ -5,6 +5,7 @@ import { styles } from '@/lib/styles'
 import { fadeIn, staggerContainer, textVariant } from '@/lib/motion'
 import { useTranslations } from 'next-intl'
 import { TypingText } from '../CustomTexts'
+import Image from 'next/image'
 
 interface Testimonial {
   testimonial: string
@@ -34,7 +35,7 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
     className='p-6 rounded-3xl xs:w-[320px] lg:mt-0 lg:mb-0 w-full bg-gray-800'
   >
     <div className='mt-1'>
-      <p className='text-white tracking-wider text-[20px]'>"{testimonial}"</p>
+      <p className='text-white tracking-wider text-[20px]'>&quot;{testimonial}&quot;</p>
 
       <div className='mt-7 flex flex-row justify-end mr-[5%] items-center gap-8 text-[#93A7B7]'>
         <p className='font-medium text-[18px]'>
@@ -44,9 +45,11 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
           {designation} - {company}
         </p>
 
-        <img
-          src={image}
+        <Image
+          src={`/${image}`}
           alt={`feedback_by-${name}`}
+          width={40}
+          height={40}
           className='w-10 h-10 rounded-full object-cover'
         />
       </div>

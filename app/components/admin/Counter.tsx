@@ -42,6 +42,7 @@ const Counter = () => {
     }
 
     getStats()
+    // eslint-disable-next-line
   }, [])
 
   return (
