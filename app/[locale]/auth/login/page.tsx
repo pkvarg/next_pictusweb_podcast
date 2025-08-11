@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Headphones, LogIn, Github } from 'lucide-react'
 import PagesHeader from '@/app/components/PagesHeader'
+import Footer from '@/app/components/Footer'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -51,9 +52,9 @@ export default function LoginPage() {
   }
 
   return (
-    <>
+    <section className="min-h-screen bg-gradient-to-r from-blue-900 to-purple-900">
       <PagesHeader />
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center px-4">
+      <div className=" flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
@@ -61,7 +62,7 @@ export default function LoginPage() {
             <Headphones size={32} className="text-white" />
           </div> */}
             {/* <h1 className="text-2xl font-bold text-white">{t('loginTitle')}</h1> */}
-            <p className="text-gray-400 mt-2">{t('loginSubtitle')}</p>
+            <p className="text-white mt-2">{t('loginSubtitle')}</p>
           </div>
 
           {/* Login Form */}
@@ -169,6 +170,7 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-    </>
+      <Footer />
+    </section>
   )
 }

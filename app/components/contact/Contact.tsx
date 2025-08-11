@@ -1,13 +1,14 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import Message from './Message'
 import axios from 'axios'
 import { useTranslations } from 'next-intl'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 
 const Contact = () => {
   const t = useTranslations('Home')
   const { locale } = useParams()
+  const searchParams = useSearchParams()
   const [message, setMessage] = useState<string | null>(null)
   const [messageSuccess, setMessageSuccess] = useState<string | null>(null)
   const [email, setEmail] = useState('')
@@ -16,6 +17,13 @@ const Contact = () => {
   const [showGdpr, setShowGdpr] = useState(false)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+
+  useEffect(() => {
+    const subject = searchParams.get('subject')
+    if (subject) {
+      setMailMessage(decodeURIComponent(subject))
+    }
+  }, [searchParams])
 
   const toggleShowGdpr = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
