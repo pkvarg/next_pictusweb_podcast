@@ -1,11 +1,11 @@
 'use client'
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, Suspense } from 'react'
 import Message from './Message'
 import axios from 'axios'
 import { useTranslations } from 'next-intl'
 import { useParams, useSearchParams } from 'next/navigation'
 
-const Contact = () => {
+const ContactForm = () => {
   const t = useTranslations('Home')
   const { locale } = useParams()
   const searchParams = useSearchParams()
@@ -261,6 +261,14 @@ const Contact = () => {
         </div>
       </div>
     </>
+  )
+}
+
+const Contact = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ContactForm />
+    </Suspense>
   )
 }
 
