@@ -1,5 +1,5 @@
 'use server'
-import { ElevenLabsClient, ElevenLabs } from 'elevenlabs'
+import { ElevenLabsClient, ElevenLabs } from '@elevenlabs/elevenlabs-js'
 import axios from 'axios'
 import { getTimeStamp } from '@/lib/timestamp'
 import fs from 'fs'
