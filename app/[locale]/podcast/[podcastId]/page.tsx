@@ -4,7 +4,7 @@ import PodcastDetailPlayer from '@/app/components/podcast/PodcastDetailPlayer'
 import PagesHeader from '@/app/components/PagesHeader'
 import NeedPodcast from '@/app/components/NeedPodcast'
 import Footer from '@/app/components/Footer'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
@@ -32,6 +32,9 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { podcastId, locale } = await params
+  
+  // Enable static rendering for next-intl
+  setRequestLocale(locale)
 
   const podcast = await db.podcast.findUnique({
     where: { id: podcastId, deleted: false, published: true },
@@ -86,6 +89,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const SinglePodcast = async ({ params }: PageProps) => {
   const { podcastId, locale } = await params
+  
+  // Enable static rendering for next-intl
+  setRequestLocale(locale)
+  
   const t = await getTranslations('Home')
 
   const podcast = await db.podcast.findUnique({

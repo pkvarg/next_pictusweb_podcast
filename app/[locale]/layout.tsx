@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Yanone_Kaffeesatz } from 'next/font/google'
 import './globals.css'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages, getTranslations } from 'next-intl/server'
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import AudioProvider from '@/app/components/podcast/AudioProvider'
 import { cn } from '@/lib/utils'
 import { Toaster } from '@/components/ui/toaster'
@@ -22,6 +22,18 @@ export async function generateMetadata({ params }: {
   try {
     const { locale } = await params
     prodLogger.info('generateMetadata: params resolved', { locale })
+    
+    // Skip processing for non-locale requests (like favicon.ico)
+    if (locale === 'favicon.ico' || locale.includes('.')) {
+      prodLogger.warn('generateMetadata: Skipping non-locale request', { locale })
+      return {
+        title: 'Pictusweb',
+        description: 'Pictusweb development'
+      }
+    }
+    
+    // Enable static rendering for next-intl
+    setRequestLocale(locale)
     
     const t = await getTranslations({ locale, namespace: 'Home' })
     prodLogger.info('generateMetadata: translations loaded', { locale, namespace: 'Home' })
@@ -81,6 +93,15 @@ export default async function RootLayout({
     prodLogger.info('LocaleRootLayout: awaiting params')
     const { locale } = await params
     prodLogger.info('LocaleRootLayout: params resolved', { locale })
+    
+    // Skip processing for non-locale requests (like favicon.ico)
+    if (locale === 'favicon.ico' || locale.includes('.')) {
+      prodLogger.warn('LocaleRootLayout: Skipping non-locale request', { locale })
+      throw new Error('Invalid locale')
+    }
+    
+    // Enable static rendering for next-intl
+    setRequestLocale(locale)
     
     prodLogger.info('LocaleRootLayout: loading messages')
     const messages = await getMessages()
