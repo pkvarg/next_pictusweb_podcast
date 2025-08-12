@@ -23,17 +23,15 @@ export async function generateMetadata({ params }: {
     const { locale } = await params
     prodLogger.info('generateMetadata: params resolved', { locale })
     
-    // Skip processing for non-locale requests (like favicon.ico)
-    if (locale === 'favicon.ico' || locale.includes('.')) {
-      prodLogger.warn('generateMetadata: Skipping non-locale request', { locale })
-      return {
-        title: 'Pictusweb',
-        description: 'Pictusweb development'
-      }
+    // Validate locale and enable static rendering
+    if (!['en', 'sk', 'hu'].includes(locale)) {
+      prodLogger.warn('generateMetadata: Invalid locale detected', { locale })
+      // Fallback to default locale
+      setRequestLocale('sk')
+    } else {
+      // Enable static rendering for next-intl
+      setRequestLocale(locale)
     }
-    
-    // Enable static rendering for next-intl
-    setRequestLocale(locale)
     
     const t = await getTranslations({ locale, namespace: 'Home' })
     prodLogger.info('generateMetadata: translations loaded', { locale, namespace: 'Home' })
@@ -94,14 +92,15 @@ export default async function RootLayout({
     const { locale } = await params
     prodLogger.info('LocaleRootLayout: params resolved', { locale })
     
-    // Skip processing for non-locale requests (like favicon.ico)
-    if (locale === 'favicon.ico' || locale.includes('.')) {
-      prodLogger.warn('LocaleRootLayout: Skipping non-locale request', { locale })
-      throw new Error('Invalid locale')
+    // Validate locale and enable static rendering
+    if (!['en', 'sk', 'hu'].includes(locale)) {
+      prodLogger.warn('LocaleRootLayout: Invalid locale detected', { locale })
+      // Fallback to default locale
+      setRequestLocale('sk')
+    } else {
+      // Enable static rendering for next-intl
+      setRequestLocale(locale)
     }
-    
-    // Enable static rendering for next-intl
-    setRequestLocale(locale)
     
     prodLogger.info('LocaleRootLayout: loading messages')
     const messages = await getMessages()

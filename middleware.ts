@@ -64,5 +64,16 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/', '/(sk|en|hu)/:path*', '/admin/:path*', '/(sk|en|hu)/admin/:path*'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - sitemap.xml, robots.txt, etc. (SEO files)
+     * - files with extensions (static assets)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.svg$|.*\\.ico$|.*\\.webp$|.*\\.css$|.*\\.js$|.*\\.json$).*)',
+  ],
 }
