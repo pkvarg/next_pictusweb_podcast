@@ -25,10 +25,11 @@ declare module 'next-auth' {
 }
 
 
-// Initialize NextAuth with configuration
-export const { handlers, auth, signIn, signOut } = NextAuth({
+// Export auth options for use in other files
+export const authOptions = {
+  trustHost: true, // Add this for production deployment
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
@@ -36,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: '/sk/auth/error', // Default to Slovak, but NextAuth will handle this
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account }: any) {
       if (user) {
         token.id = user.id
         token.role = user.role || 'user' // Default to 'user' for OAuth providers
@@ -70,7 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (token) {
         session.user.id = token.id as string
         session.user.role = token.role as string
@@ -120,4 +121,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-})
+}
+
+// Initialize NextAuth with the auth options
+export const { handlers, auth, signIn, signOut } = NextAuth(authOptions)

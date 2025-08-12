@@ -2,9 +2,6 @@
 import { ElevenLabsClient, ElevenLabs } from '@elevenlabs/elevenlabs-js'
 import axios from 'axios'
 import { getTimeStamp } from '@/lib/timestamp'
-import fs from 'fs'
-import path from 'path'
-//import { uploadFirebase } from './uploadToFirebase'
 
 const client = new ElevenLabsClient({ apiKey: process.env.ELEVEN_KEY })
 
@@ -66,28 +63,31 @@ export async function createElevenlabsSpeech(
   //const model = 'eleven_turbo_v2_5'
 
   try {
-    // Convert text to speech
-    const mp3Stream = await client.textToSpeech.convert(voiceId, {
-      optimize_streaming_latency: ElevenLabs.OptimizeStreamingLatency.Zero,
-      output_format: ElevenLabs.OutputFormat.Mp32205032,
+    // Convert text to speech using the new API
+    const audioStream = await client.textToSpeech.convert(voiceId, {
       text: inputText,
-      //model_id: 'eleven_turbo_v2_5',
-      model_id: model,
-
-      voice_settings: {
+      modelId: model, // Fixed: use modelId instead of model_id
+      voiceSettings: { // Fixed: use voiceSettings instead of voice_settings
         stability: 0.1,
-        similarity_boost: 0.3,
+        similarityBoost: 0.3, // Fixed: use camelCase
         style: 0.2,
       },
     })
 
-    //console.log('mp3 stream', mp3Stream)
-
-    // Convert the stream to a buffer
+    // Convert the ReadableStream to a buffer
     const chunks: Uint8Array[] = []
-    for await (const chunk of mp3Stream) {
-      chunks.push(chunk)
+    const reader = audioStream.getReader()
+    
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        if (value) chunks.push(value)
+      }
+    } finally {
+      reader.releaseLock()
     }
+    
     const buffer = Buffer.concat(chunks)
 
     const timestamp = getTimeStamp()

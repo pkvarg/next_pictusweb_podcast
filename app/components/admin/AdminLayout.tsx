@@ -44,7 +44,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   const handleLogout = () => {
-    signOut({ callbackUrl: '/' })
+    signOut({ callbackUrl: '/', redirect: true })
   }
 
   return (
