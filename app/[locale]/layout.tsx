@@ -24,17 +24,18 @@ export async function generateMetadata({ params }: {
     prodLogger.info('generateMetadata: params resolved', { locale })
     
     // Validate locale and enable static rendering
+    let validLocale = locale
     if (!['en', 'sk', 'hu'].includes(locale)) {
       prodLogger.warn('generateMetadata: Invalid locale detected', { locale })
       // Fallback to default locale
-      setRequestLocale('sk')
-    } else {
-      // Enable static rendering for next-intl
-      setRequestLocale(locale)
+      validLocale = 'sk'
     }
     
-    const t = await getTranslations({ locale, namespace: 'Home' })
-    prodLogger.info('generateMetadata: translations loaded', { locale, namespace: 'Home' })
+    // Enable static rendering for next-intl
+    setRequestLocale(validLocale)
+    
+    const t = await getTranslations({ locale: validLocale, namespace: 'Home' })
+    prodLogger.info('generateMetadata: translations loaded', { locale: validLocale, namespace: 'Home' })
 
     const metadata = {
       title: t('metaTitle'),
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }: {
         }],
       },
       alternates: {
-        canonical: `https://www.pictusweb.sk/${locale}`,
+        canonical: `https://www.pictusweb.sk/${validLocale}`,
         languages: {
           'en': 'https://www.pictusweb.sk/en',
           'sk': 'https://www.pictusweb.sk/sk',
@@ -93,22 +94,23 @@ export default async function RootLayout({
     prodLogger.info('LocaleRootLayout: params resolved', { locale })
     
     // Validate locale and enable static rendering
+    let validLocale = locale
     if (!['en', 'sk', 'hu'].includes(locale)) {
       prodLogger.warn('LocaleRootLayout: Invalid locale detected', { locale })
       // Fallback to default locale
-      setRequestLocale('sk')
-    } else {
-      // Enable static rendering for next-intl
-      setRequestLocale(locale)
+      validLocale = 'sk'
     }
     
+    // Enable static rendering for next-intl
+    setRequestLocale(validLocale)
+    
     prodLogger.info('LocaleRootLayout: loading messages')
-    const messages = await getMessages()
+    const messages = await getMessages({ locale: validLocale })
     prodLogger.info('LocaleRootLayout: messages loaded', { messageKeys: Object.keys(messages || {}).length })
 
     const result = (
       <NextIntlClientProvider messages={messages}>
-        <html lang={locale} className="!scroll-smooth">
+        <html lang={validLocale} className="!scroll-smooth">
           <head>
             <meta property="fb:app_id" content="627076731624225" />
           </head>

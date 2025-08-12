@@ -1,11 +1,16 @@
 import Footer from '@/app/components/Footer'
 import PagesHeader from '@/app/components/PagesHeader'
 import { CheckCircle, Car, Clock, Shield, AlertTriangle, Calculator } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 
-export default function Vehicles() {
-  const t = useTranslations('Automatizations')
+export default async function Vehicles({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  
+  // Enable static rendering for next-intl
+  setRequestLocale(locale)
+  
+  const t = await getTranslations('Automatizations')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white">
