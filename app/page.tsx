@@ -9,11 +9,16 @@ const page = () => {
   try {
     redirect('/sk')
   } catch (error) {
-    prodLogger.error('Error in RootPage redirect', {
-      component: 'RootPage',
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
-    })
+    // NEXT_REDIRECT is expected behavior, don't log as error
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      prodLogger.info('RootPage: redirect executed successfully')
+    } else {
+      prodLogger.error('Error in RootPage redirect', {
+        component: 'RootPage',
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      })
+    }
     throw error
   }
 }
