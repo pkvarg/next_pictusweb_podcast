@@ -25,7 +25,7 @@ declare module 'next-auth' {
 }
 
 
-// Export auth options for use in other files
+// Export auth options for use in other files  
 export const authOptions = {
   trustHost: true, // Add this for production deployment
   basePath: '/api/auth',
@@ -94,15 +94,30 @@ export const authOptions = {
     },
   },
   providers: [
-    GoogleProvider({
+    {
+      id: "google",
+      name: "Google", 
+      type: "oauth" as const,
+      wellKnown: "https://accounts.google.com/.well-known/openid_configuration",
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      wellKnown: "https://accounts.google.com/.well-known/openid_configuration"
-    }),
-    GitHubProvider({
+      ...(process.env.NODE_ENV === 'production' && {
+        redirectUri: "https://www.pictusweb.sk/api/auth/callback/google"
+      })
+    },
+    {
+      id: "github", 
+      name: "GitHub",
+      type: "oauth" as const,
+      authorization: "https://github.com/login/oauth/authorize",
+      token: "https://github.com/login/oauth/access_token", 
+      userinfo: "https://api.github.com/user",
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
+      ...(process.env.NODE_ENV === 'production' && {
+        redirectUri: "https://www.pictusweb.sk/api/auth/callback/github"
+      })
+    },
     CredentialsProvider({
       name: 'Admin Login',
       credentials: {
