@@ -87,37 +87,16 @@ export const authOptions = {
       }
       return session
     },
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log('SignIn callback - Provider:', account?.provider, 'User:', user?.email)
-      console.log('Account details:', account)
-      return true
-    },
   },
   providers: [
-    {
-      id: "google",
-      name: "Google", 
-      type: "oauth" as const,
-      wellKnown: "https://accounts.google.com/.well-known/openid_configuration",
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      ...(process.env.NODE_ENV === 'production' && {
-        redirectUri: "https://www.pictusweb.sk/api/auth/callback/google"
-      })
-    },
-    {
-      id: "github", 
-      name: "GitHub",
-      type: "oauth" as const,
-      authorization: "https://github.com/login/oauth/authorize",
-      token: "https://github.com/login/oauth/access_token", 
-      userinfo: "https://api.github.com/user",
+    }),
+    GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      ...(process.env.NODE_ENV === 'production' && {
-        redirectUri: "https://www.pictusweb.sk/api/auth/callback/github"
-      })
-    },
+    }),
     CredentialsProvider({
       name: 'Admin Login',
       credentials: {
