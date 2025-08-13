@@ -85,6 +85,13 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          redirect_uri: process.env.NODE_ENV === 'production' 
+            ? 'https://www.pictusweb.sk/api/auth/callback/google'
+            : undefined
+        }
+      }
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
