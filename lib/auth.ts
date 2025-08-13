@@ -28,9 +28,7 @@ declare module 'next-auth' {
 // Export auth options for use in other files
 export const authOptions = {
   trustHost: true, // Add this for production deployment
-  ...(process.env.NODE_ENV === 'production' && {
-    url: 'https://www.pictusweb.sk'
-  }),
+  basePath: '/api/auth',
   session: {
     strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
