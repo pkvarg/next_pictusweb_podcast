@@ -29,6 +29,7 @@ declare module 'next-auth' {
 export const authOptions = {
   trustHost: true, // Add this for production deployment
   basePath: '/api/auth',
+  debug: process.env.NODE_ENV === 'production',
   session: {
     strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -86,11 +87,17 @@ export const authOptions = {
       }
       return session
     },
+    async signIn({ user, account, profile, email, credentials }) {
+      console.log('SignIn callback - Provider:', account?.provider, 'User:', user?.email)
+      console.log('Account details:', account)
+      return true
+    },
   },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      wellKnown: "https://accounts.google.com/.well-known/openid_configuration"
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
