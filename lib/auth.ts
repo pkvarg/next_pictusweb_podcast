@@ -39,6 +39,8 @@ export const authOptions = {
   },
   callbacks: {
     async jwt({ token, user, account }: any) {
+      console.log('JWT callback - Provider:', account?.provider, 'User:', user?.email, 'Environment:', process.env.NODE_ENV)
+      
       if (user) {
         token.id = user.id
         token.role = user.role || 'user' // Default to 'user' for OAuth providers
@@ -46,6 +48,7 @@ export const authOptions = {
 
         // Check if OAuth user is authorized
         if (account?.provider && account.provider !== 'credentials') {
+          console.log('OAuth login attempt for:', user.email, 'Provider:', account.provider)
           const clientUsernames = process.env.CLIENT_USERNAMES
           let allowedEmails: string[] = []
           
@@ -65,9 +68,12 @@ export const authOptions = {
           }
 
           // Check if user email is in allowed list
+          console.log('Allowed emails:', allowedEmails, 'User email:', user.email)
           if (!allowedEmails.includes(user.email || '')) {
+            console.log('ACCESS DENIED for:', user.email)
             throw new Error('ACCESS_DENIED')
           }
+          console.log('ACCESS GRANTED for:', user.email)
         }
       }
       return token
@@ -96,6 +102,13 @@ export const authOptions = {
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          redirect_uri: process.env.NODE_ENV === 'production' 
+            ? 'https://www.pictusweb.sk/api/auth/callback/github'
+            : undefined
+        }
+      }
     }),
     CredentialsProvider({
       name: 'Admin Login',
@@ -104,7 +117,11 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        console.log('Credentials login attempt for:', credentials?.username)
+        console.log('Environment variables - ADMIN_USERNAME:', !!process.env.ADMIN_USERNAME, 'HASHED_ADMIN_PASSWORD:', !!process.env.HASHED_ADMIN_PASSWORD)
+        
         if (!credentials?.username || !credentials?.password) {
+          console.log('Missing credentials')
           return null
         }
 
@@ -117,6 +134,7 @@ export const authOptions = {
             process.env.HASHED_ADMIN_PASSWORD as string,
           ))
         ) {
+          console.log('Credentials login SUCCESS for:', credentials.username)
           return {
             id: '1',
             name: 'Admin',
@@ -125,6 +143,7 @@ export const authOptions = {
           }
         }
 
+        console.log('Credentials login FAILED for:', credentials.username)
         return null
       },
     }),
