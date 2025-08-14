@@ -1,8 +1,8 @@
 // auth.ts
 import NextAuth from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import GoogleProvider from 'next-auth/providers/google'
-import GitHubProvider from 'next-auth/providers/github'
+import Credentials from 'next-auth/providers/credentials'
+import Google from 'next-auth/providers/google'
+import GitHub from 'next-auth/providers/github'
 import { isValidPassword } from './isValidPassword'
 
 // Extend the built-in session types
@@ -28,15 +28,13 @@ declare module 'next-auth' {
 // Export auth options for use in other files  
 export const authOptions = {
   trustHost: true, // Add this for production deployment
-  basePath: '/api/auth',
-  debug: process.env.NODE_ENV === 'production',
   session: {
     strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
-    signIn: '/login',
-    error: '/sk/auth/error', // Default to Slovak, but NextAuth will handle this
+    signIn: '/auth/login',
+    error: '/auth/error',
   },
   callbacks: {
     async jwt({ token, user, account }: any) {
@@ -89,15 +87,15 @@ export const authOptions = {
     },
   },
   providers: [
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    GitHubProvider({
+    GitHub({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
-    CredentialsProvider({
+    Credentials({
       name: 'Admin Login',
       credentials: {
         username: { label: 'Username', type: 'text' },
