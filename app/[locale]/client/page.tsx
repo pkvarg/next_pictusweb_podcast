@@ -29,7 +29,7 @@ const ClientZone = () => {
                 </div>
               </Link>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-white">
                 <User size={16} />
@@ -54,6 +54,25 @@ const ClientZone = () => {
           <h1 className="text-4xl font-bold text-white mb-4">{t('welcomeTitle')}</h1>
           <p className="text-xl text-gray-300">{t('welcomeSubtitle')}</p>
         </div>
+
+        <div className="flex flex-col lg:flex-row gap-16 justify-between items-center w-full bg-yellow">
+          <iframe
+            className="w-[70%]"
+            src="http://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/840710e9-c0da-4acd-b6d3-fd06fd47dd4b"
+            height="250"
+          ></iframe>
+          <iframe
+            className="w-[70%]"
+            src="http://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/31ce6923-6a0d-49e7-83cb-e263f9b1550c"
+            height="250"
+          ></iframe>
+        </div>
+
+        <iframe
+          className="w-full  my-8 bg-violet-800"
+          src="http://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/b39a3903-cf10-4ee5-b5ff-0c221516ba31"
+          height={900}
+        ></iframe>
 
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
