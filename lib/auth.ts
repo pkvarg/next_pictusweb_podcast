@@ -55,11 +55,15 @@ export const authOptions = {
           
           if (clientUsernames) {
             try {
-              // Parse the array string from environment variable
-              allowedEmails = JSON.parse(clientUsernames)
+              // Clean up the string and parse the array
+              const cleanedString = clientUsernames.replace(/\\/g, '').trim()
+              allowedEmails = JSON.parse(cleanedString)
             } catch (error) {
               console.error('Failed to parse CLIENT_USERNAMES:', error)
-              allowedEmails = []
+              console.error('Raw CLIENT_USERNAMES value:', clientUsernames)
+              // Fallback: try to extract emails manually
+              const emailMatch = clientUsernames.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g)
+              allowedEmails = emailMatch || []
             }
           }
 
