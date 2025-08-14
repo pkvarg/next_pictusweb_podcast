@@ -117,14 +117,14 @@ const ClientZone = () => {
           <iframe
             ref={iframe1Ref}
             className="w-full lg:w-[48%] rounded-lg border border-purple-500/30 bg-gradient-to-br from-slate-800/80 to-purple-900/40"
-            src="http://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/840710e9-c0da-4acd-b6d3-fd06fd47dd4b"
+            src="https://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/840710e9-c0da-4acd-b6d3-fd06fd47dd4b"
             style={{ minHeight: '400px', overflow: 'hidden' }}
             data-iframe="dashboard1"
           ></iframe>
           <iframe
             ref={iframe2Ref}
             className="w-full lg:w-[48%] rounded-lg border border-purple-500/30 bg-gradient-to-br from-slate-800/80 to-purple-900/40"
-            src="http://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/31ce6923-6a0d-49e7-83cb-e263f9b1550c"
+            src="https://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/31ce6923-6a0d-49e7-83cb-e263f9b1550c"
             style={{ minHeight: '400px', overflow: 'hidden' }}
             data-iframe="dashboard2"
           ></iframe>
@@ -133,7 +133,7 @@ const ClientZone = () => {
         <iframe
           ref={iframe3Ref}
           className="w-full my-8 rounded-lg border border-purple-500/30 bg-gradient-to-br from-slate-800/80 to-purple-900/40"
-          src="http://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/b39a3903-cf10-4ee5-b5ff-0c221516ba31"
+          src="https://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/b39a3903-cf10-4ee5-b5ff-0c221516ba31"
           style={{ minHeight: '600px', overflow: 'hidden' }}
           data-iframe="dashboard3"
         ></iframe>
