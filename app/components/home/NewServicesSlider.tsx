@@ -299,101 +299,154 @@ const NewServicesSlider = () => {
           </h2>
         </div>
 
-        {/* Slider Container */}
+        {/* Slider Container - Mobile: Stack vertically, Desktop: Horizontal slider */}
         <div className="relative">
-          <div className="overflow-hidden rounded-3xl">
-            <div
-              className="flex transition-transform duration-700 ease-in-out"
-              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-            >
-              {services.map((service) => {
-                const IconComponent = service.icon
-                return (
-                  <div key={service.id} className="w-full flex-shrink-0">
-                    <div
-                      className={`relative bg-gradient-to-br ${service.bgGradient} backdrop-blur-sm border border-white/10 rounded-3xl p-8 lg:p-12 mx-2`}
-                    >
-                      {/* Badge */}
-                      {/* <div className="absolute top-6 right-6">
-                        <span
-                          className={`bg-gradient-to-r ${service.gradient} px-3 py-1 rounded-full text-xs font-bold text-white uppercase tracking-wider`}
-                        >
-                          {service.badge}
-                        </span>
-                      </div> */}
-
-                      <div className="flex flex-col justify-center items-center">
-                        {/* Content */}
-                        <div>
-                          <div className="flex items-center gap-4 mb-6">
-                            <div
-                              className={`w-16 h-16 bg-gradient-to-r ${service.gradient} rounded-2xl flex items-center justify-center`}
-                            >
-                              <IconComponent className="w-8 h-8 text-white" />
-                            </div>
-                            <div>
-                              <h3 className="text-3xl font-bold text-white mb-1">
-                                {service.title}
-                              </h3>
-                              <p className="text-gray-300 text-xl font-thin">{service.subtitle}</p>
-                            </div>
+          {/* Mobile: Vertical Stack */}
+          <div className="lg:hidden space-y-6">
+            {services.map((service) => {
+              const IconComponent = service.icon
+              return (
+                <div key={service.id} className="w-full">
+                  <div
+                    className={`relative bg-gradient-to-br ${service.bgGradient} backdrop-blur-sm border border-white/10 rounded-3xl p-6`}
+                  >
+                    <div className="flex flex-col justify-center items-center">
+                      {/* Content */}
+                      <div>
+                        <div className="flex items-center gap-4 mb-6">
+                          <div
+                            className={`w-16 h-16 bg-gradient-to-r ${service.gradient} rounded-2xl flex items-center justify-center`}
+                          >
+                            <IconComponent className="w-8 h-8 text-white" />
                           </div>
-
-                          <p className="text-white text-xl leading-relaxed mb-8 font-thin">
-                            {service.description}
-                          </p>
-
-                          {/* Features */}
-                          <div className="grid grid-cols-2 justify-center gap-2 mb-8">
-                            {service.features.map((feature, index) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <div
-                                  className={`w-2 h-2 bg-gradient-to-r ${service.gradient} rounded-full`}
-                                />
-                                <span className="text-white text-[20px] font-thin">{feature}</span>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Price & CTA */}
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                            <div className="text-2xl font-thin text-white">{service.price}</div>
-                            <Link
-                              href={service.link}
-                              className={`bg-gradient-to-r ${service.gradient} px-6 py-3 rounded-full text-white font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2 group`}
-                            >
-                              {t('learnMore')}
-                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </Link>
+                          <div>
+                            <h3 className="text-2xl font-bold text-white mb-1">
+                              {service.title}
+                            </h3>
+                            <p className="text-gray-300 text-lg font-thin">{service.subtitle}</p>
                           </div>
                         </div>
 
-                        {/* Visual/Mockup */}
+                        <p className="text-white text-lg leading-relaxed mb-6 font-thin">
+                          {service.description}
+                        </p>
+
+                        {/* Features */}
+                        <div className="grid grid-cols-1 gap-2 mb-6">
+                          {service.features.map((feature, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <div
+                                className={`w-2 h-2 bg-gradient-to-r ${service.gradient} rounded-full`}
+                              />
+                              <span className="text-white text-base font-thin">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Price & CTA */}
+                        <div className="flex flex-col gap-4">
+                          <div className="text-xl font-thin text-white">{service.price}</div>
+                          <Link
+                            href={service.link}
+                            className={`bg-gradient-to-r ${service.gradient} px-6 py-3 rounded-full text-white font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2 group w-fit`}
+                          >
+                            {t('learnMore')}
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
-                )
-              })}
-            </div>
+                </div>
+              )
+            })}
           </div>
 
-          {/* Navigation Arrows */}
-          <button
-            onClick={prevSlide}
-            className="hidden lg:flex absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full items-center justify-center text-white hover:bg-white/20 transition-all duration-300 z-10"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button
-            onClick={nextSlide}
-            className="hidden lg:flex absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full items-center justify-center text-white hover:bg-white/20 transition-all duration-300 z-10"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
+          {/* Desktop: Horizontal Slider */}
+          <div className="hidden lg:block">
+            <div className="overflow-hidden rounded-3xl">
+              <div
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
+                {services.map((service) => {
+                  const IconComponent = service.icon
+                  return (
+                    <div key={service.id} className="w-full flex-shrink-0">
+                      <div
+                        className={`relative bg-gradient-to-br ${service.bgGradient} backdrop-blur-sm border border-white/10 rounded-3xl p-8 lg:p-12 mx-2`}
+                      >
+                        <div className="flex flex-col justify-center items-center">
+                          {/* Content */}
+                          <div>
+                            <div className="flex items-center gap-4 mb-6">
+                              <div
+                                className={`w-16 h-16 bg-gradient-to-r ${service.gradient} rounded-2xl flex items-center justify-center`}
+                              >
+                                <IconComponent className="w-8 h-8 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-3xl font-bold text-white mb-1">
+                                  {service.title}
+                                </h3>
+                                <p className="text-gray-300 text-xl font-thin">{service.subtitle}</p>
+                              </div>
+                            </div>
+
+                            <p className="text-white text-xl leading-relaxed mb-8 font-thin">
+                              {service.description}
+                            </p>
+
+                            {/* Features */}
+                            <div className="grid grid-cols-2 justify-center gap-2 mb-8">
+                              {service.features.map((feature, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                  <div
+                                    className={`w-2 h-2 bg-gradient-to-r ${service.gradient} rounded-full`}
+                                  />
+                                  <span className="text-white text-[20px] font-thin">{feature}</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Price & CTA */}
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                              <div className="text-2xl font-thin text-white">{service.price}</div>
+                              <Link
+                                href={service.link}
+                                className={`bg-gradient-to-r ${service.gradient} px-6 py-3 rounded-full text-white font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2 group`}
+                              >
+                                {t('learnMore')}
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Navigation Arrows - Desktop only */}
+            <button
+              onClick={prevSlide}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300 z-10"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300 z-10"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
-        {/* Dots Navigation */}
-        <div className="flex justify-center gap-3 mt-8">
+        {/* Dots Navigation - Desktop only */}
+        <div className="hidden lg:flex justify-center gap-3 mt-8">
           {services.map((_, index) => (
             <button
               key={index}
