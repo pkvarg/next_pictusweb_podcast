@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 import createIntlMiddleware from 'next-intl/middleware'
-import { auth } from './lib/auth'
+import { getToken } from 'next-auth/jwt'
 
 // Create the internationalization middleware
 const intlMiddleware = createIntlMiddleware({
@@ -22,11 +23,12 @@ const protectedRoutes = [
 // Routes that require admin role
 const adminRoutes = ['/admin', '/en/admin', '/sk/admin', '/hu/admin']
 // Routes that should not be processed by auth middleware
-const publicRoutes = ['/auth/error', '/en/auth/error', '/sk/auth/error', '/hu/auth/error']
+const publicRoutes = ['/auth', '/en/auth', '/sk/auth', '/hu/auth']
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth
-  const userEmail = req.auth?.user?.email
+export default async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+  const isLoggedIn = !!token
+  const userEmail = token?.email
 
   const isProtectedRoute = protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
   const isAdminRoute = adminRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
@@ -35,7 +37,7 @@ export default auth((req) => {
   // Extract locale from the path or default to 'sk'
   const locale = req.nextUrl.pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
 
-  // Skip auth processing for public routes (like error pages)
+  // Skip auth processing for public routes (auth pages, error pages)
   if (isPublicRoute) {
     return intlMiddleware(req)
   }
@@ -61,7 +63,7 @@ export default auth((req) => {
 
   // Apply internationalization middleware
   return intlMiddleware(req)
-})
+}
 
 export const config = {
   matcher: [

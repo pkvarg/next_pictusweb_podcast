@@ -1,8 +1,8 @@
 // auth.ts
 import NextAuth from 'next-auth'
-import Credentials from 'next-auth/providers/credentials'
-import Google from 'next-auth/providers/google'
-import GitHub from 'next-auth/providers/github'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
+import GitHubProvider from 'next-auth/providers/github'
 import { isValidPassword } from './isValidPassword'
 
 // Extend the built-in session types
@@ -27,7 +27,6 @@ declare module 'next-auth' {
 
 // Export auth options for use in other files  
 export const authOptions = {
-  trustHost: true, // Add this for production deployment
   session: {
     strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -37,16 +36,19 @@ export const authOptions = {
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user, account }: any) {
-      console.log('JWT callback - Provider:', account?.provider, 'User:', user?.email, 'Environment:', process.env.NODE_ENV)
+    async jwt({ token, user, account, trigger }: any) {
+      console.log('JWT callback - Trigger:', trigger, 'Provider:', account?.provider, 'User:', user?.email, 'Environment:', process.env.NODE_ENV)
       
-      if (user) {
+      // Only process when user data is present (initial sign in)
+      if (user && account) {
+        console.log('Processing new sign-in for user:', user.email)
         token.id = user.id
         token.role = user.role || 'user' // Default to 'user' for OAuth providers
         token.email = user.email
+        token.name = user.name
 
         // Check if OAuth user is authorized
-        if (account?.provider && account.provider !== 'credentials') {
+        if (account.provider !== 'credentials') {
           console.log('OAuth login attempt for:', user.email, 'Provider:', account.provider)
           const clientUsernames = process.env.CLIENT_USERNAMES
           let allowedEmails: string[] = []
@@ -75,27 +77,29 @@ export const authOptions = {
           console.log('ACCESS GRANTED for:', user.email)
         }
       }
+      
       return token
     },
     async session({ session, token }: any) {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as string
         session.user.email = token.email as string
+        session.user.name = token.name as string
       }
       return session
     },
   },
   providers: [
-    Google({
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    GitHub({
+    GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
-    Credentials({
+    CredentialsProvider({
       name: 'Admin Login',
       credentials: {
         username: { label: 'Username', type: 'text' },
@@ -136,4 +140,4 @@ export const authOptions = {
 }
 
 // Initialize NextAuth with the auth options
-export const { handlers, auth, signIn, signOut } = NextAuth(authOptions)
+export default NextAuth(authOptions)
