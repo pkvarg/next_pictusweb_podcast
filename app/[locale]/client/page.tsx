@@ -16,60 +16,6 @@ const ClientZone = () => {
     signOut({ callbackUrl: '/' })
   }
 
-  // Function to resize iframe based on content
-  const resizeIframe = (iframe: HTMLIFrameElement) => {
-    try {
-      const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document
-      if (iframeDocument) {
-        const height = Math.max(
-          iframeDocument.documentElement.scrollHeight,
-          iframeDocument.body.scrollHeight,
-          400 // Minimum height
-        )
-        iframe.style.height = height + 'px'
-      }
-    } catch (error) {
-      // Cross-origin restrictions - fallback to reasonable heights
-      console.log('Cross-origin iframe, using fallback heights')
-      if (iframe === iframe1Ref.current || iframe === iframe2Ref.current) {
-        iframe.style.height = '400px'
-      } else {
-        iframe.style.height = '600px'
-      }
-    }
-  }
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // Listen for messages from iframes about their content height
-      if (event.data && event.data.height && event.data.iframe) {
-        const targetIframe = document.querySelector(`iframe[data-iframe="${event.data.iframe}"]`) as HTMLIFrameElement
-        if (targetIframe) {
-          targetIframe.style.height = event.data.height + 'px'
-        }
-      }
-    }
-
-    window.addEventListener('message', handleMessage)
-
-    // Set up iframe load handlers with delay for content loading
-    const iframes = [iframe1Ref.current, iframe2Ref.current, iframe3Ref.current]
-    
-    iframes.forEach((iframe, index) => {
-      if (iframe) {
-        iframe.onload = () => {
-          // Delay to ensure content is fully loaded
-          setTimeout(() => resizeIframe(iframe), 1000)
-          setTimeout(() => resizeIframe(iframe), 3000) // Second attempt for slow loading content
-        }
-      }
-    })
-
-    return () => {
-      window.removeEventListener('message', handleMessage)
-    }
-  }, [])
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
@@ -113,27 +59,12 @@ const ClientZone = () => {
           <p className="text-xl text-gray-300">{t('welcomeSubtitle')}</p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 justify-between items-stretch w-full mb-8">
+        <div className="mb-8">
           <iframe
-            ref={iframe1Ref}
-            className="w-full lg:w-[48%] rounded-lg border border-purple-500/30 bg-gradient-to-br from-slate-800/80 to-purple-900/40 min-h-[400px] overflow-hidden"
-            src="https://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/840710e9-c0da-4acd-b6d3-fd06fd47dd4b"
-            data-iframe="dashboard1"
-          ></iframe>
-          <iframe
-            ref={iframe2Ref}
-            className="w-full lg:w-[48%] rounded-lg border border-purple-500/30 bg-gradient-to-br from-slate-800/80 to-purple-900/40 min-h-[400px] overflow-hidden"
-            src="https://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/31ce6923-6a0d-49e7-83cb-e263f9b1550c"
-            data-iframe="dashboard2"
+            src="http://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/56b38c4b-0a20-4810-b4b9-3194b7552fc3"
+            className="w-full h-svh rounded-lg border border-purple-500/30 bg-gradient-to-br from-slate-800/80 to-purple-900/40 overflow-hidden"
           ></iframe>
         </div>
-
-        <iframe
-          ref={iframe3Ref}
-          className="w-full my-8 rounded-lg border border-purple-500/30 bg-gradient-to-br from-slate-800/80 to-purple-900/40 min-h-[600px] overflow-hidden"
-          src="https://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/b39a3903-cf10-4ee5-b5ff-0c221516ba31"
-          data-iframe="dashboard3"
-        ></iframe>
 
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
