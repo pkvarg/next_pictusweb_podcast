@@ -61,7 +61,7 @@ const ClientZone = () => {
 
         <div className="mb-8">
           <iframe
-            src="http://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/56b38c4b-0a20-4810-b4b9-3194b7552fc3"
+            src="https://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/56b38c4b-0a20-4810-b4b9-3194b7552fc3"
             className="w-full h-svh rounded-lg border border-purple-500/30 bg-gradient-to-br from-slate-800/80 to-purple-900/40 overflow-hidden"
           ></iframe>
         </div>
