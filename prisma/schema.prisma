@@ -1,75 +1,142 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url =  env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model Blog {
   id        String   @id @default(uuid())
-  title     String   
-  category     String  
-  media     String  
-  text     String  
-  upcoming     Boolean
-  english     Boolean  
-  link     String  
+  title     String
+  category  String
+  media     String
+  text      String
+  upcoming  Boolean
+  english   Boolean
+  link      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-   deleted Boolean?
-  
+  deleted   Boolean?
 }
 
 model Podcast {
-  id        String   @id @default(uuid())
-  title String
+  id          String   @id @default(uuid())
+  title       String
   description String?
-  textPrompt String
-  voiceType String?
+  audioPath   String
+  imagePath   String?
+  category    String?
+  english     Boolean?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   imagePrompt String?
-  audioPath String
-  imagePath String?
-  category     String?  
-  english     Boolean? 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deleted Boolean @default(false)
-  published Boolean @default(false)
-  
-  }
+  textPrompt  String
+  deleted     Boolean  @default(false)
+  voiceType   String?
+  published   Boolean  @default(false)
+}
 
-  model UsedImages {
-  id        String   @id @default(uuid())
-  podcastTitle     String?   
-  imagePath     String  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  reallyUsed Boolean?
-  
+model UsedImages {
+  id           String   @id @default(uuid())
+  podcastTitle String?
+  imagePath    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  reallyUsed   Boolean?
 }
 
 model UsedPodcasts {
-  id        String   @id @default(uuid())
-  podcastTitle     String?   
-  audioPath     String  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  reallyUsed Boolean?
+  id           String   @id @default(uuid())
+  podcastTitle String?
+  audioPath    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  reallyUsed   Boolean?
 }
 
-  model VisitorsCounter {
-  id String   @id @default(uuid())
-  count Int @default(0)
+model VisitorsCounter {
+  id        String   @id @default(uuid())
+  count     Int      @default(0)
   updatedAt DateTime @updatedAt
-  }
+}
 
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String?
+  loginProvider String?
+  name          String?
+  firstName     String?
+  lastName      String?
+  organization  String?
+  active        Boolean        @default(true)
+  role          Role           @default(CLIENT)
+  tier          Tier           @default(FREE)
+  emailVerified DateTime?
+  image         String?
+  lastLoggedIn  DateTime?
+  loginCount    Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+  Account       Account[]
+  LoginHistory  LoginHistory[]
+  Session       Session[]
+}
 
+model Account {
+  id                String  @id
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model LoginHistory {
+  id        String   @id
+  userId    String
+  loginAt   DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+  provider  String?
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+enum Tier {
+  FREE
+  PREMIUM
+}

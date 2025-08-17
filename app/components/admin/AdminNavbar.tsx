@@ -70,6 +70,9 @@ const AdminNavbar = () => {
                 <li>
                   <Link href={`/admin/file-upload`}>File Upload</Link>
                 </li>
+                <li>
+                  <Link href={`/admin/users`}>Users</Link>
+                </li>
 
                 {/* <li>
                   <Link href={`/admin/video`}>Video</Link>

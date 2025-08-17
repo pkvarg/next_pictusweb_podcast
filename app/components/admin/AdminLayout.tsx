@@ -3,7 +3,18 @@ import React, { useState } from 'react'
 import { Link } from '@/i18n/routing'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { Home, Mic, Brain, Upload, BarChart3, Menu, X, Headphones, LogOut } from 'lucide-react'
+import {
+  Home,
+  Mic,
+  Brain,
+  Upload,
+  BarChart3,
+  Menu,
+  X,
+  Headphones,
+  LogOut,
+  User,
+} from 'lucide-react'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -33,6 +44,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       name: 'File Upload',
       href: '/admin/file-upload',
       icon: Upload,
+    },
+    {
+      name: 'Users',
+      href: '/admin/users',
+      icon: User,
     },
   ]
 
