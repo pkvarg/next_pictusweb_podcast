@@ -11,7 +11,7 @@ import ScrollToTop from '@/app/components/ScrollToTop'
 import AuthSessionProvider from '@/app/components/SessionProvider'
 import { prodLogger } from '@/lib/prodLogger'
 import ClientErrorHandler from '@/app/components/ClientErrorHandler'
-import Script from 'next/script'
+import ConditionalUmami from '@/app/components/ConditionalUmami'
 
 const inter = Yanone_Kaffeesatz({ subsets: ['latin'] })
 
@@ -115,11 +115,7 @@ export default async function RootLayout({
           <head>
             <meta property="fb:app_id" content="627076731624225" />
           </head>
-          <Script
-            defer
-            src="https://umami-p00gs00gwcwo00s4k4c4kgg8.pictusweb.com/script.js"
-            data-website-id="a388ecb6-5425-4f32-afa7-62d945f69671"
-          />
+          <ConditionalUmami />
           <AuthSessionProvider>
             <AudioProvider>
               <body className={cn(inter.className)}>

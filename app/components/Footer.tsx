@@ -39,6 +39,7 @@ const Footer = () => {
         expires={365}
         enableDeclineButton
         onDecline={() => {
+          localStorage.setItem('CookieConsent', 'false')
           increaseVisitors()
         }}
         declineButtonStyle={{
@@ -50,6 +51,7 @@ const Footer = () => {
         }}
         declineButtonText={t('cookiesDisagree')}
         onAccept={() => {
+          localStorage.setItem('CookieConsent', 'true')
           increaseVisitors()
         }}
       >
