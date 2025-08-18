@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: {
         }],
       },
       alternates: {
-        canonical: `https://www.pictusweb.sk/${validLocale}`,
+        canonical: validLocale === 'sk' ? 'https://www.pictusweb.sk/' : `https://www.pictusweb.sk/${validLocale}`,
         languages: {
           'en': 'https://www.pictusweb.sk/en',
           'sk': 'https://www.pictusweb.sk/sk',

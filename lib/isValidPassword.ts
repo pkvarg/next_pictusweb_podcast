@@ -1,16 +1,13 @@
+import bcrypt from 'bcrypt'
+
 export async function isValidPassword(
   password: string,
   hashedPassword: string
 ) {
-  // console.log('gen', await hashPassword(password))
-  return (await hashPassword(password)) === hashedPassword
+  return await bcrypt.compare(password, hashedPassword)
 }
 
-async function hashPassword(password: string) {
-  const arrayBuffer = await crypto.subtle.digest(
-    'SHA-512',
-    new TextEncoder().encode(password)
-  )
-
-  return Buffer.from(arrayBuffer).toString('base64')
+export async function hashPassword(password: string) {
+  const saltRounds = 12
+  return await bcrypt.hash(password, saltRounds)
 }

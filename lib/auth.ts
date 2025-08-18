@@ -3,7 +3,11 @@ import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import GitHubProvider from 'next-auth/providers/github'
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { isValidPassword } from './isValidPassword'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 // Extend the built-in session types
 declare module 'next-auth' {
@@ -27,69 +31,75 @@ declare module 'next-auth' {
 
 // Export auth options for use in other files  
 export const authOptions = {
+  // Temporarily disable adapter to test OAuth flow
+  // adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  // Allow linking accounts with same email from different providers
+  // Only enable this if you trust your OAuth providers
+  // allowDangerousEmailAccountLinking: true,
   pages: {
     signIn: '/auth/login',
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user, account, trigger }: any) {
-      console.log('JWT callback - Trigger:', trigger, 'Provider:', account?.provider, 'User:', user?.email, 'Environment:', process.env.NODE_ENV)
+    async signIn({ user, account }: any) {
+      console.log('JWT SignIn attempt:', user.email, 'Provider:', account?.provider)
       
-      // Only process when user data is present (initial sign in)
-      if (user && account) {
-        console.log('Processing new sign-in for user:', user.email)
-        token.id = user.id
-        token.role = user.role || 'user' // Default to 'user' for OAuth providers
-        token.email = user.email
-        token.name = user.name
-
-        // Check if OAuth user is authorized
-        if (account.provider !== 'credentials') {
-          console.log('OAuth login attempt for:', user.email, 'Provider:', account.provider)
-          const clientUsernames = process.env.CLIENT_USERNAMES
-          let allowedEmails: string[] = []
-          
-          if (clientUsernames) {
-            try {
-              // Clean up the string and parse the array
-              const cleanedString = clientUsernames.replace(/\\/g, '').trim()
-              allowedEmails = JSON.parse(cleanedString)
-            } catch (error) {
-              console.error('Failed to parse CLIENT_USERNAMES:', error)
-              console.error('Raw CLIENT_USERNAMES value:', clientUsernames)
-              // Fallback: try to extract emails manually
-              const emailMatch = clientUsernames.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g)
-              allowedEmails = emailMatch || []
-            }
+      // Check if user exists in database for JWT mode
+      if (account?.provider !== 'credentials') {
+        const dbUser = await prisma.user.findUnique({
+          where: { 
+            email: user.email,
+            deletedAt: null,
+            active: true
           }
+        })
 
-          // Add admin username to allowed list
-          if (process.env.ADMIN_USERNAME) {
-            allowedEmails.push(process.env.ADMIN_USERNAME)
-          }
-
-          // Check if user email is in allowed list
-          console.log('Allowed emails:', allowedEmails, 'User email:', user.email)
-          if (!allowedEmails.includes(user.email || '')) {
-            console.log('ACCESS DENIED for:', user.email)
-            throw new Error('ACCESS_DENIED')
-          }
-          console.log('ACCESS GRANTED for:', user.email)
+        if (!dbUser) {
+          console.log('ACCESS DENIED - User not found:', user.email)
+          return false
         }
+        
+        console.log('ACCESS GRANTED - User found:', user.email)
+        return true
       }
       
+      return true
+    },
+    async jwt({ token, user, account }: any) {
+      if (user && account) {
+        // Get user data from database for JWT
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email }
+        })
+        
+        if (dbUser) {
+          token.id = dbUser.id
+          token.role = dbUser.role
+          token.email = dbUser.email
+          token.name = dbUser.name || `${dbUser.firstName} ${dbUser.lastName}`
+          
+          // Update login tracking
+          await prisma.user.update({
+            where: { id: dbUser.id },
+            data: { 
+              lastLoggedIn: new Date(),
+              loginCount: { increment: 1 }
+            }
+          })
+        }
+      }
       return token
     },
     async session({ session, token }: any) {
-      if (token && session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
-        session.user.email = token.email as string
-        session.user.name = token.name as string
+      if (token) {
+        session.user.id = token.id
+        session.user.role = token.role?.toLowerCase() || 'client'
+        session.user.email = token.email
+        session.user.name = token.name
       }
       return session
     },
@@ -104,40 +114,74 @@ export const authOptions = {
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
     CredentialsProvider({
-      name: 'Admin Login',
+      name: 'Credentials Login',
       credentials: {
-        username: { label: 'Username', type: 'text' },
+        username: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         console.log('Credentials login attempt for:', credentials?.username)
-        console.log('Environment variables - ADMIN_USERNAME:', !!process.env.ADMIN_USERNAME, 'HASHED_ADMIN_PASSWORD:', !!process.env.HASHED_ADMIN_PASSWORD)
         
         if (!credentials?.username || !credentials?.password) {
           console.log('Missing credentials')
           return null
         }
 
-        // Check against environment variables
-        if (
-          credentials.username === process.env.ADMIN_USERNAME &&
-          process.env.HASHED_ADMIN_PASSWORD &&
-          (await isValidPassword(
-            credentials.password as string,
-            process.env.HASHED_ADMIN_PASSWORD as string,
-          ))
-        ) {
-          console.log('Credentials login SUCCESS for:', credentials.username)
-          return {
-            id: '1',
-            name: 'Admin',
-            email: credentials.username as string,
-            role: 'admin',
-          }
-        }
+        try {
+          // Find user in database
+          const user = await prisma.user.findUnique({
+            where: {
+              email: credentials.username,
+              deletedAt: null,
+              active: true
+            }
+          })
 
-        console.log('Credentials login FAILED for:', credentials.username)
-        return null
+          if (!user) {
+            console.log('Credentials login FAILED for:', credentials.username, '- User not found or inactive')
+            return null
+          }
+
+          // Check if user has a password (credentials login)
+          if (!user.password) {
+            console.log('Credentials login FAILED for:', credentials.username, '- No password set (OAuth user)')
+            return null
+          }
+
+          // Check if user is allowed to use credentials login
+          if (user.loginProvider && user.loginProvider !== 'credentials') {
+            console.log('Credentials login FAILED for:', credentials.username, '- User must use:', user.loginProvider)
+            return null
+          }
+
+          // Verify password
+          const isValidPwd = await isValidPassword(credentials.password, user.password)
+          if (!isValidPwd) {
+            console.log('Credentials login FAILED for:', credentials.username, '- Invalid password')
+            return null
+          }
+
+          // Update last login info
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { 
+              lastLoggedIn: new Date(),
+              loginCount: { increment: 1 }
+            }
+          })
+
+          console.log('Credentials login SUCCESS for:', credentials.username)
+          // Return user object compatible with database adapter
+          return {
+            id: user.id,
+            name: user.name || `${user.firstName} ${user.lastName}`,
+            email: user.email,
+            image: user.image,
+          }
+        } catch (error) {
+          console.error('Credentials login ERROR for:', credentials.username, error)
+          return null
+        }
       },
     }),
   ],

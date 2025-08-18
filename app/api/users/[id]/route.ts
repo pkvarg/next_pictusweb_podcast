@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { hashPassword } from '../../../../lib/isValidPassword'
 
 const prisma = new PrismaClient()
 
@@ -33,20 +34,36 @@ export async function PUT(
     const body = await request.json()
     const { email, firstName, lastName, organization, active, password, loginProvider } = body
 
+    // Prepare update data
+    const updateData: any = {}
+    if (email) updateData.email = email
+    if (firstName) updateData.firstName = firstName
+    if (lastName) updateData.lastName = lastName
+    if (organization !== undefined) updateData.organization = organization
+    if (active !== undefined) updateData.active = active
+    if (loginProvider !== undefined) updateData.loginProvider = loginProvider
+    
+    // Hash password if provided
+    if (password !== undefined && password.trim() !== '') {
+      updateData.password = await hashPassword(password)
+    }
+
+    // Update name if firstName or lastName changed
+    if (firstName || lastName) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: params.id }
+      })
+      if (currentUser) {
+        updateData.name = `${firstName || currentUser.firstName} ${lastName || currentUser.lastName}`
+      }
+    }
+
     const user = await prisma.user.update({
       where: {
         id: params.id,
         deletedAt: null,
       },
-      data: {
-        ...(email && { email }),
-        ...(firstName && { firstName }),
-        ...(lastName && { lastName }),
-        ...(organization !== undefined && { organization }),
-        ...(active !== undefined && { active }),
-        ...(password !== undefined && { password }),
-        ...(loginProvider !== undefined && { loginProvider }),
-      },
+      data: updateData,
     })
 
     return NextResponse.json(user)

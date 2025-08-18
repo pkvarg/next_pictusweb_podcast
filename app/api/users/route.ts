@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { hashPassword } from '../../../lib/isValidPassword'
 
 const prisma = new PrismaClient()
 
@@ -32,6 +33,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Hash password if provided
+    let hashedPassword = null
+    if (password && password.trim() !== '') {
+      hashedPassword = await hashPassword(password)
+    }
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -39,8 +46,9 @@ export async function POST(request: NextRequest) {
         lastName,
         organization: organization || null,
         active: active !== undefined ? active : true,
-        password: password || null,
+        password: hashedPassword,
         loginProvider: loginProvider || null,
+        name: `${firstName} ${lastName}`, // Combine first and last name
       },
     })
 

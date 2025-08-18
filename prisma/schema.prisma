@@ -64,7 +64,7 @@ model VisitorsCounter {
 }
 
 model User {
-  id            String         @id @default(uuid())
+  id            String         @id @default(cuid())
   email         String         @unique
   password      String?
   loginProvider String?
@@ -82,45 +82,45 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   deletedAt     DateTime?
-  Account       Account[]
-  LoginHistory  LoginHistory[]
-  Session       Session[]
+  accounts      Account[]
+  loginHistory  LoginHistory[]
+  sessions      Session[]
 }
 
 model Account {
-  id                String  @id
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
-  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model LoginHistory {
-  id        String   @id
+  id        String   @id @default(cuid())
   userId    String
   loginAt   DateTime @default(now())
   ipAddress String?
   userAgent String?
   provider  String?
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Session {
-  id           String   @id
+  id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
