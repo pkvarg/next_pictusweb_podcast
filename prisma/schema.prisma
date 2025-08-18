@@ -84,6 +84,31 @@ model User {
   deletedAt     DateTime?
 }
 
+model VehicleNotification {
+  id                    Int       @id @default(autoincrement())
+  company               String?   @db.VarChar(100)
+  personName            String?   @db.VarChar(100)
+  email                 String?   @db.VarChar(150)
+  vehicleRegistration   String?   @db.VarChar(20)
+  vehicleType           String?   @db.VarChar(100)
+  kilometers            Int?
+  notificationType      String?   @db.VarChar(50)
+  notificationChannel   String?   @db.VarChar(50)
+  notificationDate      DateTime?
+  dutyDate              DateTime?
+  emailMessage          String?   @db.Text
+  status                String    @default("pending") @db.VarChar(20)
+  sentAt                DateTime?
+  createdAt             DateTime  @default(now())
+  sheetRowId            String?   @unique @db.VarChar(50)
+  confirmationAttempts  Int       @default(0)
+  confirmedAt           DateTime?
+  lastReminderSent      DateTime?
+  finalStatusUpdated    DateTime?
+
+  @@map("vehiclenotification")
+}
+
 
 enum Role {
   ADMIN
