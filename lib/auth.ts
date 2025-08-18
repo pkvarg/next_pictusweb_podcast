@@ -3,7 +3,6 @@ import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import GitHubProvider from 'next-auth/providers/github'
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { isValidPassword } from './isValidPassword'
 import { PrismaClient } from '@prisma/client'
 
@@ -31,15 +30,10 @@ declare module 'next-auth' {
 
 // Export auth options for use in other files  
 export const authOptions = {
-  // Temporarily disable adapter to test OAuth flow
-  // adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  // Allow linking accounts with same email from different providers
-  // Only enable this if you trust your OAuth providers
-  // allowDangerousEmailAccountLinking: true,
   pages: {
     signIn: '/auth/login',
     error: '/auth/error',
