@@ -50,6 +50,7 @@ export async function createOpenAiSpeech(podcastTitle: string, voiceType: any, i
 
     return { frontendPath }
   } catch (error) {
-    console.log(error)
+    console.error('Error generating OpenAI speech:', error)
+    throw error
   }
 }

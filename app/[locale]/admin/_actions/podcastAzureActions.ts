@@ -41,43 +41,50 @@ export async function createAzureSpeech(
 
   const synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig)
 
-  // try {
-  //   const result = await new Promise<sdk.SpeechSynthesisResult>(
-  //     (resolve, reject) => {
-  //       synthesizer.speakSsmlAsync(ssml, resolve, reject)
-  //     }
-  //   )
+  try {
+    const result = await new Promise<sdk.SpeechSynthesisResult>(
+      (resolve, reject) => {
+        synthesizer.speakSsmlAsync(ssml, resolve, reject)
+      }
+    )
 
-  //   if (result.reason === sdk.ResultReason.SynthesizingAudioCompleted) {
-  //     console.log('Synthesis finished.')
+    if (result.reason === sdk.ResultReason.SynthesizingAudioCompleted) {
+      console.log('Synthesis finished.')
 
-  //     // Convert the result.audioData (Uint8Array) to Buffer
-  //     const buffer = Buffer.from(result.audioData)
+      // Convert the result.audioData (Uint8Array) to Buffer
+      const buffer = Buffer.from(result.audioData)
 
-  //     const speechFile = path.resolve(
-  //       `./storage/mp3s/${podcastTitle}_${timestamp}.mp3`
-  //     )
+      const filename = `${podcastTitle}_${timestamp}.mp3`
+      const apiUrl = `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
 
-  //     await fs.promises.writeFile(speechFile, buffer)
+      // Upload the buffer to the API
+      const uploadResponse = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'audio/mpeg',
+        },
+        body: buffer,
+      })
 
-  //     const contentType = 'audio/mpeg'
+      if (!uploadResponse.ok) {
+        console.error('Upload failed with status:', uploadResponse.status)
+        const errorText = await uploadResponse.text().catch(() => 'Could not read error response')
+        console.error('Error details:', errorText)
+        throw new Error('Nepodarilo sa nahrať súbor')
+      }
 
-  //     // Upload the buffer directly to Firebase
-  //     const frontendPath = await uploadFirebase(
-  //       podcastTitle,
-  //       buffer,
-  //       contentType
-  //     )
+      const data = await uploadResponse.json()
+      const frontendPath = data.imageUrl
 
-  //     return { frontendPath } // Return the Firebase URL
-  //   } else {
-  //     console.error('Speech synthesis canceled:', result.errorDetails)
-  //     throw new Error(result.errorDetails)
-  //   }
-  // } catch (err) {
-  //   console.error('Error during synthesis:', err)
-  //   throw err
-  // } finally {
-  //   synthesizer.close()
-  // }
+      return { frontendPath }
+    } else {
+      console.error('Speech synthesis canceled:', result.errorDetails)
+      throw new Error(result.errorDetails)
+    }
+  } catch (err) {
+    console.error('Error during synthesis:', err)
+    throw err
+  } finally {
+    synthesizer.close()
+  }
 }

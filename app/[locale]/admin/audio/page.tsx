@@ -13,6 +13,7 @@ import { createElevenlabsSpeech } from '../_actions/podcastElevenlabsActions'
 import PreviewAudio from '@/lib/PreviewAudio'
 import AdminLayout from '@/app/components/admin/AdminLayout'
 import AdminBack from '@/app/components/admin/AdminBack'
+import { Download } from 'lucide-react'
 
 const Audio = () => {
   const { toast } = useToast()
@@ -88,26 +89,49 @@ const Audio = () => {
     e.preventDefault()
     setPreviewUrl('')
     if (!imagePrompt || !podcastTitle) {
-      toast({ title: 'Title and Prompt must not be empty.' })
-    } else {
-      const data = {
-        title: podcastTitle,
-        prompt: imagePrompt,
-      }
-      setIsSubmittingImage(true)
+      toast({ 
+        title: 'Title and Prompt must not be empty.',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    const data = {
+      title: podcastTitle,
+      prompt: imagePrompt,
+    }
+    
+    setIsSubmittingImage(true)
+    try {
       const response = await fetch('/api/podcastAiImg', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', // Set the content type to JSON
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data), // Convert the data object to a JSON string
+        body: JSON.stringify(data),
       })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
       const result = await response.json()
-
+      
+      if (result.status === 'success' && result.data) {
+        setImagePath(result.data)
+        setPreviewUrl(result.data as string)
+        toast({ title: 'Image generated successfully!' })
+      } else {
+        throw new Error(result.data || 'Failed to generate image')
+      }
+    } catch (error) {
+      console.error('Error generating image:', error)
+      toast({
+        title: 'Failed to generate image. Please try again.',
+        variant: 'destructive',
+      })
+    } finally {
       setIsSubmittingImage(false)
-
-      setImagePath(result.data)
-      setPreviewUrl(result.data as string)
     }
   }
 
@@ -195,6 +219,41 @@ const Audio = () => {
     //setMedia('')
   }
 
+  const downloadFile = async (url: string, filename: string) => {
+    try {
+      // Use our proxy API to handle CORS issues
+      const downloadUrl = `/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`
+      
+      // Create a temporary link and trigger download
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = filename
+      link.target = '_blank'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      toast({ title: 'File download started!' })
+    } catch (error) {
+      console.error('Download failed:', error)
+      toast({ title: 'Download failed', variant: 'destructive' })
+    }
+  }
+
+  const downloadAudio = () => {
+    if (audioPath) {
+      const filename = `${podcastTitle || 'audio'}_${new Date().getTime()}.mp3`
+      downloadFile(audioPath, filename)
+    }
+  }
+
+  const downloadImage = () => {
+    if (previewUrl) {
+      const filename = `${podcastTitle || 'image'}_${new Date().getTime()}.png`
+      downloadFile(previewUrl, filename)
+    }
+  }
+
   const generateAudio = async (e: any) => {
     e.preventDefault()
     if (!podcastTitle || !textPrompt) {
@@ -202,30 +261,41 @@ const Audio = () => {
         title: 'Title and Input Text must not be empty.',
         variant: 'destructive',
       })
-
       return
     }
+    
+    if (!voiceProvider) {
+      toast({
+        title: 'Please select a voice provider.',
+        variant: 'destructive',
+      })
+      return
+    }
+
     setIsSubmittingText(true)
-    if (voiceProvider === 'openai') {
-      const audio = await createOpenAiSpeech(podcastTitle, voiceType, textPrompt)
+    try {
+      let audio
+      if (voiceProvider === 'openai') {
+        audio = await createOpenAiSpeech(podcastTitle, voiceType, textPrompt)
+      } else if (voiceProvider === 'azure') {
+        audio = await createAzureSpeech(podcastTitle, voiceType, textPrompt)
+      } else if (voiceProvider === 'elevenlabs') {
+        audio = await createElevenlabsSpeech(podcastTitle, voiceType, textPrompt)
+      }
 
       if (audio && audio.frontendPath) {
         setAudioPath(audio.frontendPath)
+        toast({ title: 'Audio generated successfully!' })
+      } else {
+        throw new Error('Failed to generate audio')
       }
-      setIsSubmittingText(false)
-    } else if (voiceProvider === 'azure') {
-      const audio = await createAzureSpeech(podcastTitle, voiceType, textPrompt)
-
-      if (audio && audio.frontendPath) {
-        setAudioPath(audio.frontendPath)
-      }
-      setIsSubmittingText(false)
-    } else if (voiceProvider === 'elevenlabs') {
-      const audio = await createElevenlabsSpeech(podcastTitle, voiceType, textPrompt)
-      //console.log('aud', audio)
-      if (audio && audio.frontendPath) {
-        setAudioPath(audio.frontendPath)
-      }
+    } catch (error) {
+      console.error('Error generating audio:', error)
+      toast({
+        title: 'Failed to generate audio. Please try again.',
+        variant: 'destructive',
+      })
+    } finally {
       setIsSubmittingText(false)
     }
   }
@@ -337,8 +407,16 @@ const Audio = () => {
                 )}
 
                 {audioPath && (
-                  <div className="mt-[15px]">
+                  <div className="mt-[15px] flex flex-col gap-2">
                     <PreviewAudio audioPath={audioPath as string} />
+                    <button
+                      type="button"
+                      onClick={downloadAudio}
+                      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl flex items-center gap-2 text-white w-max"
+                    >
+                      <Download size={16} />
+                      Download Audio
+                    </button>
                   </div>
                 )}
               </div>
@@ -477,16 +555,23 @@ const Audio = () => {
             )}
 
             {previewUrl && (
-              <>
+              <div className="my-4">
                 <Image
-                  // className='my-4 w-[150px] h-auto'
-                  className="my-4 w-[250px] h-auto"
+                  className="w-[250px] h-auto mb-4"
                   src={previewUrl}
                   alt={podcastTitle}
                   width={550}
                   height={550}
                 />
-              </>
+                <button
+                  type="button"
+                  onClick={downloadImage}
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl flex items-center gap-2 text-white"
+                >
+                  <Download size={16} />
+                  Download Image
+                </button>
+              </div>
             )}
 
             {isSubmitting ? (

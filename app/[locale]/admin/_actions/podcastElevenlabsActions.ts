@@ -123,6 +123,7 @@ export async function createElevenlabsSpeech(
     return { frontendPath }
   } catch (error) {
     console.error('Error generating speech:', error)
+    throw error
   }
 }
 

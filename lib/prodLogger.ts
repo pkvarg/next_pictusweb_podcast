@@ -26,10 +26,13 @@ class ProdLogger {
   }
 
   info(message: string, context?: LogContext) {
-    const formatted = this.formatMessage('INFO', message, context)
-    console.log(formatted)
+    // Disabled to reduce log noise - only keep for critical debugging
+    // if (this.isDev) {
+    //   const formatted = this.formatMessage('INFO', message, context)
+    //   console.log(formatted)
+    // }
     
-    // In production, also send to external logging service if needed
+    // In production, only send critical info to external logging service if needed
     if (!this.isDev) {
       // You can add external logging service here (e.g., Sentry, LogRocket, etc.)
     }
@@ -54,18 +57,24 @@ class ProdLogger {
   }
 
   serverComponentStart(componentName: string, props?: any) {
-    this.info(`Server Component Render Start: ${componentName}`, {
-      component: componentName,
-      props: props ? Object.keys(props) : undefined,
-      type: 'server-component-start'
-    })
+    // Disabled to reduce log noise
+    // if (this.isDev) {
+    //   this.info(`Server Component Render Start: ${componentName}`, {
+    //     component: componentName,
+    //     props: props ? Object.keys(props) : undefined,
+    //     type: 'server-component-start'
+    //   })
+    // }
   }
 
   serverComponentEnd(componentName: string) {
-    this.info(`Server Component Render End: ${componentName}`, {
-      component: componentName,
-      type: 'server-component-end'
-    })
+    // Disabled to reduce log noise
+    // if (this.isDev) {
+    //   this.info(`Server Component Render End: ${componentName}`, {
+    //     component: componentName,
+    //     type: 'server-component-end'
+    //   })
+    // }
   }
 
   dynamicUsage(componentName: string, api: string, stack?: string) {

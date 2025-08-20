@@ -1,38 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
-import fetch from 'node-fetch'
-import fs from 'fs'
-import path from 'path'
 import OpenAI from 'openai'
-import { Readable } from 'stream'
 import { getTimeStamp } from '@/lib/timestamp'
 
-const openai = new OpenAI()
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  timeout: 60000, // 60 seconds timeout
+})
 
-function readableStreamToNodeReadable(readableStream: ReadableStream): Readable {
-  const reader = readableStream.getReader()
-  const nodeReadable = new Readable({
-    async read() {
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) {
-          this.push(null)
-          break
-        }
-        this.push(value)
-      }
-    },
-  })
-  return nodeReadable
-}
 
 export async function POST(req: NextRequest) {
-  const { title, prompt } = await req.json()
-
   try {
+    // Check if OpenAI API key is configured
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY is not configured')
+      return NextResponse.json({ 
+        status: 'fail', 
+        data: 'OpenAI API key is not configured' 
+      }, { status: 500 })
+    }
+
+    const { title, prompt } = await req.json()
+    
+    if (!title || !prompt) {
+      return NextResponse.json({ 
+        status: 'fail', 
+        data: 'Title and prompt are required' 
+      }, { status: 400 })
+    }
+    
+    console.log('Starting image generation for:', title)
+    
     const resAi = await openai.images.generate({
       model: 'dall-e-3',
       prompt: prompt,
+      size: '1024x1024',
+      quality: 'standard',
+      n: 1,
     })
+    
+    console.log('OpenAI image generation completed')
 
     // const resAi = {
     //   created: 1745045031,
@@ -46,10 +52,19 @@ export async function POST(req: NextRequest) {
     // }
 
     const imageUrl = resAi.data[0]?.url
-    const response = imageUrl ? await fetch(imageUrl) : null
-    const arrayBuffer = response ? await response.arrayBuffer() : null
-
-    if (arrayBuffer) {
+    if (!imageUrl) {
+      throw new Error('No image URL returned from OpenAI')
+    }
+    
+    console.log('Fetching generated image from OpenAI URL')
+    const response = await fetch(imageUrl)
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image from OpenAI: ${response.status}`)
+    }
+    
+    const arrayBuffer = await response.arrayBuffer()
+    console.log('Image fetched, uploading to storage...')
       const timestamp = getTimeStamp()
       const filename = `${title}_${timestamp}.png`
 
@@ -102,10 +117,13 @@ export async function POST(req: NextRequest) {
       // If using Firebase, uncomment this:
       // const frontendPath = await uploadFirebase(title, buffer, contentType);
 
+      console.log('Image uploaded successfully:', frontendPath)
       return NextResponse.json({ status: 'success', data: frontendPath })
-    }
   } catch (e: any) {
-    console.error('Error saving image:', e)
-    return NextResponse.json({ status: 'fail', data: e.message })
+    console.error('Error in image generation API:', e)
+    return NextResponse.json({ 
+      status: 'fail', 
+      data: e.message || 'Unknown error occurred' 
+    }, { status: 500 })
   }
 }
