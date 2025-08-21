@@ -89,9 +89,9 @@ model VehicleNotification {
   company               String?   @db.VarChar(100)
   personName            String?   @db.VarChar(100)
   email                 String?   @db.VarChar(150)
+  phoneNumber            String?   @db.VarChar(150)
   vehicleRegistration   String?   @db.VarChar(20)
-  vehicleType           String?   @db.VarChar(100)
-  kilometers            Int?
+  vehicleType           String?   @db.VarChar(100) 
   notificationType      String?   @db.VarChar(50)
   notificationChannel   String?   @db.VarChar(50)
   notificationDate      DateTime?
