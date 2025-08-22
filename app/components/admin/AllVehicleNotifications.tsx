@@ -183,7 +183,7 @@ export default function AllVehicleNotifications() {
           </button>
         </div>
         <p className="text-gray-400 text-sm mt-2">
-          This will set the selected notification status to "imported" and clear sentAt and confirmedAt fields.
+          This will set the selected notification status to &quot;imported&quot; and clear sentAt and confirmedAt fields.
         </p>
       </div>
 
