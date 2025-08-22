@@ -14,6 +14,7 @@ import {
   Headphones,
   LogOut,
   User,
+  Car,
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -49,6 +50,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       name: 'Users',
       href: '/admin/users',
       icon: User,
+    },
+    {
+      name: 'Vehicle Notifications',
+      href: '/admin/vehicle-notifications',
+      icon: Car,
     },
   ]
 

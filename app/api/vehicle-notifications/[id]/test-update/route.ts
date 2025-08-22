@@ -1,0 +1,50 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { status, clearSentAt, clearConfirmedAt } = await request.json()
+    const notificationId = parseInt(params.id)
+
+    if (isNaN(notificationId)) {
+      return NextResponse.json(
+        { error: 'Invalid notification ID' },
+        { status: 400 }
+      )
+    }
+
+    const updateData: any = {}
+    
+    if (status) {
+      updateData.status = status
+    }
+    
+    if (clearSentAt) {
+      updateData.sentAt = null
+    }
+    
+    if (clearConfirmedAt) {
+      updateData.confirmedAt = null
+    }
+
+    const updatedNotification = await prisma.vehicleNotification.update({
+      where: {
+        id: notificationId
+      },
+      data: updateData
+    })
+
+    return NextResponse.json(updatedNotification)
+  } catch (error) {
+    console.error('Failed to update vehicle notification:', error)
+    return NextResponse.json(
+      { error: 'Failed to update vehicle notification' },
+      { status: 500 }
+    )
+  }
+}
