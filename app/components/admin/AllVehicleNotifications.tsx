@@ -25,7 +25,8 @@ interface VehicleNotification {
   dutyDate: string | null
   emailMessage: string | null
   status: string
-  sentAt: string | null
+  emailSentAt: string | null
+  smsSentAt: string | null
   createdAt: string
   sheetRowId: string | null
   confirmationAttempts: number
@@ -83,7 +84,8 @@ export default function AllVehicleNotifications() {
         },
         body: JSON.stringify({
           status: 'imported',
-          clearSentAt: true,
+          clearEmailSentAt: true,
+          clearSmsSentAt: true,
           clearConfirmedAt: true
         })
       })
@@ -183,7 +185,7 @@ export default function AllVehicleNotifications() {
           </button>
         </div>
         <p className="text-gray-400 text-sm mt-2">
-          This will set the selected notification status to &quot;imported&quot; and clear sentAt and confirmedAt fields.
+          This will set the selected notification status to &quot;imported&quot; and clear emailSentAt, smsSentAt and confirmedAt fields.
         </p>
       </div>
 
@@ -289,8 +291,11 @@ export default function AllVehicleNotifications() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                     <div className="space-y-1">
-                      {notification.sentAt && (
-                        <div>Sent: {new Date(notification.sentAt).toLocaleDateString()}</div>
+                      {notification.emailSentAt && (
+                        <div>Email Sent: {new Date(notification.emailSentAt).toLocaleDateString()}</div>
+                      )}
+                      {notification.smsSentAt && (
+                        <div>SMS Sent: {new Date(notification.smsSentAt).toLocaleDateString()}</div>
                       )}
                       {notification.confirmedAt && (
                         <div>Confirmed: {new Date(notification.confirmedAt).toLocaleDateString()}</div>

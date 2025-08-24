@@ -5,11 +5,12 @@ const prisma = new PrismaClient()
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { status, clearSentAt, clearConfirmedAt } = await request.json()
-    const notificationId = parseInt(params.id)
+    const { status, clearSentAt, clearConfirmedAt, clearEmailSentAt, clearSmsSentAt } = await request.json()
+    const resolvedParams = await params
+    const notificationId = parseInt(resolvedParams.id)
 
     if (isNaN(notificationId)) {
       return NextResponse.json(
@@ -24,8 +25,12 @@ export async function PATCH(
       updateData.status = status
     }
     
-    if (clearSentAt) {
-      updateData.sentAt = null
+    if (clearSentAt || clearEmailSentAt) {
+      updateData.emailSentAt = null
+    }
+    
+    if (clearSentAt || clearSmsSentAt) {
+      updateData.smsSentAt = null
     }
     
     if (clearConfirmedAt) {

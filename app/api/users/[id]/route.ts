@@ -6,12 +6,13 @@ const prisma = new PrismaClient()
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const user = await prisma.user.findUnique({
       where: {
-        id: params.id,
+        id: resolvedParams.id,
         deletedAt: null,
       },
     })
@@ -28,9 +29,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const body = await request.json()
     const { email, firstName, lastName, organization, active, password, loginProvider } = body
 
@@ -51,7 +53,7 @@ export async function PUT(
     // Update name if firstName or lastName changed
     if (firstName || lastName) {
       const currentUser = await prisma.user.findUnique({
-        where: { id: params.id }
+        where: { id: resolvedParams.id }
       })
       if (currentUser) {
         updateData.name = `${firstName || currentUser.firstName} ${lastName || currentUser.lastName}`
@@ -60,7 +62,7 @@ export async function PUT(
 
     const user = await prisma.user.update({
       where: {
-        id: params.id,
+        id: resolvedParams.id,
         deletedAt: null,
       },
       data: updateData,
@@ -80,12 +82,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const user = await prisma.user.update({
       where: {
-        id: params.id,
+        id: resolvedParams.id,
         deletedAt: null,
       },
       data: {
