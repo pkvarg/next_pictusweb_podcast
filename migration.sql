@@ -125,9 +125,26 @@ CREATE TABLE "vehiclenotification" (
     CONSTRAINT "vehiclenotification_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "confirmation_log" (
+    "id" SERIAL NOT NULL,
+    "notification_id" INTEGER NOT NULL,
+    "ip_address" VARCHAR(45),
+    "user_agent" TEXT,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "confirmation_log_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "vehiclenotification_sheetRowId_key" ON "vehiclenotification"("sheetRowId");
+
+-- CreateIndex
+CREATE INDEX "confirmation_log_notification_id_idx" ON "confirmation_log"("notification_id");
+
+-- AddForeignKey
+ALTER TABLE "confirmation_log" ADD CONSTRAINT "confirmation_log_notification_id_fkey" FOREIGN KEY ("notification_id") REFERENCES "vehiclenotification"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
