@@ -16,6 +16,7 @@ declare module 'next-auth' {
       email: string
       name: string
       role?: string
+      organization?: string
     }
   }
 
@@ -24,6 +25,7 @@ declare module 'next-auth' {
     email: string
     name: string
     role?: string
+    organization?: string
   }
 }
 
@@ -75,6 +77,7 @@ export const authOptions = {
           token.role = dbUser.role
           token.email = dbUser.email
           token.name = dbUser.name || `${dbUser.firstName} ${dbUser.lastName}`
+          token.organization = dbUser.organization
           
           // Update login tracking
           await prisma.user.update({
@@ -94,6 +97,7 @@ export const authOptions = {
         session.user.role = token.role?.toLowerCase() || 'client'
         session.user.email = token.email
         session.user.name = token.name
+        session.user.organization = token.organization
       }
       return session
     },
