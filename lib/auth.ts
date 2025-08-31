@@ -88,6 +88,15 @@ export const authOptions = {
             }
           })
         }
+      } else if (token.email && !token.organization) {
+        // For existing tokens, ensure we have organization data
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email }
+        })
+        
+        if (dbUser) {
+          token.organization = dbUser.organization
+        }
       }
       return token
     },
