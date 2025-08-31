@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import { User, FolderOpen, Headphones, LogOut, Mail, Settings } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
 
 const ClientZone = () => {
   const { data: session } = useSession()
@@ -81,7 +82,7 @@ const ClientZone = () => {
           'demo'.startsWith(session?.user?.organization || '')) && (
           <section id="demo" className="mb-16">
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
-              <h1>Tu bude demo</h1>
+              <VehicleNotificationsDashboard company="DEMO" />
             </div>
           </section>
         )}
@@ -90,7 +91,7 @@ const ClientZone = () => {
           'demo-pv'.startsWith(session?.user?.organization || '')) && (
           <section id="demo-pv" className="mb-16">
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
-              <h1>Tu bude demo PV</h1>
+              <VehicleNotificationsDashboard company="DEMO-PV" />
             </div>
           </section>
         )}
@@ -99,7 +100,7 @@ const ClientZone = () => {
           'firma1'.startsWith(session?.user?.organization || '')) && (
           <section id="firma1" className="mb-16">
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
-              <h1>Tu bude Firma1</h1>
+              <VehicleNotificationsDashboard company="FIRMA1" />
             </div>
           </section>
         )}
