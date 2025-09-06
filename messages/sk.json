@@ -8,7 +8,7 @@
     "footerService3": "Blogy.",
     "footerService4": "Ai služby.",
     "footerService5": "Podcasty",
-    "footerService6": "Automatizácia vozidiel",
+    "footerService6": "Notifikácie pre Vaše vozidlá",
     "footerCategory1": "Služby",
     "footerCategory2": "O nás",
     "footerCategory3": "Kontakt",
@@ -124,7 +124,7 @@
     "latestTitle": "Najnovšie",
     "latestTitleHighlight": "AI riešenia",
 
-    "service1Title": "Automatizácia vozidiel",
+    "service1Title": "Notifikácie pre Vaše vozidlá",
     "service1Subtitle": "Inteligentné upozornenia pre firemné vozidlá",
     "service1Description": "Eliminujte pokuty za zmeškanú TK a ušetrite čas s automatickými upozorneniami na technické kontroly, výmeny pneumatík a servisné prehliadky.",
     "service1Feature1": "Technické kontroly",
@@ -178,8 +178,8 @@
   },
   "Automatizations": {
     "contactHero": "Chcem získať ukážku systému automatických upozornení pre vozidlá zdarma",
-    "contactStarter": "Chcem začať zdarma so Starter plánom pre automatizáciu vozidiel",
-    "contactBusiness": "Chcem začať zdarma s Business plánom pre automatizáciu vozidiel",
+    "contactStarter": "Chcem začať zdarma so Starter plánom pre notifikácie vozidiel",
+    "contactBusiness": "Chcem začať zdarma s Business plánom pre notifikácie vozidiel",
     "contactCta1": "Chcem objednať ukážku systému zdarma",
     "contactCta2": "Chcem dostať informácie o systéme emailom",
     "heroTitle1": "Automatické",

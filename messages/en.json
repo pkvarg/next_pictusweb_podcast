@@ -8,7 +8,7 @@
     "footerService3": "Blogs",
     "footerService4": "AI Services",
     "footerService5": "Podcasts",
-    "footerService6": "Vehicle Automation",
+    "footerService6": "Notifications for Your Vehicles",
     "footerCategory1": "Services",
     "footerCategory2": "About Us",
     "footerCategory3": "Contact",
@@ -120,7 +120,7 @@
     "latestTitle": "Latest",
     "latestTitleHighlight": "AI solutions",
 
-    "service1Title": "Vehicle Automation",
+    "service1Title": "Notifications for Your Vehicles",
     "service1Subtitle": "Smart notifications for company vehicles",
     "service1Description": "Eliminate fines for missed inspections and save time with automatic notifications for technical inspections, tire changes and service checks.",
     "service1Feature1": "Technical inspections",
@@ -174,8 +174,8 @@
   },
   "Automatizations": {
     "contactHero": "I want to get a free demo of the automatic vehicle notification system",
-    "contactStarter": "I want to start free with the Starter plan for vehicle automation",
-    "contactBusiness": "I want to start free with the Business plan for vehicle automation",
+    "contactStarter": "I want to start free with the Starter plan for vehicle notifications",
+    "contactBusiness": "I want to start free with the Business plan for vehicle notifications",
     "contactCta1": "I want to order a free demo of the system",
     "contactCta2": "I want to receive information about the system by email",
     "heroTitle1": "Automatic",

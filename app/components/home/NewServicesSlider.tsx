@@ -11,7 +11,7 @@
 //   const services = [
 //     {
 //       id: 1,
-//       title: 'Automatizácia vozidiel',
+//       title: 'Notifikácie pre Vaše vozidlá',
 //       subtitle: 'Inteligentné upozornenia pre firemné vozidlá',
 //       description:
 //         'Eliminujte pokuty za zmeškanú TK a ušetrite čas s automatickými upozorneniami na technické kontroly, výmeny pneumatík a servisné prehliadky.',

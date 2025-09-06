@@ -8,7 +8,7 @@
     "footerService3": "Blogok",
     "footerService4": "AI szolgáltatások",
     "footerService5": "Podcastok",
-    "footerService6": "Járműautomatizálás",
+    "footerService6": "Értesítések az Ön járműveihez",
     "footerCategory1": "Szolgáltatások",
     "footerCategory2": "Rólunk",
     "footerCategory3": "Kapcsolat",
@@ -124,7 +124,7 @@
     "latestTitle": "Legújabb",
     "latestTitleHighlight": "AI megoldások",
 
-    "service1Title": "Járműautomatizálás",
+    "service1Title": "Értesítések az Ön járműveihez",
     "service1Subtitle": "Intelligens értesítések céges járművekhez",
     "service1Description": "Szüntesse meg a bírságokat az elmulasztott vizsgákért és takarítson meg időt automatikus értesítésekkel.",
     "service1Feature1": "Műszaki vizsgák",
@@ -178,8 +178,8 @@
   },
   "Automatizations": {
     "contactHero": "Ingyenes bemutatót szeretnék az automatikus járműértesítési rendszerről",
-    "contactStarter": "Ingyen szeretném elkezdeni a Starter csomaggal a járműautomatizálást",
-    "contactBusiness": "Ingyen szeretném elkezdeni a Business csomaggal a járműautomatizálást",
+    "contactStarter": "Ingyen szeretném elkezdeni a Starter csomaggal a járműértesítéseket",
+    "contactBusiness": "Ingyen szeretném elkezdeni a Business csomaggal a járműértesítéseket",
     "contactCta1": "Ingyenes bemutatót szeretnék rendelni",
     "contactCta2": "Emailüzenetet szeretnék kapni a rendszerről",
     "heroTitle1": "Automatikus",

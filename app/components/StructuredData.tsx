@@ -95,7 +95,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           'AI Podcast Creation',
           'E-commerce Solutions',
           'Blog Development',
-          'Vehicle Automation Services',
+          'Vehicle Notification Services',
         ],
       }
       break
