@@ -172,7 +172,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
     return (
       <div className="text-center p-8">
         <AlertCircle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-        <p className="text-gray-300">No data available for {company}</p>
+        <p className="text-white text-2xl">Žiadne údaje nie sú dostupné pre {company}</p>
       </div>
     )
   }
@@ -239,8 +239,8 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
           <Car className="w-8 h-8 text-purple-400" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold text-white">{company} Dashboard</h2>
-          <p className="text-gray-300">Vehicle Notifications Management</p>
+          <h2 className="text-5xl font-bold text-white">{company} Dashboard</h2>
+          <p className="text-white text-2xl">Správa notifikácií vozidiel</p>
         </div>
       </div>
 
@@ -249,8 +249,8 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
         <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-xl p-6 border border-blue-500/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-300 text-sm font-medium">Total Notifications</p>
-              <p className="text-3xl font-bold text-white">{stats.totalNotifications}</p>
+              <p className="text-blue-300 text-xl font-medium">Celkové notifikácie</p>
+              <p className="text-5xl font-bold text-white">{stats.totalNotifications}</p>
             </div>
             <Bell className="w-8 h-8 text-blue-400" />
           </div>
@@ -259,8 +259,8 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
         <div className="bg-gradient-to-br from-orange-600/20 to-orange-800/20 rounded-xl p-6 border border-orange-500/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-300 text-sm font-medium">This Week</p>
-              <p className="text-3xl font-bold text-white">{stats.upcomingWeek.length}</p>
+              <p className="text-orange-300 text-xl font-medium">Tento týždeň</p>
+              <p className="text-5xl font-bold text-white">{stats.upcomingWeek.length}</p>
             </div>
             <Calendar className="w-8 h-8 text-orange-400" />
           </div>
@@ -269,8 +269,8 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
         <div className="bg-gradient-to-br from-pink-600/20 to-pink-800/20 rounded-xl p-6 border border-pink-500/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-pink-300 text-sm font-medium">This Month</p>
-              <p className="text-3xl font-bold text-white">{stats.upcomingMonth.length}</p>
+              <p className="text-pink-300 text-xl font-medium">Tento mesiac</p>
+              <p className="text-5xl font-bold text-white">{stats.upcomingMonth.length}</p>
             </div>
             <Calendar className="w-8 h-8 text-pink-400" />
           </div>
@@ -279,8 +279,8 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
         <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 rounded-xl p-6 border border-green-500/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-300 text-sm font-medium">Confirmed</p>
-              <p className="text-3xl font-bold text-white">{stats.confirmedNotifications}</p>
+              <p className="text-green-300 text-xl font-medium">Potvrdené</p>
+              <p className="text-5xl font-bold text-white">{stats.confirmedNotifications}</p>
             </div>
             <CheckCircle className="w-8 h-8 text-green-400" />
           </div>
@@ -289,8 +289,8 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
         <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-xl p-6 border border-purple-500/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-300 text-sm font-medium">Vehicles</p>
-              <p className="text-3xl font-bold text-white">{stats.vehicleGroups.length}</p>
+              <p className="text-purple-300 text-xl font-medium">Vozidlá</p>
+              <p className="text-5xl font-bold text-white">{stats.vehicleGroups.length}</p>
             </div>
             <Car className="w-8 h-8 text-purple-400" />
           </div>
@@ -299,14 +299,14 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
       {/* Notification Types Chart */}
       <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-6 border border-purple-500/30">
-        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <Activity className="w-5 h-5" />
-          Notification Types Distribution
+        <h3 className="text-4xl font-bold text-white mb-6 flex items-center gap-2">
+          <Activity className="w-8 h-8" />
+          Distribúcia typov notifikácií
         </h3>
         <div className="space-y-4">
           {Object.entries(stats.notificationTypes).map(([type, count]) => (
             <div key={type} className="flex items-center justify-between">
-              <span className="text-gray-300">{type}</span>
+              <span className="text-white text-xl">{type}</span>
               <div className="flex items-center gap-2">
                 <div className="w-32 bg-gray-700 rounded-full h-2">
                   <div 
@@ -314,7 +314,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                     style={{ width: `${(count / stats.totalNotifications) * 100}%` }}
                   ></div>
                 </div>
-                <span className="text-white font-medium w-8 text-right">{count}</span>
+                <span className="text-white font-medium w-8 text-right text-xl">{count}</span>
               </div>
             </div>
           ))}
@@ -324,22 +324,22 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       {/* Time Filter Controls */}
       <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-6 border border-purple-500/30">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-white flex items-center gap-2">
-            <Filter className="w-5 h-5" />
-            Filter Notifications
+          <h3 className="text-4xl font-bold text-white flex items-center gap-2">
+            <Filter className="w-8 h-8" />
+            Filtrovať notifikácie
           </h3>
           <div className="flex gap-2">
             {(['all', 'week', 'month'] as TimeFilter[]).map((filter) => (
               <button
                 key={filter}
                 onClick={() => setTimeFilter(filter)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-6 py-3 rounded-lg text-xl font-medium transition-all ${
                   timeFilter === filter
                     ? 'bg-purple-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'bg-gray-700 text-white hover:bg-gray-600'
                 }`}
               >
-                {filter === 'all' ? 'All' : filter === 'week' ? 'This Week' : 'This Month'}
+                {filter === 'all' ? 'Všetky' : filter === 'week' ? 'Tento týždeň' : 'Tento mesiac'}
               </button>
             ))}
           </div>
@@ -348,12 +348,12 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
       {/* Vehicle Notifications by Registration */}
       <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-6 border border-purple-500/30">
-        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <Car className="w-5 h-5" />
-          Notifications by Vehicle
+        <h3 className="text-4xl font-bold text-white mb-6 flex items-center gap-2">
+          <Car className="w-8 h-8" />
+          Notifikácie podľa vozidla
           {timeFilter !== 'all' && (
-            <span className="text-sm text-purple-300 font-normal">
-              ({timeFilter === 'week' ? 'Next 7 days' : 'Next 30 days'})
+            <span className="text-xl text-purple-300 font-normal">
+              ({timeFilter === 'week' ? 'Nasledujúcich 7 dní' : 'Nasledujúcich 30 dní'})
             </span>
           )}
         </h3>
@@ -376,16 +376,16 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                         <Car className="w-5 h-5 text-purple-400" />
                       </div>
                       <div>
-                        <h4 className="text-lg font-bold text-white">
-                          {vehicleGroup.vehicleRegistration || 'Unknown Vehicle'}
+                        <h4 className="text-2xl font-bold text-white">
+                          {vehicleGroup.vehicleRegistration || 'Neznáme vozidlo'}
                         </h4>
-                        <p className="text-gray-400 text-sm">{vehicleGroup.vehicleType || 'Unknown Type'}</p>
+                        <p className="text-white text-lg">{vehicleGroup.vehicleType || 'Neznámy typ'}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <p className="text-white font-bold">{vehicleGroup.notifications.length}</p>
-                        <p className="text-gray-400 text-sm">notifications</p>
+                        <p className="text-white font-bold text-2xl">{vehicleGroup.notifications.length}</p>
+                        <p className="text-white text-lg">notifikácií</p>
                       </div>
                       {isExpanded ? (
                         <ChevronUp className="w-5 h-5 text-purple-400" />
@@ -408,12 +408,12 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                                 <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(notification.status)}`}>
                                   {notification.status}
                                 </span>
-                                <span className="text-gray-400 text-sm">#{notification.id}</span>
+                                <span className="text-white text-lg">#{notification.id}</span>
                               </div>
                               <div className="text-right text-sm">
                                 {notification.notificationDate && (
-                                  <p className="text-purple-300">
-                                    Due: {formatDateTime(notification.notificationDate)}
+                                  <p className="text-purple-300 text-lg">
+                                    Termín: {formatDateTime(notification.notificationDate)}
                                   </p>
                                 )}
                               </div>
@@ -421,31 +421,31 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                             
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div>
-                                <p className="text-purple-300 text-sm">Notification</p>
-                                <p className="text-white font-medium">{notification.notificationType}</p>
-                                <p className="text-gray-400 text-sm">{notification.notificationChannel}</p>
+                                <p className="text-purple-300 text-lg">Notifikácia</p>
+                                <p className="text-white font-medium text-xl">{notification.notificationType}</p>
+                                <p className="text-white text-lg">{notification.notificationChannel}</p>
                               </div>
                               <div>
-                                <p className="text-purple-300 text-sm">Contact</p>
-                                <p className="text-white">{notification.personName || 'N/A'}</p>
-                                <p className="text-gray-400 text-sm">{notification.email}</p>
+                                <p className="text-purple-300 text-lg">Kontakt</p>
+                                <p className="text-white text-xl">{notification.personName || 'Nedostupné'}</p>
+                                <p className="text-white text-lg">{notification.email}</p>
                               </div>
                               <div>
-                                <p className="text-purple-300 text-sm">Communication</p>
+                                <p className="text-purple-300 text-lg">Komunikácia</p>
                                 <div className="flex gap-2 mt-1">
                                   {notification.emailSentAt && (
-                                    <span className="px-2 py-1 bg-blue-600/20 text-blue-300 text-xs rounded">
+                                    <span className="px-3 py-2 bg-blue-600/20 text-blue-300 text-lg rounded">
                                       Email ✓
                                     </span>
                                   )}
                                   {notification.smsSentAt && (
-                                    <span className="px-2 py-1 bg-green-600/20 text-green-300 text-xs rounded">
+                                    <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
                                       SMS ✓
                                     </span>
                                   )}
                                   {notification.confirmationAttempts > 0 && (
-                                    <span className="px-2 py-1 bg-yellow-600/20 text-yellow-300 text-xs rounded">
-                                      {notification.confirmationAttempts} attempts
+                                    <span className="px-3 py-2 bg-yellow-600/20 text-yellow-300 text-lg rounded">
+                                      {notification.confirmationAttempts} pokusov
                                     </span>
                                   )}
                                 </div>
@@ -466,8 +466,8 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             {getFilteredNotifications().length === 0 ? (
               <div className="text-center py-12">
                 <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-400">
-                  No upcoming notifications for {timeFilter === 'week' ? 'this week' : 'this month'}
+                <p className="text-white text-2xl">
+                  Žiadne nadchádzajúce notifikácie pre {timeFilter === 'week' ? 'tento týždeň' : 'tento mesiac'}
                 </p>
               </div>
             ) : (
@@ -481,12 +481,12 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                       <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(notification.status)}`}>
                         {notification.status}
                       </span>
-                      <span className="text-gray-400 text-sm">#{notification.id}</span>
+                      <span className="text-white text-lg">#{notification.id}</span>
                     </div>
                     <div className="text-right text-sm">
                       {notification.notificationDate && (
-                        <p className="text-purple-300 font-medium">
-                          Due: {formatDateTime(notification.notificationDate)}
+                        <p className="text-purple-300 font-medium text-lg">
+                          Termín: {formatDateTime(notification.notificationDate)}
                         </p>
                       )}
                     </div>
@@ -494,36 +494,36 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                   
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                      <p className="text-purple-300 text-sm">Vehicle</p>
-                      <p className="text-white font-medium">{notification.vehicleRegistration || 'N/A'}</p>
-                      <p className="text-gray-400 text-sm">{notification.vehicleType}</p>
+                      <p className="text-purple-300 text-lg">Vozidlo</p>
+                      <p className="text-white font-medium text-xl">{notification.vehicleRegistration || 'Nedostupné'}</p>
+                      <p className="text-white text-lg">{notification.vehicleType}</p>
                     </div>
                     <div>
-                      <p className="text-purple-300 text-sm">Notification</p>
-                      <p className="text-white font-medium">{notification.notificationType}</p>
-                      <p className="text-gray-400 text-sm">{notification.notificationChannel}</p>
+                      <p className="text-purple-300 text-lg">Oznámenie</p>
+                      <p className="text-white font-medium text-xl">{notification.notificationType}</p>
+                      <p className="text-white text-lg">{notification.notificationChannel}</p>
                     </div>
                     <div>
-                      <p className="text-purple-300 text-sm">Contact</p>
-                      <p className="text-white">{notification.personName || 'N/A'}</p>
-                      <p className="text-gray-400 text-sm">{notification.email}</p>
+                      <p className="text-purple-300 text-lg">Kontakt</p>
+                      <p className="text-white text-xl">{notification.personName || 'Nedostupné'}</p>
+                      <p className="text-white text-lg">{notification.email}</p>
                     </div>
                     <div>
-                      <p className="text-purple-300 text-sm">Communication</p>
+                      <p className="text-purple-300 text-lg">Komunikácia</p>
                       <div className="flex gap-2 mt-1">
                         {notification.emailSentAt && (
-                          <span className="px-2 py-1 bg-blue-600/20 text-blue-300 text-xs rounded">
+                          <span className="px-3 py-2 bg-blue-600/20 text-blue-300 text-lg rounded">
                             Email ✓
                           </span>
                         )}
                         {notification.smsSentAt && (
-                          <span className="px-2 py-1 bg-green-600/20 text-green-300 text-xs rounded">
+                          <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
                             SMS ✓
                           </span>
                         )}
                         {notification.confirmationAttempts > 0 && (
-                          <span className="px-2 py-1 bg-yellow-600/20 text-yellow-300 text-xs rounded">
-                            {notification.confirmationAttempts} attempts
+                          <span className="px-3 py-2 bg-yellow-600/20 text-yellow-300 text-lg rounded">
+                            {notification.confirmationAttempts} pokusov
                           </span>
                         )}
                       </div>
@@ -539,18 +539,18 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       {/* Communication Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gradient-to-br from-indigo-600/20 to-indigo-800/20 rounded-xl p-6 border border-indigo-500/30">
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <Mail className="w-5 h-5" />
-            Email Communications
+          <h3 className="text-3xl font-bold text-white mb-4 flex items-center gap-2">
+            <Mail className="w-8 h-8" />
+            E-mailová komunikácia
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-300">Emails Sent</span>
-              <span className="text-white font-bold">{stats.emailsSent}</span>
+              <span className="text-white text-xl">Odoslané e-maily</span>
+              <span className="text-white font-bold text-2xl">{stats.emailsSent}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-300">Email Rate</span>
-              <span className="text-white font-bold">
+              <span className="text-white text-xl">Pomer e-mailov</span>
+              <span className="text-white font-bold text-2xl">
                 {stats.totalNotifications > 0 ? Math.round((stats.emailsSent / stats.totalNotifications) * 100) : 0}%
               </span>
             </div>
@@ -558,18 +558,18 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
         </div>
 
         <div className="bg-gradient-to-br from-teal-600/20 to-teal-800/20 rounded-xl p-6 border border-teal-500/30">
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5" />
-            SMS Communications
+          <h3 className="text-3xl font-bold text-white mb-4 flex items-center gap-2">
+            <MessageSquare className="w-8 h-8" />
+            SMS komunikácia
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-300">SMS Sent</span>
-              <span className="text-white font-bold">{stats.smsSent}</span>
+              <span className="text-white text-xl">Odoslané SMS</span>
+              <span className="text-white font-bold text-2xl">{stats.smsSent}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-300">SMS Rate</span>
-              <span className="text-white font-bold">
+              <span className="text-white text-xl">Pomer SMS</span>
+              <span className="text-white font-bold text-2xl">
                 {stats.totalNotifications > 0 ? Math.round((stats.smsSent / stats.totalNotifications) * 100) : 0}%
               </span>
             </div>

@@ -29,8 +29,8 @@ const ClientZone = () => {
                   <Headphones size={18} className="text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold">Pictusweb</h1>
-                  <p className="text-xs text-purple-300 hidden sm:block">Client Area</p>
+                  <h1 className="text-2xl font-bold">Pictusweb</h1>
+                  <p className="text-lg text-purple-300 hidden sm:block">Klientska zóna</p>
                 </div>
               </Link>
             </div>
@@ -38,11 +38,11 @@ const ClientZone = () => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-white">
                 <User size={16} />
-                <span className="text-sm">{session?.user?.name}</span>
+                <span className="text-lg">{session?.user?.name}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-sm text-gray-300 hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
+                className="flex items-center text-lg text-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 {t('logOut')}
@@ -57,10 +57,10 @@ const ClientZone = () => {
         {/* Welcome Section */}
         <section className="py-20">
           <div className="text-center mb-16">
-            <h1 className="text-5xl lg:text-6xl font-light text-white mb-6 leading-tight">
+            <h1 className="text-7xl lg:text-4xl font-light text-white mb-6 leading-tight">
               {t('welcomeTitle')}
             </h1>
-            <p className="text-2xl text-gray-300 mb-8 leading-relaxed font-light max-w-3xl mx-auto">
+            <p className="text-2xl text-white mb-8 leading-relaxed font-light max-w-3xl mx-auto">
               {t('welcomeSubtitle')}
             </p>
           </div>
@@ -69,6 +69,9 @@ const ClientZone = () => {
         {(session?.user?.organization === 'all' ||
           'cba'.startsWith(session?.user?.organization || '')) && (
           <section id="cba" className="mb-16">
+            <div className="text-center mb-8">
+              <h2 className="text-6xl font-light text-white mb-4">CBA Dashboard</h2>
+            </div>
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
               <iframe
                 src="https://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/56b38c4b-0a20-4810-b4b9-3194b7552fc3"
@@ -81,6 +84,9 @@ const ClientZone = () => {
         {(session?.user?.organization === 'all' ||
           'demo'.startsWith(session?.user?.organization || '')) && (
           <section id="demo" className="mb-16">
+            <div className="text-center mb-8">
+              <h2 className="text-6xl font-light text-white mb-4">Demo Dashboard</h2>
+            </div>
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
               <VehicleNotificationsDashboard company="DEMO" />
             </div>
@@ -90,6 +96,9 @@ const ClientZone = () => {
         {(session?.user?.organization === 'all' ||
           'demo-pv'.startsWith(session?.user?.organization || '')) && (
           <section id="demo-pv" className="mb-16">
+            <div className="text-center mb-8">
+              <h2 className="text-6xl font-light text-white mb-4">Demo PV Dashboard</h2>
+            </div>
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
               <VehicleNotificationsDashboard company="DEMO-PV" />
             </div>
@@ -99,6 +108,9 @@ const ClientZone = () => {
         {(session?.user?.organization === 'all' ||
           'firma1'.startsWith(session?.user?.organization || '')) && (
           <section id="firma1" className="mb-16">
+            <div className="text-center mb-8">
+              <h2 className="text-6xl font-light text-white mb-4">Firma1 Dashboard</h2>
+            </div>
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
               <VehicleNotificationsDashboard company="FIRMA1" />
             </div>
@@ -109,23 +121,22 @@ const ClientZone = () => {
         <section className="py-20">
           <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-purple-500/30">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-light text-white mb-6">Account Information</h2>
-              <p className="text-xl text-gray-300 font-light">Your client dashboard details</p>
+              <h2 className="text-6xl font-light text-white mb-6">Informácie o účte</h2>
             </div>
             <div className="">
               <div className="bg-gradient-to-br from-purple-800/30 to-blue-800/30 rounded-2xl p-8 backdrop-blur-sm border border-purple-500/30">
                 <div className="flex items-center gap-4 mb-4">
                   <User className="w-8 h-8 text-purple-400" />
-                  <h3 className="text-2xl font-semibold text-white">User Profile</h3>
+                  <h3 className="text-4xl font-semibold text-white">Profil používateľa</h3>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-purple-300 text-sm font-medium">Name</label>
-                    <p className="text-white text-lg">{session?.user?.name}</p>
+                    <label className="text-white text-xl font-medium">Meno</label>
+                    <p className="text-white text-2xl">{session?.user?.name}</p>
                   </div>
                   <div>
-                    <label className="text-purple-300 text-sm font-medium">Email</label>
-                    <p className="text-white text-lg">{session?.user?.email}</p>
+                    <label className="text-white text-xl font-medium">Email</label>
+                    <p className="text-white text-2xl">{session?.user?.email}</p>
                   </div>
                 </div>
               </div>
