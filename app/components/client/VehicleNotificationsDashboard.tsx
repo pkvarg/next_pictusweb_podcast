@@ -188,7 +188,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A'
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('sk-SK', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -197,12 +197,10 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
   const formatDateTime = (dateString: string | null) => {
     if (!dateString) return 'N/A'
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('sk-SK', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: 'numeric'
     })
   }
 
@@ -376,7 +374,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                         <Car className="w-5 h-5 text-purple-400" />
                       </div>
                       <div>
-                        <h4 className="text-2xl font-bold text-white">
+                        <h4 className="text-4xl font-bold text-white">
                           {vehicleGroup.vehicleRegistration || 'Neznáme vozidlo'}
                         </h4>
                         <p className="text-white text-lg">{vehicleGroup.vehicleType || 'Neznámy typ'}</p>
@@ -495,7 +493,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                       <p className="text-purple-300 text-lg">Vozidlo</p>
-                      <p className="text-white font-medium text-xl">{notification.vehicleRegistration || 'Nedostupné'}</p>
+                      <p className="text-white font-bold text-3xl">{notification.vehicleRegistration || 'Nedostupné'}</p>
                       <p className="text-white text-lg">{notification.vehicleType}</p>
                     </div>
                     <div>
