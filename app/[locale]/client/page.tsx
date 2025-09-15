@@ -2,7 +2,7 @@
 import { useSession, signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
-import { User, FolderOpen, Headphones, LogOut, Mail, Settings } from 'lucide-react'
+import { User, FolderOpen, UserCheck, LogOut, Mail, Settings } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
 
@@ -26,7 +26,7 @@ const ClientZone = () => {
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-3 text-white">
                 <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-                  <Headphones size={18} className="text-white" />
+                  <UserCheck size={18} className="text-white" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">Pictusweb</h1>

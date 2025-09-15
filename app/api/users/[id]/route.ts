@@ -45,9 +45,15 @@ export async function PUT(
     if (active !== undefined) updateData.active = active
     if (loginProvider !== undefined) updateData.loginProvider = loginProvider
     
-    // Hash password if provided
-    if (password !== undefined && password.trim() !== '') {
+    // If setting login provider to hybrid, ALWAYS set default password
+    if (loginProvider === 'hybrid') {
+      const defaultPassword = 'Pic*Client*2025'
+      updateData.password = await hashPassword(defaultPassword)
+      console.log(`TESTING: Set HYBRID user password to default: ${defaultPassword}`)
+    } else if (password !== undefined && password.trim() !== '') {
+      // Hash password if provided (for non-hybrid users)
       updateData.password = await hashPassword(password)
+      console.log(`TESTING: Set custom password for user`)
     }
 
     // Update name if firstName or lastName changed
@@ -67,6 +73,13 @@ export async function PUT(
       },
       data: updateData,
     })
+
+    console.log(`TESTING: User ${user.email} updated successfully`)
+    console.log(`TESTING: Final loginProvider: ${user.loginProvider}`)
+    console.log(`TESTING: Has hybridPassword: ${!!user.hybridPassword}`)
+    if (user.hybridPassword) {
+      console.log(`TESTING: HybridPassword hash (first 20 chars): ${user.hybridPassword.substring(0, 20)}...`)
+    }
 
     return NextResponse.json(user)
   } catch (error: any) {

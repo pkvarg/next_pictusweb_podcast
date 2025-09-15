@@ -11,6 +11,7 @@ interface User {
   active: boolean
   password: string | null
   loginProvider: string | null
+  hybridPassword: string | null
 }
 
 interface EditUserModalProps {
@@ -20,7 +21,12 @@ interface EditUserModalProps {
   onUserUpdated: () => void
 }
 
-export default function EditUserModal({ isOpen, onClose, user, onUserUpdated }: EditUserModalProps) {
+export default function EditUserModal({
+  isOpen,
+  onClose,
+  user,
+  onUserUpdated,
+}: EditUserModalProps) {
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -28,7 +34,7 @@ export default function EditUserModal({ isOpen, onClose, user, onUserUpdated }: 
     organization: '',
     active: true,
     password: '',
-    loginProvider: ''
+    loginProvider: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -42,7 +48,7 @@ export default function EditUserModal({ isOpen, onClose, user, onUserUpdated }: 
         organization: user.organization || '',
         active: user.active,
         password: user.password || '',
-        loginProvider: user.loginProvider || ''
+        loginProvider: user.loginProvider || '',
       })
     }
   }, [user])
@@ -56,9 +62,9 @@ export default function EditUserModal({ isOpen, onClose, user, onUserUpdated }: 
       const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       })
 
       if (response.ok) {
@@ -77,9 +83,9 @@ export default function EditUserModal({ isOpen, onClose, user, onUserUpdated }: 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
     const checked = 'checked' in e.target ? e.target.checked : false
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }))
   }
 
@@ -90,10 +96,7 @@ export default function EditUserModal({ isOpen, onClose, user, onUserUpdated }: 
       <div className="bg-gray-900 rounded-xl border border-white/10 w-full max-w-md">
         <div className="flex items-center justify-between p-6 border-b border-white/10">
           <h3 className="text-lg font-semibold text-white">Edit User</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -138,9 +141,7 @@ export default function EditUserModal({ isOpen, onClose, user, onUserUpdated }: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Last Name
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Last Name</label>
               <input
                 type="text"
                 name="lastName"
@@ -197,9 +198,10 @@ export default function EditUserModal({ isOpen, onClose, user, onUserUpdated }: 
                 <option value="">None</option>
                 <option value="google">Google</option>
                 <option value="github">GitHub</option>
-                <option value="facebook">Facebook</option>
+                {/* <option value="facebook">Facebook</option>
                 <option value="twitter">Twitter</option>
-                <option value="linkedin">LinkedIn</option>
+                <option value="linkedin">LinkedIn</option> */}
+                <option value="hybrid">Hybrid (OAuth + Password)</option>
               </select>
             </div>
           </div>

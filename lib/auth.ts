@@ -59,6 +59,12 @@ export const authOptions = {
           return false
         }
         
+        // For hybrid login, allow both OAuth and password
+        if (dbUser.loginProvider === 'hybrid') {
+          console.log('ACCESS GRANTED - Hybrid user with OAuth:', user.email)
+          return true
+        }
+        
         console.log('ACCESS GRANTED - User found:', user.email)
         return true
       }
@@ -156,13 +162,25 @@ export const authOptions = {
           }
 
           // Check if user is allowed to use credentials login
-          if (user.loginProvider && user.loginProvider !== 'credentials') {
+          if (user.loginProvider && user.loginProvider !== 'credentials' && user.loginProvider !== 'hybrid') {
             console.log('Credentials login FAILED for:', credentials.username, '- User must use:', user.loginProvider)
             return null
           }
 
-          // Verify password
-          const isValidPwd = await isValidPassword(credentials.password, user.password)
+          // Check password (hybrid users use regular password field)
+          let isValidPwd = false
+          if (user.password) {
+            console.log('TESTING: Login attempt for:', credentials.username)
+            console.log('TESTING: User loginProvider:', user.loginProvider)
+            console.log('TESTING: Provided password:', credentials.password)
+            console.log('TESTING: Password hash (first 20 chars):', user.password.substring(0, 20) + '...')
+            
+            isValidPwd = await isValidPassword(credentials.password, user.password)
+            console.log('TESTING: Password validation result:', isValidPwd)
+          } else {
+            console.log('TESTING: No password found for user:', credentials.username)
+          }
+          
           if (!isValidPwd) {
             console.log('Credentials login FAILED for:', credentials.username, '- Invalid password')
             return null
