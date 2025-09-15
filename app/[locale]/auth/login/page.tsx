@@ -24,12 +24,22 @@ export default function LoginPage() {
   useEffect(() => {
     if (session?.user) {
       console.log('Frontend: User already logged in, redirecting...')
-      router.push(`/${locale}/client`)
+      window.location.href = `/${locale}/client`
     }
-  }, [session, router, locale])
+  }, [session, locale])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('Frontend: Form submitted with username:', username)
+    console.log('Frontend: Current session status:', status)
+    console.log('Frontend: Current session:', session)
+    
+    if (session?.user) {
+      console.log('Frontend: Already logged in, redirecting...')
+      window.location.href = `/${locale}/client`
+      return
+    }
+    
     setIsLoading(true)
     setError('')
 
@@ -38,6 +48,7 @@ export default function LoginPage() {
         username,
         password,
         redirect: false,
+        callbackUrl: `/${locale}/client`,
       })
 
       console.log('Frontend: signIn result:', result)
@@ -47,10 +58,8 @@ export default function LoginPage() {
         setError(t('invalidCredentials'))
       } else if (result?.ok) {
         console.log('Frontend: Login successful, redirecting...')
-        // Wait a moment for the session to be established
-        setTimeout(() => {
-          router.push(`/${locale}/client`)
-        }, 100)
+        // Force redirect using window.location
+        window.location.href = `/${locale}/client`
       } else {
         console.log('Frontend: Unexpected result:', result)
         setError(t('loginError'))
