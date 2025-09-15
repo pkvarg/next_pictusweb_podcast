@@ -235,14 +235,14 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
         return {
           border: 'border-red-500/50',
           bg: 'from-red-600/20 to-red-800/20',
-          text: 'text-red-300',
+          text: 'text-red-500',
           icon: 'text-red-400',
         }
       case 'orange':
         return {
           border: 'border-orange-500/50',
           bg: 'from-orange-600/20 to-orange-800/20',
-          text: 'text-orange-300',
+          text: 'text-orange-500',
           icon: 'text-orange-400',
         }
       case 'green':
@@ -334,10 +334,10 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
         {vehicleCards.map((vehicle) => {
           const vehicleKey = vehicle.vehicleRegistration
           const isExpanded = expandedVehicles.has(vehicleKey)
-          
+
           return (
             <div key={vehicleKey} className="bg-black/30 rounded-lg border border-purple-500/20">
-              <div 
+              <div
                 className="flex items-center justify-between p-4 cursor-pointer hover:bg-purple-500/10 transition-colors"
                 onClick={() => toggleVehicleExpanded(vehicleKey)}
               >
@@ -346,9 +346,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                     <Car className="w-5 h-5 text-purple-400" />
                   </div>
                   <div>
-                    <h4 className="text-4xl font-bold text-white">
-                      {vehicle.vehicleRegistration}
-                    </h4>
+                    <h4 className="text-4xl font-bold text-white">{vehicle.vehicleRegistration}</h4>
                     <p className="text-white text-lg">{vehicle.vehicleType || 'Neznámy typ'}</p>
                   </div>
                 </div>
@@ -364,7 +362,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                   )}
                 </div>
               </div>
-              
+
               {isExpanded && (
                 <div className="border-t border-purple-500/20 p-4">
                   {/* Vehicle Task Details */}
@@ -445,7 +443,10 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                       {groups.length > 3 && (
                                         <button
                                           onClick={() =>
-                                            toggleTaskTypeExpanded(vehicle.vehicleRegistration, taskType)
+                                            toggleTaskTypeExpanded(
+                                              vehicle.vehicleRegistration,
+                                              taskType,
+                                            )
                                           }
                                           className="flex items-center gap-3 text-purple-400 hover:text-purple-300 transition-colors"
                                         >
@@ -489,7 +490,9 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                           key={`${group.notificationType}-${group.dutyDate}-${index}`}
                                           className={`w-full md:rounded-xl p-3 md:p-6 md:border ${
                                             styles.border
-                                          } ${isNextTaskGroup ? 'md:ring-2 ring-yellow-400/50' : ''}`}
+                                          } ${
+                                            isNextTaskGroup ? 'md:ring-2 ring-yellow-400/50' : ''
+                                          }`}
                                         >
                                           <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 md:mb-4">
                                             <div className="flex items-center gap-2 md:gap-4 mb-2 md:mb-0">

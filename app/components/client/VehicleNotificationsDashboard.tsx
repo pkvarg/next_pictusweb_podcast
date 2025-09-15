@@ -213,6 +213,98 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
     }
   }
 
+  const getVehicleUrgency = (notifications: VehicleNotification[]) => {
+    const now = new Date()
+    let minDaysToTask: number | null = null
+
+    // Find the closest upcoming duty date
+    notifications.forEach((notification) => {
+      if (notification.dutyDate) {
+        const dutyDate = new Date(notification.dutyDate)
+        if (dutyDate >= now) {
+          const timeDiff = dutyDate.getTime() - now.getTime()
+          const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24))
+          if (minDaysToTask === null || daysRemaining < minDaysToTask) {
+            minDaysToTask = daysRemaining
+          }
+        }
+      }
+    })
+
+    if (minDaysToTask === null) return 'gray'
+    if (minDaysToTask <= 10) return 'red'
+    if (minDaysToTask <= 30) return 'orange'
+    return 'green'
+  }
+
+  const getNotificationUrgency = (notification: VehicleNotification) => {
+    // Use notificationDate since that's what's displayed as "Termín"
+    if (!notification.notificationDate) return 'gray'
+
+    const now = new Date()
+    const notificationDate = new Date(notification.notificationDate)
+
+    // Check if the date is valid
+    if (isNaN(notificationDate.getTime())) return 'gray'
+
+    if (notificationDate < now) return 'gray' // Past due dates
+
+    const timeDiff = notificationDate.getTime() - now.getTime()
+    const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24))
+
+    if (daysRemaining <= 10) return 'red'
+    if (daysRemaining <= 30) return 'orange'
+    return 'green'
+  }
+
+  const getDaysToNotification = (notificationDate: string | null) => {
+    if (!notificationDate) return null
+
+    const now = new Date()
+    const targetDate = new Date(notificationDate)
+
+    if (isNaN(targetDate.getTime())) return null
+
+    const timeDiff = targetDate.getTime() - now.getTime()
+    const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24))
+
+    if (daysRemaining < 0) return null // Past dates
+    return daysRemaining
+  }
+
+  const getUrgencyStyles = (urgencyLevel: 'green' | 'orange' | 'red' | 'gray') => {
+    switch (urgencyLevel) {
+      case 'red':
+        return {
+          border: 'border-red-500/50',
+          bg: 'from-red-600/20 to-red-800/20',
+          text: 'text-red-500',
+          icon: 'text-red-400',
+        }
+      case 'orange':
+        return {
+          border: 'border-orange-500/50',
+          bg: 'from-orange-600/20 to-orange-800/20',
+          text: 'text-orange-500',
+          icon: 'text-orange-400',
+        }
+      case 'green':
+        return {
+          border: 'border-green-500/50',
+          bg: 'from-green-600/20 to-green-800/20',
+          text: 'text-green-400',
+          icon: 'text-green-400',
+        }
+      default:
+        return {
+          border: 'border-purple-500/20',
+          bg: 'from-gray-600/20 to-gray-800/20',
+          text: 'text-gray-300',
+          icon: 'text-purple-400',
+        }
+    }
+  }
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A'
     return new Date(dateString).toLocaleDateString('sk-SK', {
@@ -451,19 +543,20 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             {stats.vehicleGroups.map((vehicleGroup) => {
               const vehicleKey = vehicleGroup.vehicleRegistration || 'Unknown Vehicle'
               const isExpanded = expandedVehicles.has(vehicleKey)
+              const urgencyLevel = getVehicleUrgency(vehicleGroup.notifications)
+              const styles = getUrgencyStyles(urgencyLevel)
 
               return (
-                <div
-                  key={vehicleKey}
-                  className="bg-black/30 rounded-lg border border-purple-500/20"
-                >
+                <div key={vehicleKey} className={`bg-black/30 rounded-lg border ${styles.border}`}>
                   <div
-                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-purple-500/10 transition-colors"
+                    className={`flex items-center justify-between p-4 cursor-pointer hover:opacity-80 transition-all bg-gradient-to-r ${styles.bg}`}
                     onClick={() => toggleVehicleExpanded(vehicleKey)}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-purple-600/20 rounded-lg">
-                        <Car className="w-5 h-5 text-purple-400" />
+                      <div
+                        className={`p-2 bg-gradient-to-r ${styles.bg} rounded-lg border ${styles.border}`}
+                      >
+                        <Car className={`w-5 h-5 ${styles.icon}`} />
                       </div>
                       <div>
                         <h4 className="text-4xl font-bold text-white">
@@ -482,81 +575,97 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                         <p className="text-white text-lg">notifikácií</p>
                       </div>
                       {isExpanded ? (
-                        <ChevronUp className="w-5 h-5 text-purple-400" />
+                        <ChevronUp className={`w-5 h-5 ${styles.icon}`} />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-purple-400" />
+                        <ChevronDown className={`w-5 h-5 ${styles.icon}`} />
                       )}
                     </div>
                   </div>
 
                   {isExpanded && (
-                    <div className="border-t border-purple-500/20 p-4">
+                    <div className={`border-t ${styles.border} p-4`}>
                       <div className="space-y-3">
-                        {vehicleGroup.notifications.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className="bg-gray-900/50 rounded-lg p-4 border border-gray-700"
-                          >
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
-                                    notification.status,
-                                  )}`}
-                                >
-                                  {notification.status}
-                                </span>
-                                <span className="text-white text-lg">#{notification.id}</span>
-                              </div>
-                              <div className="text-right text-sm">
-                                {notification.notificationDate && (
-                                  <p className="text-purple-300 text-lg">
-                                    Termín: {formatDateTime(notification.notificationDate)}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
+                        {vehicleGroup.notifications.map((notification) => {
+                          const notificationUrgency = getNotificationUrgency(notification)
+                          const notificationStyles = getUrgencyStyles(notificationUrgency)
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <div>
-                                <p className="text-purple-300 text-lg">Notifikácia</p>
-                                <p className="text-white font-medium text-xl">
-                                  {notification.notificationType}
-                                </p>
-                                <p className="text-white text-lg">
-                                  {notification.notificationChannel}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-purple-300 text-lg">Kontakt</p>
-                                <p className="text-white text-xl">
-                                  {notification.personName || 'Nedostupné'}
-                                </p>
-                                <p className="text-white text-lg">{notification.email}</p>
-                              </div>
-                              <div>
-                                <p className="text-purple-300 text-lg">Komunikácia</p>
-                                <div className="flex gap-2 mt-1">
-                                  {notification.emailSentAt && (
-                                    <span className="px-3 py-2 bg-blue-600/20 text-blue-300 text-lg rounded">
-                                      Email ✓
-                                    </span>
-                                  )}
-                                  {notification.smsSentAt && (
-                                    <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
-                                      SMS ✓
-                                    </span>
-                                  )}
-                                  {notification.confirmationAttempts > 0 && (
-                                    <span className="px-3 py-2 bg-yellow-600/20 text-yellow-300 text-lg rounded">
-                                      {notification.confirmationAttempts} pokusov
-                                    </span>
+                          return (
+                            <div
+                              key={notification.id}
+                              className={`bg-gradient-to-r ${notificationStyles.bg} rounded-lg p-4 border ${notificationStyles.border}`}
+                            >
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                                      notification.status,
+                                    )}`}
+                                  >
+                                    {notification.status}
+                                  </span>
+                                  <span className="text-white text-lg">#{notification.id}</span>
+                                </div>
+                                <div className="text-right text-sm">
+                                  {notification.notificationDate && (
+                                    <div>
+                                      <p className="text-purple-300 text-lg">
+                                        Termín: {formatDateTime(notification.notificationDate)}
+                                      </p>
+                                      {getDaysToNotification(notification.notificationDate) !==
+                                        null && (
+                                        <p
+                                          className={`text-xl md:text-2xl font-bold ${notificationStyles.text}`}
+                                        >
+                                          zostáva{' '}
+                                          {getDaysToNotification(notification.notificationDate)} dní
+                                        </p>
+                                      )}
+                                    </div>
                                   )}
                                 </div>
                               </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                  <p className="text-purple-300 text-lg">Notifikácia</p>
+                                  <p className="text-white font-medium text-xl">
+                                    {notification.notificationType}
+                                  </p>
+                                  <p className="text-white text-lg">
+                                    {notification.notificationChannel}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-purple-300 text-lg">Kontakt</p>
+                                  <p className="text-white text-xl">
+                                    {notification.personName || 'Nedostupné'}
+                                  </p>
+                                  <p className="text-white text-lg">{notification.email}</p>
+                                </div>
+                                <div>
+                                  <p className="text-purple-300 text-lg">Komunikácia</p>
+                                  <div className="flex gap-2 mt-1">
+                                    {notification.emailSentAt && (
+                                      <span className="px-3 py-2 bg-blue-600/20 text-blue-300 text-lg rounded">
+                                        Email ✓
+                                      </span>
+                                    )}
+                                    {notification.smsSentAt && (
+                                      <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
+                                        SMS ✓
+                                      </span>
+                                    )}
+                                    {notification.confirmationAttempts > 0 && (
+                                      <span className="px-3 py-2 bg-yellow-600/20 text-yellow-300 text-lg rounded">
+                                        {notification.confirmationAttempts} pokusov
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     </div>
                   )}
@@ -576,76 +685,90 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                 </p>
               </div>
             ) : (
-              getFilteredNotifications().map((notification) => (
-                <div
-                  key={notification.id}
-                  className="bg-black/30 rounded-lg p-4 border border-purple-500/20"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
-                          notification.status,
-                        )}`}
-                      >
-                        {notification.status}
-                      </span>
-                      <span className="text-white text-lg">#{notification.id}</span>
-                    </div>
-                    <div className="text-right text-sm">
-                      {notification.notificationDate && (
-                        <p className="text-purple-300 font-medium text-lg">
-                          Termín: {formatDateTime(notification.notificationDate)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+              getFilteredNotifications().map((notification) => {
+                const notificationUrgency = getNotificationUrgency(notification)
+                const notificationStyles = getUrgencyStyles(notificationUrgency)
 
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-purple-300 text-lg">Vozidlo</p>
-                      <p className="text-white font-bold text-3xl">
-                        {notification.vehicleRegistration || 'Nedostupné'}
-                      </p>
-                      <p className="text-white text-lg">{notification.vehicleType}</p>
-                    </div>
-                    <div>
-                      <p className="text-purple-300 text-lg">Oznámenie</p>
-                      <p className="text-white font-medium text-xl">
-                        {notification.notificationType}
-                      </p>
-                      <p className="text-white text-lg">{notification.notificationChannel}</p>
-                    </div>
-                    <div>
-                      <p className="text-purple-300 text-lg">Kontakt</p>
-                      <p className="text-white text-xl">
-                        {notification.personName || 'Nedostupné'}
-                      </p>
-                      <p className="text-white text-lg">{notification.email}</p>
-                    </div>
-                    <div>
-                      <p className="text-purple-300 text-lg">Komunikácia</p>
-                      <div className="flex gap-2 mt-1">
-                        {notification.emailSentAt && (
-                          <span className="px-3 py-2 bg-blue-600/20 text-blue-300 text-lg rounded">
-                            Email ✓
-                          </span>
-                        )}
-                        {notification.smsSentAt && (
-                          <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
-                            SMS ✓
-                          </span>
-                        )}
-                        {notification.confirmationAttempts > 0 && (
-                          <span className="px-3 py-2 bg-yellow-600/20 text-yellow-300 text-lg rounded">
-                            {notification.confirmationAttempts} pokusov
-                          </span>
+                return (
+                  <div
+                    key={notification.id}
+                    className={`bg-gradient-to-r ${notificationStyles.bg} rounded-lg p-4 border ${notificationStyles.border}`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                            notification.status,
+                          )}`}
+                        >
+                          {notification.status}
+                        </span>
+                        <span className="text-white text-lg">#{notification.id}</span>
+                      </div>
+                      <div className="text-right text-sm">
+                        {notification.notificationDate && (
+                          <div>
+                            <p className="text-purple-300 font-medium text-lg">
+                              Termín: {formatDateTime(notification.notificationDate)}
+                            </p>
+                            {getDaysToNotification(notification.notificationDate) !== null && (
+                              <p
+                                className={`text-xl md:text-2xl font-bold ${notificationStyles.text}`}
+                              >
+                                zostáva {getDaysToNotification(notification.notificationDate)} dní
+                              </p>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-purple-300 text-lg">Vozidlo</p>
+                        <p className="text-white font-bold text-3xl">
+                          {notification.vehicleRegistration || 'Nedostupné'}
+                        </p>
+                        <p className="text-white text-lg">{notification.vehicleType}</p>
+                      </div>
+                      <div>
+                        <p className="text-purple-300 text-lg">Oznámenie</p>
+                        <p className="text-white font-medium text-xl">
+                          {notification.notificationType}
+                        </p>
+                        <p className="text-white text-lg">{notification.notificationChannel}</p>
+                      </div>
+                      <div>
+                        <p className="text-purple-300 text-lg">Kontakt</p>
+                        <p className="text-white text-xl">
+                          {notification.personName || 'Nedostupné'}
+                        </p>
+                        <p className="text-white text-lg">{notification.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-purple-300 text-lg">Komunikácia</p>
+                        <div className="flex gap-2 mt-1">
+                          {notification.emailSentAt && (
+                            <span className="px-3 py-2 bg-blue-600/20 text-blue-300 text-lg rounded">
+                              Email ✓
+                            </span>
+                          )}
+                          {notification.smsSentAt && (
+                            <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
+                              SMS ✓
+                            </span>
+                          )}
+                          {notification.confirmationAttempts > 0 && (
+                            <span className="px-3 py-2 bg-yellow-600/20 text-yellow-300 text-lg rounded">
+                              {notification.confirmationAttempts} pokusov
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
         )}
