@@ -57,20 +57,20 @@ const ClientZone = () => {
         {/* Welcome Section */}
         <section className="py-20">
           <div className="text-center mb-16">
-            <h1 className="text-7xl lg:text-4xl font-light text-white mb-6 leading-tight">
+            <h1 className="text-5xl font-light text-white mb-6 leading-tight">
               {t('welcomeTitle')}
             </h1>
-            <p className="text-2xl text-white mb-8 leading-relaxed font-light max-w-3xl mx-auto">
+            <p className="text-3xl text-white mb-8 leading-relaxed font-light max-w-3xl mx-auto">
               {t('welcomeSubtitle')}
             </p>
           </div>
         </section>
 
-        {(session?.user?.organization === 'all' ||
+        {/* {(session?.user?.organization === 'all' ||
           'cba'.startsWith(session?.user?.organization || '')) && (
           <section id="cba" className="mb-16">
             <div className="text-center mb-8">
-              <h2 className="text-6xl font-light text-white mb-4">CBA Dashboard</h2>
+              <h2 className="text-4xl font-light text-white mb-4">CBA Dashboard</h2>
             </div>
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
               <iframe
@@ -79,15 +79,15 @@ const ClientZone = () => {
               ></iframe>
             </div>
           </section>
-        )}
+        )} */}
 
         {(session?.user?.organization === 'all' ||
           'demo'.startsWith(session?.user?.organization || '')) && (
           <section id="demo" className="mb-16">
             <div className="text-center mb-8">
-              <h2 className="text-6xl font-light text-white mb-4">Demo Dashboard</h2>
+              {/* <h2 className="text-4xl font-light text-white mb-4">Demo Dashboard</h2> */}
             </div>
-            <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
+            <div className="md:bg-gradient-to-br md:from-purple-600/20 md:to-pink-600/20 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-purple-500/30">
               <VehicleNotificationsDashboard company="DEMO" />
             </div>
           </section>
@@ -119,12 +119,12 @@ const ClientZone = () => {
 
         {/* User Info Section */}
         <section className="py-20">
-          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-purple-500/30">
+          <div className="bg-gradient-to-br from-purple-800/30 to-blue-800/30 rounded-2xl p-8 backdrop-blur-sm border border-purple-500/30">
             <div className="text-center mb-12">
               <h2 className="text-6xl font-light text-white mb-6">Informácie o účte</h2>
             </div>
             <div className="">
-              <div className="bg-gradient-to-br from-purple-800/30 to-blue-800/30 rounded-2xl p-8 backdrop-blur-sm border border-purple-500/30">
+              <div className="">
                 <div className="flex items-center gap-4 mb-4">
                   <User className="w-8 h-8 text-purple-400" />
                   <h3 className="text-4xl font-semibold text-white">Profil používateľa</h3>

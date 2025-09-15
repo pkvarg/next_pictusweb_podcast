@@ -365,18 +365,18 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Time Filter Controls */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-6 border border-purple-500/30">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-4xl font-bold text-white flex items-center gap-2">
-            <Filter className="w-8 h-8" />
+      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-3 md:p-6 border border-purple-500/30">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0 mb-6">
+          <h3 className="text-2xl md:text-4xl font-bold text-white flex items-center gap-2">
+            <Filter className="w-6 h-6 md:w-8 md:h-8" />
             Filtrovať notifikácie
           </h3>
-          <div className="flex gap-2">
+          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             {(['all', 'week', 'month'] as TimeFilter[]).map((filter) => (
               <button
                 key={filter}
                 onClick={() => setTimeFilter(filter)}
-                className={`px-6 py-3 rounded-lg text-xl font-medium transition-all ${
+                className={`px-3 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-xl font-medium transition-all flex-1 md:flex-none ${
                   timeFilter === filter
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-700 text-white hover:bg-gray-600'

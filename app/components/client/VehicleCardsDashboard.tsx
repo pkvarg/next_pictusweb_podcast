@@ -309,39 +309,47 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
           <Car className="w-10 h-10 text-purple-400" />
         </div>
         <div>
-          <h2 className="text-5xl font-bold text-white">Karty vozidiel</h2>
-          <p className="text-white text-2xl">Prehľad nadchádzajúcich úloh pre každé vozidlo</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-white">Karty vozidiel</h2>
+          <p className="text-white text-xl md:text-2xl">
+            Prehľad nadchádzajúcich úloh pre každé vozidlo
+          </p>
         </div>
       </div>
 
       {/* Vehicle Cards List */}
-      <div className="space-y-6">
+      <div className="space-y-0 md:space-y-6">
         {vehicleCards.map((vehicle) => {
           const styles = getUrgencyStyles(vehicle.urgencyLevel)
 
           return (
             <div
               key={vehicle.vehicleRegistration}
-              className={`rounded-xl p-6 border ${styles.border} transition-all`}
+              className={`md:rounded-xl p-3 md:p-6 md:border ${styles.border} transition-all`}
             >
-              {/* Vehicle Header */}
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                  <Car className={`w-12 h-12 ${styles.icon}`} />
+              {/* Vehicle Header - Responsive */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-8">
+                <div className="flex items-center gap-2 md:gap-4 mb-3 md:mb-0">
+                  <Car className={`w-6 h-6 md:w-12 md:h-12 ${styles.icon}`} />
                   <div>
-                    <h3 className="text-white font-bold text-4xl">{vehicle.vehicleRegistration}</h3>
-                    <p className="text-white text-2xl opacity-75">
+                    <h3 className="text-white font-bold text-3xl md:text-4xl">
+                      {vehicle.vehicleRegistration}
+                    </h3>
+                    <p className="text-white text-lg md:text-2xl opacity-75">
                       {vehicle.vehicleType || 'Neznámy typ'}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3 md:gap-6">
                   {vehicle.daysToNextTask !== null && (
-                    <div className="text-right">
-                      <p className={`text-xl font-medium ${styles.text}`}>Nasledujúca úloha</p>
-                      <p className={`text-8xl font-bold ${styles.text}`}>
+                    <div className="text-center md:text-right">
+                      <p className={`text-lg md:text-xl font-medium ${styles.text}`}>
+                        Nasledujúca úloha
+                      </p>
+                      <p className={`text-5xl md:text-8xl font-bold ${styles.text}`}>
                         {vehicle.daysToNextTask}{' '}
-                        <span className={`text-2xl font-medium ${styles.text}`}>dní</span>
+                        <span className={`text-xl md:text-2xl font-medium ${styles.text}`}>
+                          dní
+                        </span>
                       </p>
                     </div>
                   )}
@@ -351,7 +359,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
 
               {/* Task Groups */}
               <div>
-                <h4 className="text-white font-bold text-4xl mb-6">
+                <h4 className="text-white font-bold text-2xl md:text-4xl mb-3 md:mb-6">
                   Úlohy podľa typu a termínu ({vehicle.taskGroups.length})
                 </h4>
 
@@ -361,7 +369,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                     <p className="text-gray-400 text-3xl">Žiadne úlohy</p>
                   </div>
                 ) : (
-                  <div className="space-y-6">
+                  <div className="w-full space-y-1 md:space-y-6">
                     {(() => {
                       // Group task groups by notification type for display
                       const groupsByType = vehicle.taskGroups.reduce((acc, group) => {
@@ -380,12 +388,17 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                         const totalTasks = groups.length // Count unique task groups, not individual notifications
 
                         return (
-                          <div key={taskType} className="rounded-xl border border-gray-600/50">
+                          <div
+                            key={taskType}
+                            className="w-full md:rounded-xl md:border border-gray-600/50"
+                          >
                             {/* Task Type Header */}
-                            <div className="p-6 border-b border-gray-600/50">
+                            <div className="p-3 md:p-6 md:border-b border-gray-600/50">
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <h5 className="text-white font-bold text-3xl">{taskType}</h5>
+                                  <h5 className="text-white font-bold text-lg md:text-3xl">
+                                    {taskType}
+                                  </h5>
                                 </div>
                                 {groups.length > 3 && (
                                   <button
@@ -394,10 +407,10 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                     }
                                     className="flex items-center gap-3 text-purple-400 hover:text-purple-300 transition-colors"
                                   >
-                                    <span className="text-xl">
+                                    <span className="text-sm md:text-xl">
                                       {isExpanded
-                                        ? `Skryť ${groups.length - 3} termínov`
-                                        : `Zobraziť všetkých ${groups.length} termínov`}
+                                        ? `Skryť ${groups.length - 3}`
+                                        : `Zobraziť ${groups.length}`}
                                     </span>
                                     {isExpanded ? (
                                       <ChevronUp className="w-6 h-6" />
@@ -410,7 +423,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                             </div>
 
                             {/* Task Groups in this type */}
-                            <div className="p-6 space-y-4">
+                            <div className="w-full p-0 md:p-6 space-y-1 md:space-y-4">
                               {visibleGroups.map((group, index) => {
                                 const isNextTaskGroup =
                                   vehicle.nextTask &&
@@ -432,29 +445,31 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                 return (
                                   <div
                                     key={`${group.notificationType}-${group.dutyDate}-${index}`}
-                                    className={` rounded-xl p-6 border ${styles.border} ${
-                                      isNextTaskGroup ? 'ring-2 ring-yellow-400/50' : ''
-                                    }`}
+                                    className={`w-full md:rounded-xl p-3 md:p-6 md:border ${
+                                      styles.border
+                                    } ${isNextTaskGroup ? 'md:ring-2 ring-yellow-400/50' : ''}`}
                                   >
-                                    <div className="flex items-center justify-between mb-4">
-                                      <div className="flex items-center gap-4">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 md:mb-4">
+                                      <div className="flex items-center gap-2 md:gap-4 mb-2 md:mb-0">
                                         {isNextTaskGroup && (
-                                          <span className="text-yellow-400 text-lg bg-yellow-400/20 px-4 py-2 rounded-lg font-normal">
-                                            NASLEDUJÚCA ÚLOHA
+                                          <span className="text-yellow-400 text-xs md:text-lg bg-yellow-400/20 px-2 md:px-4 py-1 md:py-2 rounded-lg font-normal">
+                                            NASLEDUJÚCA
                                           </span>
                                         )}
                                         <div>
-                                          <h6 className="text-white font-bold text-2xl">1 úloha</h6>
-                                          <p className="text-white text-lg opacity-75">
+                                          <h6 className="text-white font-bold text-2xl md:text-2xl">
+                                            1 úloha
+                                          </h6>
+                                          <p className="text-white text-lg md:text-lg opacity-75">
                                             Termín: {formatDate(group.dutyDate)}
                                           </p>
                                         </div>
                                       </div>
-                                      <div className="text-right">
+                                      <div className="text-left md:text-right">
                                         {group.daysRemaining !== null && (
                                           <div>
                                             <span
-                                              className={`text-2xl font-bold px-4 py-2 rounded-lg ${
+                                              className={`text-xl md:text-2xl font-bold px-3 md:px-4 py-2 md:py-2 rounded-lg ${
                                                 group.daysRemaining <= 10
                                                   ? 'text-red-300 bg-red-400/30'
                                                   : group.daysRemaining <= 30
@@ -469,46 +484,46 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                       </div>
                                     </div>
 
-                                    {/* Simplified task details */}
-                                    <div className="space-y-3 mt-4">
-                                      <div className="flex items-center gap-3 flex-wrap">
+                                    {/* Mobile-simplified task details */}
+                                    <div className="space-y-2 md:space-y-3 mt-2 md:mt-4">
+                                      <div className="flex items-center gap-1 md:gap-3 flex-wrap">
                                         <span
-                                          className={`px-3 py-1 rounded text-lg font-medium ${getTaskStatusColor(
+                                          className={`px-3 md:px-3 py-1 rounded text-lg md:text-lg font-medium ${getTaskStatusColor(
                                             group.tasks[0].status,
                                           )}`}
                                         >
                                           {group.tasks[0].status}
                                         </span>
                                         {group.tasks.length > 1 && (
-                                          <span className="px-3 py-1 bg-purple-600/20 text-purple-300 text-lg rounded">
-                                            {group.tasks.length} notifikácií
+                                          <span className="px-3 md:px-3 py-1 bg-purple-600/20 text-purple-300 text-lg md:text-lg rounded">
+                                            {group.tasks.length}x
                                           </span>
                                         )}
                                         {group.tasks.some((task) => task.emailSentAt) && (
-                                          <span className="px-3 py-1 bg-blue-600/20 text-blue-300 text-lg rounded">
-                                            Email ✓
+                                          <span className="px-3 md:px-3 py-1 bg-blue-600/20 text-blue-300 text-lg md:text-lg rounded">
+                                            📧
                                           </span>
                                         )}
                                         {group.tasks.some((task) => task.smsSentAt) && (
-                                          <span className="px-3 py-1 bg-green-600/20 text-green-300 text-lg rounded">
-                                            SMS ✓
+                                          <span className="px-3 md:px-3 py-1 bg-green-600/20 text-green-300 text-lg md:text-lg rounded">
+                                            📱
                                           </span>
                                         )}
                                         {group.tasks.some((task) => task.confirmedAt) && (
-                                          <span className="px-3 py-1 bg-green-600/20 text-green-300 text-lg rounded">
-                                            Potvrdené
+                                          <span className="px-3 md:px-3 py-1 bg-green-600/20 text-green-300 text-lg md:text-lg rounded">
+                                            ✓
                                           </span>
                                         )}
                                       </div>
 
-                                      <div className="flex items-center gap-6 text-lg">
+                                      <div className="block md:flex md:items-center md:gap-6 text-lg md:text-lg space-y-1 md:space-y-0">
                                         <div>
                                           <span className="text-gray-400">Kontakt:</span>
-                                          <span className="text-white ml-2 font-medium">
+                                          <span className="text-white ml-2 md:ml-2 font-medium">
                                             {group.tasks[0].personName || 'Nedostupné'}
                                           </span>
                                         </div>
-                                        <div>
+                                        <div className="hidden md:block">
                                           <span className="text-gray-400">Email:</span>
                                           <span className="text-white ml-2">
                                             {group.tasks[0].email || 'Nedostupné'}
@@ -517,8 +532,10 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                       </div>
 
                                       <div>
-                                        <span className="text-gray-400 text-lg">Notifikácie:</span>
-                                        <div className="flex flex-wrap gap-2 mt-1">
+                                        <span className="text-gray-400 text-lg md:text-lg">
+                                          Notifikácie:
+                                        </span>
+                                        <div className="flex flex-wrap gap-2 md:gap-2 mt-1">
                                           {group.tasks
                                             .sort((a, b) => {
                                               const dateA = a.notificationDate
@@ -532,7 +549,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                             .map((task) => (
                                               <span
                                                 key={task.id}
-                                                className="text-white text-lg px-2 py-1 bg-white/10 rounded"
+                                                className="text-white text-lg md:text-lg px-2 md:px-2 py-1 bg-white/10 rounded"
                                               >
                                                 {task.notificationDate
                                                   ? formatDate(task.notificationDate)
