@@ -236,7 +236,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
         return {
           border: 'border-green-500/50',
           bg: 'from-green-600/20 to-green-800/20',
-          text: 'text-green-300',
+          text: 'text-green-400',
           icon: 'text-green-400',
         }
       default:
@@ -322,7 +322,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
           return (
             <div
               key={vehicle.vehicleRegistration}
-              className={`bg-gradient-to-br ${styles.bg} rounded-xl p-6 border ${styles.border} transition-all`}
+              className={`rounded-xl p-6 border ${styles.border} transition-all`}
             >
               {/* Vehicle Header */}
               <div className="flex items-center justify-between mb-8">
@@ -340,9 +340,9 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                     <div className="text-right">
                       <p className={`text-xl font-medium ${styles.text}`}>Nasledujúca úloha</p>
                       <p className={`text-8xl font-bold ${styles.text}`}>
-                        {vehicle.daysToNextTask}
+                        {vehicle.daysToNextTask}{' '}
+                        <span className={`text-2xl font-medium ${styles.text}`}>dní</span>
                       </p>
-                      <p className={`text-2xl font-medium ${styles.text}`}>dní</p>
                     </div>
                   )}
                   <div className={`${styles.icon}`}>{getStatusIcon(vehicle.urgencyLevel)}</div>
@@ -380,10 +380,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                         const totalTasks = groups.length // Count unique task groups, not individual notifications
 
                         return (
-                          <div
-                            key={taskType}
-                            className="bg-gray-800/50 rounded-xl border border-gray-600/50"
-                          >
+                          <div key={taskType} className="rounded-xl border border-gray-600/50">
                             {/* Task Type Header */}
                             <div className="p-6 border-b border-gray-600/50">
                               <div className="flex items-center justify-between">
@@ -435,16 +432,14 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                 return (
                                   <div
                                     key={`${group.notificationType}-${group.dutyDate}-${index}`}
-                                    className={`bg-gradient-to-br ${
-                                      styles.bg
-                                    } rounded-xl p-6 border ${styles.border} ${
+                                    className={` rounded-xl p-6 border ${styles.border} ${
                                       isNextTaskGroup ? 'ring-2 ring-yellow-400/50' : ''
                                     }`}
                                   >
                                     <div className="flex items-center justify-between mb-4">
                                       <div className="flex items-center gap-4">
                                         {isNextTaskGroup && (
-                                          <span className="text-yellow-400 font-bold text-lg bg-yellow-400/20 px-4 py-2 rounded-lg">
+                                          <span className="text-yellow-400 text-lg bg-yellow-400/20 px-4 py-2 rounded-lg font-normal">
                                             NASLEDUJÚCA ÚLOHA
                                           </span>
                                         )}
@@ -474,9 +469,9 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                       </div>
                                     </div>
 
-                                    {/* Show task details (single task representation) */}
-                                    <div className="bg-black/20 rounded-lg p-4">
-                                      <div className="flex items-center gap-2 mb-3">
+                                    {/* Simplified task details */}
+                                    <div className="space-y-3 mt-4">
+                                      <div className="flex items-center gap-3 flex-wrap">
                                         <span
                                           className={`px-3 py-1 rounded text-lg font-medium ${getTaskStatusColor(
                                             group.tasks[0].status,
@@ -484,118 +479,66 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                         >
                                           {group.tasks[0].status}
                                         </span>
-                                        <span className="text-white text-xl font-medium">
-                                          {group.notificationType}
-                                        </span>
                                         {group.tasks.length > 1 && (
-                                          <span className="px-2 py-1 bg-purple-600/20 text-purple-300 text-sm rounded">
+                                          <span className="px-3 py-1 bg-purple-600/20 text-purple-300 text-lg rounded">
                                             {group.tasks.length} notifikácií
+                                          </span>
+                                        )}
+                                        {group.tasks.some((task) => task.emailSentAt) && (
+                                          <span className="px-3 py-1 bg-blue-600/20 text-blue-300 text-lg rounded">
+                                            Email ✓
+                                          </span>
+                                        )}
+                                        {group.tasks.some((task) => task.smsSentAt) && (
+                                          <span className="px-3 py-1 bg-green-600/20 text-green-300 text-lg rounded">
+                                            SMS ✓
+                                          </span>
+                                        )}
+                                        {group.tasks.some((task) => task.confirmedAt) && (
+                                          <span className="px-3 py-1 bg-green-600/20 text-green-300 text-lg rounded">
+                                            Potvrdené
                                           </span>
                                         )}
                                       </div>
 
-                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                      <div className="flex items-center gap-6 text-lg">
                                         <div>
-                                          <p className="text-gray-400 text-lg">Kontakt</p>
-                                          <p className="text-white text-xl font-medium">
+                                          <span className="text-gray-400">Kontakt:</span>
+                                          <span className="text-white ml-2 font-medium">
                                             {group.tasks[0].personName || 'Nedostupné'}
-                                          </p>
-                                          <p className="text-white text-lg">
-                                            {group.tasks[0].email || 'Bez emailu'}
-                                          </p>
+                                          </span>
                                         </div>
-
                                         <div>
-                                          <p className="text-gray-400 text-lg">
-                                            Dátumy notifikácií
-                                          </p>
-                                          <div className="space-y-2">
-                                            {group.tasks
-                                              .sort((a, b) => {
-                                                // Sort by notification date if available, otherwise by created date
-                                                const dateA = a.notificationDate
-                                                  ? new Date(a.notificationDate)
-                                                  : new Date(a.createdAt)
-                                                const dateB = b.notificationDate
-                                                  ? new Date(b.notificationDate)
-                                                  : new Date(b.createdAt)
-                                                return dateA.getTime() - dateB.getTime()
-                                              })
-                                              .map((task) => (
-                                                <div
-                                                  key={task.id}
-                                                  className="bg-gray-700/50 rounded px-3 py-2"
-                                                >
-                                                  <div className="flex items-center justify-between">
-                                                    <div>
-                                                      <p className="text-white text-lg font-medium">
-                                                        {task.notificationDate
-                                                          ? formatDate(task.notificationDate)
-                                                          : 'Bez dátumu'}
-                                                      </p>
-                                                    </div>
-                                                    <div className="flex gap-1">
-                                                      {task.emailSentAt && (
-                                                        <span
-                                                          className="w-2 h-2 bg-blue-400 rounded-full"
-                                                          title="Email odoslaný"
-                                                        ></span>
-                                                      )}
-                                                      {task.smsSentAt && (
-                                                        <span
-                                                          className="w-2 h-2 bg-green-400 rounded-full"
-                                                          title="SMS odoslaný"
-                                                        ></span>
-                                                      )}
-                                                      {task.confirmedAt && (
-                                                        <span
-                                                          className="w-2 h-2 bg-yellow-400 rounded-full"
-                                                          title="Potvrdené"
-                                                        ></span>
-                                                      )}
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              ))}
-                                            {group.tasks.length === 0 && (
-                                              <div className="text-gray-400 text-lg">
-                                                Žiadne notifikácie
-                                              </div>
-                                            )}
-                                          </div>
+                                          <span className="text-gray-400">Email:</span>
+                                          <span className="text-white ml-2">
+                                            {group.tasks[0].email || 'Nedostupné'}
+                                          </span>
                                         </div>
+                                      </div>
 
-                                        <div>
-                                          <p className="text-gray-400 text-lg">Komunikácia</p>
-                                          <div className="flex flex-wrap gap-2 mt-2">
-                                            {group.tasks.some((task) => task.emailSentAt) && (
-                                              <span className="px-3 py-2 bg-blue-600/20 text-blue-300 text-lg rounded">
-                                                Email ✓
+                                      <div>
+                                        <span className="text-gray-400 text-lg">Notifikácie:</span>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                          {group.tasks
+                                            .sort((a, b) => {
+                                              const dateA = a.notificationDate
+                                                ? new Date(a.notificationDate)
+                                                : new Date(a.createdAt)
+                                              const dateB = b.notificationDate
+                                                ? new Date(b.notificationDate)
+                                                : new Date(b.createdAt)
+                                              return dateA.getTime() - dateB.getTime()
+                                            })
+                                            .map((task) => (
+                                              <span
+                                                key={task.id}
+                                                className="text-white text-lg px-2 py-1 bg-white/10 rounded"
+                                              >
+                                                {task.notificationDate
+                                                  ? formatDate(task.notificationDate)
+                                                  : 'Bez dátumu'}
                                               </span>
-                                            )}
-                                            {group.tasks.some((task) => task.smsSentAt) && (
-                                              <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
-                                                SMS ✓
-                                              </span>
-                                            )}
-                                            {group.tasks.some(
-                                              (task) => task.confirmationAttempts > 0,
-                                            ) && (
-                                              <span className="px-3 py-2 bg-yellow-600/20 text-yellow-300 text-lg rounded">
-                                                {Math.max(
-                                                  ...group.tasks.map(
-                                                    (task) => task.confirmationAttempts,
-                                                  ),
-                                                )}{' '}
-                                                pokusov
-                                              </span>
-                                            )}
-                                            {group.tasks.some((task) => task.confirmedAt) && (
-                                              <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
-                                                Potvrdené
-                                              </span>
-                                            )}
-                                          </div>
+                                            ))}
                                         </div>
                                       </div>
                                     </div>

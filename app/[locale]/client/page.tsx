@@ -93,7 +93,7 @@ const ClientZone = () => {
           </section>
         )}
 
-        {(session?.user?.organization === 'all' ||
+        {/* {(session?.user?.organization === 'all' ||
           'demo-pv'.startsWith(session?.user?.organization || '')) && (
           <section id="demo-pv" className="mb-16">
             <div className="text-center mb-8">
@@ -115,7 +115,7 @@ const ClientZone = () => {
               <VehicleNotificationsDashboard company="FIRMA1" />
             </div>
           </section>
-        )}
+        )} */}
 
         {/* User Info Section */}
         <section className="py-20">
