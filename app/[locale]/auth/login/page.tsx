@@ -1,6 +1,6 @@
 'use client'
-import { signIn } from 'next-auth/react'
-import { useState } from 'react'
+import { signIn, useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Headphones, LogIn, Github } from 'lucide-react'
@@ -15,9 +15,18 @@ export default function LoginPage() {
   const router = useRouter()
   const pathname = usePathname()
   const t = useTranslations('Auth')
+  const { data: session, status } = useSession()
 
   // Extract locale from pathname
   const locale = pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (session?.user) {
+      console.log('Frontend: User already logged in, redirecting...')
+      router.push(`/${locale}/client`)
+    }
+  }, [session, router, locale])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,12 +40,23 @@ export default function LoginPage() {
         redirect: false,
       })
 
+      console.log('Frontend: signIn result:', result)
+
       if (result?.error) {
+        console.log('Frontend: Login failed with error:', result.error)
         setError(t('invalidCredentials'))
+      } else if (result?.ok) {
+        console.log('Frontend: Login successful, redirecting...')
+        // Wait a moment for the session to be established
+        setTimeout(() => {
+          router.push(`/${locale}/client`)
+        }, 100)
       } else {
-        router.push(`/${locale}/client`)
+        console.log('Frontend: Unexpected result:', result)
+        setError(t('loginError'))
       }
     } catch (error) {
+      console.error('Frontend: Login error:', error)
       setError(t('loginError'))
     } finally {
       setIsLoading(false)
