@@ -58,6 +58,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
   const [vehicleCards, setVehicleCards] = useState<VehicleCard[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedTaskTypes, setExpandedTaskTypes] = useState<Set<string>>(new Set())
+  const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     const fetchData = async () => {
@@ -216,6 +217,18 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
     })
   }
 
+  const toggleVehicleExpanded = (vehicleKey: string) => {
+    setExpandedVehicles((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(vehicleKey)) {
+        newSet.delete(vehicleKey)
+      } else {
+        newSet.add(vehicleKey)
+      }
+      return newSet
+    })
+  }
+
   const getUrgencyStyles = (urgencyLevel: 'green' | 'orange' | 'red' | 'gray') => {
     switch (urgencyLevel) {
       case 'red':
@@ -316,263 +329,304 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
         </div>
       </div>
 
-      {/* Vehicle Cards List */}
-      <div className="space-y-0 md:space-y-6">
-        {vehicleCards.map((vehicle) => {
-          const styles = getUrgencyStyles(vehicle.urgencyLevel)
-
-          return (
-            <div
-              key={vehicle.vehicleRegistration}
-              className={`md:rounded-xl p-3 md:p-6 md:border ${styles.border} transition-all`}
-            >
-              {/* Vehicle Header - Responsive */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-8">
-                <div className="flex items-center gap-2 md:gap-4 mb-3 md:mb-0">
-                  <Car className={`w-6 h-6 md:w-12 md:h-12 ${styles.icon}`} />
-                  <div>
-                    <h3 className="text-white font-bold text-3xl md:text-4xl">
-                      {vehicle.vehicleRegistration}
-                    </h3>
-                    <p className="text-white text-lg md:text-2xl opacity-75">
-                      {vehicle.vehicleType || 'Neznámy typ'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 md:gap-6">
-                  {vehicle.daysToNextTask !== null && (
-                    <div className="text-center md:text-right">
-                      <p className={`text-lg md:text-xl font-medium ${styles.text}`}>
-                        Nasledujúca úloha
-                      </p>
-                      <p className={`text-5xl md:text-8xl font-bold ${styles.text}`}>
-                        {vehicle.daysToNextTask}{' '}
-                        <span className={`text-xl md:text-2xl font-medium ${styles.text}`}>
-                          dní
-                        </span>
+      {/* Vehicle List Dropdown */}
+      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-3 md:p-6 border border-purple-500/30">
+        <h3 className="text-2xl md:text-4xl font-bold text-white flex items-center gap-2 mb-4">
+          <Car className="w-6 h-6 md:w-8 md:h-8" />
+          Zoznam vozidiel ({vehicleCards.length})
+        </h3>
+        <div className="space-y-2">
+          {vehicleCards.map((vehicle) => {
+            const isExpanded = expandedVehicles.has(vehicle.vehicleRegistration)
+            const styles = getUrgencyStyles(vehicle.urgencyLevel)
+            
+            return (
+              <div key={vehicle.vehicleRegistration} className="w-full">
+                <button
+                  onClick={() => toggleVehicleExpanded(vehicle.vehicleRegistration)}
+                  className={`w-full flex items-center justify-between p-3 md:p-4 rounded-lg border ${styles.border} bg-gradient-to-r ${styles.bg} hover:opacity-80 transition-all`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Car className={`w-5 h-5 md:w-6 md:h-6 ${styles.icon}`} />
+                    <div className="text-left">
+                      <h4 className="text-white font-bold text-lg md:text-2xl">
+                        {vehicle.vehicleRegistration}
+                      </h4>
+                      <p className="text-white text-sm md:text-lg opacity-75">
+                        {vehicle.taskGroups.length} úloh • {vehicle.vehicleType || 'Neznámy typ'}
                       </p>
                     </div>
-                  )}
-                  <div className={`${styles.icon}`}>{getStatusIcon(vehicle.urgencyLevel)}</div>
-                </div>
-              </div>
-
-              {/* Task Groups */}
-              <div>
-                <h4 className="text-white font-bold text-2xl md:text-4xl mb-3 md:mb-6">
-                  Úlohy podľa typu a termínu ({vehicle.taskGroups.length})
-                </h4>
-
-                {vehicle.taskGroups.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-                    <p className="text-gray-400 text-3xl">Žiadne úlohy</p>
                   </div>
-                ) : (
-                  <div className="w-full space-y-1 md:space-y-6">
-                    {(() => {
-                      // Group task groups by notification type for display
-                      const groupsByType = vehicle.taskGroups.reduce((acc, group) => {
-                        const type = group.notificationType || 'Neznámy typ'
-                        if (!acc[type]) {
-                          acc[type] = []
-                        }
-                        acc[type].push(group)
-                        return acc
-                      }, {} as Record<string, TaskGroup[]>)
-
-                      return Object.entries(groupsByType).map(([taskType, groups]) => {
-                        const taskTypeKey = `${vehicle.vehicleRegistration}-${taskType}`
-                        const isExpanded = expandedTaskTypes.has(taskTypeKey)
-                        const visibleGroups = isExpanded ? groups : groups.slice(0, 3)
-                        const totalTasks = groups.length // Count unique task groups, not individual notifications
-
-                        return (
-                          <div
-                            key={taskType}
-                            className="w-full md:rounded-xl md:border border-gray-600/50"
-                          >
-                            {/* Task Type Header */}
-                            <div className="p-3 md:p-6 md:border-b border-gray-600/50">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <h5 className="text-white font-bold text-lg md:text-3xl">
-                                    {taskType}
-                                  </h5>
-                                </div>
-                                {groups.length > 3 && (
-                                  <button
-                                    onClick={() =>
-                                      toggleTaskTypeExpanded(vehicle.vehicleRegistration, taskType)
-                                    }
-                                    className="flex items-center gap-3 text-purple-400 hover:text-purple-300 transition-colors"
-                                  >
-                                    <span className="text-sm md:text-xl">
-                                      {isExpanded
-                                        ? `Skryť ${groups.length - 3}`
-                                        : `Zobraziť ${groups.length}`}
-                                    </span>
-                                    {isExpanded ? (
-                                      <ChevronUp className="w-6 h-6" />
-                                    ) : (
-                                      <ChevronDown className="w-6 h-6" />
-                                    )}
-                                  </button>
-                                )}
-                              </div>
+                  <div className="flex items-center gap-3">
+                    {vehicle.daysToNextTask !== null && (
+                      <div className="text-right">
+                        <p className={`text-sm md:text-lg font-medium ${styles.text}`}>
+                          {vehicle.daysToNextTask} dní
+                        </p>
+                      </div>
+                    )}
+                    {isExpanded ? (
+                      <ChevronUp className="w-5 h-5 text-white" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-white" />
+                    )}
+                  </div>
+                </button>
+                
+                {isExpanded && (
+                  <div className="mt-4 ml-0 md:ml-4">
+                    {/* Vehicle Task Details */}
+                    <div className={`md:rounded-xl p-3 md:p-6 md:border ${styles.border} transition-all`}>
+                      {/* Vehicle Header - Responsive */}
+                      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-8">
+                        <div className="flex items-center gap-2 md:gap-4 mb-3 md:mb-0">
+                          <Car className={`w-6 h-6 md:w-12 md:h-12 ${styles.icon}`} />
+                          <div>
+                            <h3 className="text-white font-bold text-3xl md:text-4xl">
+                              {vehicle.vehicleRegistration}
+                            </h3>
+                            <p className="text-white text-lg md:text-2xl opacity-75">
+                              {vehicle.vehicleType || 'Neznámy typ'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 md:gap-6">
+                          {vehicle.daysToNextTask !== null && (
+                            <div className="text-center md:text-right">
+                              <p className={`text-lg md:text-xl font-medium ${styles.text}`}>
+                                Nasledujúca úloha
+                              </p>
+                              <p className={`text-5xl md:text-8xl font-bold ${styles.text}`}>
+                                {vehicle.daysToNextTask}{' '}
+                                <span className={`text-xl md:text-2xl font-medium ${styles.text}`}>
+                                  dní
+                                </span>
+                              </p>
                             </div>
+                          )}
+                          <div className={`${styles.icon}`}>{getStatusIcon(vehicle.urgencyLevel)}</div>
+                        </div>
+                      </div>
 
-                            {/* Task Groups in this type */}
-                            <div className="w-full p-0 md:p-6 space-y-1 md:space-y-4">
-                              {visibleGroups.map((group, index) => {
-                                const isNextTaskGroup =
-                                  vehicle.nextTask &&
-                                  group.tasks.some((task) => task.id === vehicle.nextTask!.id)
+                      {/* Task Groups */}
+                      <div>
+                        <h4 className="text-white font-bold text-2xl md:text-4xl mb-3 md:mb-6">
+                          Úlohy podľa typu a termínu ({vehicle.taskGroups.length})
+                        </h4>
 
-                                let daysText = ''
-                                if (group.daysRemaining !== null) {
-                                  if (group.daysRemaining > 0) {
-                                    daysText = `zostáva ${group.daysRemaining} dní`
-                                  } else if (group.daysRemaining === 0) {
-                                    daysText = 'dnes'
-                                  } else {
-                                    daysText = `pred ${Math.abs(group.daysRemaining)} dňami`
-                                  }
+                        {vehicle.taskGroups.length === 0 ? (
+                          <div className="text-center py-12">
+                            <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-6" />
+                            <p className="text-gray-400 text-3xl">Žiadne úlohy</p>
+                          </div>
+                        ) : (
+                          <div className="w-full space-y-1 md:space-y-6">
+                            {(() => {
+                              // Group task groups by notification type for display
+                              const groupsByType = vehicle.taskGroups.reduce((acc, group) => {
+                                const type = group.notificationType || 'Neznámy typ'
+                                if (!acc[type]) {
+                                  acc[type] = []
                                 }
+                                acc[type].push(group)
+                                return acc
+                              }, {} as Record<string, TaskGroup[]>)
 
-                                const styles = getUrgencyStyles(group.urgencyLevel)
+                              return Object.entries(groupsByType).map(([taskType, groups]) => {
+                                const taskTypeKey = `${vehicle.vehicleRegistration}-${taskType}`
+                                const isExpanded = expandedTaskTypes.has(taskTypeKey)
+                                const visibleGroups = isExpanded ? groups : groups.slice(0, 3)
 
                                 return (
                                   <div
-                                    key={`${group.notificationType}-${group.dutyDate}-${index}`}
-                                    className={`w-full md:rounded-xl p-3 md:p-6 md:border ${
-                                      styles.border
-                                    } ${isNextTaskGroup ? 'md:ring-2 ring-yellow-400/50' : ''}`}
+                                    key={taskType}
+                                    className="w-full md:rounded-xl md:border border-gray-600/50"
                                   >
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 md:mb-4">
-                                      <div className="flex items-center gap-2 md:gap-4 mb-2 md:mb-0">
-                                        {isNextTaskGroup && (
-                                          <span className="text-yellow-400 text-xs md:text-lg bg-yellow-400/20 px-2 md:px-4 py-1 md:py-2 rounded-lg font-normal">
-                                            NASLEDUJÚCA
-                                          </span>
-                                        )}
+                                    {/* Task Type Header */}
+                                    <div className="p-3 md:p-6 md:border-b border-gray-600/50">
+                                      <div className="flex items-center justify-between">
                                         <div>
-                                          <h6 className="text-white font-bold text-2xl md:text-2xl">
-                                            1 úloha
-                                          </h6>
-                                          <p className="text-white text-lg md:text-lg opacity-75">
-                                            Termín: {formatDate(group.dutyDate)}
-                                          </p>
+                                          <h5 className="text-white font-bold text-lg md:text-3xl">
+                                            {taskType}
+                                          </h5>
                                         </div>
-                                      </div>
-                                      <div className="text-left md:text-right">
-                                        {group.daysRemaining !== null && (
-                                          <div>
-                                            <span
-                                              className={`text-xl md:text-2xl font-bold px-3 md:px-4 py-2 md:py-2 rounded-lg ${
-                                                group.daysRemaining <= 10
-                                                  ? 'text-red-300 bg-red-400/30'
-                                                  : group.daysRemaining <= 30
-                                                  ? 'text-orange-300 bg-orange-400/30'
-                                                  : 'text-green-400 font-normal bg-green-400/10'
-                                              }`}
-                                            >
-                                              {daysText}
+                                        {groups.length > 3 && (
+                                          <button
+                                            onClick={() =>
+                                              toggleTaskTypeExpanded(vehicle.vehicleRegistration, taskType)
+                                            }
+                                            className="flex items-center gap-3 text-purple-400 hover:text-purple-300 transition-colors"
+                                          >
+                                            <span className="text-sm md:text-xl">
+                                              {isExpanded
+                                                ? `Skryť ${groups.length - 3}`
+                                                : `Zobraziť ${groups.length}`}
                                             </span>
-                                          </div>
+                                            {isExpanded ? (
+                                              <ChevronUp className="w-6 h-6" />
+                                            ) : (
+                                              <ChevronDown className="w-6 h-6" />
+                                            )}
+                                          </button>
                                         )}
                                       </div>
                                     </div>
 
-                                    {/* Mobile-simplified task details */}
-                                    <div className="space-y-2 md:space-y-3 mt-2 md:mt-4">
-                                      <div className="flex items-center gap-1 md:gap-3 flex-wrap">
-                                        <span
-                                          className={`px-3 md:px-3 py-1 rounded text-lg md:text-lg font-medium ${getTaskStatusColor(
-                                            group.tasks[0].status,
-                                          )}`}
-                                        >
-                                          {group.tasks[0].status}
-                                        </span>
-                                        {group.tasks.length > 1 && (
-                                          <span className="px-3 md:px-3 py-1 bg-purple-600/20 text-purple-300 text-lg md:text-lg rounded">
-                                            {group.tasks.length}x
-                                          </span>
-                                        )}
-                                        {group.tasks.some((task) => task.emailSentAt) && (
-                                          <span className="px-3 md:px-3 py-1 bg-blue-600/20 text-blue-300 text-lg md:text-lg rounded">
-                                            📧
-                                          </span>
-                                        )}
-                                        {group.tasks.some((task) => task.smsSentAt) && (
-                                          <span className="px-3 md:px-3 py-1 bg-green-600/20 text-green-300 text-lg md:text-lg rounded">
-                                            📱
-                                          </span>
-                                        )}
-                                        {group.tasks.some((task) => task.confirmedAt) && (
-                                          <span className="px-3 md:px-3 py-1 bg-green-600/20 text-green-300 text-lg md:text-lg rounded">
-                                            ✓
-                                          </span>
-                                        )}
-                                      </div>
+                                    {/* Task Groups in this type */}
+                                    <div className="w-full p-0 md:p-6 space-y-1 md:space-y-4">
+                                      {visibleGroups.map((group, index) => {
+                                        const isNextTaskGroup =
+                                          vehicle.nextTask &&
+                                          group.tasks.some((task) => task.id === vehicle.nextTask!.id)
 
-                                      <div className="block md:flex md:items-center md:gap-6 text-lg md:text-lg space-y-1 md:space-y-0">
-                                        <div>
-                                          <span className="text-gray-400">Kontakt:</span>
-                                          <span className="text-white ml-2 md:ml-2 font-medium">
-                                            {group.tasks[0].personName || 'Nedostupné'}
-                                          </span>
-                                        </div>
-                                        <div className="hidden md:block">
-                                          <span className="text-gray-400">Email:</span>
-                                          <span className="text-white ml-2">
-                                            {group.tasks[0].email || 'Nedostupné'}
-                                          </span>
-                                        </div>
-                                      </div>
+                                        let daysText = ''
+                                        if (group.daysRemaining !== null) {
+                                          if (group.daysRemaining > 0) {
+                                            daysText = `zostáva ${group.daysRemaining} dní`
+                                          } else if (group.daysRemaining === 0) {
+                                            daysText = 'dnes'
+                                          } else {
+                                            daysText = `pred ${Math.abs(group.daysRemaining)} dňami`
+                                          }
+                                        }
 
-                                      <div>
-                                        <span className="text-gray-400 text-lg md:text-lg">
-                                          Notifikácie:
-                                        </span>
-                                        <div className="flex flex-wrap gap-2 md:gap-2 mt-1">
-                                          {group.tasks
-                                            .sort((a, b) => {
-                                              const dateA = a.notificationDate
-                                                ? new Date(a.notificationDate)
-                                                : new Date(a.createdAt)
-                                              const dateB = b.notificationDate
-                                                ? new Date(b.notificationDate)
-                                                : new Date(b.createdAt)
-                                              return dateA.getTime() - dateB.getTime()
-                                            })
-                                            .map((task) => (
-                                              <span
-                                                key={task.id}
-                                                className="text-white text-lg md:text-lg px-2 md:px-2 py-1 bg-white/10 rounded"
-                                              >
-                                                {task.notificationDate
-                                                  ? formatDate(task.notificationDate)
-                                                  : 'Bez dátumu'}
-                                              </span>
-                                            ))}
-                                        </div>
-                                      </div>
+                                        const styles = getUrgencyStyles(group.urgencyLevel)
+
+                                        return (
+                                          <div
+                                            key={`${group.notificationType}-${group.dutyDate}-${index}`}
+                                            className={`w-full md:rounded-xl p-3 md:p-6 md:border ${
+                                              styles.border
+                                            } ${isNextTaskGroup ? 'md:ring-2 ring-yellow-400/50' : ''}`}
+                                          >
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 md:mb-4">
+                                              <div className="flex items-center gap-2 md:gap-4 mb-2 md:mb-0">
+                                                {isNextTaskGroup && (
+                                                  <span className="text-yellow-400 text-xs md:text-lg bg-yellow-400/20 px-2 md:px-4 py-1 md:py-2 rounded-lg font-normal">
+                                                    NASLEDUJÚCA
+                                                  </span>
+                                                )}
+                                                <div>
+                                                  <h6 className="text-white font-bold text-2xl md:text-2xl">
+                                                    1 úloha
+                                                  </h6>
+                                                  <p className="text-white text-lg md:text-lg opacity-75">
+                                                    Termín: {formatDate(group.dutyDate)}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                              <div className="text-left md:text-right">
+                                                {group.daysRemaining !== null && (
+                                                  <div>
+                                                    <span
+                                                      className={`text-xl md:text-2xl font-bold px-3 md:px-4 py-2 md:py-2 rounded-lg ${
+                                                        group.daysRemaining <= 10
+                                                          ? 'text-red-300 bg-red-400/30'
+                                                          : group.daysRemaining <= 30
+                                                          ? 'text-orange-300 bg-orange-400/30'
+                                                          : 'text-green-400 font-normal bg-green-400/10'
+                                                      }`}
+                                                    >
+                                                      {daysText}
+                                                    </span>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </div>
+
+                                            {/* Mobile-simplified task details */}
+                                            <div className="space-y-2 md:space-y-3 mt-2 md:mt-4">
+                                              <div className="flex items-center gap-1 md:gap-3 flex-wrap">
+                                                <span
+                                                  className={`px-3 md:px-3 py-1 rounded text-lg md:text-lg font-medium ${getTaskStatusColor(
+                                                    group.tasks[0].status,
+                                                  )}`}
+                                                >
+                                                  {group.tasks[0].status}
+                                                </span>
+                                                {group.tasks.length > 1 && (
+                                                  <span className="px-3 md:px-3 py-1 bg-purple-600/20 text-purple-300 text-lg md:text-lg rounded">
+                                                    {group.tasks.length}x
+                                                  </span>
+                                                )}
+                                                {group.tasks.some((task) => task.emailSentAt) && (
+                                                  <span className="px-3 md:px-3 py-1 bg-blue-600/20 text-blue-300 text-lg md:text-lg rounded">
+                                                    📧
+                                                  </span>
+                                                )}
+                                                {group.tasks.some((task) => task.smsSentAt) && (
+                                                  <span className="px-3 md:px-3 py-1 bg-green-600/20 text-green-300 text-lg md:text-lg rounded">
+                                                    📱
+                                                  </span>
+                                                )}
+                                                {group.tasks.some((task) => task.confirmedAt) && (
+                                                  <span className="px-3 md:px-3 py-1 bg-green-600/20 text-green-300 text-lg md:text-lg rounded">
+                                                    ✓
+                                                  </span>
+                                                )}
+                                              </div>
+
+                                              <div className="block md:flex md:items-center md:gap-6 text-lg md:text-lg space-y-1 md:space-y-0">
+                                                <div>
+                                                  <span className="text-gray-400">Kontakt:</span>
+                                                  <span className="text-white ml-2 md:ml-2 font-medium">
+                                                    {group.tasks[0].personName || 'Nedostupné'}
+                                                  </span>
+                                                </div>
+                                                <div className="hidden md:block">
+                                                  <span className="text-gray-400">Email:</span>
+                                                  <span className="text-white ml-2">
+                                                    {group.tasks[0].email || 'Nedostupné'}
+                                                  </span>
+                                                </div>
+                                              </div>
+
+                                              <div>
+                                                <span className="text-gray-400 text-lg md:text-lg">
+                                                  Notifikácie:
+                                                </span>
+                                                <div className="flex flex-wrap gap-2 md:gap-2 mt-1">
+                                                  {group.tasks
+                                                    .sort((a, b) => {
+                                                      const dateA = a.notificationDate
+                                                        ? new Date(a.notificationDate)
+                                                        : new Date(a.createdAt)
+                                                      const dateB = b.notificationDate
+                                                        ? new Date(b.notificationDate)
+                                                        : new Date(b.createdAt)
+                                                      return dateA.getTime() - dateB.getTime()
+                                                    })
+                                                    .map((task) => (
+                                                      <span
+                                                        key={task.id}
+                                                        className="text-white text-lg md:text-lg px-2 md:px-2 py-1 bg-white/10 rounded"
+                                                      >
+                                                        {task.notificationDate
+                                                          ? formatDate(task.notificationDate)
+                                                          : 'Bez dátumu'}
+                                                      </span>
+                                                    ))}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )
+                                      })}
                                     </div>
                                   </div>
                                 )
-                              })}
-                            </div>
+                              })
+                            })()}
                           </div>
-                        )
-                      })
-                    })()}
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
     </div>
   )
