@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { 
-  Car, 
-  Bell, 
-  CheckCircle, 
-  Clock, 
-  AlertCircle, 
-  Mail, 
+import {
+  Car,
+  Bell,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Mail,
   MessageSquare,
   Calendar,
   TrendingUp,
@@ -15,7 +15,7 @@ import {
   Activity,
   Filter,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react'
 import VehicleCardsDashboard from './VehicleCardsDashboard'
 
@@ -76,58 +76,60 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
         const response = await fetch(`/api/vehicle-notifications?company=${company}`)
         if (response.ok) {
           const data = await response.json()
-          
+
           // Process the data to create stats
           const notifications = data.notifications || []
-          
+
           // Sort notifications by notificationDate first
-          const sortedNotifications = notifications.sort((a: VehicleNotification, b: VehicleNotification) => {
-            if (!a.notificationDate && !b.notificationDate) return 0
-            if (!a.notificationDate) return 1
-            if (!b.notificationDate) return -1
-            return new Date(a.notificationDate).getTime() - new Date(b.notificationDate).getTime()
-          })
-          
+          const sortedNotifications = notifications.sort(
+            (a: VehicleNotification, b: VehicleNotification) => {
+              if (!a.notificationDate && !b.notificationDate) return 0
+              if (!a.notificationDate) return 1
+              if (!b.notificationDate) return -1
+              return new Date(a.notificationDate).getTime() - new Date(b.notificationDate).getTime()
+            },
+          )
+
           // Calculate time-based filters
           const now = new Date()
           const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
           const oneMonthFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-          
+
           const upcomingWeek = sortedNotifications.filter((n: VehicleNotification) => {
             if (!n.notificationDate) return false
             const notificationDate = new Date(n.notificationDate)
             return notificationDate >= now && notificationDate <= oneWeekFromNow
           })
-          
+
           const upcomingMonth = sortedNotifications.filter((n: VehicleNotification) => {
             if (!n.notificationDate) return false
             const notificationDate = new Date(n.notificationDate)
             return notificationDate >= now && notificationDate <= oneMonthFromNow
           })
-          
+
           // Group notifications by vehicle registration
           const vehicleMap = new Map<string, VehicleGroup>()
-          
+
           sortedNotifications.forEach((notification: VehicleNotification) => {
             const key = notification.vehicleRegistration || 'Unknown Vehicle'
-            
+
             if (!vehicleMap.has(key)) {
               vehicleMap.set(key, {
                 vehicleRegistration: notification.vehicleRegistration,
                 vehicleType: notification.vehicleType,
-                notifications: []
+                notifications: [],
               })
             }
-            
+
             vehicleMap.get(key)!.notifications.push(notification)
           })
-          
+
           const vehicleGroups = Array.from(vehicleMap.values()).sort((a, b) => {
             const aReg = a.vehicleRegistration || 'Unknown Vehicle'
             const bReg = b.vehicleRegistration || 'Unknown Vehicle'
             return aReg.localeCompare(bReg)
           })
-          
+
           // Count unique tasks (same type + duty date = one task) for top widgets
           const uniqueTasksMap = new Map<string, VehicleNotification>()
           notifications.forEach((n: VehicleNotification) => {
@@ -140,25 +142,35 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
           const processedStats: DashboardStats = {
             totalNotifications: notifications.length, // Keep original for notification-based widgets
-            pendingNotifications: notifications.filter((n: VehicleNotification) => n.status === 'pending').length,
-            confirmedNotifications: notifications.filter((n: VehicleNotification) => n.confirmedAt !== null).length,
-            emailsSent: notifications.filter((n: VehicleNotification) => n.emailSentAt !== null).length,
+            pendingNotifications: notifications.filter(
+              (n: VehicleNotification) => n.status === 'pending',
+            ).length,
+            confirmedNotifications: notifications.filter(
+              (n: VehicleNotification) => n.confirmedAt !== null,
+            ).length,
+            emailsSent: notifications.filter((n: VehicleNotification) => n.emailSentAt !== null)
+              .length,
             smsSent: notifications.filter((n: VehicleNotification) => n.smsSentAt !== null).length,
-            notificationTypes: uniqueTasks.reduce((acc: { [key: string]: number }, n: VehicleNotification) => {
-              if (n.notificationType) {
-                acc[n.notificationType] = (acc[n.notificationType] || 0) + 1
-              }
-              return acc
-            }, {}), // Count unique tasks for task-based widgets
+            notificationTypes: uniqueTasks.reduce(
+              (acc: { [key: string]: number }, n: VehicleNotification) => {
+                if (n.notificationType) {
+                  acc[n.notificationType] = (acc[n.notificationType] || 0) + 1
+                }
+                return acc
+              },
+              {},
+            ), // Count unique tasks for task-based widgets
             recentNotifications: notifications
-              .sort((a: VehicleNotification, b: VehicleNotification) => 
-                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .sort(
+                (a: VehicleNotification, b: VehicleNotification) =>
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+              )
               .slice(0, 5),
             upcomingWeek,
             upcomingMonth,
-            vehicleGroups
+            vehicleGroups,
           }
-          
+
           setStats(processedStats)
         }
       } catch (error) {
@@ -190,10 +202,14 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'text-green-400 bg-green-400/20'
-      case 'pending': return 'text-yellow-400 bg-yellow-400/20'
-      case 'failed': return 'text-red-400 bg-red-400/20'
-      default: return 'text-gray-400 bg-gray-400/20'
+      case 'confirmed':
+        return 'text-green-400 bg-green-400/20'
+      case 'pending':
+        return 'text-yellow-400 bg-yellow-400/20'
+      case 'failed':
+        return 'text-red-400 bg-red-400/20'
+      default:
+        return 'text-gray-400 bg-gray-400/20'
     }
   }
 
@@ -202,7 +218,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
     return new Date(dateString).toLocaleDateString('sk-SK', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 
@@ -211,12 +227,12 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
     return new Date(dateString).toLocaleDateString('sk-SK', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 
   const toggleVehicleExpanded = (vehicleKey: string) => {
-    setExpandedVehicles(prev => {
+    setExpandedVehicles((prev) => {
       const newSet = new Set(prev)
       if (newSet.has(vehicleKey)) {
         newSet.delete(vehicleKey)
@@ -229,14 +245,14 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
   const getFilteredNotifications = () => {
     if (!stats) return []
-    
+
     switch (timeFilter) {
       case 'week':
         return stats.upcomingWeek
       case 'month':
         return stats.upcomingMonth
       default:
-        return stats.vehicleGroups.flatMap(group => group.notifications)
+        return stats.vehicleGroups.flatMap((group) => group.notifications)
     }
   }
 
@@ -256,20 +272,48 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       {/* Task Type Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {Object.entries(stats.notificationTypes)
-          .sort(([,a], [,b]) => b - a)
+          .sort(([, a], [, b]) => b - a)
           .slice(0, 5)
           .map(([type, count], index) => {
             const colors = [
-              { bg: 'from-blue-600/20 to-blue-800/20', border: 'border-blue-500/30', text: 'text-blue-300', icon: 'text-blue-400' },
-              { bg: 'from-green-600/20 to-green-800/20', border: 'border-green-500/30', text: 'text-green-300', icon: 'text-green-400' },
-              { bg: 'from-purple-600/20 to-purple-800/20', border: 'border-purple-500/30', text: 'text-purple-300', icon: 'text-purple-400' },
-              { bg: 'from-orange-600/20 to-orange-800/20', border: 'border-orange-500/30', text: 'text-orange-300', icon: 'text-orange-400' },
-              { bg: 'from-pink-600/20 to-pink-800/20', border: 'border-pink-500/30', text: 'text-pink-300', icon: 'text-pink-400' }
+              {
+                bg: 'from-blue-600/20 to-blue-800/20',
+                border: 'border-blue-500/30',
+                text: 'text-blue-300',
+                icon: 'text-blue-400',
+              },
+              {
+                bg: 'from-green-600/20 to-green-800/20',
+                border: 'border-green-500/30',
+                text: 'text-green-300',
+                icon: 'text-green-400',
+              },
+              {
+                bg: 'from-purple-600/20 to-purple-800/20',
+                border: 'border-purple-500/30',
+                text: 'text-purple-300',
+                icon: 'text-purple-400',
+              },
+              {
+                bg: 'from-orange-600/20 to-orange-800/20',
+                border: 'border-orange-500/30',
+                text: 'text-orange-300',
+                icon: 'text-orange-400',
+              },
+              {
+                bg: 'from-pink-600/20 to-pink-800/20',
+                border: 'border-pink-500/30',
+                text: 'text-pink-300',
+                icon: 'text-pink-400',
+              },
             ]
             const color = colors[index % colors.length]
-            
+
             return (
-              <div key={type} className={`bg-gradient-to-br ${color.bg} rounded-xl p-6 border ${color.border}`}>
+              <div
+                key={type}
+                className={`bg-gradient-to-br ${color.bg} rounded-xl p-6 border ${color.border}`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className={`${color.text} text-xl font-medium`}>{type}</p>
@@ -283,7 +327,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Vehicle Cards Dashboard */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-6 border border-purple-500/30">
+      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-2 lg:p-6 border border-purple-500/30">
         <VehicleCardsDashboard company={company} />
       </div>
 
@@ -352,7 +396,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
               <span className="text-white text-xl">{type}</span>
               <div className="flex items-center gap-2">
                 <div className="w-32 bg-gray-700 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${(count / stats.totalNotifications) * 100}%` }}
                   ></div>
@@ -390,7 +434,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Vehicle Notifications by Registration */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-6 border border-purple-500/30">
+      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-2 lg:p-6 border border-purple-500/30">
         <h3 className="text-4xl font-bold text-white mb-6 flex items-center gap-2">
           <Car className="w-8 h-8" />
           Notifikácie podľa vozidla
@@ -400,17 +444,20 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             </span>
           )}
         </h3>
-        
+
         {timeFilter === 'all' ? (
           // Show grouped by vehicle
           <div className="space-y-4">
             {stats.vehicleGroups.map((vehicleGroup) => {
               const vehicleKey = vehicleGroup.vehicleRegistration || 'Unknown Vehicle'
               const isExpanded = expandedVehicles.has(vehicleKey)
-              
+
               return (
-                <div key={vehicleKey} className="bg-black/30 rounded-lg border border-purple-500/20">
-                  <div 
+                <div
+                  key={vehicleKey}
+                  className="bg-black/30 rounded-lg border border-purple-500/20"
+                >
+                  <div
                     className="flex items-center justify-between p-4 cursor-pointer hover:bg-purple-500/10 transition-colors"
                     onClick={() => toggleVehicleExpanded(vehicleKey)}
                   >
@@ -422,12 +469,16 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                         <h4 className="text-4xl font-bold text-white">
                           {vehicleGroup.vehicleRegistration || 'Neznáme vozidlo'}
                         </h4>
-                        <p className="text-white text-lg">{vehicleGroup.vehicleType || 'Neznámy typ'}</p>
+                        <p className="text-white text-lg">
+                          {vehicleGroup.vehicleType || 'Neznámy typ'}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <p className="text-white font-bold text-2xl">{vehicleGroup.notifications.length}</p>
+                        <p className="text-white font-bold text-2xl">
+                          {vehicleGroup.notifications.length}
+                        </p>
                         <p className="text-white text-lg">notifikácií</p>
                       </div>
                       {isExpanded ? (
@@ -437,18 +488,22 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                       )}
                     </div>
                   </div>
-                  
+
                   {isExpanded && (
                     <div className="border-t border-purple-500/20 p-4">
                       <div className="space-y-3">
                         {vehicleGroup.notifications.map((notification) => (
-                          <div 
+                          <div
                             key={notification.id}
                             className="bg-gray-900/50 rounded-lg p-4 border border-gray-700"
                           >
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex items-center gap-2">
-                                <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(notification.status)}`}>
+                                <span
+                                  className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                                    notification.status,
+                                  )}`}
+                                >
                                   {notification.status}
                                 </span>
                                 <span className="text-white text-lg">#{notification.id}</span>
@@ -461,16 +516,22 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                                 )}
                               </div>
                             </div>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div>
                                 <p className="text-purple-300 text-lg">Notifikácia</p>
-                                <p className="text-white font-medium text-xl">{notification.notificationType}</p>
-                                <p className="text-white text-lg">{notification.notificationChannel}</p>
+                                <p className="text-white font-medium text-xl">
+                                  {notification.notificationType}
+                                </p>
+                                <p className="text-white text-lg">
+                                  {notification.notificationChannel}
+                                </p>
                               </div>
                               <div>
                                 <p className="text-purple-300 text-lg">Kontakt</p>
-                                <p className="text-white text-xl">{notification.personName || 'Nedostupné'}</p>
+                                <p className="text-white text-xl">
+                                  {notification.personName || 'Nedostupné'}
+                                </p>
                                 <p className="text-white text-lg">{notification.email}</p>
                               </div>
                               <div>
@@ -510,18 +571,23 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
               <div className="text-center py-12">
                 <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-white text-2xl">
-                  Žiadne nadchádzajúce notifikácie pre {timeFilter === 'week' ? 'tento týždeň' : 'tento mesiac'}
+                  Žiadne nadchádzajúce notifikácie pre{' '}
+                  {timeFilter === 'week' ? 'tento týždeň' : 'tento mesiac'}
                 </p>
               </div>
             ) : (
               getFilteredNotifications().map((notification) => (
-                <div 
+                <div
                   key={notification.id}
                   className="bg-black/30 rounded-lg p-4 border border-purple-500/20"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(notification.status)}`}>
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                          notification.status,
+                        )}`}
+                      >
                         {notification.status}
                       </span>
                       <span className="text-white text-lg">#{notification.id}</span>
@@ -534,21 +600,27 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                       <p className="text-purple-300 text-lg">Vozidlo</p>
-                      <p className="text-white font-bold text-3xl">{notification.vehicleRegistration || 'Nedostupné'}</p>
+                      <p className="text-white font-bold text-3xl">
+                        {notification.vehicleRegistration || 'Nedostupné'}
+                      </p>
                       <p className="text-white text-lg">{notification.vehicleType}</p>
                     </div>
                     <div>
                       <p className="text-purple-300 text-lg">Oznámenie</p>
-                      <p className="text-white font-medium text-xl">{notification.notificationType}</p>
+                      <p className="text-white font-medium text-xl">
+                        {notification.notificationType}
+                      </p>
                       <p className="text-white text-lg">{notification.notificationChannel}</p>
                     </div>
                     <div>
                       <p className="text-purple-300 text-lg">Kontakt</p>
-                      <p className="text-white text-xl">{notification.personName || 'Nedostupné'}</p>
+                      <p className="text-white text-xl">
+                        {notification.personName || 'Nedostupné'}
+                      </p>
                       <p className="text-white text-lg">{notification.email}</p>
                     </div>
                     <div>
@@ -594,7 +666,10 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             <div className="flex justify-between">
               <span className="text-white text-xl">Pomer e-mailov</span>
               <span className="text-white font-bold text-2xl">
-                {stats.totalNotifications > 0 ? Math.round((stats.emailsSent / stats.totalNotifications) * 100) : 0}%
+                {stats.totalNotifications > 0
+                  ? Math.round((stats.emailsSent / stats.totalNotifications) * 100)
+                  : 0}
+                %
               </span>
             </div>
           </div>
@@ -613,7 +688,10 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             <div className="flex justify-between">
               <span className="text-white text-xl">Pomer SMS</span>
               <span className="text-white font-bold text-2xl">
-                {stats.totalNotifications > 0 ? Math.round((stats.smsSent / stats.totalNotifications) * 100) : 0}%
+                {stats.totalNotifications > 0
+                  ? Math.round((stats.smsSent / stats.totalNotifications) * 100)
+                  : 0}
+                %
               </span>
             </div>
           </div>
