@@ -72,49 +72,79 @@ export const authOptions = {
       return true
     },
     async jwt({ token, user, account }: any) {
-      if (user && account) {
-        // Get user data from database for JWT
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email }
-        })
-        
-        if (dbUser) {
-          token.id = dbUser.id
-          token.role = dbUser.role
-          token.email = dbUser.email
-          token.name = dbUser.name || `${dbUser.firstName} ${dbUser.lastName}`
-          token.organization = dbUser.organization
-          
-          // Update login tracking
-          await prisma.user.update({
-            where: { id: dbUser.id },
-            data: { 
-              lastLoggedIn: new Date(),
-              loginCount: { increment: 1 }
-            }
+      console.log('TESTING: JWT callback triggered for:', user?.email || token?.email)
+      console.log('TESTING: Account provider:', account?.provider)
+      
+      try {
+        if (user && account) {
+          console.log('TESTING: Getting user data from database...')
+          // Get user data from database for JWT
+          const dbUser = await prisma.user.findUnique({
+            where: { email: user.email }
           })
+          
+          if (dbUser) {
+            console.log('TESTING: Found user in database, setting token data')
+            token.id = dbUser.id
+            token.role = dbUser.role
+            token.email = dbUser.email
+            token.name = dbUser.name || `${dbUser.firstName} ${dbUser.lastName}`
+            token.organization = dbUser.organization
+            
+            console.log('TESTING: Updating login tracking...')
+            // Update login tracking
+            await prisma.user.update({
+              where: { id: dbUser.id },
+              data: { 
+                lastLoggedIn: new Date(),
+                loginCount: { increment: 1 }
+              }
+            })
+            console.log('TESTING: Login tracking updated successfully')
+          } else {
+            console.log('TESTING: User not found in database!')
+          }
+        } else if (token.email && !token.organization) {
+          console.log('TESTING: Refreshing token organization data...')
+          // For existing tokens, ensure we have organization data
+          const dbUser = await prisma.user.findUnique({
+            where: { email: token.email }
+          })
+          
+          if (dbUser) {
+            token.organization = dbUser.organization
+            console.log('TESTING: Organization data refreshed')
+          }
         }
-      } else if (token.email && !token.organization) {
-        // For existing tokens, ensure we have organization data
-        const dbUser = await prisma.user.findUnique({
-          where: { email: token.email }
-        })
         
-        if (dbUser) {
-          token.organization = dbUser.organization
-        }
+        console.log('TESTING: JWT callback completed successfully')
+        return token
+      } catch (error) {
+        console.error('TESTING: JWT callback error:', error)
+        return token
       }
-      return token
     },
     async session({ session, token }: any) {
-      if (token) {
-        session.user.id = token.id
-        session.user.role = token.role?.toLowerCase() || 'client'
-        session.user.email = token.email
-        session.user.name = token.name
-        session.user.organization = token.organization
+      console.log('TESTING: Session callback triggered for:', token?.email)
+      try {
+        if (token) {
+          console.log('TESTING: Setting session data from token')
+          session.user.id = token.id
+          session.user.role = token.role?.toLowerCase() || 'client'
+          session.user.email = token.email
+          session.user.name = token.name
+          session.user.organization = token.organization
+          console.log('TESTING: Session data set successfully')
+        } else {
+          console.log('TESTING: No token provided to session callback')
+        }
+        
+        console.log('TESTING: Session callback completed successfully')
+        return session
+      } catch (error) {
+        console.error('TESTING: Session callback error:', error)
+        return session
       }
-      return session
     },
   },
   providers: [
