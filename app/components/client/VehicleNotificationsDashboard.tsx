@@ -17,6 +17,7 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react'
+import VehicleCardsDashboard from './VehicleCardsDashboard'
 
 interface VehicleNotification {
   id: number
@@ -127,18 +128,28 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             return aReg.localeCompare(bReg)
           })
           
+          // Count unique tasks (same type + duty date = one task) for top widgets
+          const uniqueTasksMap = new Map<string, VehicleNotification>()
+          notifications.forEach((n: VehicleNotification) => {
+            const taskKey = `${n.notificationType || 'Unknown'}-${n.dutyDate || 'No Date'}`
+            if (!uniqueTasksMap.has(taskKey)) {
+              uniqueTasksMap.set(taskKey, n)
+            }
+          })
+          const uniqueTasks = Array.from(uniqueTasksMap.values())
+
           const processedStats: DashboardStats = {
-            totalNotifications: notifications.length,
+            totalNotifications: notifications.length, // Keep original for notification-based widgets
             pendingNotifications: notifications.filter((n: VehicleNotification) => n.status === 'pending').length,
             confirmedNotifications: notifications.filter((n: VehicleNotification) => n.confirmedAt !== null).length,
             emailsSent: notifications.filter((n: VehicleNotification) => n.emailSentAt !== null).length,
             smsSent: notifications.filter((n: VehicleNotification) => n.smsSentAt !== null).length,
-            notificationTypes: notifications.reduce((acc: { [key: string]: number }, n: VehicleNotification) => {
+            notificationTypes: uniqueTasks.reduce((acc: { [key: string]: number }, n: VehicleNotification) => {
               if (n.notificationType) {
                 acc[n.notificationType] = (acc[n.notificationType] || 0) + 1
               }
               return acc
-            }, {}),
+            }, {}), // Count unique tasks for task-based widgets
             recentNotifications: notifications
               .sort((a: VehicleNotification, b: VehicleNotification) => 
                 new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -242,7 +253,41 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Task Type Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {Object.entries(stats.notificationTypes)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 5)
+          .map(([type, count], index) => {
+            const colors = [
+              { bg: 'from-blue-600/20 to-blue-800/20', border: 'border-blue-500/30', text: 'text-blue-300', icon: 'text-blue-400' },
+              { bg: 'from-green-600/20 to-green-800/20', border: 'border-green-500/30', text: 'text-green-300', icon: 'text-green-400' },
+              { bg: 'from-purple-600/20 to-purple-800/20', border: 'border-purple-500/30', text: 'text-purple-300', icon: 'text-purple-400' },
+              { bg: 'from-orange-600/20 to-orange-800/20', border: 'border-orange-500/30', text: 'text-orange-300', icon: 'text-orange-400' },
+              { bg: 'from-pink-600/20 to-pink-800/20', border: 'border-pink-500/30', text: 'text-pink-300', icon: 'text-pink-400' }
+            ]
+            const color = colors[index % colors.length]
+            
+            return (
+              <div key={type} className={`bg-gradient-to-br ${color.bg} rounded-xl p-6 border ${color.border}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={`${color.text} text-xl font-medium`}>{type}</p>
+                    <p className="text-5xl font-bold text-white">{count}</p>
+                  </div>
+                  <Bell className={`w-8 h-8 ${color.icon}`} />
+                </div>
+              </div>
+            )
+          })}
+      </div>
+
+      {/* Vehicle Cards Dashboard */}
+      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-6 border border-purple-500/30">
+        <VehicleCardsDashboard company={company} />
+      </div>
+
+      {/* Original Notification Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-xl p-6 border border-blue-500/30">
           <div className="flex items-center justify-between">
