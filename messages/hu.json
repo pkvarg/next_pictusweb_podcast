@@ -197,6 +197,18 @@
     "heroFeature6": "Okmányok érvényessége",
     "heroButton": "Ingyenes bemutató",
 
+    "dashboardTitle": "FleetSync Dashboard",
+    "dashboardSubtitle": "Járműkezelés",
+    "dashboardTotalVehicles": "Összes jármű",
+    "dashboardThisMonth": "Ez a hónap",
+    "dashboardUpcomingTasks": "Közelgő feladatok",
+    "dashboardTechInspection": "Műszaki vizsga - BA 123 AB",
+    "dashboardWinterTires": "Téli gumik - BA 456 CD",
+    "dashboardService": "Szerviz - BA 789 EF",
+    "dashboardDays7": "7 nap",
+    "dashboardDays14": "14 nap",
+    "dashboardCompleted": "Befejezve",
+
     "mockupTK": "Műszaki vizsga",
     "mockupTKDate": "2025.03.15",
     "mockupTKStatus": "✓ Értesítés elküldve",

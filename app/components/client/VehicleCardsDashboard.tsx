@@ -380,21 +380,21 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 md:gap-6">
+                      <div className="flex items-center gap-3 md:gap-6 mr-8">
                         {vehicle.daysToNextTask !== null && (
                           <div className="text-center md:text-right">
-                            <p className="text-lg md:text-xl font-medium text-purple-300">
+                            <p className="text-lg md:text-xl font-normal text-white">
                               Nasledujúca úloha
                             </p>
-                            <p className="text-5xl md:text-8xl font-bold text-purple-300">
+                            <p className="text-5xl md:text-8xl font-bold text-white">
+                              <span className="text-xl md:text-3xl font-medium text-white">o</span>{' '}
                               {vehicle.daysToNextTask}{' '}
-                              <span className="text-xl md:text-2xl font-medium text-purple-300">
+                              <span className="text-xl md:text-2xl font-medium text-white">
                                 dní
                               </span>
                             </p>
                           </div>
                         )}
-                        <div className="text-purple-400">{getStatusIcon(vehicle.urgencyLevel)}</div>
                       </div>
                     </div>
 

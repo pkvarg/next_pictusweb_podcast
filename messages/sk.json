@@ -197,6 +197,18 @@
     "heroFeature6": "Platnosť dokladov",
     "heroButton": "Získajte ukážku zdarma",
 
+    "dashboardTitle": "FleetSync Dashboard",
+    "dashboardSubtitle": "Správa vozidiel",
+    "dashboardTotalVehicles": "Celkom vozidiel",
+    "dashboardThisMonth": "Tento mesiac",
+    "dashboardUpcomingTasks": "Nadchádzajúce úlohy",
+    "dashboardTechInspection": "Technická kontrola - BA 123 AB",
+    "dashboardWinterTires": "Zimné pneumatiky - BA 456 CD",
+    "dashboardService": "Servis - BA 789 EF",
+    "dashboardDays7": "7 dní",
+    "dashboardDays14": "14 dní",
+    "dashboardCompleted": "Dokončené",
+
     "mockupTK": "TK termín",
     "mockupTKDate": "15.03.2025",
     "mockupTKStatus": "✓ Upozornenie odoslané",

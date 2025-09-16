@@ -193,6 +193,18 @@
     "heroFeature6": "Documents expiry",
     "heroButton": "Get free demo",
 
+    "dashboardTitle": "FleetSync Dashboard",
+    "dashboardSubtitle": "Vehicle Management",
+    "dashboardTotalVehicles": "Total Vehicles",
+    "dashboardThisMonth": "This Month",
+    "dashboardUpcomingTasks": "Upcoming Tasks",
+    "dashboardTechInspection": "Tech inspection - BA 123 AB",
+    "dashboardWinterTires": "Winter tires - BA 456 CD",
+    "dashboardService": "Service - BA 789 EF",
+    "dashboardDays7": "7 days",
+    "dashboardDays14": "14 days",
+    "dashboardCompleted": "Completed",
+
     "mockupTK": "Tech inspection",
     "mockupTKDate": "15.03.2025",
     "mockupTKStatus": "✓ Notification sent",

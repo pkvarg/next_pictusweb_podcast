@@ -30,7 +30,7 @@ const ClientZone = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">Pictusweb</h1>
-                  <p className="text-lg text-purple-300 hidden sm:block">Klientska zóna</p>
+                  <p className="text-lg text-purple-300 hidden sm:block">FleetSync</p>
                 </div>
               </Link>
             </div>
@@ -60,9 +60,7 @@ const ClientZone = () => {
             <h1 className="text-5xl font-light text-white mb-6 leading-tight">
               {t('welcomeTitle')}
             </h1>
-            <p className="text-3xl text-white mb-8 leading-relaxed font-light max-w-3xl mx-auto">
-              {t('welcomeSubtitle')}
-            </p>
+            <h2 className="text-5xl lg:text-6xl font-light leading-tight text-center">FleetSync</h2>
           </div>
         </section>
 

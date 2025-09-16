@@ -1,15 +1,15 @@
 import Footer from '@/app/components/Footer'
 import PagesHeader from '@/app/components/PagesHeader'
-import { CheckCircle, Car, Clock, Shield, AlertTriangle, Calculator } from 'lucide-react'
+import { CheckCircle, Calculator, BarChart3, Users, Calendar, Bell } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 
 export default async function Vehicles({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
-  
+
   // Enable static rendering for next-intl
   setRequestLocale(locale)
-  
+
   const t = await getTranslations('Automatizations')
 
   return (
@@ -17,17 +17,17 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
       <PagesHeader />
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-20">
+        <h1 className="text-5xl lg:text-6xl font-light leading-tight text-center">FleetSync</h1>
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h1 className="text-5xl lg:text-6xl font-light mb-6 leading-tight">
-              FleetSync
+            <h2 className="text-4xl lg:text-5xl font-light mb-6 leading-tight">
               <br />
               {t('heroTitle1')}
               <br />
               {t('heroTitle2')}
               <br />
               <span className="text-purple-400">{t('heroTitle3')}</span>
-            </h1>
+            </h2>
             <p className="text-2xl text-white mb-8 leading-relaxed font-light">
               {t('heroSubtitle1')} <br /> {t('heroSubtitle2')}
             </p>
@@ -65,33 +65,69 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             </Link>
           </div>
 
-          {/* Hero Illustration - matching your style */}
+          {/* Client Dashboard Mockup */}
           <div className="relative">
-            <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm font-light">
-                  <Car className="w-8 h-8 text-purple-400 mb-2" />
-                  <div className="text-2xl text-white">{t('mockupTK')}</div>
-                  <div className="text-lg font-semibold">{t('mockupTKDate')}</div>
-                  <div className="text-md text-green-400 mt-1">{t('mockupTKStatus')}</div>
+            <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-6 backdrop-blur-sm border border-purple-500/30">
+              {/* Dashboard Header */}
+              <div className="bg-white/10 rounded-2xl p-4 mb-4 backdrop-blur-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <BarChart3 className="w-6 h-6 text-purple-400" />
+                    <div>
+                      <div className="font-normal text-2xl text-white">{t('dashboardTitle')}</div>
+                      <div className="text-white text-lg">{t('dashboardSubtitle')}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Bell className="w-5 h-5 text-orange-400" />
+                    <span className="bg-orange-400 text-black px-2 py-1 rounded-full text-xs font-bold">
+                      3
+                    </span>
+                  </div>
                 </div>
-                <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm font-light">
-                  <Clock className="w-8 h-8 text-orange-400 mb-2" />
-                  <div className="text-2xl text-white">{t('mockupTires')}</div>
-                  <div className="text-lg font-semibold">{t('mockupTiresDate')}</div>
-                  <div className="text-md text-orange-400 mt-1">{t('mockupTiresStatus')}</div>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-blue-400" />
+                    <div>
+                      <div className="text-md text-white">{t('dashboardTotalVehicles')}</div>
+                      <div className="text-xl font-bold text-white">12</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm font-light">
-                  <Shield className="w-8 h-8 text-blue-400 mb-2" />
-                  <div className="text-2xl text-white">{t('mockupService')}</div>
-                  <div className="text-lg font-semibold">{t('mockupServiceKm')}</div>
-                  <div className="text-md text-blue-400 mt-1">{t('mockupServiceStatus')}</div>
+                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-green-400" />
+                    <div>
+                      <div className="text-md text-white">{t('dashboardThisMonth')}</div>
+                      <div className="text-xl font-bold text-white">2</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm font-light">
-                  <AlertTriangle className="w-8 h-8 text-red-400 mb-2" />
-                  <div className="text-2xl text-white">{t('mockupInsurance')}</div>
-                  <div className="text-lg font-semibold">{t('mockupInsuranceDate')}</div>
-                  <div className="text-md text-red-400 mt-1">{t('mockupInsuranceStatus')}</div>
+              </div>
+
+              {/* Upcoming Tasks */}
+              <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                <div className="text-xl font-normal text-white mb-4 flex items-center gap-2">
+                  <Bell className="w-6 h-6" />
+                  {t('dashboardUpcomingTasks')}
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-lg">
+                    <span className="text-white font-normal">{t('dashboardTechInspection')}</span>
+                    <span className="text-red-500 font-normal">{t('dashboardDays7')}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-lg">
+                    <span className="text-white font-normal">{t('dashboardWinterTires')}</span>
+                    <span className="text-orange-400 font-normal">{t('dashboardDays14')}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-lg">
+                    <span className="text-white font-normal">{t('dashboardService')}</span>
+                    <span className="text-green-500 font-normal">{t('dashboardCompleted')}</span>
+                  </div>
                 </div>
               </div>
             </div>
