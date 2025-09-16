@@ -15,7 +15,7 @@
     "footerForClients": "Ügyfeleknek",
 
     "navbarOffer": "Ajánlat",
-    "navbarAutomatizations": "Automatizálás",
+    "navbarAutomatizations": "FleetSync",
     "navbarPodcasts": "Podcastok",
     "navbarProjects": "Projektek",
     "navbarContact": "Kapcsolat",
@@ -124,13 +124,15 @@
     "latestTitle": "Legújabb",
     "latestTitleHighlight": "AI megoldások",
 
-    "service1Title": "Értesítések az Ön járműveihez",
-    "service1Subtitle": "Intelligens értesítések céges járművekhez",
+    "service1Title": "FleetSync",
+    "service1Subtitle": "Járművei intelligens kezelése",
     "service1Description": "Szüntesse meg a bírságokat az elmulasztott vizsgákért és takarítson meg időt automatikus értesítésekkel.",
     "service1Feature1": "Műszaki vizsgák",
     "service1Feature2": "Gumiabroncs cserék",
     "service1Feature3": "Szerviz ellenőrzések",
     "service1Feature4": "Biztosítási határidők",
+    "service1Feature5": "Autópálya-matricák",
+    "service1Feature6": "Okmányok érvényessége",
     "service1Price": "€60/jármű/évtől",
     "service1Badge": "ÚJ",
 
@@ -191,6 +193,8 @@
     "heroFeature2": "Gumiabroncs cserék",
     "heroFeature3": "Szerviz ellenőrzések",
     "heroFeature4": "Biztosítási határidők",
+    "heroFeature5": "Autópálya-matricák",
+    "heroFeature6": "Okmányok érvényessége",
     "heroButton": "Ingyenes bemutató",
 
     "mockupTK": "Műszaki vizsga",

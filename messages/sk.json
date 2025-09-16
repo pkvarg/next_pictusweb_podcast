@@ -15,7 +15,7 @@
     "footerForClients": "Pre klientov",
 
     "navbarOffer": "Ponuka",
-    "navbarAutomatizations": "Automatizácie",
+    "navbarAutomatizations": "FleetSync",
     "navbarPodcasts": "Podcasty",
     "navbarProjects": "Projekty",
     "navbarContact": "Kontakt",
@@ -124,13 +124,15 @@
     "latestTitle": "Najnovšie",
     "latestTitleHighlight": "AI riešenia",
 
-    "service1Title": "Notifikácie pre Vaše vozidlá",
-    "service1Subtitle": "Inteligentné upozornenia pre firemné vozidlá",
-    "service1Description": "Eliminujte pokuty za zmeškanú TK a ušetrite čas s automatickými upozorneniami na technické kontroly, výmeny pneumatík a servisné prehliadky.",
+    "service1Title": "FleetSync",
+    "service1Subtitle": "Inteligentná správa vašich vozidiel",
+    "service1Description": "Eliminujte pokuty za zmeškanú TK a ušetrite čas s automatickými upozorneniami.",
     "service1Feature1": "Technické kontroly",
     "service1Feature2": "Výmeny pneumatík",
     "service1Feature3": "Servisné prehliadky",
     "service1Feature4": "Poistné termíny",
+    "service1Feature5": "Diaľničné známky",
+    "service1Feature6": "Platnosť dokladov",
     "service1Price": "Od €60/vozidlo/rok",
     "service1Badge": "NOVÉ",
 
@@ -191,6 +193,8 @@
     "heroFeature2": "Výmeny pneumatík",
     "heroFeature3": "Servisné prehliadky",
     "heroFeature4": "Poistné termíny",
+    "heroFeature5": "Diaľničné známky",
+    "heroFeature6": "Platnosť dokladov",
     "heroButton": "Získajte ukážku zdarma",
 
     "mockupTK": "TK termín",

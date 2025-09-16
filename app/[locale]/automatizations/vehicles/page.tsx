@@ -20,6 +20,8 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="text-5xl lg:text-6xl font-light mb-6 leading-tight">
+              FleetSync
+              <br />
               {t('heroTitle1')}
               <br />
               {t('heroTitle2')}
@@ -45,6 +47,14 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
               <div className="flex items-center gap-2 bg-purple-800/30 px-4 py-2 rounded-full">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span>{t('heroFeature4')}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-purple-800/30 px-4 py-2 rounded-full">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>{t('heroFeature5')}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-purple-800/30 px-4 py-2 rounded-full">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>{t('heroFeature6')}</span>
               </div>
             </div>
             <Link
@@ -197,6 +207,14 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
               <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
               <span>{t('feature6')}</span>
+            </div>
+            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
+              <span>{t('heroFeature5')}</span>
+            </div>
+            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
+              <span>{t('heroFeature6')}</span>
             </div>
           </div>
         </div>
