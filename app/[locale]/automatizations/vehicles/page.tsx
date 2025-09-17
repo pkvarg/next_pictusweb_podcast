@@ -257,7 +257,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
       </section>
 
       {/* ROI Calculator Section */}
-      <section className="bg-gradient-to-r from-green-900/20 to-blue-900/20 py-20">
+      {/* <section className="bg-gradient-to-r from-green-900/20 to-blue-900/20 py-20">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-light mb-6">
@@ -300,7 +300,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span>{t('calculatorServiceCost')}</span>
-                    <span className="font-semibold">€900</span>
+                    <span className="font-semibold">€500</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>{t('calculatorFines')}</span>
@@ -330,7 +330,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Pricing Section */}
       <section className="py-20">
@@ -347,7 +347,8 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30">
               <h3 className="text-2xl font-semibold mb-2">{t('starterTitle')}</h3>
               <div className="text-4xl font-bold mb-6">
-                {t('starterPrice')}
+                40€
+                {/* {t('starterPrice')} */}
                 <span className="text-lg text-gray-400 font-thin">{t('starterPriceUnit')}</span>
               </div>
               <ul className="space-y-3 mb-8">
@@ -379,7 +380,8 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             <div className="bg-gradient-to-br from-purple-600/30 to-pink-600/30 backdrop-blur-sm rounded-3xl p-8 border-2 border-purple-500/50 relative">
               <h3 className="text-2xl font-semibold mb-2">{t('businessTitle')}</h3>
               <div className="text-4xl font-bold mb-6">
-                {t('businessPrice')}
+                60€
+                {/* {t('businessPrice')} */}
                 <span className="text-lg text-gray-400 font-thin">{t('businessPriceUnit')}</span>
               </div>
               <ul className="space-y-3 mb-8">
