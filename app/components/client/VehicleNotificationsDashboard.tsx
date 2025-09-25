@@ -130,15 +130,16 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             return aReg.localeCompare(bReg)
           })
 
-          // Count unique tasks (same type + duty date = one task) for top widgets
-          const uniqueTasksMap = new Map<string, VehicleNotification>()
+          // Count unique task groups (same type + duty date + vehicle = one group) for top widgets
+          // This matches the logic used in VehicleCardsDashboard
+          const uniqueTaskGroupsMap = new Map<string, VehicleNotification>()
           notifications.forEach((n: VehicleNotification) => {
-            const taskKey = `${n.notificationType || 'Unknown'}-${n.dutyDate || 'No Date'}`
-            if (!uniqueTasksMap.has(taskKey)) {
-              uniqueTasksMap.set(taskKey, n)
+            const taskKey = `${n.vehicleRegistration || 'Unknown'}-${n.notificationType || 'Unknown'}-${n.dutyDate || 'No Date'}`
+            if (!uniqueTaskGroupsMap.has(taskKey)) {
+              uniqueTaskGroupsMap.set(taskKey, n)
             }
           })
-          const uniqueTasks = Array.from(uniqueTasksMap.values())
+          const uniqueTaskGroups = Array.from(uniqueTaskGroupsMap.values())
 
           const processedStats: DashboardStats = {
             totalNotifications: notifications.length, // Keep original for notification-based widgets
@@ -151,7 +152,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             emailsSent: notifications.filter((n: VehicleNotification) => n.emailSentAt !== null)
               .length,
             smsSent: notifications.filter((n: VehicleNotification) => n.smsSentAt !== null).length,
-            notificationTypes: uniqueTasks.reduce(
+            notificationTypes: uniqueTaskGroups.reduce(
               (acc: { [key: string]: number }, n: VehicleNotification) => {
                 if (n.notificationType) {
                   acc[n.notificationType] = (acc[n.notificationType] || 0) + 1
@@ -159,7 +160,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                 return acc
               },
               {},
-            ), // Count unique tasks for task-based widgets
+            ), // Count unique task groups for task-based widgets
             recentNotifications: notifications
               .sort(
                 (a: VehicleNotification, b: VehicleNotification) =>
@@ -362,10 +363,9 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Task Type Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         {Object.entries(stats.notificationTypes)
-          .sort(([, a], [, b]) => b - a)
-          .slice(0, 5)
+          .sort(([a], [b]) => a.localeCompare(b))
           .map(([type, count], index) => {
             const colors = [
               {
