@@ -356,7 +356,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
           <Car className="w-8 h-8 text-purple-400" />
         </div>
         <div>
-          <h2 className="text-5xl font-bold text-white">{company} Dashboard</h2>
+          <h2 className="text-5xl font-bold text-white">Dashboard</h2>
           <p className="text-white text-2xl">Správa notifikácií vozidiel</p>
         </div>
       </div>

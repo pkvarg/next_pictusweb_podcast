@@ -8,7 +8,30 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const company = searchParams.get('company')
 
-    const whereClause = company ? { company: { equals: company, mode: 'insensitive' as const } } : {}
+    let whereClause = {}
+
+    if (company) {
+      if (company === 'all') {
+        // Show all organizations
+        whereClause = {}
+      } else if (company === 'demo') {
+        // Show all organizations that start with 'demo' or 'DEMO' (case insensitive)
+        whereClause = {
+          company: {
+            startsWith: 'demo',
+            mode: 'insensitive' as const
+          }
+        }
+      } else {
+        // Show only specific organization (exact match)
+        whereClause = {
+          company: {
+            equals: company,
+            mode: 'insensitive' as const
+          }
+        }
+      }
+    }
 
     const notifications = await prisma.vehicleNotification.findMany({
       where: whereClause,

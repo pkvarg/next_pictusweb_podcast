@@ -60,6 +60,7 @@ const ClientZone = () => {
             <h1 className="text-5xl font-light text-white mb-6 leading-tight">
               {t('welcomeTitle')}
             </h1>
+            <p className="text-3xl text-purple-300 mb-6">{session?.user?.name}</p>
             <h2 className="text-5xl lg:text-6xl font-light leading-tight text-center">FleetSync</h2>
           </div>
         </section>
@@ -79,14 +80,19 @@ const ClientZone = () => {
           </section>
         )} */}
 
-        {(session?.user?.organization === 'all' ||
-          'demo'.startsWith(session?.user?.organization || '')) && (
-          <section id="demo" className="mb-16">
+        {session?.user?.organization && (
+          <section id="dashboard" className="mb-16">
             <div className="text-center mb-8">
-              {/* <h2 className="text-4xl font-light text-white mb-4">Demo Dashboard</h2> */}
+              {/* <h2 className="text-4xl font-light text-white mb-4">Dashboard</h2> */}
             </div>
             <div className="md:bg-gradient-to-br md:from-purple-600/20 md:to-pink-600/20 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-purple-500/30">
-              <VehicleNotificationsDashboard company="DEMO" />
+              <VehicleNotificationsDashboard 
+                company={
+                  session.user.organization === 'all' ? 'all' :
+                  session.user.organization === 'demo' ? 'demo' :
+                  session.user.organization
+                } 
+              />
             </div>
           </section>
         )}
