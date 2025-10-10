@@ -13,6 +13,7 @@ interface Testimonial {
   designation: string
   company: string
   image: string
+  companyUrl?: string
 }
 
 interface FeedbackCardProps extends Testimonial {
@@ -26,23 +27,36 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
   designation,
   company,
   image,
+  companyUrl,
 }) => (
   <motion.div
     initial={{ x: 250 }}
     animate={{ x: 0 }}
     transition={{ duration: 3 }}
     viewport={{ once: true, amount: 0.25 }}
-    className='p-6 rounded-3xl xs:w-[320px] lg:mt-0 lg:mb-0 w-full bg-gray-800'
+    className="p-6 rounded-3xl xs:w-[320px] lg:mt-0 lg:mb-0 w-full bg-gray-800"
   >
-    <div className='mt-1'>
-      <p className='text-white tracking-wider text-[20px]'>&quot;{testimonial}&quot;</p>
+    <div className="mt-1">
+      <p className="text-white tracking-wider text-[20px]">&quot;{testimonial}&quot;</p>
 
-      <div className='mt-7 flex flex-row justify-end mr-[5%] items-center gap-8 text-[#93A7B7]'>
-        <p className='font-medium text-[18px]'>
-          <span className='blue-text-gradient'>@</span> {name}
+      <div className="mt-7 flex flex-row justify-end mr-[5%] items-center gap-8 text-[#93A7B7]">
+        <p className="font-medium text-[18px]">
+          <span className="blue-text-gradient">@</span> {name}
         </p>
-        <p className='text-secondary text-[16px]'>
-          {designation} - {company}
+        <p className="text-secondary text-[16px]">
+          {designation} -{' '}
+          {companyUrl ? (
+            <a
+              href={companyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors cursor-pointer underline"
+            >
+              {company}
+            </a>
+          ) : (
+            company
+          )}
         </p>
 
         <Image
@@ -50,7 +64,7 @@ const FeedbackCard: React.FC<FeedbackCardProps> = ({
           alt={`feedback_by-${name}`}
           width={40}
           height={40}
-          className='w-10 h-10 rounded-full object-cover'
+          className="w-10 h-10 rounded-full object-cover"
         />
       </div>
     </div>
@@ -66,6 +80,7 @@ const Feedbacks: React.FC = () => {
       designation: 'Designer',
       company: 'IoanaM',
       image: 'ionuca1.webp',
+      companyUrl: 'https://ioana-illustrations.eu/',
     },
     {
       testimonial: t('reviewsTom'),
@@ -73,6 +88,7 @@ const Feedbacks: React.FC = () => {
       designation: 'CEO',
       company: 'Dovala Construction',
       image: 'tomas1.webp',
+      companyUrl: 'https://www.kvalitnamontaz.sk/',
     },
     {
       testimonial: t('reviewsLeo'),
@@ -80,6 +96,7 @@ const Feedbacks: React.FC = () => {
       designation: 'Manager',
       company: 'prud.sk',
       image: 'leo1.webp',
+      companyUrl: 'https://prud.sk/',
     },
     {
       testimonial: t('reviewsMich'),
@@ -87,6 +104,7 @@ const Feedbacks: React.FC = () => {
       designation: t('reviewsDesignationMich'),
       company: 'michaldovala.sk',
       image: 'michal.webp',
+      companyUrl: 'https://michaldovala.sk/',
     },
     {
       testimonial: t('reviewsSam'),
@@ -94,6 +112,15 @@ const Feedbacks: React.FC = () => {
       designation: t('reviewsDesignationSam'),
       company: 'cestazivota.sk',
       image: 'sam1.webp',
+      companyUrl: 'https://cestazivota.sk',
+    },
+    {
+      testimonial: t('reviewsVlado'),
+      name: 'Vladimír Chovanec',
+      designation: t('reviewsDesignationVlado'),
+      company: 'fyziology.sk',
+      image: 'vlado.webp',
+      companyUrl: 'https://fyziology.sk',
     },
   ]
   return (
@@ -101,11 +128,11 @@ const Feedbacks: React.FC = () => {
       <div className={`rounded-2xl min-h-[200px]`}>
         <motion.div
           variants={staggerContainer(0.1, 0.3)}
-          initial='hidden'
-          whileInView='show'
+          initial="hidden"
+          whileInView="show"
           viewport={{ once: false, amount: 0.25 }}
         >
-          <h1 className='text-[35px] text-center lg:mt-16 lg:mb-16'>
+          <h1 className="text-[35px] text-center lg:mt-16 lg:mb-16">
             <TypingText title={t('reviewsTitle')} />
           </h1>
         </motion.div>

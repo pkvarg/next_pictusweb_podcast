@@ -40,7 +40,32 @@ const Projects: React.FC = () => {
   const typescript = '/tech/typescript.webp'
   const express = '/tech/express.webp'
   const postgres = '/tech/postgres.webp'
+  const hono = '/tech/hono.svg'
   const projects: Project[] = [
+    {
+      name: 'bow4bass.com',
+      description: t('ourProjectsBow4bass'),
+      tags: [
+        {
+          name: 'next.js',
+          image: next,
+        },
+        {
+          name: 'Typescript',
+          image: typescript,
+        },
+        {
+          name: 'Hono',
+          image: hono,
+        },
+        {
+          name: 'MongoDB',
+          image: mongo,
+        },
+      ],
+      image: 'bow4bass.webp',
+      website: 'https://bow4bass.com/',
+    },
     {
       name: 'ioana-illustrations.eu',
       description: t('ourProjectsIoana'),
@@ -234,7 +259,13 @@ const Projects: React.FC = () => {
           className="bg-gray-900 p-5 rounded-2xl sm:w-[360px] w-full"
         >
           <div className="relative w-full h-[230px]">
-            <Image src={`/${image}`} alt="project_image" className="w-full h-full rounded-2xl object-cover" width={360} height={230} />
+            <Image
+              src={`/${image}`}
+              alt="project_image"
+              className="w-full h-full rounded-2xl object-cover"
+              width={360}
+              height={230}
+            />
           </div>
 
           <div className="mt-5">

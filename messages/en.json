@@ -37,6 +37,7 @@
     "offerButton": "Get a quote",
 
     "ourProjectsTitle": "Projects",
+    "ourProjectsBow4bass": "Bow maker presentational web",
     "ourProjectsIoana": "Simple presentational web of a designer",
     "ourProjectsPrud": "Modern book eshop",
     "ourProjectsDvl": "Presentational web of a carpenter",
@@ -52,9 +53,11 @@
     "reviewsLeo": "I have been working with Peter for many years in different areas and I am always pleased by his friendly approach and willingness to help. Thank you.",
     "reviewsMich": "If you are looking for someone reliable and smart, Peter is your man. I am very satisfied with his work and recommend working with him.",
     "reviewsSam": "Excellent cooperation, easy understanding of my requests and comments, flexible for options that were subject to my decision.",
+    "reviewsVlado": "I contacted Pictusweb for styling the graphic design of my website. I rate the cooperation very positively, the gentleman was very pleasant, helpful and fast in his work. I definitely recommend to anyone looking for styling for their website.",
 
     "reviewsDesignationMich": "Real Estate Agent",
     "reviewsDesignationSam": "Author",
+    "reviewsDesignationVlado": "Physiotherapist",
 
     "getInTouch": "Do you want to find out more?",
     "getInTouchButton": "Get in touch!",

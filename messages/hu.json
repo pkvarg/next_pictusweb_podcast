@@ -51,6 +51,7 @@
     "projectsDetails": "Részletek",
 
     "ourProjectsTitle": "Projektek",
+    "ourProjectsBow4bass": "Vonókészítő bemutatkozó weboldala",
     "ourProjectsIoana": "Designer bemutatkozó weboldala",
     "ourProjectsPrud": "Modern könyv webshop",
     "ourProjectsDvl": "Szolgáltatások bemutatkozó weboldala",
@@ -66,9 +67,11 @@
     "reviewsLeo": "Péterrel már hosszú évek óta dolgozom együtt különböző területeken, és mindig örülök barátságos hozzáállásának és segítőkészségének. Köszönöm.",
     "reviewsMich": "Ha megbízható és ügyes embert keres, Péter az Ön embere. Nagyon elégedett vagyok a munkájával és ajánlom vele az együttműködést.",
     "reviewsSam": "Kiváló együttműködés, könnyen megértette az igényeimet és észrevételeimet, rugalmasság a lehetőségekben, amelyek a döntésem tárgyát képezték.",
+    "reviewsVlado": "A Pictuswebet a webolalam grafikai dizájnjának stílusához kerestem meg. Az együttműködést nagyon pozitívan értékelem, az úr nagyon kedves, segítőkész és gyors volt a munkájában. Mindenképpen ajánlom mindenkinek, aki stílust keres weboldalához.",
 
     "reviewsDesignationMich": "Ingatlanközvetítő",
     "reviewsDesignationSam": "Szerző",
+    "reviewsDesignationVlado": "Fizioterápeuta",
 
     "getInTouch": "További információra van szüksége?",
     "getInTouchButton": "Írjon nekünk!",
