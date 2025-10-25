@@ -34,7 +34,7 @@ const Gdpr = () => {
 
           <h4>{t('gdprCookiesAnalyticsTitle')}</h4>
           <p style={{ whiteSpace: 'pre-line' }}>{t('gdprCookiesAnalyticsText')}</p>
-          <p style={{ whiteSpace: 'pre-line' }}>{t('gdprCookiesAnalyticsDetails')}</p>
+          
 
           <h4>{t('gdprCookiesNotUsedTitle')}</h4>
           <p style={{ whiteSpace: 'pre-line' }}>{t('gdprCookiesNotUsedText')}</p>

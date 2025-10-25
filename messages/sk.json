@@ -137,7 +137,7 @@
     "gdprCookiesEssentialText": "Tieto cookies sú potrebné pre základné fungovanie webu a nemožno ich vypnúť:\n- Uloženie Vášho súhlasu s cookies (CookieConsent) - 365 dní\n- Funkčnosť kontaktného formulára",
     "gdprCookiesAnalyticsTitle": "2. Analytické cookies (voliteľné)",
     "gdprCookiesAnalyticsText": "S Vaším súhlasom používame vlastný analytický nástroj Umami na:\n- Meranie návštevnosti stránky\n- Analýzu správania návštevníkov (anonymne)\n- Zlepšenie používateľského zážitku",
-    "gdprCookiesAnalyticsDetails": "Poskytovateľ: Vlastný server (umami-p00gs00gwcwo00s4k4c4kgg8.pictusweb.com)\nÚčel: Webová analytika\nDoba uchovávania: 24 mesiacov\nPrávny základ: Váš súhlas (čl. 6 ods. 1 písm. a) GDPR)",
+
     "gdprCookiesNotUsedTitle": "3. Čo nepoužívame",
     "gdprCookiesNotUsedText": "Nepoužívame:\n- Marketingové cookies\n- Reklamné cookies tretích strán\n- Cookies sociálnych sietí\n- Sledovacie cookies tretích strán",
     "gdprCookiesManagementTitle": "Správa súhlasu",
