@@ -104,7 +104,7 @@ const Contact = () => {
   const logBotAttempt = async (
     detectionType: string,
     detectionDetails: string,
-    timeSpent?: number
+    timeSpent?: number,
   ) => {
     try {
       await fetch('/api/bot-log', {
@@ -131,8 +131,8 @@ const Contact = () => {
   }
 
   const form = useRef<HTMLFormElement>(null)
-  const x = process.env.VITE_EMAIL_EXTRA_ONE
-  const y = process.env.VITE_EMAIL_EXTRA_TWO
+  const x = process.env.NEXT_PUBLIC_EMAIL_EXTRA_ONE
+  const y = process.env.NEXT_PUBLIC_EMAIL_EXTRA_TWO
   const [passwordGroupOne, setPasswordGroupOne] = useState(x)
   const [passwordGroupTwo, setPasswordGroupTwo] = useState(y)
   const origin = 'PICTUSWEB.SK'
@@ -171,11 +171,7 @@ const Contact = () => {
     // Anti-spam Check 1: Honeypot field
     if (honeypot !== '') {
       const timeSpent = Date.now() - formStartTime
-      await logBotAttempt(
-        'honeypot',
-        `Honeypot field filled with value: "${honeypot}"`,
-        timeSpent
-      )
+      await logBotAttempt('honeypot', `Honeypot field filled with value: "${honeypot}"`, timeSpent)
       setMessage(t('contactError'))
       setName('')
       setEmail('')
@@ -192,7 +188,7 @@ const Contact = () => {
       await logBotAttempt(
         'time-based',
         `Form submitted too quickly: ${timeSpent}ms (minimum: 3000ms)`,
-        timeSpent
+        timeSpent,
       )
       setMessage(t('contactError'))
       setName('')
@@ -207,11 +203,7 @@ const Contact = () => {
     // Anti-spam Check 3: Content validation
     if (isSpamContent(name) || isSpamContent(mailMessage)) {
       const spamReason = isSpamContent(name) ? 'name field' : 'message field'
-      await logBotAttempt(
-        'content-validation',
-        `Spam content detected in ${spamReason}`,
-        timeSpent
-      )
+      await logBotAttempt('content-validation', `Spam content detected in ${spamReason}`, timeSpent)
       setMessage(t('contactError'))
       setName('')
       setEmail('')
@@ -227,7 +219,7 @@ const Contact = () => {
       await logBotAttempt(
         'rate-limit',
         'Rate limit exceeded: More than 3 submissions in 1 hour',
-        timeSpent
+        timeSpent,
       )
       setMessage(t('contactError'))
       document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
@@ -239,7 +231,7 @@ const Contact = () => {
       await logBotAttempt(
         'honeypot-legacy',
         'Legacy honeypot password fields were modified',
-        timeSpent
+        timeSpent,
       )
       setMessage(t('contactError'))
       setName('')
@@ -363,7 +355,10 @@ const Contact = () => {
                     />
 
                     {/* Anti-spam: Honeypot field - hidden with CSS, bots will fill it */}
-                    <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }} aria-hidden="true">
+                    <div
+                      style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
+                      aria-hidden="true"
+                    >
                       <label htmlFor="website_url">Website</label>
                       <input
                         type="text"
