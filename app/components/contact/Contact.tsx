@@ -18,6 +18,17 @@ const Contact = () => {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
 
+  // Anti-spam: Time-based validation
+  const [formStartTime, setFormStartTime] = useState<number>(0)
+
+  // Anti-spam: Honeypot field
+  const [honeypot, setHoneypot] = useState('')
+
+  // Initialize form start time on mount
+  useEffect(() => {
+    setFormStartTime(Date.now())
+  }, [])
+
   useEffect(() => {
     try {
       const subject = searchParams.get('subject')
@@ -36,6 +47,87 @@ const Contact = () => {
 
   const handleCheckBox = () => {
     setCheckBox((current) => !current)
+  }
+
+  // Anti-spam: Content validation function
+  const isSpamContent = (text: string): boolean => {
+    if (!text || text.trim().length < 3) return true
+
+    // Check for excessive special characters (more than 40% of content)
+    const specialChars = text.match(/[^a-zA-Z0-9\s]/g) || []
+    if (specialChars.length / text.length > 0.4) return true
+
+    // Check for random character patterns (less than 20% vowels)
+    const vowels = text.match(/[aeiouAEIOUáéíóúýäëïöüÁÉÍÓÚÝ]/g) || []
+    if (vowels.length / text.length < 0.2) return true
+
+    // Check for excessive uppercase (more than 50% uppercase letters)
+    const uppercase = text.match(/[A-Z]/g) || []
+    const letters = text.match(/[a-zA-Z]/g) || []
+    if (letters && letters.length > 0 && uppercase.length / letters.length > 0.5) return true
+
+    // Check for repetitive characters (same char 5+ times in a row)
+    if (/(.)\1{4,}/.test(text)) return true
+
+    return false
+  }
+
+  // Anti-spam: Rate limiting (client-side)
+  const checkRateLimit = (): boolean => {
+    const storageKey = 'contact_form_submissions'
+    const now = Date.now()
+    const oneHour = 60 * 60 * 1000 // 1 hour in milliseconds
+    const maxSubmissions = 3
+
+    try {
+      const stored = localStorage.getItem(storageKey)
+      const submissions: number[] = stored ? JSON.parse(stored) : []
+
+      // Filter out submissions older than 1 hour
+      const recentSubmissions = submissions.filter((time) => now - time < oneHour)
+
+      if (recentSubmissions.length >= maxSubmissions) {
+        return false // Rate limit exceeded
+      }
+
+      // Add current submission and save
+      recentSubmissions.push(now)
+      localStorage.setItem(storageKey, JSON.stringify(recentSubmissions))
+      return true
+    } catch (error) {
+      // If localStorage is not available, allow submission
+      console.error('Rate limit check error:', error)
+      return true
+    }
+  }
+
+  const logBotAttempt = async (
+    detectionType: string,
+    detectionDetails: string,
+    timeSpent?: number
+  ) => {
+    try {
+      await fetch('/api/bot-log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          message: mailMessage,
+          honeypot,
+          detectionType,
+          detectionDetails,
+          locale,
+          origin,
+          timeSpent,
+        }),
+      })
+    } catch (error) {
+      console.error('Error logging bot attempt:', error)
+    }
   }
 
   const form = useRef<HTMLFormElement>(null)
@@ -73,24 +165,94 @@ const Contact = () => {
     }
   }
 
-  const sendEmail = (e: any) => {
+  const sendEmail = async (e: any) => {
     e.preventDefault()
 
-    if (passwordGroupOne !== x || passwordGroupTwo !== y) {
+    // Anti-spam Check 1: Honeypot field
+    if (honeypot !== '') {
+      const timeSpent = Date.now() - formStartTime
+      await logBotAttempt(
+        'honeypot',
+        `Honeypot field filled with value: "${honeypot}"`,
+        timeSpent
+      )
       setMessage(t('contactError'))
       setName('')
       setEmail('')
       setPhone('')
       setMailMessage('')
       increaseBots()
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
 
-      const element = document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+    // Anti-spam Check 2: Time-based validation (minimum 3 seconds)
+    const timeSpent = Date.now() - formStartTime
+    if (timeSpent < 3000) {
+      await logBotAttempt(
+        'time-based',
+        `Form submitted too quickly: ${timeSpent}ms (minimum: 3000ms)`,
+        timeSpent
+      )
+      setMessage(t('contactError'))
+      setName('')
+      setEmail('')
+      setPhone('')
+      setMailMessage('')
+      increaseBots()
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+
+    // Anti-spam Check 3: Content validation
+    if (isSpamContent(name) || isSpamContent(mailMessage)) {
+      const spamReason = isSpamContent(name) ? 'name field' : 'message field'
+      await logBotAttempt(
+        'content-validation',
+        `Spam content detected in ${spamReason}`,
+        timeSpent
+      )
+      setMessage(t('contactError'))
+      setName('')
+      setEmail('')
+      setPhone('')
+      setMailMessage('')
+      increaseBots()
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+
+    // Anti-spam Check 4: Rate limiting
+    if (!checkRateLimit()) {
+      await logBotAttempt(
+        'rate-limit',
+        'Rate limit exceeded: More than 3 submissions in 1 hour',
+        timeSpent
+      )
+      setMessage(t('contactError'))
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+
+    // Original honeypot check (keeping for backward compatibility)
+    if (passwordGroupOne !== x || passwordGroupTwo !== y) {
+      await logBotAttempt(
+        'honeypot-legacy',
+        'Legacy honeypot password fields were modified',
+        timeSpent
+      )
+      setMessage(t('contactError'))
+      setName('')
+      setEmail('')
+      setPhone('')
+      setMailMessage('')
+      increaseBots()
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
     } else {
       //callContactApi(name, email, phone, mailMessage)
-      callHonoAPI(name, email, phone, mailMessage)
+      await callHonoAPI(name, email, phone, mailMessage)
       increaseEmails()
-      const element = document.getElementById('contact')
-      element?.scrollIntoView({ behavior: 'smooth' })
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
       setName('')
       setPhone('')
       setEmail('')
@@ -199,6 +361,20 @@ const Contact = () => {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                     />
+
+                    {/* Anti-spam: Honeypot field - hidden with CSS, bots will fill it */}
+                    <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }} aria-hidden="true">
+                      <label htmlFor="website_url">Website</label>
+                      <input
+                        type="text"
+                        id="website_url"
+                        name="website_url"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col">

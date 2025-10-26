@@ -112,6 +112,23 @@ model VehicleNotification {
 }
 
 
+model BotLog {
+  id               String   @id @default(uuid())
+  name             String?
+  email            String?
+  phone            String?
+  message          String?
+  honeypot         String?
+  userAgent        String?
+  ipAddress        String?
+  timeSpent        Int? // milliseconds spent on form
+  detectionType    String // honeypot, time-based, content-validation, rate-limit
+  detectionDetails String? // additional context about what triggered detection
+  locale           String?
+  origin           String?
+  createdAt        DateTime @default(now())
+}
+
 enum Role {
   ADMIN
   CLIENT
