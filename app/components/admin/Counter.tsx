@@ -26,8 +26,7 @@ const Counter = () => {
     },
   }
 
-  const apiUrl = 'https://hono-api.pictusweb.com/api/stats/pictuswebsk'
-  //const apiUrl = 'http://localhost:3013/api/stats/pictuswebsk'
+  const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/stats/pictuswebsk`
 
   useEffect(() => {
     const getStats = async () => {

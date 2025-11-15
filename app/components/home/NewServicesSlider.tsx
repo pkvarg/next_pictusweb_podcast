@@ -25,7 +25,7 @@ const NewServicesSlider = () => {
       ],
       price: t('service1Price'),
       icon: Car,
-      link: '/automatizations/vehicles',
+      link: '/fleetsync',
       gradient: 'from-blue-600 to-purple-600',
       bgGradient: 'from-blue-900/20 to-purple-900/20',
       href: '/vozidla-notifikacie',

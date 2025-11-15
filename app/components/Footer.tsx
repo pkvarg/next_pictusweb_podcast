@@ -103,7 +103,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link
-                    href={`/automatizations/vehicles`}
+                    href={`/fleetsync`}
                     className="hover:text-purple-300 transition-colors"
                   >
                     {t('footerService6')}

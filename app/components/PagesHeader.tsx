@@ -11,8 +11,19 @@ const PagesHeader = () => {
   const [navbar, setNavbar] = useState(false)
   const t = useTranslations('Home')
   const { locale } = useParams()
-  const path = usePathname()
-  const page = path.slice(4)
+  const pathname = usePathname()
+
+  const isActive = (path: string) => {
+    // Remove locale prefix from pathname for comparison
+    const cleanPath = pathname.replace(/^\/(en|sk|hu)/, '')
+
+    if (path === '/#projects') {
+      // For anchor links, check if we're on home page
+      return cleanPath === '' || cleanPath === '/'
+    }
+
+    return cleanPath.startsWith(path)
+  }
 
   return (
     <nav id="navbar" className="w-full text-white bg-transparent">
@@ -67,30 +78,46 @@ const PagesHeader = () => {
             }`}
           >
             <ul className="text-[22.5px] lg:text-[22.5px] font-light justify-center space-y-4 md:flex md:space-x-6 md:space-y-0">
-              {page !== 'automatizations/vehicles' && (
-                <li>
-                  <Link href={`/automatizations/vehicles`} className="hover:text-[#0388f4]">
-                    {t('navbarAutomatizations')}
-                  </Link>
-                </li>
-              )}
-
-              {page !== 'podcast' && (
-                <li>
-                  <Link href={`/podcast`} className="hover:text-[#0388f4]">
-                    {t('navbarPodcasts')}
-                  </Link>
-                </li>
-              )}
+              <li>
+                <Link
+                  href={`/fleetsync`}
+                  className={`hover:text-[#0388f4] transition-colors ${
+                    isActive('/fleetsync') ? 'text-[#0388f4] font-normal' : ''
+                  }`}
+                >
+                  {t('navbarAutomatizations')}
+                </Link>
+              </li>
 
               <li>
-                <Link href={`/#projects`} className="hover:text-[#0388f4]">
+                <Link
+                  href={`/#projects`}
+                  className={`hover:text-[#0388f4] transition-colors ${
+                    isActive('/#projects') ? 'text-[#0388f4] font-normal' : ''
+                  }`}
+                >
                   {t('navbarProjects')}
                 </Link>
               </li>
 
               <li>
-                <Link href={`/contact`} className="hover:text-[#0388f4]">
+                <Link
+                  href={`/podcasts`}
+                  className={`hover:text-[#0388f4] transition-colors ${
+                    isActive('/podcasts') ? 'text-[#0388f4] font-normal' : ''
+                  }`}
+                >
+                  {t('navbarPodcasts')}
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href={`/contact`}
+                  className={`hover:text-[#0388f4] transition-colors ${
+                    isActive('/contact') ? 'text-[#0388f4] font-normal' : ''
+                  }`}
+                >
                   {t('navbarContact')}
                 </Link>
               </li>

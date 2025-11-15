@@ -144,8 +144,10 @@ const Contact = () => {
   }
 
   const increaseBots = async () => {
-    const apiUrl = 'https://hono-api.pictusweb.com/api/bots/pictuswebsk/increase'
-    //const apiUrl = 'http://localhost:3013/api/bots/pictuswebsk/increase'
+    const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/bots/pictuswebsk/increase`
+
+    console.log('API URL IN CTC***', apiUrl)
+
     try {
       const { data } = await axios.put(apiUrl, {}, config)
       console.log('data bots', data)
@@ -155,8 +157,8 @@ const Contact = () => {
   }
 
   const increaseEmails = async () => {
-    const apiUrl = 'https://hono-api.pictusweb.com/api/emails/pictuswebsk/increase'
-    //const apiUrl = 'http://localhost:3013/api/emails/pictuswebsk/increase'
+    const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/emails/pictuswebsk/increase`
+
     try {
       const { data } = await axios.put(apiUrl, {}, config)
       console.log('data email', data)
@@ -215,7 +217,7 @@ const Contact = () => {
     }
 
     // Anti-spam Check 4: Rate limiting
-    if (!checkRateLimit()) {
+    if (!checkRateLimit() && process.env.NEXT_PUBLIC_HONO_API_URL !== 'http://localhost:3013') {
       await logBotAttempt(
         'rate-limit',
         'Rate limit exceeded: More than 3 submissions in 1 hour',
@@ -279,8 +281,7 @@ const Contact = () => {
         subject,
       }
 
-      //const apiUrl = 'http://localhost:3013/api/contact'
-      const apiUrl = 'https://hono-api.pictusweb.com/api/contact'
+      const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/contact`
 
       // Make the API request
       const response = await fetch(apiUrl, {

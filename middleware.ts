@@ -28,7 +28,7 @@ const publicRoutes = ['/auth', '/en/auth', '/sk/auth', '/hu/auth']
 export default async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   const isLoggedIn = !!token
-  const userEmail = token?.email
+  const userRole = token?.role // Get role from JWT token
 
   const isProtectedRoute = protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
   const isAdminRoute = adminRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
@@ -47,18 +47,12 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}/auth/login`, req.url))
   }
 
-  // Check admin access - only allow if user email matches ADMIN_USERNAME
-  if (isAdminRoute && isLoggedIn && userEmail !== process.env.ADMIN_USERNAME) {
-    return NextResponse.redirect(new URL(`/${locale}`, req.url))
-  }
-
-  // Redirect admin user from client to admin area
-  if (
-    req.nextUrl.pathname.match(/^\/(en|sk|hu)?\/client/) &&
-    isLoggedIn &&
-    userEmail === process.env.ADMIN_USERNAME
-  ) {
-    return NextResponse.redirect(new URL(`/${locale}/admin`, req.url))
+  // Check admin access - user must have ADMIN role in JWT token
+  if (isAdminRoute && isLoggedIn) {
+    // Only allow access if user has ADMIN role (check both cases for compatibility)
+    if (userRole !== 'ADMIN' && userRole !== 'admin') {
+      return NextResponse.redirect(new URL(`/${locale}`, req.url))
+    }
   }
 
   // Apply internationalization middleware

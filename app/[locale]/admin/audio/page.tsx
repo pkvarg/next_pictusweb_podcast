@@ -89,9 +89,9 @@ const Audio = () => {
     e.preventDefault()
     setPreviewUrl('')
     if (!imagePrompt || !podcastTitle) {
-      toast({ 
+      toast({
         title: 'Title and Prompt must not be empty.',
-        variant: 'destructive'
+        variant: 'destructive',
       })
       return
     }
@@ -100,7 +100,7 @@ const Audio = () => {
       title: podcastTitle,
       prompt: imagePrompt,
     }
-    
+
     setIsSubmittingImage(true)
     try {
       const response = await fetch('/api/podcastAiImg', {
@@ -110,13 +110,13 @@ const Audio = () => {
         },
         body: JSON.stringify(data),
       })
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      
+
       const result = await response.json()
-      
+
       if (result.status === 'success' && result.data) {
         setImagePath(result.data)
         setPreviewUrl(result.data as string)
@@ -189,7 +189,7 @@ const Audio = () => {
         const formdata = new FormData()
         formdata.append('file', e.target.files[0])
 
-        const apiUrl = 'https://hono-api.pictusweb.com/api/upload/pictusweb'
+        const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/upload/pictusweb`
 
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -222,8 +222,10 @@ const Audio = () => {
   const downloadFile = async (url: string, filename: string) => {
     try {
       // Use our proxy API to handle CORS issues
-      const downloadUrl = `/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`
-      
+      const downloadUrl = `/api/download?url=${encodeURIComponent(
+        url,
+      )}&filename=${encodeURIComponent(filename)}`
+
       // Create a temporary link and trigger download
       const link = document.createElement('a')
       link.href = downloadUrl
@@ -232,7 +234,7 @@ const Audio = () => {
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      
+
       toast({ title: 'File download started!' })
     } catch (error) {
       console.error('Download failed:', error)
@@ -263,7 +265,7 @@ const Audio = () => {
       })
       return
     }
-    
+
     if (!voiceProvider) {
       toast({
         title: 'Please select a voice provider.',

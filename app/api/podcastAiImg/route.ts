@@ -7,29 +7,34 @@ const openai = new OpenAI({
   timeout: 60000, // 60 seconds timeout
 })
 
-
 export async function POST(req: NextRequest) {
   try {
     // Check if OpenAI API key is configured
     if (!process.env.OPENAI_API_KEY) {
       console.error('OPENAI_API_KEY is not configured')
-      return NextResponse.json({ 
-        status: 'fail', 
-        data: 'OpenAI API key is not configured' 
-      }, { status: 500 })
+      return NextResponse.json(
+        {
+          status: 'fail',
+          data: 'OpenAI API key is not configured',
+        },
+        { status: 500 },
+      )
     }
 
     const { title, prompt } = await req.json()
-    
+
     if (!title || !prompt) {
-      return NextResponse.json({ 
-        status: 'fail', 
-        data: 'Title and prompt are required' 
-      }, { status: 400 })
+      return NextResponse.json(
+        {
+          status: 'fail',
+          data: 'Title and prompt are required',
+        },
+        { status: 400 },
+      )
     }
-    
+
     console.log('Starting image generation for:', title)
-    
+
     const resAi = await openai.images.generate({
       model: 'dall-e-3',
       prompt: prompt,
@@ -37,7 +42,7 @@ export async function POST(req: NextRequest) {
       quality: 'standard',
       n: 1,
     })
-    
+
     console.log('OpenAI image generation completed')
 
     // const resAi = {
@@ -51,79 +56,78 @@ export async function POST(req: NextRequest) {
     //   ],
     // }
 
-    const imageUrl = resAi.data[0]?.url
+    const imageUrl = resAi.data?.[0]?.url
     if (!imageUrl) {
       throw new Error('No image URL returned from OpenAI')
     }
-    
+
     console.log('Fetching generated image from OpenAI URL')
     const response = await fetch(imageUrl)
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch image from OpenAI: ${response.status}`)
     }
-    
+
     const arrayBuffer = await response.arrayBuffer()
     console.log('Image fetched, uploading to storage...')
-      const timestamp = getTimeStamp()
-      const filename = `${title}_${timestamp}.png`
+    const timestamp = getTimeStamp()
+    const filename = `${title}_${timestamp}.png`
 
-      // const apiUrl =
-      //   process.env.NODE_ENV === 'development'
-      //     ? `http://localhost:3013/api/namedupload/pictusweb/${filename}`
-      //     : `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
-      const apiUrl = `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
+    const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/namedupload/pictusweb/${filename}`
 
-      // Send the raw arrayBuffer directly instead of using FormData
-      const uploadResponse = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'image/png',
-        },
-        body: arrayBuffer,
-      })
+    // Send the raw arrayBuffer directly instead of using FormData
+    const uploadResponse = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'image/png',
+      },
+      body: arrayBuffer,
+    })
 
-      if (!uploadResponse.ok) {
-        console.error('Upload failed with status:', uploadResponse.status)
-        const errorText = await uploadResponse.text().catch(() => 'Could not read error response')
-        console.error('Error details:', errorText)
-        throw new Error('Nepodarilo sa nahrať súbor')
-      }
+    if (!uploadResponse.ok) {
+      console.error('Upload failed with status:', uploadResponse.status)
+      const errorText = await uploadResponse.text().catch(() => 'Could not read error response')
+      console.error('Error details:', errorText)
+      throw new Error('Nepodarilo sa nahrať súbor')
+    }
 
-      const data = await uploadResponse.json()
+    const data = await uploadResponse.json()
 
-      const frontendPath = data.imageUrl
+    const frontendPath = data.imageUrl
 
-      console.log('front', frontendPath)
+    console.log('front', frontendPath)
 
-      // const filePath = path.resolve(`public/storage/podcast_images/${fileName}`)
-      // const frontendPath = `/storage/podcast_images/${fileName}`
+    // const filePath = path.resolve(`public/storage/podcast_images/${fileName}`)
+    // const frontendPath = `/storage/podcast_images/${fileName}`
 
-      // // Ensure the directory exists
-      // fs.mkdirSync(path.dirname(filePath), { recursive: true })
+    // // Ensure the directory exists
+    // fs.mkdirSync(path.dirname(filePath), { recursive: true })
 
-      // // Convert ArrayBuffer to Buffer
-      // const buffer = new Uint8Array(arrayBuffer)
+    // // Convert ArrayBuffer to Buffer
+    // const buffer = new Uint8Array(arrayBuffer)
 
-      // // Write file to the public directory
-      // fs.writeFile(filePath, buffer, (err) => {
-      //   if (err) {
-      //     console.error('Error saving image:', err)
-      //   } else {
-      //     console.log('Image saved successfully to', filePath)
-      //   }
-      // })
+    // // Write file to the public directory
+    // fs.writeFile(filePath, buffer, (err) => {
+    //   if (err) {
+    //     console.error('Error saving image:', err)
+    //   } else {
+    //     console.log('Image saved successfully to', filePath)
+    //   }
+    // })
 
-      // If using Firebase, uncomment this:
-      // const frontendPath = await uploadFirebase(title, buffer, contentType);
+    // If using Firebase, uncomment this:
+    // const frontendPath = await uploadFirebase(title, buffer, contentType);
 
-      console.log('Image uploaded successfully:', frontendPath)
-      return NextResponse.json({ status: 'success', data: frontendPath })
+    console.log('Image uploaded successfully:', frontendPath)
+    return NextResponse.json({ status: 'success', data: frontendPath })
   } catch (e: any) {
     console.error('Error in image generation API:', e)
-    return NextResponse.json({ 
-      status: 'fail', 
-      data: e.message || 'Unknown error occurred' 
-    }, { status: 500 })
+    return NextResponse.json(
+      {
+        status: 'fail',
+        data: e.message || 'Unknown error occurred',
+      },
+      { status: 500 },
+    )
   }
 }

@@ -173,7 +173,7 @@ const EditPodcast = () => {
         const formdata = new FormData()
         formdata.append('file', e.target.files[0])
 
-        const apiUrl = 'https://hono-api.pictusweb.com/api/upload/pictusweb'
+        const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/upload/pictusweb`
         // const apiUrl = 'http://localhost:3013/api/upload/pictusweb'
 
         console.log('api url edit', apiUrl)

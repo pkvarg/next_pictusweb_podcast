@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { Headphones, LogIn, Github } from 'lucide-react'
 import PagesHeader from '@/app/components/PagesHeader'
 import Footer from '@/app/components/Footer'
+import { Link } from '@/i18n/routing'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -33,13 +34,13 @@ export default function LoginPage() {
     console.log('Frontend: Form submitted with username:', username)
     console.log('Frontend: Current session status:', status)
     console.log('Frontend: Current session:', session)
-    
+
     if (session?.user) {
       console.log('Frontend: Already logged in, redirecting...')
       window.location.href = `/${locale}/client`
       return
     }
-    
+
     setIsLoading(true)
     setError('')
 
@@ -97,7 +98,7 @@ export default function LoginPage() {
           {/* Login Form */}
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/20">
             {/* OAuth Buttons */}
-            <div className="space-y-4 mb-6">
+            {/* <div className="space-y-4 mb-6">
               <button
                 type="button"
                 onClick={() => handleOAuthSignIn('google')}
@@ -132,17 +133,17 @@ export default function LoginPage() {
                 <Github className="mr-3 h-5 w-5" />
                 {t('signInWithGitHub')}
               </button>
-            </div>
+            </div> */}
 
             {/* Divider */}
-            <div className="relative my-6">
+            {/* <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-white/20"></div>
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-white/10 text-gray-400">{t('orDivider')}</span>
               </div>
-            </div>
+            </div> */}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -161,9 +162,17 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-2">
-                  {t('password')}
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-200">
+                    {t('password')}
+                  </label>
+                  <Link
+                    href="/auth/forgot-password"
+                    className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                  >
+                    Zabudli ste heslo?
+                  </Link>
+                </div>
                 <input
                   id="password"
                   type="password"

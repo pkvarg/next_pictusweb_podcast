@@ -3,6 +3,40 @@ import PagesHeader from '@/app/components/PagesHeader'
 import { CheckCircle, Calculator, BarChart3, Users, Calendar, Bell } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
+import type { Metadata } from 'next'
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  setRequestLocale(locale)
+  const t = await getTranslations({ locale, namespace: 'Automatizations' })
+
+  return {
+    title: 'FleetSync - ' + t('metaTitle'),
+    description: t('metaDescription'),
+    keywords: 'fleet management, vehicle notifications, STK Slovakia, EK reminders, vehicle tracking, fleet automation',
+    openGraph: {
+      title: 'FleetSync - ' + t('metaTitle'),
+      description: t('metaDescription'),
+      type: 'website',
+      siteName: 'pictusweb.sk',
+      url: `https://www.pictusweb.sk/${locale}/fleetsync`,
+      images: [{
+        url: 'https://www.pictusweb.sk/pictusweb.webp',
+        width: 400,
+        height: 400,
+        alt: 'FleetSync by PICTUSWEB',
+      }],
+    },
+    alternates: {
+      canonical: locale === 'sk' ? 'https://www.pictusweb.sk/fleetsync' : `https://www.pictusweb.sk/${locale}/fleetsync`,
+      languages: {
+        'en': 'https://www.pictusweb.sk/en/fleetsync',
+        'sk': 'https://www.pictusweb.sk/sk/fleetsync',
+        'hu': 'https://www.pictusweb.sk/hu/fleetsync',
+      },
+    },
+  }
+}
 
 export default async function Vehicles({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -343,45 +377,45 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             <p className="text-2xl text-gray-300 font-thin">{t('pricingSubtitle')}</p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Personal Plan */}
             <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30">
-              <h3 className="text-2xl font-semibold mb-2">{t('starterTitle')}</h3>
+              <h3 className="text-2xl font-semibold mb-2">{t('personalTitle')}</h3>
               <div className="text-4xl font-bold mb-6">
-                40€
-                {/* {t('starterPrice')} */}
-                <span className="text-lg text-gray-400 font-thin">{t('starterPriceUnit')}</span>
+                {t('personalPrice')}
+                <span className="text-lg text-gray-400 font-thin">{t('personalPriceUnit')}</span>
               </div>
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('starterFeature1')}</span>
+                  <span>{t('personalFeature1')}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('starterFeature2')}</span>
+                  <span>{t('personalFeature2')}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('starterFeature3')}</span>
+                  <span>{t('personalFeature3')}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('starterFeature4')}</span>
+                  <span>{t('personalFeature4')}</span>
                 </li>
               </ul>
               <Link
-                href={`/contact?subject=${encodeURIComponent(t('contactStarter'))}`}
+                href={`/contact?subject=${encodeURIComponent(t('contactPersonal'))}`}
                 className="block w-full bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-full transition-colors text-center"
               >
-                {t('starterButton')}
+                {t('personalButton')}
               </Link>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-600/30 to-pink-600/30 backdrop-blur-sm rounded-3xl p-8 border-2 border-purple-500/50 relative">
+            {/* Business Plan */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30">
               <h3 className="text-2xl font-semibold mb-2">{t('businessTitle')}</h3>
               <div className="text-4xl font-bold mb-6">
-                60€
-                {/* {t('businessPrice')} */}
+                {t('businessPrice')}
                 <span className="text-lg text-gray-400 font-thin">{t('businessPriceUnit')}</span>
               </div>
               <ul className="space-y-3 mb-8">
@@ -402,12 +436,45 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
                   <span>{t('businessFeature4')}</span>
                 </li>
               </ul>
-
               <Link
                 href={`/contact?subject=${encodeURIComponent(t('contactBusiness'))}`}
-                className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center"
+                className="block w-full bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-full transition-colors text-center"
               >
                 {t('businessButton')}
+              </Link>
+            </div>
+
+            {/* Enterprise Plan */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30">
+              <h3 className="text-2xl font-semibold mb-2">{t('enterpriseTitle')}</h3>
+              <div className="text-4xl font-bold mb-6">
+                {t('enterprisePrice')}
+                <span className="text-lg text-gray-400 font-thin">{t('enterprisePriceUnit')}</span>
+              </div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span>{t('enterpriseFeature1')}</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span>{t('enterpriseFeature2')}</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span>{t('enterpriseFeature3')}</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span>{t('enterpriseFeature4')}</span>
+                </li>
+              </ul>
+
+              <Link
+                href={`/contact?subject=${encodeURIComponent(t('contactEnterprise'))}`}
+                className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center"
+              >
+                {t('enterpriseButton')}
               </Link>
             </div>
           </div>

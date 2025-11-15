@@ -67,7 +67,8 @@ export async function createElevenlabsSpeech(
     const audioStream = await client.textToSpeech.convert(voiceId, {
       text: inputText,
       modelId: model, // Fixed: use modelId instead of model_id
-      voiceSettings: { // Fixed: use voiceSettings instead of voice_settings
+      voiceSettings: {
+        // Fixed: use voiceSettings instead of voice_settings
         stability: 0.1,
         similarityBoost: 0.3, // Fixed: use camelCase
         style: 0.2,
@@ -77,7 +78,7 @@ export async function createElevenlabsSpeech(
     // Convert the ReadableStream to a buffer
     const chunks: Uint8Array[] = []
     const reader = audioStream.getReader()
-    
+
     try {
       while (true) {
         const { done, value } = await reader.read()
@@ -87,17 +88,13 @@ export async function createElevenlabsSpeech(
     } finally {
       reader.releaseLock()
     }
-    
+
     const buffer = Buffer.concat(chunks)
 
     const timestamp = getTimeStamp()
     const filename = `${podcastTitle}_${timestamp}.mp3`
 
-    // const apiUrl =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `http://localhost:3013/api/namedupload/pictusweb/${filename}`
-    //     : `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
-    const apiUrl = `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
+    const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/namedupload/pictusweb/${filename}`
 
     // Send the buffer data
     const uploadResponse = await fetch(apiUrl, {

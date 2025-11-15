@@ -42,11 +42,9 @@ export async function createAzureSpeech(
   const synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig)
 
   try {
-    const result = await new Promise<sdk.SpeechSynthesisResult>(
-      (resolve, reject) => {
-        synthesizer.speakSsmlAsync(ssml, resolve, reject)
-      }
-    )
+    const result = await new Promise<sdk.SpeechSynthesisResult>((resolve, reject) => {
+      synthesizer.speakSsmlAsync(ssml, resolve, reject)
+    })
 
     if (result.reason === sdk.ResultReason.SynthesizingAudioCompleted) {
       console.log('Synthesis finished.')
@@ -55,7 +53,8 @@ export async function createAzureSpeech(
       const buffer = Buffer.from(result.audioData)
 
       const filename = `${podcastTitle}_${timestamp}.mp3`
-      const apiUrl = `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/namedupload/pictusweb/${filename}`
 
       // Upload the buffer to the API
       const uploadResponse = await fetch(apiUrl, {

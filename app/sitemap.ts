@@ -8,9 +8,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
   const staticPages = [
     '',
-    '/podcast',
+    '/podcasts',
     '/contact',
-    '/automatizations/vehicles',
+    '/fleetsync',
   ]
 
   // Generate static page URLs for all locales
@@ -49,19 +49,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Generate podcast page URLs for all locales
   const podcastUrls: MetadataRoute.Sitemap = []
-  
+
   for (const podcast of podcasts) {
     for (const locale of locales) {
       podcastUrls.push({
-        url: `${baseUrl}/${locale}/podcast/${podcast.id}`,
+        url: `${baseUrl}/${locale}/podcasts/${podcast.id}`,
         lastModified: podcast.updatedAt,
         changeFrequency: 'monthly',
         priority: 0.6,
         alternates: {
           languages: {
-            en: `${baseUrl}/en/podcast/${podcast.id}`,
-            sk: `${baseUrl}/sk/podcast/${podcast.id}`,
-            hu: `${baseUrl}/hu/podcast/${podcast.id}`,
+            en: `${baseUrl}/en/podcasts/${podcast.id}`,
+            sk: `${baseUrl}/sk/podcasts/${podcast.id}`,
+            hu: `${baseUrl}/hu/podcasts/${podcast.id}`,
           },
         },
       })

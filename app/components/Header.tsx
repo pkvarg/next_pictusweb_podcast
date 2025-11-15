@@ -3,11 +3,25 @@ import React, { useState } from 'react'
 import { Link } from '@/i18n/routing'
 import LanguageBar from './LanguageBar'
 import { useTranslations } from 'next-intl'
+import { usePathname } from 'next/navigation'
 
 const Header = () => {
   const [navbar, setNavbar] = useState(false)
   const [isSticky, setIsSticky] = useState(false)
   const t = useTranslations('Home')
+  const pathname = usePathname()
+
+  const isActive = (path: string) => {
+    // Remove locale prefix from pathname for comparison
+    const cleanPath = pathname.replace(/^\/(en|sk|hu)/, '')
+
+    if (path === '/#projects') {
+      // For anchor links, check if we're on home page
+      return cleanPath === '' || cleanPath === '/'
+    }
+
+    return cleanPath.startsWith(path)
+  }
 
   return (
     <nav
@@ -70,24 +84,44 @@ const Header = () => {
           >
             <ul className="text-[22.5px] lg:text-[22.5px] font-light justify-center space-y-4 md:flex md:space-x-6 md:space-y-0">
               <li>
-                <Link href={`/automatizations/vehicles`} className="hover:text-[#0388f4]">
+                <Link
+                  href={`/fleetsync`}
+                  className={`hover:text-[#0388f4] transition-colors ${
+                    isActive('/fleetsync') ? 'text-[#0388f4] font-normal' : ''
+                  }`}
+                >
                   {t('navbarAutomatizations')}
                 </Link>
               </li>
               <li>
-                <Link href={`/#projects`} className="hover:text-[#0388f4]">
+                <Link
+                  href={`/#projects`}
+                  className={`hover:text-[#0388f4] transition-colors ${
+                    isActive('/#projects') ? 'text-[#0388f4] font-normal' : ''
+                  }`}
+                >
                   {t('navbarProjects')}
                 </Link>
               </li>
 
               <li>
-                <Link href={`/podcast`} className="hover:text-[#0388f4]">
+                <Link
+                  href={`/podcasts`}
+                  className={`hover:text-[#0388f4] transition-colors ${
+                    isActive('/podcasts') ? 'text-[#0388f4] font-normal' : ''
+                  }`}
+                >
                   {t('podcastsTitle')}
                 </Link>
               </li>
 
               <li>
-                <Link href={`/contact`} className="hover:text-[#0388f4]">
+                <Link
+                  href={`/contact`}
+                  className={`hover:text-[#0388f4] transition-colors ${
+                    isActive('/contact') ? 'text-[#0388f4] font-normal' : ''
+                  }`}
+                >
                   {t('navbarContact')}
                 </Link>
               </li>

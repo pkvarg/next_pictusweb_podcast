@@ -20,11 +20,7 @@ export async function createOpenAiSpeech(podcastTitle: string, voiceType: any, i
     const timestamp = getTimeStamp()
     const filename = `${podcastTitle}_${timestamp}.mp3`
 
-    // const apiUrl =
-    //   process.env.NODE_ENV === 'development'
-    //     ? `http://localhost:3013/api/namedupload/pictusweb/${filename}`
-    //     : `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
-    const apiUrl = `https://hono-api.pictusweb.com/api/namedupload/pictusweb/${filename}`
+    const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/namedupload/pictusweb/${filename}`
 
     // Send the audio data
     const uploadResponse = await fetch(apiUrl, {

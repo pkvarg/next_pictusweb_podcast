@@ -133,7 +133,7 @@ const SinglePodcast = async ({ params }: PageProps) => {
       <PagesHeader />
 
       <section className="flex flex-col mx-4 lg:mx-[10%] py-4 font-light">
-        <Link href={`/podcast`} className="hover:text-[#0388f4] py-2 w-auto">
+        <Link href={`/podcasts`} className="hover:text-[#0388f4] py-2 w-auto">
           {t('podcastsBack')}
         </Link>
 

@@ -59,11 +59,7 @@ const FileUpload = () => {
     const formData = new FormData()
     formData.append('file', file)
 
-    // const apiUrl =
-    //   process.env.NODE_ENV === 'development'
-    //     ? 'http://localhost:3013/api/upload/pictusweb'
-    //     : 'https://hono-api.pictusweb.com/api/upload/pictusweb'
-    const apiUrl = 'https://hono-api.pictusweb.com/api/upload/pictusweb'
+    const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/upload/pictusweb`
 
     //console.log('apiUrl', apiUrl)
 
