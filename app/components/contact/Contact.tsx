@@ -146,11 +146,8 @@ const Contact = () => {
   const increaseBots = async () => {
     const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/bots/pictuswebsk/increase`
 
-    console.log('API URL IN CTC***', apiUrl)
-
     try {
-      const { data } = await axios.put(apiUrl, {}, config)
-      console.log('data bots', data)
+      await axios.put(apiUrl, {}, config)
     } catch (error) {
       console.error('Error increasing bots:', error)
     }
@@ -160,8 +157,7 @@ const Contact = () => {
     const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/emails/pictuswebsk/increase`
 
     try {
-      const { data } = await axios.put(apiUrl, {}, config)
-      console.log('data email', data)
+      await axios.put(apiUrl, {}, config)
     } catch (error) {
       console.error('Error increasing emails:', error)
     }
