@@ -23,7 +23,7 @@ const NewServicesSlider = () => {
         t('service1Feature5'),
         t('service1Feature6'),
       ],
-      price: t('service1Price'),
+      //price: t('service1Price'),
       icon: Car,
       link: '/fleetsync',
       gradient: 'from-blue-600 to-purple-600',
@@ -140,7 +140,7 @@ const NewServicesSlider = () => {
 
                         {/* Price & CTA */}
                         <div className="flex flex-col gap-4">
-                          <div className="text-xl font-thin text-white">{service.price}</div>
+                          {/* <div className="text-xl font-thin text-white">{service.price}</div> */}
                           <Link
                             href={service.link}
                             className={`bg-gradient-to-r ${service.gradient} px-6 py-3 rounded-full text-white font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2 group w-fit`}
@@ -210,7 +210,7 @@ const NewServicesSlider = () => {
 
                             {/* Price & CTA */}
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                              <div className="text-2xl font-thin text-white">{service.price}</div>
+                              {/* <div className="text-2xl font-thin text-white">{service.price}</div> */}
                               <Link
                                 href={service.link}
                                 className={`bg-gradient-to-r ${service.gradient} px-6 py-3 rounded-full text-white font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2 group`}
