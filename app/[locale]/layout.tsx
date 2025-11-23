@@ -115,10 +115,10 @@ export default async function RootLayout({
           <head>
             <meta property="fb:app_id" content="627076731624225" />
           </head>
-          <ConditionalUmami />
           <AuthSessionProvider>
             <AudioProvider>
               <body className={cn(inter.className)}>
+                <ConditionalUmami />
                 <ClientErrorHandler />
                 {children}
                 <Toaster />

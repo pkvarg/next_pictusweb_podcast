@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useTranslations } from 'next-intl'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { Link } from '@/i18n/routing'
@@ -7,7 +7,7 @@ import { Lock, ArrowLeft, Check, Eye, EyeOff } from 'lucide-react'
 import PagesHeader from '@/app/components/PagesHeader'
 import Footer from '@/app/components/Footer'
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -294,5 +294,17 @@ export default function ResetPasswordPage() {
       </div>
       <Footer />
     </section>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <section className="min-h-screen bg-gradient-to-r from-blue-900 to-purple-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+      </section>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }
