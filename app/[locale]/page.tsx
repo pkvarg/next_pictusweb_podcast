@@ -7,6 +7,8 @@ import Footer from '../components/Footer'
 import Offer from '../components/home/Offer'
 import GetInTouch from '../components/GetInTouch'
 import NewServicesSlider from '../components/home/NewServicesSlider'
+import GlassmorphismCard from '../components/home/GlassmorphismCard'
+import GlassyShowcase from '../components/home/GlassyShowcase'
 import Scene3D from '../components/3d/Scene3D'
 import { prodLogger } from '@/lib/prodLogger'
 
@@ -19,6 +21,17 @@ const Home = () => {
         <div className="text-white text-[25px] hero-gradient">
           <Header />
           <Hero />
+          
+          {/* Glassmorphism Card Section */}
+          <section className="py-16 px-4 lg:px-8">
+            <GlassmorphismCard />
+          </section>
+          
+          {/* Glassy Showcase Section */}
+          <section className="py-16 px-4 lg:px-8">
+            <GlassyShowcase />
+          </section>
+          
           <NewServicesSlider />
           <Offer />
           <Projects />
