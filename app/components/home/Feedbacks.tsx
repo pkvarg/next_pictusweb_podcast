@@ -104,7 +104,7 @@ const Feedbacks: React.FC = () => {
       designation: t('reviewsDesignationMich'),
       company: 'michaldovala.sk',
       image: 'michal.webp',
-      companyUrl: 'https://michaldovala.sk/',
+      companyUrl: 'https://michaldovala.vercel.app/',
     },
     {
       testimonial: t('reviewsSam'),
