@@ -191,7 +191,7 @@ const Projects: React.FC = () => {
         },
       ],
       image: 'md.webp',
-      website: 'https://michaldovala.sk/',
+      website: 'https://michaldovala.vercel.app/',
     },
     {
       name: 'librosophia.sk',
