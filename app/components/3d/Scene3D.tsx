@@ -7,10 +7,11 @@ import { Suspense } from 'react'
 
 export default function Scene3D() {
   return (
-    <div className="fixed inset-0 w-full h-full pointer-events-none z-10">
+    <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
       <Canvas
         camera={{ position: [0, 10, 15], fov: 75 }}
         className="pointer-events-none"
+        style={{ pointerEvents: 'none' }}
       >
         <Suspense fallback={null}>
           {/* Lighting */}

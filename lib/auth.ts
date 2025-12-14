@@ -30,8 +30,9 @@ declare module 'next-auth' {
 }
 
 
-// Export auth options for use in other files  
+// Export auth options for use in other files
 export const authOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
