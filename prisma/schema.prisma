@@ -129,6 +129,21 @@ model BotLog {
   createdAt        DateTime @default(now())
 }
 
+model IPReputation {
+  id                String   @id @default(uuid())
+  ipAddress         String   @unique
+  violations        Int      @default(0)
+  firstSeen         DateTime @default(now())
+  lastSeen          DateTime @updatedAt
+  bannedUntil       DateTime?
+  isPermanentBan    Boolean  @default(false)
+  detectionHistory  Json?    // Array of {type, details, timestamp}
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("ip_reputations")
+}
+
 enum Role {
   ADMIN
   CLIENT

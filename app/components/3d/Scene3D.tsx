@@ -2,16 +2,14 @@
 
 import { Canvas } from '@react-three/fiber'
 import { Environment } from '@react-three/drei'
-import { AliceCharacter } from './AliceCharacter'
 import { Suspense } from 'react'
+import { InteractiveCube } from './InteractiveCube'
 
 export default function Scene3D() {
   return (
-    <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
+    <div className="fixed inset-0 w-full h-full z-0">
       <Canvas
-        camera={{ position: [0, 10, 15], fov: 75 }}
-        className="pointer-events-none"
-        style={{ pointerEvents: 'none' }}
+        camera={{ position: [0, 2, 8], fov: 75 }}
       >
         <Suspense fallback={null}>
           {/* Lighting */}
@@ -39,8 +37,7 @@ export default function Scene3D() {
             />
           </mesh>
 
-          {/* Alice Character - larger scale and bigger walking radius */}
-          <AliceCharacter position={[0, 0, 0]} scale={2} />
+          <InteractiveCube />
         </Suspense>
       </Canvas>
     </div>
