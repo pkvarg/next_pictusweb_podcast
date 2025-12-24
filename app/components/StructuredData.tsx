@@ -13,7 +13,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         '@type': 'AudioObject',
         name: data.title,
         description: data.description,
-        url: `https://www.pictusweb.sk/${data.locale}/podcast/${data.id}`,
+        url: `https://www.pictusweb.sk/${data.locale}/podcasts/${data.id}`,
         contentUrl: data.audioPath,
         encodingFormat: 'audio/mpeg',
         duration: data.duration || 'PT0M0S',
@@ -61,7 +61,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@type': 'SearchAction',
           target: {
             '@type': 'EntryPoint',
-            urlTemplate: `${data.url}/${data.locale}/podcast?search={search_term_string}`,
+            urlTemplate: `${data.url}/${data.locale}/podcasts?search={search_term_string}`,
           },
           'query-input': 'required name=search_term_string',
         },

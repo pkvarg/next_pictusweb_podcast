@@ -10,7 +10,7 @@ interface PodcastImageProps {
 
 const PodcastImage: React.FC<PodcastImageProps> = ({ imagePath, title, id }) => {
   return (
-    <Link href={`/podcast/${id}`} className="cursor-pointer">
+    <Link href={`/podcasts/${id}`} className="cursor-pointer">
       <Image
         src={imagePath || '/icons/headphones.svg'}
         alt={title}

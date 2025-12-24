@@ -8,7 +8,13 @@ export default function RootLayout({
   prodLogger.serverComponentStart('RootLayout')
   
   try {
-    const result = <>{children}</>
+    const result = (
+      <html>
+        <body>
+          {children}
+        </body>
+      </html>
+    )
     prodLogger.serverComponentEnd('RootLayout')
     return result
   } catch (error) {
