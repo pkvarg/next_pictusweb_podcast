@@ -50,24 +50,26 @@ export default function ForgotPasswordPage() {
       const resetToken = btoa(`${email}:${Date.now()}`) // Simple token for demo
       const resetUrl = `${window.location.origin}/${locale}/auth/reset-password?token=${resetToken}`
 
-      // Send forgot password email
-      const emailResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/email-forgot-password`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: checkData.name || 'Vážený zákazník',
-            email: email,
-            resetUrl: resetUrl,
-            origin: 'PICTUSWEB.SK',
-          }),
+      // Send forgot password email via protected endpoint
+      const emailResponse = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
+        body: JSON.stringify({
+          name: checkData.name || 'Vážený zákazník',
+          email: email,
+          resetUrl: resetUrl,
+          origin: 'PICTUSWEB.SK',
+        }),
+      })
 
       if (!emailResponse.ok) {
+        const errorData = await emailResponse.json()
+        // Check if IP is banned
+        if (errorData.code === 'IP_BANNED') {
+          throw new Error(`Access Denied: ${errorData.message}`)
+        }
         throw new Error('Failed to send email')
       }
 

@@ -277,7 +277,8 @@ const Contact = () => {
         subject,
       }
 
-      const apiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/contact`
+      // Use local API endpoint which has IP ban protection
+      const apiUrl = '/api/contact'
 
       // Make the API request
       const response = await fetch(apiUrl, {
@@ -291,6 +292,14 @@ const Contact = () => {
       // Check if request was successful
       if (!response.ok) {
         const errorData = await response.json()
+
+        // Check if IP is banned
+        if (errorData.code === 'IP_BANNED') {
+          setMessage(`Access Denied: ${errorData.message}`)
+        } else {
+          setMessage(t('contactError'))
+        }
+
         return {
           success: false,
           message: errorData.message || 'Failed to submit form',

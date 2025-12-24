@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '@/lib/isValidPassword'
+import { checkIPBan } from '@/lib/checkIPBan'
 
 const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if IP is banned
+    const ipCheck = await checkIPBan(request)
+    if (ipCheck.isBanned && ipCheck.banInfo) {
+      return NextResponse.json(
+        {
+          error: 'Access Denied',
+          message: ipCheck.banInfo.message,
+        },
+        { status: 403 },
+      )
+    }
+
     const { email, newPassword } = await request.json()
 
     if (!email || !newPassword) {
