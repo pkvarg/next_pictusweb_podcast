@@ -92,7 +92,7 @@ model VehicleNotification {
   email                 String?   @db.VarChar(150)
   phoneNumber           String?   @db.VarChar(150)
   vehicleRegistration   String?   @db.VarChar(20)
-  vehicleType           String?   @db.VarChar(100) 
+  vehicleType           String?   @db.VarChar(100)
   notificationType      String?   @db.VarChar(50)
   notificationChannel   String?   @db.VarChar(50)
   notificationDate      DateTime?
@@ -103,6 +103,8 @@ model VehicleNotification {
   smsSentAt                DateTime?
   createdAt             DateTime  @default(now())
   sheetRowId            String?   @unique @db.VarChar(50)
+  confirmationToken     String?   @unique @map("confirmation_token") @db.VarChar(64)
+  tokenExpiresAt        DateTime? @map("token_expires_at")
   confirmationAttempts  Int       @default(0)
   confirmedAt           DateTime?
   lastReminderSent      DateTime?
