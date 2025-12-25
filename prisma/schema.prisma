@@ -64,53 +64,54 @@ model VisitorsCounter {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  password      String?
-  loginProvider String?
+  id             String    @id @default(uuid())
+  email          String    @unique
+  password       String?
+  name           String?
+  role           Role      @default(CLIENT)
+  tier           Tier      @default(FREE)
+  emailVerified  DateTime?
+  image          String?
+  lastLoggedIn   DateTime?
+  loginCount     Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  active         Boolean   @default(true)
+  deletedAt      DateTime?
+  firstName      String?
+  lastName       String?
+  organization   String?
+  loginProvider  String?
   hybridPassword String?
-  name          String?
-  firstName     String?
-  lastName      String?
-  organization  String?
-  active        Boolean   @default(true)
-  role          Role      @default(CLIENT)
-  tier          Tier      @default(FREE)
-  emailVerified DateTime?
-  image         String?
-  lastLoggedIn  DateTime?
-  loginCount    Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
 }
 
 model VehicleNotification {
-  id                    Int       @id @default(autoincrement())
-  company               String?   @db.VarChar(100)
-  personName            String?   @db.VarChar(100)
-  email                 String?   @db.VarChar(150)
-  phoneNumber           String?   @db.VarChar(150)
-  vehicleRegistration   String?   @db.VarChar(20)
-  vehicleType           String?   @db.VarChar(100) 
-  notificationType      String?   @db.VarChar(50)
-  notificationChannel   String?   @db.VarChar(50)
-  notificationDate      DateTime?
-  dutyDate              DateTime?
-  emailMessage          String?   @db.Text
-  status                String    @default("pending") @db.VarChar(20)
-  emailSentAt                DateTime?
-  smsSentAt                DateTime?
-  createdAt             DateTime  @default(now())
-  sheetRowId            String?   @unique @db.VarChar(50)
-  confirmationAttempts  Int       @default(0)
-  confirmedAt           DateTime?
-  lastReminderSent      DateTime?
-  finalStatusUpdated    DateTime?
+  id                   Int       @id @default(autoincrement())
+  company              String?   @db.VarChar(100)
+  personName           String?   @db.VarChar(100)
+  email                String?   @db.VarChar(150)
+  vehicleRegistration  String?   @db.VarChar(20)
+  vehicleType          String?   @db.VarChar(100)
+  notificationType     String?   @db.VarChar(50)
+  notificationChannel  String?   @db.VarChar(50)
+  notificationDate     DateTime?
+  dutyDate             DateTime?
+  emailMessage         String?
+  status               String    @default("pending") @db.VarChar(20)
+  createdAt            DateTime  @default(now())
+  sheetRowId           String?   @unique @db.VarChar(50)
+  confirmationAttempts Int       @default(0)
+  confirmedAt          DateTime?
+  lastReminderSent     DateTime?
+  finalStatusUpdated   DateTime?
+  phoneNumber          String?   @db.VarChar(150)
+  emailSentAt          DateTime?
+  smsSentAt            DateTime?
+  confirmationToken    String?   @unique(map: "VehicleNotification_confirmationToken_key") @db.VarChar(64)
+  tokenExpiresAt       DateTime?
 
   @@map("vehiclenotification")
 }
-
 
 model BotLog {
   id               String   @id @default(uuid())
@@ -121,25 +122,25 @@ model BotLog {
   honeypot         String?
   userAgent        String?
   ipAddress        String?
-  timeSpent        Int? // milliseconds spent on form
-  detectionType    String // honeypot, time-based, content-validation, rate-limit
-  detectionDetails String? // additional context about what triggered detection
+  timeSpent        Int?
+  detectionType    String
+  detectionDetails String?
   locale           String?
   origin           String?
   createdAt        DateTime @default(now())
 }
 
 model IPReputation {
-  id                String   @id @default(uuid())
-  ipAddress         String   @unique
-  violations        Int      @default(0)
-  firstSeen         DateTime @default(now())
-  lastSeen          DateTime @updatedAt
-  bannedUntil       DateTime?
-  isPermanentBan    Boolean  @default(false)
-  detectionHistory  Json?    // Array of {type, details, timestamp}
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String    @id @default(uuid())
+  ipAddress        String    @unique
+  violations       Int       @default(0)
+  firstSeen        DateTime  @default(now())
+  lastSeen         DateTime  @updatedAt
+  bannedUntil      DateTime?
+  isPermanentBan   Boolean   @default(false)
+  detectionHistory Json?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@map("ip_reputations")
 }
