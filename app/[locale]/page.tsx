@@ -2,6 +2,7 @@ import React from 'react'
 import Header from '../components/Header'
 import Projects from '../components/home/Projects'
 import Hero from '../components/home/Hero'
+import HeroFigma6 from '../components/home/HeroFigma6'
 import Feedbacks from '../components/home/Feedbacks'
 import Footer from '../components/Footer'
 import Offer from '../components/home/Offer'
@@ -18,9 +19,9 @@ const Home = () => {
   try {
     const result = (
       <>
+        <HeroFigma6 />
         <div className="text-white text-[25px] hero-gradient">
           <Header />
-          <Hero />
           
           {/* Glassmorphism Card Section */}
           <section className="py-16 px-4 lg:px-8">
@@ -42,8 +43,8 @@ const Home = () => {
           <Footer />
         </div>
 
-        {/* 3D Character walking around */}
-        <Scene3D />
+        {/* 3D Character walking around - Temporarily hidden for HeroFigma6 */}
+        {/* <Scene3D /> */}
       </>
     )
 
