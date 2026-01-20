@@ -39,3 +39,4 @@ next-env.d.ts
 
 # claude config
 ~/claude_desktop_config.json
+BOT_PROTECTION_SUMMARY.md
