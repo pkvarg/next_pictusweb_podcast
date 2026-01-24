@@ -6,17 +6,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   prodLogger.serverComponentStart('RootLayout')
-  
+
   try {
-    const result = (
-      <html>
-        <body>
-          {children}
-        </body>
-      </html>
-    )
     prodLogger.serverComponentEnd('RootLayout')
-    return result
+    return children
   } catch (error) {
     prodLogger.error('Error in RootLayout', {
       component: 'RootLayout',

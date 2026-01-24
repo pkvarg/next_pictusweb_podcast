@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { Link } from '@/i18n/routing'
-import { Mic, Brain, Upload, Eye, Bot, Mail, TrendingUp, Plus, Activity } from 'lucide-react'
+import { Mic, Brain, Upload, Eye, Bot, Mail, TrendingUp, Plus, Activity, BarChart3 } from 'lucide-react'
 import Counter from './Counter'
 import RefreshButton from './RefreshButton'
 
@@ -30,6 +30,14 @@ const AdminDashboard = () => {
       icon: Upload,
       color: 'from-green-500 to-teal-600',
       bgColor: 'bg-green-500/10 hover:bg-green-500/20',
+    },
+    {
+      title: 'Analytics Dashboard',
+      description: 'View Metabase analytics',
+      href: '/admin/dashboard',
+      icon: BarChart3,
+      color: 'from-orange-500 to-red-600',
+      bgColor: 'bg-orange-500/10 hover:bg-orange-500/20',
     },
   ]
 

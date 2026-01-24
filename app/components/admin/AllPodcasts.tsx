@@ -84,6 +84,7 @@ export default async function AllPodcasts() {
                   src={podcast.imagePath}
                   alt={podcast.title}
                   fill
+                  sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 50vw, 33vw"
                   className="object-cover"
                   priority
                 />

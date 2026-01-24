@@ -47,7 +47,7 @@ export default function AllVehicleNotifications() {
       const response = await fetch('/api/vehicle-notifications')
       if (response.ok) {
         const data = await response.json()
-        setNotifications(data)
+        setNotifications(Array.isArray(data.notifications) ? data.notifications : [])
       }
     } catch (error) {
       console.error('Failed to fetch vehicle notifications:', error)
@@ -60,7 +60,7 @@ export default function AllVehicleNotifications() {
     fetchNotifications()
   }, [])
 
-  const filteredNotifications = notifications.filter(notification => {
+  const filteredNotifications = (Array.isArray(notifications) ? notifications : []).filter(notification => {
     const searchLower = searchTerm.toLowerCase()
     return (
       notification.id.toString().includes(searchLower) ||
@@ -159,7 +159,7 @@ export default function AllVehicleNotifications() {
               className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-purple-500"
             >
               <option value="">Select a notification ID...</option>
-              {notifications.map((notification) => (
+              {(Array.isArray(notifications) ? notifications : []).map((notification) => (
                 <option key={notification.id} value={notification.id}>
                   ID: {notification.id} - {notification.vehicleRegistration || 'No registration'} ({notification.status})
                 </option>
@@ -292,21 +292,21 @@ export default function AllVehicleNotifications() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                     <div className="space-y-1">
                       {notification.emailSentAt && (
-                        <div>Email Sent: {new Date(notification.emailSentAt).toLocaleDateString()}</div>
+                        <div suppressHydrationWarning>Email Sent: {new Date(notification.emailSentAt).toLocaleDateString()}</div>
                       )}
                       {notification.smsSentAt && (
-                        <div>SMS Sent: {new Date(notification.smsSentAt).toLocaleDateString()}</div>
+                        <div suppressHydrationWarning>SMS Sent: {new Date(notification.smsSentAt).toLocaleDateString()}</div>
                       )}
                       {notification.confirmedAt && (
-                        <div>Confirmed: {new Date(notification.confirmedAt).toLocaleDateString()}</div>
+                        <div suppressHydrationWarning>Confirmed: {new Date(notification.confirmedAt).toLocaleDateString()}</div>
                       )}
                       {notification.dutyDate && (
-                        <div>Duty: {new Date(notification.dutyDate).toLocaleDateString()}</div>
+                        <div suppressHydrationWarning>Duty: {new Date(notification.dutyDate).toLocaleDateString()}</div>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                    <div className="flex items-center">
+                    <div className="flex items-center" suppressHydrationWarning>
                       <Calendar className="h-4 w-4 mr-2" />
                       {new Date(notification.createdAt).toLocaleDateString()}
                     </div>
