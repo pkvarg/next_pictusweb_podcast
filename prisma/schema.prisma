@@ -146,6 +146,17 @@ model IPReputation {
   @@map("ip_reputations")
 }
 
+model ConfirmationLog {
+  id             Int      @id @default(autoincrement())
+  notificationId Int      @map("notification_id")
+  ipAddress      String?  @map("ip_address") @db.VarChar(45)
+  userAgent      String?  @map("user_agent")
+  timestamp      DateTime @default(now())
+
+  @@index([notificationId])
+  @@map("confirmation_log")
+}
+
 enum Role {
   ADMIN
   CLIENT
