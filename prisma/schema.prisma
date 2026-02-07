@@ -63,26 +63,30 @@ model VisitorsCounter {
 }
 
 model User {
-  id             String    @id @default(uuid())
-  email          String    @unique
-  password       String?
-  name           String?
-  role           Role      @default(CLIENT)
-  tier           Tier      @default(FREE)
-  emailVerified  DateTime?
-  image          String?
-  lastLoggedIn   DateTime?
-  loginCount     Int       @default(0)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  active         Boolean   @default(true)
-  deletedAt      DateTime?
-  firstName      String?
-  lastName       String?
-  organization   String?
-  isFleetManager Boolean   @default(false)
-  loginProvider  String?
-  hybridPassword String?
+  id                   String                 @id @default(uuid())
+  email                String                 @unique
+  password             String?
+  name                 String?
+  role                 Role                   @default(CLIENT)
+  tier                 Tier                   @default(FREE)
+  emailVerified        DateTime?
+  image                String?
+  lastLoggedIn         DateTime?
+  loginCount           Int                    @default(0)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  active               Boolean                @default(true)
+  deletedAt            DateTime?
+  firstName            String?
+  lastName             String?
+  organization         String?
+  isFleetManager       Boolean                @default(false)
+  loginProvider        String?
+  hybridPassword       String?
+  vehicles             MyVehicle[]
+  vehicleExpenses      MyVehicleExpense[]
+  vehicleMileage       MyVehicleMileage[]
+  vehicleNotifications VehicleNotification[]
 }
 
 model VehicleNotification {
@@ -109,7 +113,10 @@ model VehicleNotification {
   confirmedAt          DateTime?
   lastReminderSent     DateTime?
   finalStatusUpdated   DateTime?
+  userId               String?   @map("user_id")
+  user                 User?     @relation(fields: [userId], references: [id])
 
+  @@index([userId])
   @@map("vehiclenotification")
 }
 
@@ -154,6 +161,63 @@ model ConfirmationLog {
 
   @@index([notificationId])
   @@map("confirmation_log")
+}
+
+model MyVehicle {
+  id             String               @id @default(uuid())
+  organization   String               @db.VarChar(100)
+  type           String               @db.VarChar(100)
+  registration   String               @db.VarChar(20)
+  year           Int?
+  image          String?
+  note           String?              @db.Text
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+  deletedAt      DateTime?            @map("deleted_at")
+  userId         String               @map("user_id")
+  user           User                 @relation(fields: [userId], references: [id])
+  expenses       MyVehicleExpense[]
+  mileageRecords MyVehicleMileage[]
+
+  @@index([userId])
+  @@map("my_vehicles")
+}
+
+model MyVehicleExpense {
+  id           String     @id @default(uuid())
+  vehicleId    String     @map("vehicle_id")
+  vehicle      MyVehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  organization String     @db.VarChar(100)
+  item         String     @db.VarChar(200)
+  cost         Decimal    @db.Decimal(10, 2)
+  date         DateTime
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  deletedAt    DateTime?  @map("deleted_at")
+  userId       String     @map("user_id")
+  user         User       @relation(fields: [userId], references: [id])
+
+  @@index([vehicleId])
+  @@index([userId])
+  @@map("my_vehicle_expenses")
+}
+
+model MyVehicleMileage {
+  id         String     @id @default(uuid())
+  vehicleId  String     @map("vehicle_id")
+  vehicle    MyVehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  kilometers Int
+  date       DateTime
+  note       String?    @db.Text
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  deletedAt  DateTime?  @map("deleted_at")
+  userId     String     @map("user_id")
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@index([vehicleId])
+  @@index([userId])
+  @@map("my_vehicle_mileage")
 }
 
 enum Role {
