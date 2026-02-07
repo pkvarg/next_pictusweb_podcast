@@ -14,6 +14,7 @@ import {
   EyeOff,
   Check,
   X,
+  Car,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
@@ -137,7 +138,7 @@ const ClientZone = () => {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-3 text-white">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg flex items-center justify-center">
                   <UserCheck size={18} className="text-white" />
                 </div>
                 <div>
@@ -173,7 +174,20 @@ const ClientZone = () => {
               {t('welcomeTitle')}
             </h1>
             <p className="text-3xl text-purple-300 mb-6">{session?.user?.name}</p>
-            <h2 className="text-5xl lg:text-6xl font-light leading-tight text-center">FleetSync</h2>
+            <h2 className="text-5xl lg:text-6xl font-light leading-tight text-center mb-8">FleetSync</h2>
+
+            {/* Navigation to My Fleet - Only for Fleet Managers */}
+            {session?.user?.isFleetManager && (
+              <div className="flex justify-center gap-4">
+                <Link
+                  href="/client/my-fleet"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-8 py-4 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 transition-all text-xl"
+                >
+                  <Car size={24} />
+                  Moja flotila
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 
@@ -197,7 +211,7 @@ const ClientZone = () => {
             <div className="text-center mb-8">
               {/* <h2 className="text-4xl font-light text-white mb-4">Dashboard</h2> */}
             </div>
-            <div className="md:bg-gradient-to-br md:from-purple-600/20 md:to-pink-600/20 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-purple-500/30">
+            <div className="md:bg-gradient-to-br md:from-purple-600/20 md:to-purple-800/20 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-purple-500/30">
               <VehicleNotificationsDashboard
                 company={
                   session.user.organization === 'all'
@@ -237,7 +251,7 @@ const ClientZone = () => {
 
         {/* User Info Section */}
         <section className="py-20">
-          <div className="bg-gradient-to-br from-purple-800/30 to-blue-800/30 rounded-2xl p-8 backdrop-blur-sm border border-purple-500/30">
+          <div className="bg-gradient-to-br from-purple-800/30 to-purple-900/30 rounded-2xl p-8 backdrop-blur-sm border border-purple-500/30">
             <div className="text-center mb-12">
               <h2 className="text-6xl font-light text-white mb-6">Informácie o účte</h2>
             </div>
@@ -270,7 +284,7 @@ const ClientZone = () => {
                 {!showPasswordChange ? (
                   <button
                     onClick={() => setShowPasswordChange(true)}
-                    className="mt-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-all text-lg"
+                    className="mt-4 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 transition-all text-lg"
                   >
                     Zmeniť heslo
                   </button>
@@ -371,7 +385,7 @@ const ClientZone = () => {
                       <button
                         type="submit"
                         disabled={isChangingPassword}
-                        className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 bg-gradient-to-r from-purple-600 to-purple-800 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isChangingPassword ? (
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />

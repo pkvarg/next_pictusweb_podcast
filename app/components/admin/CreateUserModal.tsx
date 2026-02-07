@@ -15,6 +15,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
     lastName: '',
     organization: '',
     active: true,
+    isFleetManager: false,
     password: '',
     loginProvider: '',
   })
@@ -43,6 +44,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
           lastName: '',
           organization: '',
           active: true,
+          isFleetManager: false,
           password: '',
           loginProvider: '',
         })
@@ -191,6 +193,20 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
               type="checkbox"
               name="active"
               checked={formData.active}
+              onChange={handleChange}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <label className="flex items-center text-sm font-medium text-gray-300">
+              <Shield className="h-4 w-4 mr-2" />
+              Fleet Manager
+            </label>
+            <input
+              type="checkbox"
+              name="isFleetManager"
+              checked={formData.isFleetManager}
               onChange={handleChange}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
             />

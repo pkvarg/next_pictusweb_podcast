@@ -9,6 +9,7 @@ interface User {
   lastName: string | null
   organization: string | null
   active: boolean
+  isFleetManager: boolean
   password: string | null
   loginProvider: string | null
   hybridPassword: string | null
@@ -33,6 +34,7 @@ export default function EditUserModal({
     lastName: '',
     organization: '',
     active: true,
+    isFleetManager: false,
     password: '',
     loginProvider: '',
   })
@@ -47,7 +49,8 @@ export default function EditUserModal({
         lastName: user.lastName || '',
         organization: user.organization || '',
         active: user.active,
-        password: user.password || '',
+        isFleetManager: user.isFleetManager || false,
+        password: '', // Never load existing password (security + prevents double-hashing)
         loginProvider: user.loginProvider || '',
       })
     }
@@ -215,6 +218,20 @@ export default function EditUserModal({
               type="checkbox"
               name="active"
               checked={formData.active}
+              onChange={handleChange}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <label className="flex items-center text-sm font-medium text-gray-300">
+              <Shield className="h-4 w-4 mr-2" />
+              Fleet Manager
+            </label>
+            <input
+              type="checkbox"
+              name="isFleetManager"
+              checked={formData.isFleetManager}
               onChange={handleChange}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
             />

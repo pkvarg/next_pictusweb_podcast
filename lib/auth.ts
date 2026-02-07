@@ -17,6 +17,7 @@ declare module 'next-auth' {
       name: string
       role?: string
       organization?: string
+      isFleetManager?: boolean
     }
   }
 
@@ -26,6 +27,7 @@ declare module 'next-auth' {
     name: string
     role?: string
     organization?: string
+    isFleetManager?: boolean
   }
 }
 
@@ -90,6 +92,7 @@ export const authOptions = {
             token.email = dbUser.email
             token.name = dbUser.name || `${dbUser.firstName} ${dbUser.lastName}`
             token.organization = dbUser.organization
+            token.isFleetManager = dbUser.isFleetManager
             
             console.log('TESTING: Updating login tracking...')
             // Update login tracking
@@ -110,9 +113,10 @@ export const authOptions = {
           const dbUser = await prisma.user.findUnique({
             where: { email: token.email }
           })
-          
+
           if (dbUser) {
             token.organization = dbUser.organization
+            token.isFleetManager = dbUser.isFleetManager
             console.log('TESTING: Organization data refreshed')
           }
         }
@@ -134,6 +138,7 @@ export const authOptions = {
           session.user.email = token.email
           session.user.name = token.name
           session.user.organization = token.organization
+          session.user.isFleetManager = token.isFleetManager || false
           console.log('TESTING: Session data set successfully')
         } else {
           console.log('TESTING: No token provided to session callback')

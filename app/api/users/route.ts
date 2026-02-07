@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { email, firstName, lastName, organization, active, password, loginProvider } = body
+    const { email, firstName, lastName, organization, active, isFleetManager, password, loginProvider } = body
 
     if (!email || !firstName || !lastName) {
       return NextResponse.json(
@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
         lastName,
         organization: organization || null,
         active: active !== undefined ? active : true,
+        isFleetManager: isFleetManager || false,
         password: hashedPassword,
         loginProvider: loginProvider || null,
         name: `${firstName} ${lastName}`, // Combine first and last name

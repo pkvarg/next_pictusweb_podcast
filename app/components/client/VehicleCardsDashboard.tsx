@@ -318,7 +318,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="p-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl">
+        <div className="p-4 bg-gradient-to-r from-purple-600/20 to-purple-800/20 rounded-xl">
           <Car className="w-10 h-10 text-purple-400" />
         </div>
         <div>

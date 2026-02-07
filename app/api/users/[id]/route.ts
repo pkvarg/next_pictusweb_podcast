@@ -34,7 +34,7 @@ export async function PUT(
   try {
     const resolvedParams = await params
     const body = await request.json()
-    const { email, firstName, lastName, organization, active, password, loginProvider } = body
+    const { email, firstName, lastName, organization, active, isFleetManager, password, loginProvider } = body
 
     // Prepare update data
     const updateData: any = {}
@@ -43,6 +43,7 @@ export async function PUT(
     if (lastName) updateData.lastName = lastName
     if (organization !== undefined) updateData.organization = organization
     if (active !== undefined) updateData.active = active
+    if (isFleetManager !== undefined) updateData.isFleetManager = isFleetManager
     if (loginProvider !== undefined) updateData.loginProvider = loginProvider
     
     // If setting login provider to hybrid, ALWAYS set default password

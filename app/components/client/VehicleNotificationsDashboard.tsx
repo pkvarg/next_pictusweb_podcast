@@ -353,7 +353,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl">
+        <div className="p-3 bg-gradient-to-r from-purple-600/20 to-purple-800/20 rounded-xl">
           <Car className="w-8 h-8 text-purple-400" />
         </div>
         <div>
@@ -369,10 +369,10 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
           .map(([type, count], index) => {
             const colors = [
               {
-                bg: 'from-blue-600/20 to-blue-800/20',
-                border: 'border-blue-500/30',
-                text: 'text-blue-300',
-                icon: 'text-blue-400',
+                bg: 'from-purple-600/20 to-purple-800/20',
+                border: 'border-purple-500/30',
+                text: 'text-purple-300',
+                icon: 'text-purple-400',
               },
               {
                 bg: 'from-green-600/20 to-green-800/20',
@@ -381,10 +381,10 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                 icon: 'text-green-400',
               },
               {
-                bg: 'from-purple-600/20 to-purple-800/20',
-                border: 'border-purple-500/30',
-                text: 'text-purple-300',
-                icon: 'text-purple-400',
+                bg: 'from-purple-700/20 to-purple-900/20',
+                border: 'border-purple-600/30',
+                text: 'text-purple-200',
+                icon: 'text-purple-300',
               },
               {
                 bg: 'from-orange-600/20 to-orange-800/20',
@@ -393,10 +393,10 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                 icon: 'text-orange-400',
               },
               {
-                bg: 'from-pink-600/20 to-pink-800/20',
-                border: 'border-pink-500/30',
-                text: 'text-pink-300',
-                icon: 'text-pink-400',
+                bg: 'from-purple-500/20 to-purple-700/20',
+                border: 'border-purple-400/30',
+                text: 'text-purple-300',
+                icon: 'text-purple-400',
               },
             ]
             const color = colors[index % colors.length]
@@ -419,19 +419,19 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Vehicle Cards Dashboard */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-2 lg:p-6 border border-purple-500/30">
+      <div className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-xl p-2 lg:p-6 border border-purple-500/30">
         <VehicleCardsDashboard company={company} />
       </div>
 
       {/* Original Notification Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-xl p-6 border border-blue-500/30">
+        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-xl p-6 border border-purple-500/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-300 text-xl font-medium">Celkové notifikácie</p>
+              <p className="text-purple-300 text-xl font-medium">Celkové notifikácie</p>
               <p className="text-5xl font-bold text-white">{stats.totalNotifications}</p>
             </div>
-            <Bell className="w-8 h-8 text-blue-400" />
+            <Bell className="w-8 h-8 text-purple-400" />
           </div>
         </div>
 
@@ -445,13 +445,13 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-pink-600/20 to-pink-800/20 rounded-xl p-6 border border-pink-500/30">
+        <div className="bg-gradient-to-br from-purple-700/20 to-purple-900/20 rounded-xl p-6 border border-purple-600/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-pink-300 text-xl font-medium">Tento mesiac</p>
+              <p className="text-purple-300 text-xl font-medium">Tento mesiac</p>
               <p className="text-5xl font-bold text-white">{stats.upcomingMonth.length}</p>
             </div>
-            <Calendar className="w-8 h-8 text-pink-400" />
+            <Calendar className="w-8 h-8 text-purple-400" />
           </div>
         </div>
 
@@ -477,7 +477,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Notification Types Chart */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-6 border border-purple-500/30">
+      <div className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-xl p-6 border border-purple-500/30">
         <h3 className="text-4xl font-bold text-white mb-6 flex items-center gap-2">
           <Activity className="w-8 h-8" />
           Distribúcia typov notifikácií
@@ -489,7 +489,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
               <div className="flex items-center gap-2">
                 <div className="w-32 bg-gray-700 rounded-full h-2">
                   <div
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-gradient-to-r from-purple-500 to-purple-700 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${(count / stats.totalNotifications) * 100}%` }}
                   ></div>
                 </div>
@@ -501,7 +501,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Time Filter Controls */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-3 md:p-6 border border-purple-500/30">
+      <div className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-xl p-3 md:p-6 border border-purple-500/30">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0 mb-6">
           <h3 className="text-2xl md:text-4xl font-bold text-white flex items-center gap-2">
             <Filter className="w-6 h-6 md:w-8 md:h-8" />
@@ -526,7 +526,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Vehicle Notifications by Registration */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-xl p-2 lg:p-6 border border-purple-500/30">
+      <div className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-xl p-2 lg:p-6 border border-purple-500/30">
         <h3 className="text-4xl font-bold text-white mb-6 flex items-center gap-2">
           <Car className="w-8 h-8" />
           Notifikácie podľa vozidla
@@ -776,7 +776,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
       {/* Communication Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-br from-indigo-600/20 to-indigo-800/20 rounded-xl p-6 border border-indigo-500/30">
+        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-xl p-6 border border-purple-500/30">
           <h3 className="text-3xl font-bold text-white mb-4 flex items-center gap-2">
             <Mail className="w-8 h-8" />
             E-mailová komunikácia
@@ -798,7 +798,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-teal-600/20 to-teal-800/20 rounded-xl p-6 border border-teal-500/30">
+        <div className="bg-gradient-to-br from-purple-700/20 to-purple-900/20 rounded-xl p-6 border border-purple-600/30">
           <h3 className="text-3xl font-bold text-white mb-4 flex items-center gap-2">
             <MessageSquare className="w-8 h-8" />
             SMS komunikácia

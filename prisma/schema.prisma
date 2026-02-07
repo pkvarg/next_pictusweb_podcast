@@ -4,8 +4,7 @@ generator client {
 
 datasource db {
   provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  
+  url               = env("DATABASE_URL")  
 }
 
 model Blog {
@@ -81,6 +80,7 @@ model User {
   firstName      String?
   lastName       String?
   organization   String?
+  isFleetManager Boolean   @default(false)
   loginProvider  String?
   hybridPassword String?
 }

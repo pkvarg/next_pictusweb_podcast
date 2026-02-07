@@ -1,16 +1,17 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { 
-  Users, 
-  Plus, 
-  Edit2, 
-  Trash2, 
+import {
+  Users,
+  Plus,
+  Edit2,
+  Trash2,
   Calendar,
   Mail,
   Building,
   UserCheck,
   UserX,
-  Search
+  Search,
+  Shield
 } from 'lucide-react'
 import CreateUserModal from './CreateUserModal'
 import EditUserModal from './EditUserModal'
@@ -23,6 +24,7 @@ interface User {
   lastName: string | null
   organization: string | null
   active: boolean
+  isFleetManager: boolean
   role: string
   password: string | null
   loginProvider: string | null
@@ -207,7 +209,13 @@ export default function AllUsers() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm text-gray-300">
                       <Building className="h-4 w-4 mr-2 text-gray-400" />
-                      {user.organization || 'N/A'}
+                      <span>{user.organization || 'N/A'}</span>
+                      {user.isFleetManager && (
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                          <Shield className="h-3 w-3 mr-1" />
+                          Manager
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
