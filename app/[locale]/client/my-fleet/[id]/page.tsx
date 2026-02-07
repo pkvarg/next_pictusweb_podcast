@@ -11,9 +11,12 @@ import {
   Save,
   ShieldAlert,
   AlertCircle,
+  Upload,
+  X,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
+import Image from 'next/image'
 
 interface MyVehicle {
   id: string
@@ -34,9 +37,13 @@ const EditVehiclePage = () => {
   const vehicleId = params.id as string
   const t = useTranslations('Client')
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [fetchingVehicle, setFetchingVehicle] = useState(true)
   const [error, setError] = useState('')
   const [vehicle, setVehicle] = useState<MyVehicle | null>(null)
+  const [file, setFile] = useState<File | null>(null)
+  const [filePreview, setFilePreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
     type: '',
     registration: '',
@@ -114,6 +121,64 @@ const EditVehiclePage = () => {
     }))
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0]
+    if (!selectedFile) return
+
+    // Validate file type
+    if (!selectedFile.type.startsWith('image/')) {
+      setError('Prosím, nahrajte obrázok')
+      return
+    }
+
+    setFile(selectedFile)
+    setError('')
+
+    // Create preview
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setFilePreview(reader.result as string)
+    }
+    reader.readAsDataURL(selectedFile)
+  }
+
+  const removeFile = () => {
+    setFile(null)
+    setFilePreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const uploadImage = async () => {
+    if (!file || !session?.user?.organization) return null
+
+    setUploading(true)
+    try {
+      const formDataUpload = new FormData()
+      formDataUpload.append('file', file)
+      formDataUpload.append('organization', session.user.organization)
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/upload/fleetsync`, {
+        method: 'POST',
+        body: formDataUpload,
+      })
+
+      if (!response.ok) {
+        throw new Error('Nepodarilo sa nahrať obrázok')
+      }
+
+      const data = await response.json()
+      return data.imageUrl
+    } catch (err) {
+      console.error('Error uploading image:', err)
+      setError('Nepodarilo sa nahrať obrázok')
+      return null
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -127,6 +192,17 @@ const EditVehiclePage = () => {
     }
 
     try {
+      // Upload image if file is selected
+      let imageUrl = formData.image
+      if (file) {
+        const uploadedUrl = await uploadImage()
+        if (!uploadedUrl) {
+          setLoading(false)
+          return // Error already set by uploadImage
+        }
+        imageUrl = uploadedUrl
+      }
+
       const response = await fetch(`/api/my-vehicles/${vehicleId}`, {
         method: 'PUT',
         headers: {
@@ -136,7 +212,7 @@ const EditVehiclePage = () => {
           type: formData.type,
           registration: formData.registration,
           year: formData.year ? parseInt(formData.year) : null,
-          image: formData.image || null,
+          image: imageUrl || null,
           note: formData.note || null,
         }),
       })
@@ -323,18 +399,65 @@ const EditVehiclePage = () => {
               />
             </div>
 
-            {/* Image URL */}
+            {/* Image Upload */}
             <div>
-              <label className="block text-white text-lg font-medium mb-2">URL obrázku</label>
-              <input
-                type="url"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                placeholder="https://example.com/vehicle.jpg"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-              <p className="text-purple-400 text-sm mt-2">Vložte URL obrázku vozidla (voliteľné)</p>
+              <label className="block text-white text-lg font-medium mb-2">Obrázok vozidla</label>
+
+              {!filePreview ? (
+                <div className="border-2 border-dashed border-purple-500/30 rounded-lg p-6 text-center hover:border-purple-500/50 transition">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="vehicle-image"
+                  />
+                  <label
+                    htmlFor="vehicle-image"
+                    className="cursor-pointer flex flex-col items-center gap-2"
+                  >
+                    <Upload className="w-12 h-12 text-purple-400" />
+                    <p className="text-white">Kliknite pre výber nového obrázku</p>
+                    <p className="text-purple-400 text-sm">alebo vložte URL nižšie</p>
+                  </label>
+                  {formData.image && (
+                    <p className="text-purple-300 text-sm mt-2">Aktuálny obrázok: {formData.image}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className="relative h-48 w-full border border-purple-500/30 rounded-lg overflow-hidden">
+                    <Image
+                      src={filePreview}
+                      alt="Náhľad"
+                      fill
+                      style={{ objectFit: 'contain' }}
+                      className="bg-black/20"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeFile}
+                    className="absolute top-2 right-2 p-2 bg-red-600/80 hover:bg-red-600 rounded-lg transition"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              )}
+
+              <div className="mt-4">
+                <p className="text-purple-400 text-sm mb-2">Alebo vložte URL obrázku:</p>
+                <input
+                  type="url"
+                  name="image"
+                  value={formData.image}
+                  onChange={handleChange}
+                  placeholder="https://example.com/vehicle.jpg"
+                  disabled={!!file}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-50"
+                />
+              </div>
             </div>
 
             {/* Note */}
@@ -363,13 +486,13 @@ const EditVehiclePage = () => {
           <div className="flex items-center gap-4 mt-8">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || uploading}
               className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-6 py-4 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
+              {loading || uploading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Ukladám...
+                  {uploading ? 'Nahrávam obrázok...' : 'Ukladám...'}
                 </>
               ) : (
                 <>
