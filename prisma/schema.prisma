@@ -90,33 +90,36 @@ model User {
 }
 
 model VehicleNotification {
-  id                   Int       @id @default(autoincrement())
-  company              String?   @db.VarChar(100)
-  personName           String?   @db.VarChar(100)
-  email                String?   @db.VarChar(150)
-  phoneNumber          String?   @db.VarChar(150)
-  vehicleRegistration  String?   @db.VarChar(20)
-  vehicleType          String?   @db.VarChar(100)
-  notificationType     String?   @db.VarChar(50)
-  notificationChannel  String?   @db.VarChar(50)
+  id                   Int        @id @default(autoincrement())
+  company              String?    @db.VarChar(100)
+  personName           String?    @db.VarChar(100)
+  email                String?    @db.VarChar(150)
+  phoneNumber          String?    @db.VarChar(150)
+  vehicleRegistration  String?    @db.VarChar(20)
+  vehicleType          String?    @db.VarChar(100)
+  notificationType     String?    @db.VarChar(50)
+  notificationChannel  String?    @db.VarChar(50)
   notificationDate     DateTime?
   dutyDate             DateTime?
   emailMessage         String?
-  status               String    @default("pending") @db.VarChar(20)
+  status               String     @default("pending") @db.VarChar(20)
   emailSentAt          DateTime?
   smsSentAt            DateTime?
-  createdAt            DateTime  @default(now())
-  sheetRowId           String?   @unique @db.VarChar(50)
-  confirmationToken    String?   @unique @map("confirmation_token") @db.VarChar(64)
-  tokenExpiresAt       DateTime? @map("token_expires_at")
-  confirmationAttempts Int       @default(0)
+  createdAt            DateTime   @default(now())
+  sheetRowId           String?    @unique @db.VarChar(50)
+  confirmationToken    String?    @unique @map("confirmation_token") @db.VarChar(64)
+  tokenExpiresAt       DateTime?  @map("token_expires_at")
+  confirmationAttempts Int        @default(0)
   confirmedAt          DateTime?
   lastReminderSent     DateTime?
   finalStatusUpdated   DateTime?
-  userId               String?   @map("user_id")
-  user                 User?     @relation(fields: [userId], references: [id])
+  userId               String?    @map("user_id")
+  user                 User?      @relation(fields: [userId], references: [id])
+  myVehicleId          String?    @map("my_vehicle_id")
+  myVehicle            MyVehicle? @relation(fields: [myVehicleId], references: [id])
 
   @@index([userId])
+  @@index([myVehicleId])
   @@map("vehiclenotification")
 }
 
@@ -164,20 +167,21 @@ model ConfirmationLog {
 }
 
 model MyVehicle {
-  id             String               @id @default(uuid())
-  organization   String               @db.VarChar(100)
-  type           String               @db.VarChar(100)
-  registration   String               @db.VarChar(20)
-  year           Int?
-  image          String?
-  note           String?              @db.Text
-  createdAt      DateTime             @default(now()) @map("created_at")
-  updatedAt      DateTime             @updatedAt @map("updated_at")
-  deletedAt      DateTime?            @map("deleted_at")
-  userId         String               @map("user_id")
-  user           User                 @relation(fields: [userId], references: [id])
-  expenses       MyVehicleExpense[]
-  mileageRecords MyVehicleMileage[]
+  id                    String                 @id @default(uuid())
+  organization          String                 @db.VarChar(100)
+  type                  String                 @db.VarChar(100)
+  registration          String                 @db.VarChar(20)
+  year                  Int?
+  image                 String?
+  note                  String?                @db.Text
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  deletedAt             DateTime?              @map("deleted_at")
+  userId                String                 @map("user_id")
+  user                  User                   @relation(fields: [userId], references: [id])
+  expenses              MyVehicleExpense[]
+  mileageRecords        MyVehicleMileage[]
+  vehicleNotifications  VehicleNotification[]
 
   @@index([userId])
   @@map("my_vehicles")

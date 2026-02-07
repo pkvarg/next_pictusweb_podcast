@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import {
   Car,
   Bell,
@@ -18,6 +19,13 @@ import {
   ChevronUp,
 } from 'lucide-react'
 import VehicleCardsDashboard from './VehicleCardsDashboard'
+
+interface MyVehicle {
+  id: string
+  image: string | null
+  registration: string
+  type: string
+}
 
 interface VehicleNotification {
   id: number
@@ -37,11 +45,13 @@ interface VehicleNotification {
   createdAt: string
   confirmedAt: string | null
   confirmationAttempts: number
+  myVehicle?: MyVehicle | null
 }
 
 interface VehicleGroup {
   vehicleRegistration: string | null
   vehicleType: string | null
+  vehicleImage: string | null
   notifications: VehicleNotification[]
 }
 
@@ -117,6 +127,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
               vehicleMap.set(key, {
                 vehicleRegistration: notification.vehicleRegistration,
                 vehicleType: notification.vehicleType,
+                vehicleImage: notification.myVehicle?.image || null,
                 notifications: [],
               })
             }
@@ -553,11 +564,22 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                     onClick={() => toggleVehicleExpanded(vehicleKey)}
                   >
                     <div className="flex items-center gap-4">
-                      <div
-                        className={`p-2 bg-gradient-to-r ${styles.bg} rounded-lg border ${styles.border}`}
-                      >
-                        <Car className={`w-5 h-5 ${styles.icon}`} />
-                      </div>
+                      {vehicleGroup.vehicleImage ? (
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-purple-900/50">
+                          <Image
+                            src={vehicleGroup.vehicleImage}
+                            alt={vehicleGroup.vehicleRegistration || 'Vehicle'}
+                            fill
+                            style={{ objectFit: 'cover' }}
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className={`p-2 bg-gradient-to-r ${styles.bg} rounded-lg border ${styles.border}`}
+                        >
+                          <Car className={`w-5 h-5 ${styles.icon}`} />
+                        </div>
+                      )}
                       <div>
                         <h4 className="text-4xl font-bold text-white">
                           {vehicleGroup.vehicleRegistration || 'Neznáme vozidlo'}

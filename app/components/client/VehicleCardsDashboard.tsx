@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import {
   Car,
   Calendar,
@@ -11,6 +12,13 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react'
+
+interface MyVehicle {
+  id: string
+  image: string | null
+  registration: string
+  type: string
+}
 
 interface VehicleNotification {
   id: number
@@ -30,6 +38,7 @@ interface VehicleNotification {
   createdAt: string
   confirmedAt: string | null
   confirmationAttempts: number
+  myVehicle?: MyVehicle | null
 }
 
 interface TaskGroup {
@@ -43,6 +52,7 @@ interface TaskGroup {
 interface VehicleCard {
   vehicleRegistration: string
   vehicleType: string | null
+  vehicleImage: string | null
   nextTask: VehicleNotification | null
   allTasks: VehicleNotification[]
   taskGroups: TaskGroup[]
@@ -168,6 +178,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
             cards.push({
               vehicleRegistration,
               vehicleType: notifications[0]?.vehicleType || null,
+              vehicleImage: notifications[0]?.myVehicle?.image || null,
               nextTask,
               allTasks: notifications,
               taskGroups,
@@ -342,9 +353,20 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                 onClick={() => toggleVehicleExpanded(vehicleKey)}
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 bg-purple-600/20 rounded-lg">
-                    <Car className="w-5 h-5 text-purple-400" />
-                  </div>
+                  {vehicle.vehicleImage ? (
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-purple-900/50">
+                      <Image
+                        src={vehicle.vehicleImage}
+                        alt={vehicle.vehicleRegistration}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-2 bg-purple-600/20 rounded-lg">
+                      <Car className="w-5 h-5 text-purple-400" />
+                    </div>
+                  )}
                   <div>
                     <h4 className="text-4xl font-bold text-white">{vehicle.vehicleRegistration}</h4>
                     <p className="text-white text-lg">{vehicle.vehicleType || 'Neznámy typ'}</p>

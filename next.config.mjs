@@ -31,10 +31,21 @@ const nextConfig = {
         pathname: '/api/upload/pictusweb/**',
       },
       {
+        protocol: 'https',
+        hostname: 'hono-api.pictusweb.com',
+        pathname: '/api/upload/fleetsync/**',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
         port: '3013',
         pathname: '/api/upload/pictusweb/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3013',
+        pathname: '/api/upload/fleetsync/**',
       },
     ],
   },

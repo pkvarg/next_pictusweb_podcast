@@ -35,9 +35,19 @@ export async function GET(request: NextRequest) {
 
     const notifications = await prisma.vehicleNotification.findMany({
       where: whereClause,
+      include: {
+        myVehicle: {
+          select: {
+            id: true,
+            image: true,
+            registration: true,
+            type: true,
+          },
+        },
+      },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     })
 
     return NextResponse.json({ notifications })
