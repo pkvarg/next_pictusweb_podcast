@@ -33,16 +33,16 @@ const AI = () => {
       description: 'Test Azure TTS with Slovak voice',
       action: start,
       icon: Brain,
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-500/10 hover:bg-blue-500/20'
+      color: 'from-pictus-lime to-pictus-lime600',
+      bgColor: 'bg-pictus-lime/10 hover:bg-pictus-lime/20'
     },
     {
       title: 'ElevenLabs TTS',
       description: 'Test ElevenLabs voice synthesis',
       action: startEleven,
       icon: Mic,
-      color: 'from-purple-500 to-purple-600', 
-      bgColor: 'bg-purple-500/10 hover:bg-purple-500/20'
+      color: 'from-pictus-lime to-pictus-lime600',
+      bgColor: 'bg-pictus-lime/10 hover:bg-pictus-lime/20'
     },
     {
       title: 'Get ElevenLabs Voices',
@@ -101,14 +101,14 @@ const AI = () => {
           <h2 className="text-xl font-semibold text-white mb-4">Service Information</h2>
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+              <div className="w-2 h-2 bg-pictus-lime rounded-full mt-2 flex-shrink-0"></div>
               <div>
                 <h3 className="font-medium text-white">Azure TTS</h3>
                 <p className="text-sm text-gray-400">Microsoft&apos;s neural voice synthesis with Slovak language support</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+              <div className="w-2 h-2 bg-pictus-lime rounded-full mt-2 flex-shrink-0"></div>
               <div>
                 <h3 className="font-medium text-white">ElevenLabs</h3>
                 <p className="text-sm text-gray-400">Advanced AI voice cloning and synthesis technology</p>

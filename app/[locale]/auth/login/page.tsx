@@ -25,7 +25,8 @@ export default function LoginPage() {
   useEffect(() => {
     if (session?.user) {
       console.log('Frontend: User already logged in, redirecting...')
-      window.location.href = `/${locale}/client`
+      const redirectPath = session.user.role === 'admin' ? 'admin' : 'client'
+      window.location.href = `/${locale}/${redirectPath}`
     }
   }, [session, locale])
 
@@ -37,7 +38,8 @@ export default function LoginPage() {
 
     if (session?.user) {
       console.log('Frontend: Already logged in, redirecting...')
-      window.location.href = `/${locale}/client`
+      const redirectPath = session.user.role === 'admin' ? 'admin' : 'client'
+      window.location.href = `/${locale}/${redirectPath}`
       return
     }
 
@@ -58,9 +60,19 @@ export default function LoginPage() {
         console.log('Frontend: Login failed with error:', result.error)
         setError(t('invalidCredentials'))
       } else if (result?.ok) {
-        console.log('Frontend: Login successful, redirecting...')
+        console.log('Frontend: Login successful, getting session...')
+        // Wait a moment for session to be updated
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        // Get the updated session to check user role
+        const response = await fetch('/api/auth/session')
+        const sessionData = await response.json()
+
+        console.log('Frontend: Session data:', sessionData)
+        const redirectPath = sessionData?.user?.role === 'admin' ? 'admin' : 'client'
+
         // Force redirect using window.location
-        window.location.href = `/${locale}/client`
+        window.location.href = `/${locale}/${redirectPath}`
       } else {
         console.log('Frontend: Unexpected result:', result)
         setError(t('loginError'))
@@ -82,21 +94,21 @@ export default function LoginPage() {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-r from-blue-900 to-purple-900">
+    <section className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black font-brutal-milk">
       <PagesHeader />
       <div className=" flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            {/* <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Headphones size={32} className="text-white" />
+            {/* <div className="w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Headphones size={32} className="text-pictus-black" />
           </div> */}
-            {/* <h1 className="text-2xl font-bold text-white">{t('loginTitle')}</h1> */}
-            <p className="text-white mt-2">{t('loginSubtitle')}</p>
+            {/* <h1 className="text-2xl font-bold text-pictus-white">{t('loginTitle')}</h1> */}
+            <p className="text-pictus-white mt-2">{t('loginSubtitle')}</p>
           </div>
 
           {/* Login Form */}
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/20">
+          <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 backdrop-blur-xl rounded-2xl p-8 border border-pictus-lime/30">
             {/* OAuth Buttons */}
             {/* <div className="space-y-4 mb-6">
               <button
@@ -147,7 +159,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-200 mb-2">
+                <label htmlFor="username" className="block text-lg font-light text-pictus-white mb-2">
                   {t('username')}
                 </label>
                 <input
@@ -156,19 +168,19 @@ export default function LoginPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
                   placeholder={t('usernamePlaceholder')}
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-200">
+                  <label htmlFor="password" className="block text-lg font-light text-pictus-white">
                     {t('password')}
                   </label>
                   <Link
                     href="/auth/forgot-password"
-                    className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                    className="text-sm text-pictus-lime hover:text-pictus-lime600 transition-colors"
                   >
                     Zabudli ste heslo?
                   </Link>
@@ -179,7 +191,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
                   placeholder={t('passwordPlaceholder')}
                 />
               </div>
@@ -193,10 +205,10 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-pictus-lime/50"
               >
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin" />
                 ) : (
                   <>
                     <LogIn className="mr-2 h-4 w-4" />

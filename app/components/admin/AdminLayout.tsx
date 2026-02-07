@@ -70,20 +70,20 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
       {/* Top Navigation */}
-      <header className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
+      <header className="bg-pictus-white/10 backdrop-blur-xl border-b border-pictus-lime/30 sticky top-0 z-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <Link href="/" className="flex items-center space-x-3 text-white">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Headphones size={18} className="text-white" />
+              <Link href="/" className="flex items-center space-x-3 text-pictus-white">
+                <div className="w-8 h-8 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-lg flex items-center justify-center">
+                  <Headphones size={18} className="text-pictus-black" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold">Pictusweb</h1>
-                  <p className="text-xs text-gray-400 hidden sm:block">Admin Panel</p>
+                  <h1 className="text-xl font-light">Pictusweb</h1>
+                  <p className="text-lg text-pictus-lime hidden sm:block">Admin Panel</p>
                 </div>
               </Link>
             </div>
@@ -98,15 +98,15 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    className={`flex items-center px-4 py-2 text-[14px] font-light rounded-lg transition-all duration-200 ${
                       isActive
-                        ? 'bg-gradient-to-r from-blue-500/20 to-purple-600/20 text-white border border-blue-500/30'
-                        : 'text-gray-300 hover:text-white hover:bg-white/10'
+                        ? 'bg-gradient-to-r from-pictus-lime/20 to-pictus-lime600/20 text-pictus-white border border-pictus-lime/30'
+                        : 'text-pictus-white/70 hover:text-pictus-white hover:bg-pictus-white/10'
                     }`}
                   >
                     <Icon
                       className={`mr-2 h-4 w-4 transition-colors ${
-                        isActive ? 'text-blue-400' : 'text-gray-400'
+                        isActive ? 'text-pictus-lime' : 'text-pictus-white/50'
                       }`}
                     />
                     <span className="hidden lg:block">{item.name}</span>
@@ -121,7 +121,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               {/* Back to Website - Desktop */}
               <Link
                 href="/"
-                className="hidden sm:flex items-center text-sm text-gray-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                className="hidden sm:flex items-center text-lg text-pictus-white hover:text-pictus-lime transition-colors px-3 py-2 rounded-lg hover:bg-pictus-white/10"
               >
                 <Home className="mr-2 h-4 w-4" />
                 <span className="hidden lg:block">Back to Website</span>
@@ -130,7 +130,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               {/* Logout - Desktop */}
               <button
                 onClick={handleLogout}
-                className="hidden sm:flex items-center text-sm text-gray-400 hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
+                className="hidden sm:flex items-center text-lg text-pictus-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span className="hidden lg:block">Logout</span>
@@ -139,7 +139,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all"
+                className="md:hidden p-2 rounded-lg bg-pictus-white/10 text-pictus-white hover:bg-pictus-white/20 transition-all"
               >
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
@@ -149,7 +149,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white/5 backdrop-blur-xl border-t border-white/10">
+          <div className="md:hidden bg-pictus-white/5 backdrop-blur-xl border-t border-pictus-lime/30">
             <nav className="px-4 py-4 space-y-2">
               {navigation.map((item) => {
                 const Icon = item.icon
@@ -160,15 +160,15 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                     key={item.name}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    className={`flex items-center px-4 py-3 text-lg font-light rounded-lg transition-all duration-200 ${
                       isActive
-                        ? 'bg-gradient-to-r from-blue-500/20 to-purple-600/20 text-white border border-blue-500/30'
-                        : 'text-gray-300 hover:text-white hover:bg-white/10'
+                        ? 'bg-gradient-to-r from-pictus-lime/20 to-pictus-lime600/20 text-pictus-white border border-pictus-lime/30'
+                        : 'text-pictus-white/70 hover:text-pictus-white hover:bg-pictus-white/10'
                     }`}
                   >
                     <Icon
                       className={`mr-3 h-5 w-5 transition-colors ${
-                        isActive ? 'text-blue-400' : 'text-gray-400'
+                        isActive ? 'text-pictus-lime' : 'text-pictus-white/50'
                       }`}
                     />
                     {item.name}
@@ -179,7 +179,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               {/* Mobile Back to Website */}
               <Link
                 href="/"
-                className="flex items-center px-4 py-3 text-sm text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors border-t border-white/10 mt-4 pt-4"
+                className="flex items-center px-4 py-3 text-lg text-pictus-white hover:text-pictus-lime hover:bg-pictus-white/10 rounded-lg transition-colors border-t border-pictus-lime/30 mt-4 pt-4"
               >
                 <Home className="mr-3 h-5 w-5" />
                 Back to Website
@@ -188,7 +188,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               {/* Mobile Logout */}
               <button
                 onClick={handleLogout}
-                className="flex items-center px-4 py-3 text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors w-full"
+                className="flex items-center px-4 py-3 text-lg text-pictus-white hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors w-full"
               >
                 <LogOut className="mr-3 h-5 w-5" />
                 Logout

@@ -42,12 +42,12 @@ export default async function AllPodcasts() {
     return (
       <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-12">
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-4">
-            <Headphones className="h-8 w-8 text-white" />
+          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-full flex items-center justify-center mb-4">
+            <Headphones className="h-8 w-8 text-pictus-black" />
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">No Podcasts Found</h3>
           <p className="text-gray-400 mb-6">Start creating your first AI-generated podcast</p>
-          <div className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] font-normal rounded-lg transition-all shadow-lg hover:shadow-pictus-lime/50 hover:from-pictus-lime400 hover:to-pictus-lime700">
             <Mic className="h-4 w-4 mr-2" />
             Create Your First Podcast
           </div>
@@ -78,7 +78,7 @@ export default async function AllPodcasts() {
             className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden hover:border-white/20 transition-all duration-200 hover:scale-[1.02]"
           >
             {/* Image Header */}
-            <div className="relative h-48 bg-gradient-to-br from-blue-500/20 to-purple-600/20">
+            <div className="relative h-48 bg-gradient-to-br from-pictus-lime/20 to-pictus-lime600/20">
               {podcast.imagePath ? (
                 <Image
                   src={podcast.imagePath}

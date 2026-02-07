@@ -219,7 +219,7 @@ export default function EditUserModal({
               name="active"
               checked={formData.active}
               onChange={handleChange}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-pictus-lime bg-gray-100 border-gray-300 rounded focus:ring-pictus-lime"
             />
           </div>
 
@@ -233,7 +233,7 @@ export default function EditUserModal({
               name="isFleetManager"
               checked={formData.isFleetManager}
               onChange={handleChange}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-pictus-lime bg-gray-100 border-gray-300 rounded focus:ring-pictus-lime"
             />
           </div>
 
@@ -241,14 +241,14 @@ export default function EditUserModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-gray-400 hover:text-white text-[14px] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white rounded-lg transition-colors"
+              className="px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all shadow-lg hover:shadow-pictus-lime/50 disabled:opacity-50"
             >
               {loading ? 'Updating...' : 'Update User'}
             </button>

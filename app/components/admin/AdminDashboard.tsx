@@ -12,8 +12,8 @@ const AdminDashboard = () => {
       description: 'Generate AI podcast from text',
       href: '/admin/audio',
       icon: Mic,
-      color: 'from-blue-500 to-purple-600',
-      bgColor: 'bg-blue-500/10 hover:bg-blue-500/20',
+      color: 'from-pictus-lime to-pictus-lime600',
+      bgColor: 'bg-pictus-lime/10 hover:bg-pictus-lime/20',
     },
     // {
     //   title: 'AI Services',
@@ -36,8 +36,8 @@ const AdminDashboard = () => {
       description: 'View Metabase analytics',
       href: '/admin/dashboard',
       icon: BarChart3,
-      color: 'from-orange-500 to-red-600',
-      bgColor: 'bg-orange-500/10 hover:bg-orange-500/20',
+      color: 'from-pictus-lime to-pictus-lime600',
+      bgColor: 'bg-pictus-lime/10 hover:bg-pictus-lime/20',
     },
   ]
 
@@ -65,8 +65,8 @@ const AdminDashboard = () => {
                   <Counter />
                 </div>
               </div>
-              <div className="p-3 bg-blue-500/20 rounded-lg">
-                <Eye className="h-6 w-6 text-blue-400" />
+              <div className="p-3 bg-pictus-lime/20 rounded-lg">
+                <Eye className="h-6 w-6 text-pictus-lime" />
               </div>
             </div>
           </div>
@@ -77,8 +77,8 @@ const AdminDashboard = () => {
                 <p className="text-sm text-gray-400">Bot Visits</p>
                 <p className="text-2xl font-semibold text-white">--</p>
               </div>
-              <div className="p-3 bg-purple-500/20 rounded-lg">
-                <Bot className="h-6 w-6 text-purple-400" />
+              <div className="p-3 bg-pictus-lime/20 rounded-lg">
+                <Bot className="h-6 w-6 text-pictus-lime" />
               </div>
             </div>
           </div>
@@ -133,7 +133,7 @@ const AdminDashboard = () => {
           <h2 className="text-xl font-semibold text-white">Recent Podcasts</h2>
           <Link
             href="/admin/audio"
-            className="text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center space-x-1"
+            className="text-pictus-lime hover:text-pictus-lime600 text-[14px] font-medium flex items-center space-x-1"
           >
             <span>View all</span>
             <TrendingUp className="h-4 w-4" />
@@ -148,7 +148,7 @@ const AdminDashboard = () => {
               <p className="text-gray-400 mb-4">Your recent podcasts will appear here</p>
               <Link
                 href="/admin/audio"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] font-normal rounded-lg transition-all shadow-lg hover:shadow-pictus-lime/50 hover:from-pictus-lime400 hover:to-pictus-lime700"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Create First Podcast

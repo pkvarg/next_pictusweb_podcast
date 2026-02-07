@@ -38,8 +38,8 @@ const PublishButton: React.FC<Publish> = ({ published, podcastId }) => {
           onClick={changePublishStatus}
           className={
             published
-              ? 'my-8 py-1 px-8 bg-orange-900 text-white rounded-xl'
-              : 'my-8 py-1 px-8  bg-green-500 text-white rounded-xl'
+              ? 'my-8 py-1 px-8 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] rounded-xl font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all shadow-lg hover:shadow-pictus-lime/50'
+              : 'my-8 py-1 px-8  bg-green-500 text-white text-[14px] rounded-xl'
           }
         >
           {published ? 'Unpublish' : 'Publish'}

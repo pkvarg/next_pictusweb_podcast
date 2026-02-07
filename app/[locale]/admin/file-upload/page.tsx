@@ -133,7 +133,7 @@ const FileUpload = () => {
               <button
                 onClick={uploadFile}
                 disabled={loading || !file}
-                className="flex-1 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:opacity-50 cursor-pointer"
+                className="flex-1 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] py-2 px-4 rounded font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all shadow-lg hover:shadow-pictus-lime/50 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? 'Nahrávam...' : 'Nahrať súbor'}
               </button>
@@ -141,7 +141,7 @@ const FileUpload = () => {
               {file && (
                 <button
                   onClick={resetUpload}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded"
+                  className="flex-1 bg-pictus-white/10 hover:bg-pictus-white/20 text-pictus-white text-[14px] py-2 px-4 rounded transition-all"
                 >
                   Zrušiť
                 </button>

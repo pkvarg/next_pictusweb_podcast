@@ -87,8 +87,8 @@ export default function AllUsers() {
     return (
       <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-12">
         <div className="text-center">
-          <div className="animate-spin mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-4">
-            <Users className="h-8 w-8 text-white" />
+          <div className="animate-spin mx-auto w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-full flex items-center justify-center mb-4">
+            <Users className="h-8 w-8 text-pictus-black" />
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">Loading Users...</h3>
         </div>
@@ -100,14 +100,14 @@ export default function AllUsers() {
     return (
       <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-12">
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-4">
-            <Users className="h-8 w-8 text-white" />
+          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-full flex items-center justify-center mb-4">
+            <Users className="h-8 w-8 text-pictus-black" />
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">No Users Found</h3>
           <p className="text-gray-400 mb-6">Create your first user to get started</p>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] font-normal rounded-lg transition-all shadow-lg hover:shadow-pictus-lime/50 hover:from-pictus-lime400 hover:to-pictus-lime700"
           >
             <Plus className="h-4 w-4 mr-2" />
             Create First User
@@ -132,7 +132,7 @@ export default function AllUsers() {
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+          className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] font-normal rounded-lg transition-all shadow-lg hover:shadow-pictus-lime/50 hover:from-pictus-lime400 hover:to-pictus-lime700"
         >
           <Plus className="h-4 w-4" />
           <span>Add User</span>
@@ -186,8 +186,8 @@ export default function AllUsers() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                          <span className="text-white font-medium text-sm">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 flex items-center justify-center">
+                          <span className="text-pictus-black font-medium text-sm">
                             {(user.firstName?.[0] || user.email[0]).toUpperCase()}
                           </span>
                         </div>
@@ -211,7 +211,7 @@ export default function AllUsers() {
                       <Building className="h-4 w-4 mr-2 text-gray-400" />
                       <span>{user.organization || 'N/A'}</span>
                       {user.isFleetManager && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
                           <Shield className="h-3 w-3 mr-1" />
                           Manager
                         </span>
@@ -221,7 +221,7 @@ export default function AllUsers() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="space-y-1">
                       {user.loginProvider && (
-                        <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                        <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
                           {user.loginProvider}
                         </div>
                       )}
@@ -246,7 +246,7 @@ export default function AllUsers() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
                       {user.role}
                     </span>
                   </td>
@@ -260,7 +260,7 @@ export default function AllUsers() {
                     <div className="flex items-center justify-end space-x-2">
                       <button
                         onClick={() => setEditingUser(user)}
-                        className="text-blue-400 hover:text-blue-300 p-1 rounded"
+                        className="text-pictus-lime hover:text-pictus-lime600 p-1 rounded"
                         title="Edit user"
                       >
                         <Edit2 className="h-4 w-4" />

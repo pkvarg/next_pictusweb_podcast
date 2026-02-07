@@ -83,14 +83,14 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-r from-blue-900 to-purple-900">
+    <section className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black font-brutal-milk">
       <PagesHeader />
       <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {/* Back to Login Link */}
           <Link
             href="/auth/login"
-            className="inline-flex items-center text-white hover:text-purple-300 transition-colors mb-6"
+            className="inline-flex items-center text-pictus-white hover:text-pictus-lime transition-colors mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Späť na prihlásenie
@@ -98,18 +98,18 @@ export default function ForgotPasswordPage() {
 
           {/* Logo */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white mb-2">Obnovenie hesla</h1>
-            <p className="text-white mt-2">
+            <h1 className="text-4xl font-light text-pictus-white mb-2">Obnovenie hesla</h1>
+            <p className="text-pictus-white mt-2">
               Zadajte svoj email a pošleme vám odkaz na obnovenie hesla.
             </p>
           </div>
 
           {/* Form */}
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/20">
+          <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 backdrop-blur-xl rounded-2xl p-8 border border-pictus-lime/30">
             {!success ? (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
+                  <label htmlFor="email" className="block text-lg font-light text-pictus-white mb-2">
                     Email
                   </label>
                   <div className="relative">
@@ -119,7 +119,7 @@ export default function ForgotPasswordPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full px-4 py-3 pl-12 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 pl-12 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
                       placeholder="vas.email@priklad.sk"
                     />
                     <Mail
@@ -138,10 +138,10 @@ export default function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-pictus-lime/50"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin" />
                   ) : (
                     <>
                       <Mail className="mr-2 h-4 w-4" />
@@ -155,15 +155,15 @@ export default function ForgotPasswordPage() {
                 <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-green-500">
                   <Check size={32} className="text-green-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Email bol odoslaný!</h3>
-                <p className="text-gray-300 mb-6">
+                <h3 className="text-2xl font-normal text-pictus-white mb-3">Email bol odoslaný!</h3>
+                <p className="text-pictus-white/80 mb-6">
                   Ak je tento email zaregistrovaný v našom systéme, poslali sme vám odkaz na
                   obnovenie hesla. Skontrolujte si prosím emailovú schránku.
                 </p>
-                <p className="text-sm text-gray-400 mb-6">Odkaz je platný 1 hodinu.</p>
+                <p className="text-sm text-pictus-white/60 mb-6">Odkaz je platný 1 hodinu.</p>
                 <Link
                   href="/auth/login"
-                  className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center text-pictus-lime hover:text-pictus-lime600 transition-colors"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Späť na prihlásenie

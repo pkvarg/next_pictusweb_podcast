@@ -402,7 +402,7 @@ const Audio = () => {
                 ) : (
                   <button
                     onClick={generateAudio}
-                    className="bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer"
+                    className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] px-4 py-2 rounded-xl mt-4 cursor-pointer font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all shadow-lg hover:shadow-pictus-lime/50"
                   >
                     Generate
                   </button>
@@ -414,7 +414,7 @@ const Audio = () => {
                     <button
                       type="button"
                       onClick={downloadAudio}
-                      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl flex items-center gap-2 text-white w-max"
+                      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl flex items-center gap-2 text-white text-[14px] w-max"
                     >
                       <Download size={16} />
                       Download Audio
@@ -436,7 +436,7 @@ const Audio = () => {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
-              <option value="life" className="focus:bg-orange-500">
+              <option value="life" className="focus:bg-pictus-lime">
                 Life
               </option>
               <option value="tech">Tech</option>
@@ -493,16 +493,16 @@ const Audio = () => {
               )}
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-4 my-4 text-orange-500">
+            <div className="flex flex-col lg:flex-row gap-4 my-4 text-pictus-lime">
               <p
                 onClick={() => setOpenOwnImage((prev) => !prev)}
-                className="cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4"
+                className="cursor-pointer hover:text-pictus-lime600 border border-1 border-pictus-lime/30 rounded-xl px-4"
               >
                 Upload your own Image
               </p>
               <p
                 onClick={() => setOpenAiImage((prev) => !prev)}
-                className="cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4"
+                className="cursor-pointer hover:text-pictus-lime600 border border-1 border-pictus-lime/30 rounded-xl px-4"
               >
                 Use AI to create an Image
               </p>
@@ -548,7 +548,7 @@ const Audio = () => {
                 ) : (
                   <button
                     onClick={handleGetAiImage}
-                    className="bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer w-max"
+                    className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] px-4 py-2 rounded-xl mt-4 cursor-pointer w-max font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all shadow-lg hover:shadow-pictus-lime/50"
                   >
                     Get AI Image from Prompt
                   </button>
@@ -568,7 +568,7 @@ const Audio = () => {
                 <button
                   type="button"
                   onClick={downloadImage}
-                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl flex items-center gap-2 text-white"
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl flex items-center gap-2 text-white text-[14px]"
                 >
                   <Download size={16} />
                   Download Image
@@ -581,7 +581,7 @@ const Audio = () => {
             ) : (
               <button
                 onClick={handleSubmit}
-                className="bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer"
+                className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] px-4 py-2 rounded-xl mt-4 cursor-pointer font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all shadow-lg hover:shadow-pictus-lime/50"
               >
                 Create Podcast
               </button>

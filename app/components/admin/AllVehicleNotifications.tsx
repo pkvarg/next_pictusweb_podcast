@@ -110,11 +110,11 @@ export default function AllVehicleNotifications() {
       case 'pending':
         return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
       case 'sent':
-        return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+        return 'bg-pictus-lime/20 text-pictus-lime border-pictus-lime/30'
       case 'confirmed':
         return 'bg-green-500/20 text-green-400 border-green-500/30'
       case 'imported':
-        return 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+        return 'bg-pictus-lime/20 text-pictus-lime border-pictus-lime/30'
       case 'failed':
         return 'bg-red-500/20 text-red-400 border-red-500/30'
       default:
@@ -126,8 +126,8 @@ export default function AllVehicleNotifications() {
     return (
       <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-12">
         <div className="text-center">
-          <div className="animate-spin mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-4">
-            <Car className="h-8 w-8 text-white" />
+          <div className="animate-spin mx-auto w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-full flex items-center justify-center mb-4">
+            <Car className="h-8 w-8 text-pictus-black" />
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">Loading Vehicle Notifications...</h3>
         </div>
@@ -148,7 +148,7 @@ export default function AllVehicleNotifications() {
       {/* Testing Section */}
       <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
         <div className="flex items-center mb-4">
-          <TestTube className="h-5 w-5 text-purple-400 mr-2" />
+          <TestTube className="h-5 w-5 text-pictus-lime mr-2" />
           <h3 className="text-lg font-semibold text-white">Testing Section</h3>
         </div>
         <div className="flex items-center space-x-4">
@@ -156,7 +156,7 @@ export default function AllVehicleNotifications() {
             <select
               value={selectedNotificationId}
               onChange={(e) => setSelectedNotificationId(e.target.value)}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
             >
               <option value="">Select a notification ID...</option>
               {(Array.isArray(notifications) ? notifications : []).map((notification) => (
@@ -169,7 +169,7 @@ export default function AllVehicleNotifications() {
           <button
             onClick={handleTestStatusUpdate}
             disabled={!selectedNotificationId || testingLoading}
-            className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:bg-gray-600 disabled:cursor-not-allowed text-pictus-black text-[14px] font-normal rounded-lg transition-all shadow-lg hover:shadow-pictus-lime/50"
           >
             {testingLoading ? (
               <>
@@ -321,8 +321,8 @@ export default function AllVehicleNotifications() {
       {filteredNotifications.length === 0 && !loading && (
         <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-12">
           <div className="text-center">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-4">
-              <Car className="h-8 w-8 text-white" />
+            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-full flex items-center justify-center mb-4">
+              <Car className="h-8 w-8 text-pictus-black" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">No Vehicle Notifications Found</h3>
             <p className="text-gray-400">No notifications match your search criteria</p>

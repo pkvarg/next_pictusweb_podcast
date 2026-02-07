@@ -396,7 +396,7 @@ const EditPodcast = () => {
                 ) : (
                   <button
                     onClick={generateAudio}
-                    className="bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer"
+                    className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] px-4 py-2 rounded-xl mt-4 cursor-pointer font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all shadow-lg hover:shadow-pictus-lime/50"
                   >
                     Generate
                   </button>
@@ -418,7 +418,7 @@ const EditPodcast = () => {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                <option value="life" className="focus:bg-orange-500">
+                <option value="life" className="focus:bg-pictus-lime">
                   Life
                 </option>
                 <option value="tech">Tech</option>
@@ -435,16 +435,16 @@ const EditPodcast = () => {
                 <span className="pl-2">Is this to be displayed on the english webpage?</span>
               </label>
 
-              <div className="flex flex-col lg:flex-row gap-4 my-4 text-orange-500">
+              <div className="flex flex-col lg:flex-row gap-4 my-4 text-pictus-lime">
                 <p
                   onClick={() => setOpenOwnImage((prev) => !prev)}
-                  className="cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4"
+                  className="cursor-pointer hover:text-pictus-lime600 border border-1 border-pictus-lime/30 rounded-xl px-4"
                 >
                   Upload your own Image
                 </p>
                 <p
                   onClick={() => setOpenAiImage((prev) => !prev)}
-                  className="cursor-pointer hover:text-blue-500 border border-1 rounded-xl px-4"
+                  className="cursor-pointer hover:text-pictus-lime600 border border-1 border-pictus-lime/30 rounded-xl px-4"
                 >
                   Use AI to create an Image
                 </p>
@@ -496,7 +496,7 @@ const EditPodcast = () => {
                   ) : (
                     <button
                       onClick={handleGetAiImage}
-                      className="bg-orange-500 px-4 py-2 rounded-xl mt-4 cursor-pointer w-max"
+                      className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] px-4 py-2 rounded-xl mt-4 cursor-pointer w-max font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all shadow-lg hover:shadow-pictus-lime/50"
                     >
                       Get AI Image from Prompt
                     </button>

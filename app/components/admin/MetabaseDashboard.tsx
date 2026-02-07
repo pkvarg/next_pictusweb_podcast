@@ -34,8 +34,8 @@ export default function MetabaseDashboard() {
     return (
       <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-12">
         <div className="text-center">
-          <div className="animate-spin mx-auto w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center mb-4">
-            <BarChart3 className="h-8 w-8 text-white" />
+          <div className="animate-spin mx-auto w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-full flex items-center justify-center mb-4">
+            <BarChart3 className="h-8 w-8 text-pictus-black" />
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">Loading Dashboard...</h3>
         </div>
@@ -53,7 +53,7 @@ export default function MetabaseDashboard() {
           <h3 className="text-xl font-semibold text-white mb-2">{error}</h3>
           <button
             onClick={fetchEmbedUrl}
-            className="mt-4 inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded-lg transition-colors"
+            className="mt-4 inline-flex items-center px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] font-normal rounded-lg transition-all shadow-lg hover:shadow-pictus-lime/50 hover:from-pictus-lime400 hover:to-pictus-lime700"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Retry
@@ -69,7 +69,7 @@ export default function MetabaseDashboard() {
         <h2 className="text-lg font-semibold text-white">Metabase Analytics</h2>
         <button
           onClick={fetchEmbedUrl}
-          className="inline-flex items-center px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded-lg transition-colors"
+          className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-[14px] font-normal rounded-lg transition-all shadow-lg hover:shadow-pictus-lime/50 hover:from-pictus-lime400 hover:to-pictus-lime700"
         >
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh
