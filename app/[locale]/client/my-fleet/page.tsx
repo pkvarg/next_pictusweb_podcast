@@ -120,8 +120,8 @@ const MyFleetPage = () => {
   // Show loading while checking authentication
   if (status === 'loading' || (session && loading)) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+      <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime"></div>
       </div>
     )
   }
@@ -129,16 +129,16 @@ const MyFleetPage = () => {
   // Show access denied if not fleet manager
   if (session && !session.user.isFleetManager) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white flex items-center justify-center">
         <div className="text-center max-w-md">
           <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-4">Prístup zamietnutý</h2>
-          <p className="text-purple-300 mb-6">
+          <h2 className="text-3xl font-light mb-4">Prístup zamietnutý</h2>
+          <p className="text-pictus-lime mb-6">
             Na prístup k správe flotily potrebujete oprávnenie správcu flotily.
           </p>
           <Link
             href="/client"
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime600 text-pictus-white px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
           >
             <ArrowLeft size={20} />
             Späť na dashboard
@@ -149,31 +149,31 @@ const MyFleetPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-xl border-b border-purple-500/30 sticky top-0 z-40">
+      <header className="bg-white/10 backdrop-blur-xl border-b border-pictus-lime/30 sticky top-0 z-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <Link href="/" className="flex items-center space-x-3 text-white">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg flex items-center justify-center">
-                  <UserCheck size={18} className="text-white" />
+              <Link href="/" className="flex items-center space-x-3 text-pictus-white">
+                <div className="w-8 h-8 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-lg flex items-center justify-center">
+                  <UserCheck size={18} className="text-pictus-black" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Pictusweb</h1>
-                  <p className="text-lg text-purple-300 hidden sm:block">FleetSync</p>
+                  <h1 className="text-2xl font-light">Pictusweb</h1>
+                  <p className="text-lg text-pictus-lime hidden sm:block">FleetSync</p>
                 </div>
               </Link>
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-white">
+              <div className="flex items-center space-x-2 text-pictus-white">
                 <User size={16} />
                 <span className="text-lg">{session?.user?.name}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-lg text-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
+                className="flex items-center text-lg text-pictus-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 {t('logOut')}
@@ -189,7 +189,7 @@ const MyFleetPage = () => {
         <div className="mb-8">
           <Link
             href="/client"
-            className="inline-flex items-center gap-2 text-purple-300 hover:text-purple-200 transition-colors text-lg"
+            className="inline-flex items-center gap-2 text-pictus-lime hover:text-pictus-lime-200 transition-colors text-lg"
           >
             <ArrowLeft size={20} />
             Späť na dashboard
@@ -199,18 +199,18 @@ const MyFleetPage = () => {
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <div className="p-4 bg-gradient-to-r from-purple-600/20 to-purple-800/20 rounded-xl">
-              <Car className="w-10 h-10 text-purple-400" />
+            <div className="p-4 bg-gradient-to-r from-pictus-lime600/20 to-pictus-lime600/20 rounded-xl">
+              <Car className="w-10 h-10 text-pictus-lime" />
             </div>
             <div>
-              <h1 className="text-5xl font-bold text-white">Moja flotila</h1>
-              <p className="text-2xl text-purple-300">{vehicles.length} vozidiel</p>
+              <h1 className="text-5xl font-light text-pictus-white">Moja flotila</h1>
+              <p className="text-2xl text-pictus-lime">{vehicles.length} vozidiel</p>
             </div>
           </div>
 
           <Link
             href="/client/my-fleet/new"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 transition-all text-lg"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white px-6 py-3 rounded-lg font-light hover:from-pictus-lime700 hover:to-pictus-black transition-all text-lg"
           >
             <Plus size={20} />
             Pridať vozidlo
@@ -228,18 +228,18 @@ const MyFleetPage = () => {
         {/* Vehicles Grid */}
         {vehicles.length === 0 ? (
           // Empty State
-          <div className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-3xl p-12 border border-purple-500/30 text-center">
+          <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-3xl p-12 border border-pictus-lime/30 text-center">
             <div className="max-w-2xl mx-auto">
-              <div className="p-6 bg-purple-600/20 rounded-2xl inline-block mb-6">
-                <Car className="w-16 h-16 text-purple-400" />
+              <div className="p-6 bg-pictus-lime/20 rounded-2xl inline-block mb-6">
+                <Car className="w-16 h-16 text-pictus-black" />
               </div>
-              <h2 className="text-4xl font-bold text-white mb-4">Žiadne vozidlá</h2>
-              <p className="text-xl text-purple-300 mb-8">
+              <h2 className="text-4xl font-light text-pictus-white mb-4">Žiadne vozidlá</h2>
+              <p className="text-xl text-pictus-lime mb-8">
                 Začnite pridaním prvého vozidla do vašej flotily.
               </p>
               <Link
                 href="/client/my-fleet/new"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-8 py-4 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 transition-all text-xl"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-8 py-4 rounded-lg font-light hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/50"
               >
                 <Plus size={24} />
                 Pridať prvé vozidlo
@@ -252,10 +252,10 @@ const MyFleetPage = () => {
             {vehicles.map((vehicle) => (
               <div
                 key={vehicle.id}
-                className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-xl overflow-hidden border border-purple-500/30 hover:border-purple-400/50 transition-all"
+                className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl overflow-hidden border border-pictus-lime/30 hover:border-pictus-lime/50 transition-all"
               >
                 {vehicle.image && (
-                  <div className="w-full h-48 bg-purple-900/50 overflow-hidden">
+                  <div className="w-full h-48 bg-pictus-black/50 overflow-hidden">
                     <img
                       src={vehicle.image}
                       alt={vehicle.registration}
@@ -266,15 +266,15 @@ const MyFleetPage = () => {
 
                 <div className="p-6">
                   <div className="mb-4">
-                    <h3 className="text-3xl font-bold text-white mb-2">{vehicle.registration}</h3>
-                    <p className="text-xl text-purple-300">{vehicle.type}</p>
+                    <h3 className="text-3xl font-light text-pictus-white mb-2">{vehicle.registration}</h3>
+                    <p className="text-xl text-pictus-lime">{vehicle.type}</p>
                     {vehicle.year && (
-                      <p className="text-lg text-purple-400 mt-1">Rok: {vehicle.year}</p>
+                      <p className="text-lg text-pictus-lime mt-1">Rok: {vehicle.year}</p>
                     )}
                   </div>
 
                   {vehicle.note && (
-                    <p className="text-white/80 text-sm mb-4 line-clamp-2">{vehicle.note}</p>
+                    <p className="text-pictus-white/80 text-sm mb-4 line-clamp-2">{vehicle.note}</p>
                   )}
 
                   <div className="space-y-2 mb-4">
@@ -284,7 +284,7 @@ const MyFleetPage = () => {
                           setSelectedVehicle(vehicle)
                           setExpensesModalOpen(true)
                         }}
-                        className="flex-1 inline-flex items-center justify-center gap-2 bg-purple-600/30 text-white px-3 py-2 rounded-lg hover:bg-purple-600/50 transition text-sm"
+                        className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
                       >
                         <FaEuroSign size={16} />
                         Výdavky
@@ -294,7 +294,7 @@ const MyFleetPage = () => {
                           setSelectedVehicle(vehicle)
                           setMileageModalOpen(true)
                         }}
-                        className="flex-1 inline-flex items-center justify-center gap-2 bg-purple-600/30 text-white px-3 py-2 rounded-lg hover:bg-purple-600/50 transition text-sm"
+                        className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
                       >
                         <Gauge size={16} />
                         Kilometre
@@ -302,17 +302,17 @@ const MyFleetPage = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-4 border-t border-purple-500/20">
+                  <div className="flex items-center gap-2 pt-4 border-t border-pictus-lime/20">
                     <Link
                       href={`/client/my-fleet/${vehicle.id}`}
-                      className="flex-1 inline-flex items-center justify-center gap-2 bg-purple-600/30 text-white px-4 py-2 rounded-lg hover:bg-purple-600/50 transition text-sm"
+                      className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
                     >
                       <Edit size={16} />
                       Upraviť
                     </Link>
                     <button
                       onClick={() => handleDelete(vehicle.id)}
-                      className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600/30 text-white px-4 py-2 rounded-lg hover:bg-red-600/50 transition text-sm"
+                      className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-red-600/50 transition text-sm"
                     >
                       <Trash2 size={16} />
                       Odstrániť

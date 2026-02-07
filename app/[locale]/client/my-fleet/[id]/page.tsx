@@ -235,8 +235,8 @@ const EditVehiclePage = () => {
   // Show loading while checking authentication or fetching vehicle
   if (status === 'loading' || fetchingVehicle) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+      <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white flex items-center justify-center font-brutal-milk">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime"></div>
       </div>
     )
   }
@@ -244,16 +244,16 @@ const EditVehiclePage = () => {
   // Show access denied if not fleet manager
   if (session && !session.user.isFleetManager) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white flex items-center justify-center font-brutal-milk">
         <div className="text-center max-w-md">
           <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-4">Prístup zamietnutý</h2>
-          <p className="text-purple-300 mb-6">
+          <h2 className="text-3xl font-light mb-4">Prístup zamietnutý</h2>
+          <p className="text-pictus-lime mb-6">
             Na prístup k správe flotily potrebujete oprávnenie správcu flotily.
           </p>
           <Link
             href="/client"
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
           >
             <ArrowLeft size={20} />
             Späť na dashboard
@@ -266,14 +266,14 @@ const EditVehiclePage = () => {
   // Show error if vehicle not found or access denied
   if (error && !vehicle) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white flex items-center justify-center font-brutal-milk">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-4">Chyba</h2>
-          <p className="text-purple-300 mb-6">{error}</p>
+          <h2 className="text-3xl font-light mb-4">Chyba</h2>
+          <p className="text-pictus-lime mb-6">{error}</p>
           <Link
             href="/client/my-fleet"
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
           >
             <ArrowLeft size={20} />
             Späť na flotilu
@@ -284,31 +284,31 @@ const EditVehiclePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white font-brutal-milk">
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-xl border-b border-purple-500/30 sticky top-0 z-40">
+      <header className="bg-white/10 backdrop-blur-xl border-b border-pictus-lime/30 sticky top-0 z-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <Link href="/" className="flex items-center space-x-3 text-white">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg flex items-center justify-center">
-                  <UserCheck size={18} className="text-white" />
+              <Link href="/" className="flex items-center space-x-3 text-pictus-white">
+                <div className="w-8 h-8 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-lg flex items-center justify-center">
+                  <UserCheck size={18} className="text-pictus-black" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Pictusweb</h1>
-                  <p className="text-lg text-purple-300 hidden sm:block">FleetSync</p>
+                  <h1 className="text-2xl font-light">Pictusweb</h1>
+                  <p className="text-lg text-pictus-lime hidden sm:block">FleetSync</p>
                 </div>
               </Link>
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-white">
+              <div className="flex items-center space-x-2 text-pictus-white">
                 <User size={16} />
                 <span className="text-lg">{session?.user?.name}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-lg text-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
+                className="flex items-center text-lg text-pictus-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 {t('logOut')}
@@ -324,7 +324,7 @@ const EditVehiclePage = () => {
         <div className="mb-8">
           <Link
             href="/client/my-fleet"
-            className="inline-flex items-center gap-2 text-purple-300 hover:text-purple-200 transition-colors text-lg"
+            className="inline-flex items-center gap-2 text-pictus-lime hover:text-pictus-lime600 transition-colors text-lg"
           >
             <ArrowLeft size={20} />
             Späť na flotilu
@@ -333,19 +333,19 @@ const EditVehiclePage = () => {
 
         {/* Page Header */}
         <div className="flex items-center gap-4 mb-8">
-          <div className="p-4 bg-gradient-to-r from-purple-600/20 to-purple-800/20 rounded-xl">
-            <Car className="w-10 h-10 text-purple-400" />
+          <div className="p-4 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-xl">
+            <Car className="w-10 h-10 text-pictus-black" />
           </div>
           <div>
-            <h1 className="text-5xl font-bold text-white">Upraviť vozidlo</h1>
-            <p className="text-2xl text-purple-300">{vehicle?.registration}</p>
+            <h1 className="text-5xl font-light text-pictus-white">Upraviť vozidlo</h1>
+            <p className="text-2xl text-pictus-lime">{vehicle?.registration}</p>
           </div>
         </div>
 
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-3xl p-8 border border-purple-500/30"
+          className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-3xl p-8 border border-pictus-lime/30"
         >
           {error && (
             <div className="mb-6 bg-red-500/20 border border-red-500/30 rounded-xl p-4 text-red-200">
@@ -356,7 +356,7 @@ const EditVehiclePage = () => {
           <div className="space-y-6">
             {/* Type */}
             <div>
-              <label className="block text-white text-lg font-medium mb-2">Typ vozidla *</label>
+              <label className="block text-pictus-white text-lg font-light mb-2">Typ vozidla *</label>
               <input
                 type="text"
                 name="type"
@@ -364,13 +364,13 @@ const EditVehiclePage = () => {
                 onChange={handleChange}
                 required
                 placeholder="napr. Mercedes..."
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
               />
             </div>
 
             {/* Registration */}
             <div>
-              <label className="block text-white text-lg font-medium mb-2">
+              <label className="block text-pictus-white text-lg font-light mb-2">
                 Registračná značka *
               </label>
               <input
@@ -380,13 +380,13 @@ const EditVehiclePage = () => {
                 onChange={handleChange}
                 required
                 placeholder="napr. BA-123-XY"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
               />
             </div>
 
             {/* Year */}
             <div>
-              <label className="block text-white text-lg font-medium mb-2">Rok výroby</label>
+              <label className="block text-pictus-white text-lg font-light mb-2">Rok výroby</label>
               <input
                 type="number"
                 name="year"
@@ -395,16 +395,16 @@ const EditVehiclePage = () => {
                 min="1900"
                 max={new Date().getFullYear() + 1}
                 placeholder="napr. 2020"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
               />
             </div>
 
             {/* Image Upload */}
             <div>
-              <label className="block text-white text-lg font-medium mb-2">Obrázok vozidla</label>
+              <label className="block text-pictus-white text-lg font-light mb-2">Obrázok vozidla</label>
 
               {!filePreview ? (
-                <div className="border-2 border-dashed border-purple-500/30 rounded-lg p-6 text-center hover:border-purple-500/50 transition">
+                <div className="border-2 border-dashed border-pictus-lime/30 rounded-lg p-6 text-center hover:border-pictus-lime/50 transition">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -417,17 +417,17 @@ const EditVehiclePage = () => {
                     htmlFor="vehicle-image"
                     className="cursor-pointer flex flex-col items-center gap-2"
                   >
-                    <Upload className="w-12 h-12 text-purple-400" />
-                    <p className="text-white">Kliknite pre výber nového obrázku</p>
-                    <p className="text-purple-400 text-sm">alebo vložte URL nižšie</p>
+                    <Upload className="w-12 h-12 text-pictus-lime" />
+                    <p className="text-pictus-white">Kliknite pre výber nového obrázku</p>
+                    <p className="text-pictus-lime text-sm">alebo vložte URL nižšie</p>
                   </label>
                   {formData.image && (
-                    <p className="text-purple-300 text-sm mt-2">Aktuálny obrázok: {formData.image}</p>
+                    <p className="text-pictus-lime text-sm mt-2">Aktuálny obrázok: {formData.image}</p>
                   )}
                 </div>
               ) : (
                 <div className="relative">
-                  <div className="relative h-48 w-full border border-purple-500/30 rounded-lg overflow-hidden">
+                  <div className="relative h-48 w-full border border-pictus-lime/30 rounded-lg overflow-hidden">
                     <Image
                       src={filePreview}
                       alt="Náhľad"
@@ -447,7 +447,7 @@ const EditVehiclePage = () => {
               )}
 
               <div className="mt-4">
-                <p className="text-purple-400 text-sm mb-2">Alebo vložte URL obrázku:</p>
+                <p className="text-pictus-lime text-sm mb-2">Alebo vložte URL obrázku:</p>
                 <input
                   type="url"
                   name="image"
@@ -455,30 +455,30 @@ const EditVehiclePage = () => {
                   onChange={handleChange}
                   placeholder="https://example.com/vehicle.jpg"
                   disabled={!!file}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-50"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all disabled:opacity-50"
                 />
               </div>
             </div>
 
             {/* Note */}
             <div>
-              <label className="block text-white text-lg font-medium mb-2">Poznámka</label>
+              <label className="block text-pictus-white text-lg font-light mb-2">Poznámka</label>
               <textarea
                 name="note"
                 value={formData.note}
                 onChange={handleChange}
                 rows={4}
                 placeholder="Doplňujúce informácie o vozidle..."
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all resize-none"
               />
             </div>
 
             {/* Organization Info */}
-            <div className="bg-purple-600/20 border border-purple-500/30 rounded-xl p-4">
-              <p className="text-purple-300 text-sm">
+            <div className="bg-pictus-lime/20 border border-pictus-lime/30 rounded-xl p-4">
+              <p className="text-pictus-lime text-sm">
                 <strong>Organizácia:</strong> {vehicle?.organization}
               </p>
-              <p className="text-purple-400 text-xs mt-1">Organizácia nemôže byť zmenená</p>
+              <p className="text-pictus-lime text-xs mt-1">Organizácia nemôže byť zmenená</p>
             </div>
           </div>
 
@@ -487,11 +487,11 @@ const EditVehiclePage = () => {
             <button
               type="submit"
               disabled={loading || uploading}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-6 py-4 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-4 rounded-lg font-light hover:from-pictus-lime600 hover:to-pictus-lime700 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading || uploading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin" />
                   {uploading ? 'Nahrávam obrázok...' : 'Ukladám...'}
                 </>
               ) : (
@@ -503,7 +503,7 @@ const EditVehiclePage = () => {
             </button>
             <Link
               href="/client/my-fleet"
-              className="px-6 py-4 bg-white/10 text-white rounded-lg font-medium hover:bg-white/20 transition-all text-lg"
+              className="px-6 py-4 bg-white/10 text-pictus-white rounded-lg font-light hover:bg-white/20 transition-all text-lg"
             >
               Zrušiť
             </Link>

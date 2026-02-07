@@ -2,11 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Brutal Milk No2 Font Family */
+@font-face {
+  font-family: 'Brutal Milk';
+  src: url('/fonts/brutalmilkNo2/WOFF2/BrutalMilkNo2-Thin.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Brutal Milk';
+  src: url('/fonts/brutalmilkNo2/WOFF2/BrutalMilkNo2-Extralight.woff2') format('woff2');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Brutal Milk';
+  src: url('/fonts/brutalmilkNo2/WOFF2/BrutalMilkNo2-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Brutal Milk';
+  src: url('/fonts/brutalmilkNo2/WOFF2/BrutalMilkNo2-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Brutal Milk';
+  src: url('/fonts/brutalmilkNo2/WOFF2/BrutalMilkNo2-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Brutal Milk';
+  src: url('/fonts/brutalmilkNo2/WOFF2/BrutalMilkNo2-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Brutal Milk';
+  src: url('/fonts/brutalmilkNo2/WOFF2/BrutalMilkNo2-Extrabold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Brutal Milk';
+  src: url('/fonts/brutalmilkNo2/WOFF2/BrutalMilkNo2-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Brutal Milk';
+  src: url('/fonts/brutalmilkNo2/WOFF2/BrutalMilkNo2-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
   overflow-x: hidden;
-  background-color: #2e2236;
-  color: white;
+  background-color: #141511;
+  color: #F8F8F8;
   font-size: 25px;
+  font-family: 'Brutal Milk', sans-serif;
+  font-weight: 300;
 }
 
 .hero-gradient {
@@ -68,9 +143,9 @@ body {
 }
 .icon-style:hover {
   animation: none;
-  background: #2b2a64;
-  color: #fff;
-  /* border: 2px solid #d57703; */
+  background: #B6E036;
+  color: #141511;
+  /* border: 2px solid #B6E036; */
 }
 @keyframes movebtn {
   0% {

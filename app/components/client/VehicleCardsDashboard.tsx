@@ -258,8 +258,8 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
         }
       case 'green':
         return {
-          border: 'border-green-500/50',
-          bg: 'from-green-600/20 to-green-800/20',
+          border: 'border-gray-500/50',
+          bg: 'from-gray-600/20 to-gray-800/20',
           text: 'text-green-400',
           icon: 'text-green-400',
         }
@@ -289,7 +289,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
   const getTaskStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'text-green-400 bg-green-400/20'
+        return 'text-green-400 bg-gray-600/30'
       case 'pending':
         return 'text-yellow-400 bg-yellow-400/20'
       case 'failed':
@@ -311,7 +311,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-32">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pictus-lime"></div>
       </div>
     )
   }
@@ -320,7 +320,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
     return (
       <div className="text-center p-8">
         <Car className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-white text-xl">Žiadne vozidlá neboli nájdené pre {company}</p>
+        <p className="text-pictus-white text-xl font-light">Žiadne vozidlá neboli nájdené pre {company}</p>
       </div>
     )
   }
@@ -329,12 +329,12 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="p-4 bg-gradient-to-r from-purple-600/20 to-purple-800/20 rounded-xl">
-          <Car className="w-10 h-10 text-purple-400" />
+        <div className="p-4 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-xl">
+          <Car className="w-10 h-10 text-pictus-black" />
         </div>
         <div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white">Karty vozidiel</h2>
-          <p className="text-white text-xl md:text-2xl">
+          <h2 className="text-4xl md:text-5xl font-light text-pictus-white">Karty vozidiel</h2>
+          <p className="text-pictus-white text-xl md:text-2xl font-light">
             Prehľad nadchádzajúcich úloh pre každé vozidlo
           </p>
         </div>
@@ -347,14 +347,14 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
           const isExpanded = expandedVehicles.has(vehicleKey)
 
           return (
-            <div key={vehicleKey} className="bg-black/30 rounded-lg border border-purple-500/20">
+            <div key={vehicleKey} className="bg-black/30 rounded-lg border border-pictus-lime/20">
               <div
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-purple-500/10 transition-colors"
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-pictus-lime/10 transition-colors"
                 onClick={() => toggleVehicleExpanded(vehicleKey)}
               >
                 <div className="flex items-center gap-4">
                   {vehicle.vehicleImage ? (
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-purple-900/50">
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-pictus-onyx900/50">
                       <Image
                         src={vehicle.vehicleImage}
                         alt={vehicle.vehicleRegistration}
@@ -363,41 +363,41 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                       />
                     </div>
                   ) : (
-                    <div className="p-2 bg-purple-600/20 rounded-lg">
-                      <Car className="w-5 h-5 text-purple-400" />
+                    <div className="p-2 bg-pictus-lime/20 rounded-lg">
+                      <Car className="w-5 h-5 text-pictus-lime" />
                     </div>
                   )}
                   <div>
-                    <h4 className="text-4xl font-bold text-white">{vehicle.vehicleRegistration}</h4>
-                    <p className="text-white text-lg">{vehicle.vehicleType || 'Neznámy typ'}</p>
+                    <h4 className="text-4xl font-light text-pictus-white">{vehicle.vehicleRegistration}</h4>
+                    <p className="text-pictus-white text-lg">{vehicle.vehicleType || 'Neznámy typ'}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <p className="text-white font-bold text-2xl">{vehicle.taskGroups.length}</p>
-                    <p className="text-white text-lg">úloh</p>
+                    <p className="text-pictus-white font-light text-2xl">{vehicle.taskGroups.length}</p>
+                    <p className="text-pictus-white text-lg">úloh</p>
                   </div>
                   {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-purple-400" />
+                    <ChevronUp className="w-5 h-5 text-pictus-lime" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-purple-400" />
+                    <ChevronDown className="w-5 h-5 text-pictus-lime" />
                   )}
                 </div>
               </div>
 
               {isExpanded && (
-                <div className="border-t border-purple-500/20 p-4">
+                <div className="border-t border-pictus-lime/20 p-4">
                   {/* Vehicle Task Details */}
                   <div className="space-y-6">
                     {/* Vehicle Header - Responsive */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-8">
                       <div className="flex items-center gap-2 md:gap-4 mb-3 md:mb-0">
-                        <Car className="w-6 h-6 md:w-12 md:h-12 text-purple-400" />
+                        <Car className="w-6 h-6 md:w-12 md:h-12 text-pictus-lime" />
                         <div>
-                          <h3 className="text-white font-bold text-3xl md:text-4xl">
+                          <h3 className="text-pictus-white font-light text-3xl md:text-4xl">
                             {vehicle.vehicleRegistration}
                           </h3>
-                          <p className="text-white text-lg md:text-2xl opacity-75">
+                          <p className="text-pictus-white text-lg md:text-2xl opacity-75">
                             {vehicle.vehicleType || 'Neznámy typ'}
                           </p>
                         </div>
@@ -405,13 +405,13 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                       <div className="flex items-center gap-3 md:gap-6 mr-8">
                         {vehicle.daysToNextTask !== null && (
                           <div className="text-center md:text-right">
-                            <p className="text-lg md:text-xl font-normal text-white">
+                            <p className="text-lg md:text-xl font-normal text-pictus-white">
                               Nasledujúca úloha
                             </p>
-                            <p className="text-5xl md:text-8xl font-bold text-white">
-                              <span className="text-xl md:text-3xl font-medium text-white">o</span>{' '}
+                            <p className="text-5xl md:text-8xl font-light text-pictus-white">
+                              <span className="text-xl md:text-3xl font-medium text-pictus-white">o</span>{' '}
                               {vehicle.daysToNextTask}{' '}
-                              <span className="text-xl md:text-2xl font-medium text-white">
+                              <span className="text-xl md:text-2xl font-medium text-pictus-white">
                                 dní
                               </span>
                             </p>
@@ -422,7 +422,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
 
                     {/* Task Groups */}
                     <div>
-                      <h4 className="text-white font-bold text-2xl md:text-4xl mb-3 md:mb-6">
+                      <h4 className="text-pictus-white font-light text-2xl md:text-4xl mb-3 md:mb-6">
                         Úlohy podľa typu a termínu ({vehicle.taskGroups.length})
                       </h4>
 
@@ -458,7 +458,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                   <div className="p-3 md:p-6 md:border-b border-gray-600/50">
                                     <div className="flex items-center justify-between">
                                       <div>
-                                        <h5 className="text-white font-bold text-lg md:text-3xl">
+                                        <h5 className="text-pictus-white font-light text-lg md:text-3xl">
                                           {taskType}
                                         </h5>
                                       </div>
@@ -470,7 +470,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                               taskType,
                                             )
                                           }
-                                          className="flex items-center gap-3 text-purple-400 hover:text-purple-300 transition-colors"
+                                          className="flex items-center gap-3 text-pictus-lime hover:text-pictus-lime transition-colors"
                                         >
                                           <span className="text-sm md:text-xl">
                                             {isExpanded
@@ -524,10 +524,10 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                                 </span>
                                               )}
                                               <div>
-                                                <h6 className="text-white font-bold text-2xl md:text-2xl">
+                                                <h6 className="text-pictus-white font-light text-2xl md:text-2xl">
                                                   1 úloha
                                                 </h6>
-                                                <p className="text-white text-lg md:text-lg opacity-75">
+                                                <p className="text-pictus-white text-lg md:text-lg opacity-75">
                                                   Termín: {formatDate(group.dutyDate)}
                                                 </p>
                                               </div>
@@ -536,12 +536,12 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                               {group.daysRemaining !== null && (
                                                 <div>
                                                   <span
-                                                    className={`text-xl md:text-2xl font-bold px-3 md:px-4 py-2 md:py-2 rounded-lg ${
+                                                    className={`text-xl md:text-2xl font-light px-3 md:px-4 py-2 md:py-2 rounded-lg ${
                                                       group.daysRemaining <= 10
                                                         ? 'text-red-300 bg-red-400/30'
                                                         : group.daysRemaining <= 30
                                                         ? 'text-orange-300 bg-orange-400/30'
-                                                        : 'text-green-400 font-normal bg-green-400/10'
+                                                        : 'text-green-400 font-normal bg-gray-600/20'
                                                     }`}
                                                   >
                                                     {daysText}
@@ -562,7 +562,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                                 {group.tasks[0].status}
                                               </span>
                                               {group.tasks.length > 1 && (
-                                                <span className="px-3 md:px-3 py-1 bg-purple-600/20 text-purple-300 text-lg md:text-lg rounded">
+                                                <span className="px-3 md:px-3 py-1 bg-pictus-lime/20 text-pictus-lime text-lg md:text-lg rounded">
                                                   {group.tasks.length}x
                                                 </span>
                                               )}
@@ -572,12 +572,12 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                                 </span>
                                               )}
                                               {group.tasks.some((task) => task.smsSentAt) && (
-                                                <span className="px-3 md:px-3 py-1 bg-green-600/20 text-green-300 text-lg md:text-lg rounded">
+                                                <span className="px-3 md:px-3 py-1 bg-gray-600/30 text-green-300 text-lg md:text-lg rounded">
                                                   📱
                                                 </span>
                                               )}
                                               {group.tasks.some((task) => task.confirmedAt) && (
-                                                <span className="px-3 md:px-3 py-1 bg-green-600/20 text-green-300 text-lg md:text-lg rounded">
+                                                <span className="px-3 md:px-3 py-1 bg-gray-600/30 text-green-300 text-lg md:text-lg rounded">
                                                   ✓
                                                 </span>
                                               )}
@@ -586,13 +586,13 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                             <div className="block md:flex md:items-center md:gap-6 text-lg md:text-lg space-y-1 md:space-y-0">
                                               <div>
                                                 <span className="text-gray-400">Kontakt:</span>
-                                                <span className="text-white ml-2 md:ml-2 font-medium">
+                                                <span className="text-pictus-white ml-2 md:ml-2 font-medium">
                                                   {group.tasks[0].personName || 'Nedostupné'}
                                                 </span>
                                               </div>
                                               <div className="hidden md:block">
                                                 <span className="text-gray-400">Email:</span>
-                                                <span className="text-white ml-2">
+                                                <span className="text-pictus-white ml-2">
                                                   {group.tasks[0].email || 'Nedostupné'}
                                                 </span>
                                               </div>
@@ -616,7 +616,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                                                   .map((task) => (
                                                     <span
                                                       key={task.id}
-                                                      className="text-white text-lg md:text-lg px-2 md:px-2 py-1 bg-white/10 rounded"
+                                                      className="text-pictus-white text-lg md:text-lg px-2 md:px-2 py-1 bg-white/10 rounded"
                                                     >
                                                       {task.notificationDate
                                                         ? formatDate(task.notificationDate)

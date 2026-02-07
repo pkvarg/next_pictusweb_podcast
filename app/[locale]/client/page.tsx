@@ -131,31 +131,31 @@ const ClientZone = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-xl border-b border-purple-500/30 sticky top-0 z-40">
+      <header className="bg-pictus-white/10 backdrop-blur-xl border-b border-pictus-lime/30 sticky top-0 z-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <Link href="/" className="flex items-center space-x-3 text-white">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg flex items-center justify-center">
-                  <UserCheck size={18} className="text-white" />
+              <Link href="/" className="flex items-center space-x-3 text-pictus-white">
+                <div className="w-8 h-8 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-lg flex items-center justify-center">
+                  <UserCheck size={18} className="text-pictus-black" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Pictusweb</h1>
-                  <p className="text-lg text-purple-300 hidden sm:block">FleetSync</p>
+                  <h1 className="text-2xl font-light">Pictusweb</h1>
+                  <p className="text-lg text-pictus-lime hidden sm:block">FleetSync</p>
                 </div>
               </Link>
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-white">
+              <div className="flex items-center space-x-2 text-pictus-white">
                 <User size={16} />
                 <span className="text-lg">{session?.user?.name}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-lg text-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
+                className="flex items-center text-lg text-pictus-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 {t('logOut')}
@@ -170,10 +170,10 @@ const ClientZone = () => {
         {/* Welcome Section */}
         <section className="py-20">
           <div className="text-center mb-16">
-            <h1 className="text-5xl font-light text-white mb-6 leading-tight">
+            <h1 className="text-5xl font-light text-pictus-white mb-6 leading-tight">
               {t('welcomeTitle')}
             </h1>
-            <p className="text-3xl text-purple-300 mb-6">{session?.user?.name}</p>
+            <p className="text-3xl text-pictus-lime mb-6">{session?.user?.name}</p>
             <h2 className="text-5xl lg:text-6xl font-light leading-tight text-center mb-8">FleetSync</h2>
 
             {/* Navigation to My Fleet - Only for Fleet Managers */}
@@ -181,7 +181,7 @@ const ClientZone = () => {
               <div className="flex justify-center gap-4">
                 <Link
                   href="/client/my-fleet"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-8 py-4 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 transition-all text-xl"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-8 py-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/50"
                 >
                   <Car size={24} />
                   Moja flotila
@@ -209,9 +209,9 @@ const ClientZone = () => {
         {session?.user?.organization && (
           <section id="dashboard" className="mb-16">
             <div className="text-center mb-8">
-              {/* <h2 className="text-4xl font-light text-white mb-4">Dashboard</h2> */}
+              {/* <h2 className="text-4xl font-light text-pictus-white mb-4">Dashboard</h2> */}
             </div>
-            <div className="md:bg-gradient-to-br md:from-purple-600/20 md:to-purple-800/20 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-purple-500/30">
+            <div className="md:bg-gradient-to-br md:from-pictus-onyx900/30 md:to-pictus-black/50 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-pictus-lime/30">
               <VehicleNotificationsDashboard
                 company={
                   session.user.organization === 'all'
@@ -251,25 +251,25 @@ const ClientZone = () => {
 
         {/* User Info Section */}
         <section className="py-20">
-          <div className="bg-gradient-to-br from-purple-800/30 to-purple-900/30 rounded-2xl p-8 backdrop-blur-sm border border-purple-500/30">
+          <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-2xl p-8 backdrop-blur-sm border border-pictus-lime/30">
             <div className="text-center mb-12">
-              <h2 className="text-6xl font-light text-white mb-6">Informácie o účte</h2>
+              <h2 className="text-6xl font-light text-pictus-white mb-6">Informácie o účte</h2>
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               {/* User Profile */}
               <div className="">
                 <div className="flex items-center gap-4 mb-4">
-                  <User className="w-8 h-8 text-purple-400" />
-                  <h3 className="text-4xl font-semibold text-white">Profil používateľa</h3>
+                  <User className="w-8 h-8 text-pictus-lime" />
+                  <h3 className="text-4xl font-normal text-pictus-white">Profil používateľa</h3>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-white text-xl font-medium">Meno</label>
-                    <p className="text-white text-2xl">{session?.user?.name}</p>
+                    <label className="text-pictus-white text-xl font-light">Meno</label>
+                    <p className="text-pictus-white text-2xl">{session?.user?.name}</p>
                   </div>
                   <div>
-                    <label className="text-white text-xl font-medium">Email</label>
-                    <p className="text-white text-2xl">{session?.user?.email}</p>
+                    <label className="text-pictus-white text-xl font-light">Email</label>
+                    <p className="text-pictus-white text-2xl">{session?.user?.email}</p>
                   </div>
                 </div>
               </div>
@@ -277,14 +277,14 @@ const ClientZone = () => {
               {/* Password Change */}
               <div className="">
                 <div className="flex items-center gap-4 mb-4">
-                  <Lock className="w-8 h-8 text-purple-400" />
-                  <h3 className="text-4xl font-semibold text-white">Zmena hesla</h3>
+                  <Lock className="w-8 h-8 text-pictus-lime" />
+                  <h3 className="text-4xl font-normal text-pictus-white">Zmena hesla</h3>
                 </div>
 
                 {!showPasswordChange ? (
                   <button
                     onClick={() => setShowPasswordChange(true)}
-                    className="mt-4 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 transition-all text-lg"
+                    className="mt-4 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-lg shadow-lg hover:shadow-pictus-lime/50"
                   >
                     Zmeniť heslo
                   </button>
@@ -292,7 +292,7 @@ const ClientZone = () => {
                   <form onSubmit={handlePasswordChange} className="space-y-4 mt-4">
                     {/* Old Password */}
                     <div>
-                      <label className="text-white text-lg font-medium block mb-2">
+                      <label className="text-pictus-white text-lg font-light block mb-2">
                         Staré heslo
                       </label>
                       <div className="relative">
@@ -301,13 +301,13 @@ const ClientZone = () => {
                           value={oldPassword}
                           onChange={(e) => setOldPassword(e.target.value)}
                           required
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all pr-12"
+                          className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
                           placeholder="Zadajte staré heslo"
                         />
                         <button
                           type="button"
                           onClick={() => setShowOldPassword(!showOldPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pictus-white transition-colors"
                         >
                           {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
@@ -316,7 +316,7 @@ const ClientZone = () => {
 
                     {/* New Password */}
                     <div>
-                      <label className="text-white text-lg font-medium block mb-2">
+                      <label className="text-pictus-white text-lg font-light block mb-2">
                         Nové heslo
                       </label>
                       <div className="relative">
@@ -326,13 +326,13 @@ const ClientZone = () => {
                           onChange={(e) => setNewPassword(e.target.value)}
                           required
                           minLength={8}
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all pr-12"
+                          className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
                           placeholder="Zadajte nové heslo (min. 8 znakov)"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pictus-white transition-colors"
                         >
                           {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
@@ -341,7 +341,7 @@ const ClientZone = () => {
 
                     {/* Confirm Password */}
                     <div>
-                      <label className="text-white text-lg font-medium block mb-2">
+                      <label className="text-pictus-white text-lg font-light block mb-2">
                         Potvrďte nové heslo
                       </label>
                       <div className="relative">
@@ -351,13 +351,13 @@ const ClientZone = () => {
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           required
                           minLength={8}
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all pr-12"
+                          className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
                           placeholder="Zopakujte nové heslo"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pictus-white transition-colors"
                         >
                           {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
@@ -385,10 +385,10 @@ const ClientZone = () => {
                       <button
                         type="submit"
                         disabled={isChangingPassword}
-                        className="flex-1 bg-gradient-to-r from-purple-600 to-purple-800 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 focus:outline-none focus:ring-2 focus:ring-pictus-lime transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-pictus-lime/50"
                       >
                         {isChangingPassword ? (
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
+                          <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin mx-auto" />
                         ) : (
                           'Uložiť heslo'
                         )}
@@ -403,7 +403,7 @@ const ClientZone = () => {
                           setPasswordChangeError('')
                           setPasswordChangeSuccess('')
                         }}
-                        className="px-6 py-3 bg-white/10 text-white rounded-lg font-medium hover:bg-white/20 transition-all"
+                        className="px-6 py-3 bg-pictus-white/10 text-pictus-white rounded-lg font-light hover:bg-pictus-white/20 transition-all"
                       >
                         Zrušiť
                       </button>

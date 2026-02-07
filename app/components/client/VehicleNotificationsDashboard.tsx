@@ -198,7 +198,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime"></div>
       </div>
     )
   }
@@ -207,7 +207,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
     return (
       <div className="text-center p-8">
         <AlertCircle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-        <p className="text-white text-2xl">Žiadne údaje nie sú dostupné pre {company}</p>
+        <p className="text-pictus-white text-2xl">Žiadne údaje nie sú dostupné pre {company}</p>
       </div>
     )
   }
@@ -215,7 +215,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'text-green-400 bg-green-400/20'
+        return 'text-green-400 bg-gray-600/30'
       case 'pending':
         return 'text-yellow-400 bg-yellow-400/20'
       case 'failed':
@@ -302,17 +302,17 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
         }
       case 'green':
         return {
-          border: 'border-green-500/50',
-          bg: 'from-green-600/20 to-green-800/20',
+          border: 'border-gray-500/50',
+          bg: 'from-gray-600/20 to-gray-800/20',
           text: 'text-green-400',
           icon: 'text-green-400',
         }
       default:
         return {
-          border: 'border-purple-500/20',
+          border: 'border-gray-500/20',
           bg: 'from-gray-600/20 to-gray-800/20',
           text: 'text-gray-300',
-          icon: 'text-purple-400',
+          icon: 'text-gray-400',
         }
     }
   }
@@ -364,12 +364,12 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-gradient-to-r from-purple-600/20 to-purple-800/20 rounded-xl">
-          <Car className="w-8 h-8 text-purple-400" />
+        <div className="p-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-xl">
+          <Car className="w-8 h-8 text-pictus-black" />
         </div>
         <div>
-          <h2 className="text-5xl font-bold text-white">Dashboard</h2>
-          <p className="text-white text-2xl">Správa notifikácií vozidiel</p>
+          <h2 className="text-5xl font-light text-pictus-white">Dashboard</h2>
+          <p className="text-pictus-white text-2xl font-light">Správa notifikácií vozidiel</p>
         </div>
       </div>
 
@@ -380,22 +380,22 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
           .map(([type, count], index) => {
             const colors = [
               {
-                bg: 'from-purple-600/20 to-purple-800/20',
-                border: 'border-purple-500/30',
-                text: 'text-purple-300',
-                icon: 'text-purple-400',
+                bg: 'from-pictus-lime/20 to-pictus-lime600/20',
+                border: 'border-pictus-lime/30',
+                text: 'text-pictus-lime',
+                icon: 'text-pictus-lime',
               },
               {
-                bg: 'from-green-600/20 to-green-800/20',
-                border: 'border-green-500/30',
+                bg: 'from-gray-600/20 to-gray-800/20',
+                border: 'border-gray-500/30',
                 text: 'text-green-300',
                 icon: 'text-green-400',
               },
               {
-                bg: 'from-purple-700/20 to-purple-900/20',
-                border: 'border-purple-600/30',
-                text: 'text-purple-200',
-                icon: 'text-purple-300',
+                bg: 'from-pictus-onyx700/20 to-pictus-onyx900/20',
+                border: 'border-pictus-onyx600/30',
+                text: 'text-pictus-white',
+                icon: 'text-pictus-white',
               },
               {
                 bg: 'from-orange-600/20 to-orange-800/20',
@@ -404,10 +404,10 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                 icon: 'text-orange-400',
               },
               {
-                bg: 'from-purple-500/20 to-purple-700/20',
-                border: 'border-purple-400/30',
-                text: 'text-purple-300',
-                icon: 'text-purple-400',
+                bg: 'from-red-600/20 to-red-800/20',
+                border: 'border-red-500/30',
+                text: 'text-red-300',
+                icon: 'text-red-400',
               },
             ]
             const color = colors[index % colors.length]
@@ -419,8 +419,8 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`${color.text} text-xl font-medium`}>{type}</p>
-                    <p className="text-5xl font-bold text-white">{count}</p>
+                    <p className={`${color.text} text-xl font-light`}>{type}</p>
+                    <p className="text-5xl font-light text-pictus-white">{count}</p>
                   </div>
                   <Bell className={`w-8 h-8 ${color.icon}`} />
                 </div>
@@ -430,81 +430,81 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Vehicle Cards Dashboard */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-xl p-2 lg:p-6 border border-purple-500/30">
+      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-2 lg:p-6 border border-pictus-lime/30">
         <VehicleCardsDashboard company={company} />
       </div>
 
       {/* Original Notification Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-xl p-6 border border-purple-500/30">
+        <div className="bg-gradient-to-br from-pictus-lime/20 to-pictus-lime600/20 rounded-xl p-6 border border-pictus-lime/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-300 text-xl font-medium">Celkové notifikácie</p>
-              <p className="text-5xl font-bold text-white">{stats.totalNotifications}</p>
+              <p className="text-pictus-lime text-xl font-light">Celkové notifikácie</p>
+              <p className="text-5xl font-light text-pictus-white">{stats.totalNotifications}</p>
             </div>
-            <Bell className="w-8 h-8 text-purple-400" />
+            <Bell className="w-8 h-8 text-pictus-lime" />
           </div>
         </div>
 
         <div className="bg-gradient-to-br from-orange-600/20 to-orange-800/20 rounded-xl p-6 border border-orange-500/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-300 text-xl font-medium">Tento týždeň</p>
-              <p className="text-5xl font-bold text-white">{stats.upcomingWeek.length}</p>
+              <p className="text-orange-300 text-xl font-light">Tento týždeň</p>
+              <p className="text-5xl font-light text-pictus-white">{stats.upcomingWeek.length}</p>
             </div>
             <Calendar className="w-8 h-8 text-orange-400" />
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-700/20 to-purple-900/20 rounded-xl p-6 border border-purple-600/30">
+        <div className="bg-gradient-to-br from-pictus-onyx700/20 to-pictus-onyx900/20 rounded-xl p-6 border border-pictus-onyx600/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-300 text-xl font-medium">Tento mesiac</p>
-              <p className="text-5xl font-bold text-white">{stats.upcomingMonth.length}</p>
+              <p className="text-pictus-white text-xl font-light">Tento mesiac</p>
+              <p className="text-5xl font-light text-pictus-white">{stats.upcomingMonth.length}</p>
             </div>
-            <Calendar className="w-8 h-8 text-purple-400" />
+            <Calendar className="w-8 h-8 text-pictus-white" />
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 rounded-xl p-6 border border-green-500/30">
+        <div className="bg-gradient-to-br from-gray-600/20 to-gray-800/20 rounded-xl p-6 border border-gray-500/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-300 text-xl font-medium">Potvrdené</p>
-              <p className="text-5xl font-bold text-white">{stats.confirmedNotifications}</p>
+              <p className="text-green-300 text-xl font-light">Potvrdené</p>
+              <p className="text-5xl font-light text-pictus-white">{stats.confirmedNotifications}</p>
             </div>
             <CheckCircle className="w-8 h-8 text-green-400" />
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-xl p-6 border border-purple-500/30">
+        <div className="bg-gradient-to-br from-pictus-lime/20 to-pictus-lime600/20 rounded-xl p-6 border border-pictus-lime/30">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-300 text-xl font-medium">Vozidlá</p>
-              <p className="text-5xl font-bold text-white">{stats.vehicleGroups.length}</p>
+              <p className="text-pictus-lime text-xl font-light">Vozidlá</p>
+              <p className="text-5xl font-light text-pictus-white">{stats.vehicleGroups.length}</p>
             </div>
-            <Car className="w-8 h-8 text-purple-400" />
+            <Car className="w-8 h-8 text-pictus-lime" />
           </div>
         </div>
       </div>
 
       {/* Notification Types Chart */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-xl p-6 border border-purple-500/30">
-        <h3 className="text-4xl font-bold text-white mb-6 flex items-center gap-2">
+      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
+        <h3 className="text-4xl font-light text-pictus-white mb-6 flex items-center gap-2">
           <Activity className="w-8 h-8" />
           Distribúcia typov notifikácií
         </h3>
         <div className="space-y-4">
           {Object.entries(stats.notificationTypes).map(([type, count]) => (
             <div key={type} className="flex items-center justify-between">
-              <span className="text-white text-xl">{type}</span>
+              <span className="text-pictus-white text-xl font-light">{type}</span>
               <div className="flex items-center gap-2">
                 <div className="w-32 bg-gray-700 rounded-full h-2">
                   <div
-                    className="bg-gradient-to-r from-purple-500 to-purple-700 h-2 rounded-full transition-all duration-300"
+                    className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${(count / stats.totalNotifications) * 100}%` }}
                   ></div>
                 </div>
-                <span className="text-white font-medium w-8 text-right text-xl">{count}</span>
+                <span className="text-pictus-white font-light w-8 text-right text-xl">{count}</span>
               </div>
             </div>
           ))}
@@ -512,9 +512,9 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Time Filter Controls */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-xl p-3 md:p-6 border border-purple-500/30">
+      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-3 md:p-6 border border-pictus-lime/30">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0 mb-6">
-          <h3 className="text-2xl md:text-4xl font-bold text-white flex items-center gap-2">
+          <h3 className="text-2xl md:text-4xl font-light text-pictus-white flex items-center gap-2">
             <Filter className="w-6 h-6 md:w-8 md:h-8" />
             Filtrovať notifikácie
           </h3>
@@ -523,10 +523,10 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
               <button
                 key={filter}
                 onClick={() => setTimeFilter(filter)}
-                className={`px-3 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-xl font-medium transition-all flex-1 md:flex-none ${
+                className={`px-3 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-xl font-light transition-all flex-1 md:flex-none ${
                   timeFilter === filter
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                    ? 'bg-pictus-lime text-pictus-black'
+                    : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
                 }`}
               >
                 {filter === 'all' ? 'Všetky' : filter === 'week' ? 'Tento týždeň' : 'Tento mesiac'}
@@ -537,12 +537,12 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
       </div>
 
       {/* Vehicle Notifications by Registration */}
-      <div className="bg-gradient-to-br from-purple-600/10 to-purple-800/10 rounded-xl p-2 lg:p-6 border border-purple-500/30">
-        <h3 className="text-4xl font-bold text-white mb-6 flex items-center gap-2">
+      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-2 lg:p-6 border border-pictus-lime/30">
+        <h3 className="text-4xl font-light text-pictus-white mb-6 flex items-center gap-2">
           <Car className="w-8 h-8" />
           Notifikácie podľa vozidla
           {timeFilter !== 'all' && (
-            <span className="text-xl text-purple-300 font-normal">
+            <span className="text-xl text-pictus-lime font-light">
               ({timeFilter === 'week' ? 'Nasledujúcich 7 dní' : 'Nasledujúcich 30 dní'})
             </span>
           )}
@@ -565,7 +565,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                   >
                     <div className="flex items-center gap-4">
                       {vehicleGroup.vehicleImage ? (
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-purple-900/50">
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-pictus-onyx900/50">
                           <Image
                             src={vehicleGroup.vehicleImage}
                             alt={vehicleGroup.vehicleRegistration || 'Vehicle'}
@@ -577,24 +577,24 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                         <div
                           className={`p-2 bg-gradient-to-r ${styles.bg} rounded-lg border ${styles.border}`}
                         >
-                          <Car className={`w-5 h-5 ${styles.icon}`} />
+                          <Car className={`w-8 h-8 ${styles.icon}`} />
                         </div>
                       )}
                       <div>
-                        <h4 className="text-4xl font-bold text-white">
+                        <h4 className="text-4xl font-light text-pictus-white">
                           {vehicleGroup.vehicleRegistration || 'Neznáme vozidlo'}
                         </h4>
-                        <p className="text-white text-lg">
+                        <p className="text-pictus-white text-lg font-light">
                           {vehicleGroup.vehicleType || 'Neznámy typ'}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <p className="text-white font-bold text-2xl">
+                        <p className="text-pictus-white font-light text-2xl">
                           {vehicleGroup.notifications.length}
                         </p>
-                        <p className="text-white text-lg">notifikácií</p>
+                        <p className="text-pictus-white text-lg font-light">notifikácií</p>
                       </div>
                       {isExpanded ? (
                         <ChevronUp className={`w-5 h-5 ${styles.icon}`} />
@@ -619,24 +619,24 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                   <span
-                                    className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                                    className={`px-2 py-1 rounded text-xs font-light ${getStatusColor(
                                       notification.status,
                                     )}`}
                                   >
                                     {notification.status}
                                   </span>
-                                  <span className="text-white text-lg">#{notification.id}</span>
+                                  <span className="text-pictus-white text-lg">#{notification.id}</span>
                                 </div>
                                 <div className="text-right text-sm">
                                   {notification.notificationDate && (
                                     <div>
-                                      <p className="text-purple-300 text-lg">
+                                      <p className="text-pictus-lime text-lg">
                                         Termín: {formatDateTime(notification.notificationDate)}
                                       </p>
                                       {getDaysToNotification(notification.notificationDate) !==
                                         null && (
                                         <p
-                                          className={`text-xl md:text-2xl font-bold ${notificationStyles.text}`}
+                                          className={`text-xl md:text-2xl font-light ${notificationStyles.text}`}
                                         >
                                           zostáva{' '}
                                           {getDaysToNotification(notification.notificationDate)} dní
@@ -649,23 +649,23 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                  <p className="text-purple-300 text-lg">Notifikácia</p>
-                                  <p className="text-white font-medium text-xl">
+                                  <p className="text-pictus-lime text-lg">Notifikácia</p>
+                                  <p className="text-pictus-white font-light text-xl">
                                     {notification.notificationType}
                                   </p>
-                                  <p className="text-white text-lg">
+                                  <p className="text-pictus-white text-lg">
                                     {notification.notificationChannel}
                                   </p>
                                 </div>
                                 <div>
-                                  <p className="text-purple-300 text-lg">Kontakt</p>
-                                  <p className="text-white text-xl">
+                                  <p className="text-pictus-lime text-lg">Kontakt</p>
+                                  <p className="text-pictus-white text-xl">
                                     {notification.personName || 'Nedostupné'}
                                   </p>
-                                  <p className="text-white text-lg">{notification.email}</p>
+                                  <p className="text-pictus-white text-lg">{notification.email}</p>
                                 </div>
                                 <div>
-                                  <p className="text-purple-300 text-lg">Komunikácia</p>
+                                  <p className="text-pictus-lime text-lg">Komunikácia</p>
                                   <div className="flex gap-2 mt-1">
                                     {notification.emailSentAt && (
                                       <span className="px-3 py-2 bg-blue-600/20 text-blue-300 text-lg rounded">
@@ -673,7 +673,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                                       </span>
                                     )}
                                     {notification.smsSentAt && (
-                                      <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
+                                      <span className="px-3 py-2 bg-gray-600/30 text-green-300 text-lg rounded">
                                         SMS ✓
                                       </span>
                                     )}
@@ -701,7 +701,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             {getFilteredNotifications().length === 0 ? (
               <div className="text-center py-12">
                 <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-white text-2xl">
+                <p className="text-pictus-white text-2xl">
                   Žiadne nadchádzajúce notifikácie pre{' '}
                   {timeFilter === 'week' ? 'tento týždeň' : 'tento mesiac'}
                 </p>
@@ -719,23 +719,23 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                          className={`px-2 py-1 rounded text-xs font-light ${getStatusColor(
                             notification.status,
                           )}`}
                         >
                           {notification.status}
                         </span>
-                        <span className="text-white text-lg">#{notification.id}</span>
+                        <span className="text-pictus-white text-lg">#{notification.id}</span>
                       </div>
                       <div className="text-right text-sm">
                         {notification.notificationDate && (
                           <div>
-                            <p className="text-purple-300 font-medium text-lg">
+                            <p className="text-pictus-lime font-light text-lg">
                               Termín: {formatDateTime(notification.notificationDate)}
                             </p>
                             {getDaysToNotification(notification.notificationDate) !== null && (
                               <p
-                                className={`text-xl md:text-2xl font-bold ${notificationStyles.text}`}
+                                className={`text-xl md:text-2xl font-light ${notificationStyles.text}`}
                               >
                                 zostáva {getDaysToNotification(notification.notificationDate)} dní
                               </p>
@@ -747,28 +747,28 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div>
-                        <p className="text-purple-300 text-lg">Vozidlo</p>
-                        <p className="text-white font-bold text-3xl">
+                        <p className="text-pictus-lime text-lg">Vozidlo</p>
+                        <p className="text-pictus-white font-light text-3xl">
                           {notification.vehicleRegistration || 'Nedostupné'}
                         </p>
-                        <p className="text-white text-lg">{notification.vehicleType}</p>
+                        <p className="text-pictus-white text-lg">{notification.vehicleType}</p>
                       </div>
                       <div>
-                        <p className="text-purple-300 text-lg">Oznámenie</p>
-                        <p className="text-white font-medium text-xl">
+                        <p className="text-pictus-lime text-lg">Oznámenie</p>
+                        <p className="text-pictus-white font-light text-xl">
                           {notification.notificationType}
                         </p>
-                        <p className="text-white text-lg">{notification.notificationChannel}</p>
+                        <p className="text-pictus-white text-lg">{notification.notificationChannel}</p>
                       </div>
                       <div>
-                        <p className="text-purple-300 text-lg">Kontakt</p>
-                        <p className="text-white text-xl">
+                        <p className="text-pictus-lime text-lg">Kontakt</p>
+                        <p className="text-pictus-white text-xl">
                           {notification.personName || 'Nedostupné'}
                         </p>
-                        <p className="text-white text-lg">{notification.email}</p>
+                        <p className="text-pictus-white text-lg">{notification.email}</p>
                       </div>
                       <div>
-                        <p className="text-purple-300 text-lg">Komunikácia</p>
+                        <p className="text-pictus-lime text-lg">Komunikácia</p>
                         <div className="flex gap-2 mt-1">
                           {notification.emailSentAt && (
                             <span className="px-3 py-2 bg-blue-600/20 text-blue-300 text-lg rounded">
@@ -776,7 +776,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                             </span>
                           )}
                           {notification.smsSentAt && (
-                            <span className="px-3 py-2 bg-green-600/20 text-green-300 text-lg rounded">
+                            <span className="px-3 py-2 bg-gray-600/30 text-green-300 text-lg rounded">
                               SMS ✓
                             </span>
                           )}
@@ -798,19 +798,19 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
       {/* Communication Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-xl p-6 border border-purple-500/30">
-          <h3 className="text-3xl font-bold text-white mb-4 flex items-center gap-2">
+        <div className="bg-gradient-to-br from-pictus-lime/20 to-pictus-lime600/20 rounded-xl p-6 border border-pictus-lime/30">
+          <h3 className="text-3xl font-light text-pictus-white mb-4 flex items-center gap-2">
             <Mail className="w-8 h-8" />
             E-mailová komunikácia
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-white text-xl">Odoslané e-maily</span>
-              <span className="text-white font-bold text-2xl">{stats.emailsSent}</span>
+              <span className="text-pictus-white text-xl font-light">Odoslané e-maily</span>
+              <span className="text-pictus-white font-light text-2xl">{stats.emailsSent}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white text-xl">Pomer e-mailov</span>
-              <span className="text-white font-bold text-2xl">
+              <span className="text-pictus-white text-xl font-light">Pomer e-mailov</span>
+              <span className="text-pictus-white font-light text-2xl">
                 {stats.totalNotifications > 0
                   ? Math.round((stats.emailsSent / stats.totalNotifications) * 100)
                   : 0}
@@ -820,19 +820,19 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-700/20 to-purple-900/20 rounded-xl p-6 border border-purple-600/30">
-          <h3 className="text-3xl font-bold text-white mb-4 flex items-center gap-2">
+        <div className="bg-gradient-to-br from-pictus-onyx700/20 to-pictus-onyx900/20 rounded-xl p-6 border border-pictus-onyx600/30">
+          <h3 className="text-3xl font-light text-pictus-white mb-4 flex items-center gap-2">
             <MessageSquare className="w-8 h-8" />
             SMS komunikácia
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-white text-xl">Odoslané SMS</span>
-              <span className="text-white font-bold text-2xl">{stats.smsSent}</span>
+              <span className="text-pictus-white text-xl font-light">Odoslané SMS</span>
+              <span className="text-pictus-white font-light text-2xl">{stats.smsSent}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white text-xl">Pomer SMS</span>
-              <span className="text-white font-bold text-2xl">
+              <span className="text-pictus-white text-xl font-light">Pomer SMS</span>
+              <span className="text-pictus-white font-light text-2xl">
                 {stats.totalNotifications > 0
                   ? Math.round((stats.smsSent / stats.totalNotifications) * 100)
                   : 0}
