@@ -1,15 +1,20 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { 
-  Car, 
+import {
+  Car,
   Calendar,
   Mail,
   Building,
   Phone,
   Search,
   TestTube,
-  RotateCcw
+  RotateCcw,
+  Plus,
+  Copy,
+  Settings
 } from 'lucide-react'
+import NotificationBuilder from './NotificationBuilder'
+import NotificationSettings from './NotificationSettings'
 
 interface VehicleNotification {
   id: number
@@ -41,6 +46,9 @@ export default function AllVehicleNotifications() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedNotificationId, setSelectedNotificationId] = useState<string>('')
   const [testingLoading, setTestingLoading] = useState(false)
+  const [showBuilder, setShowBuilder] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [duplicateData, setDuplicateData] = useState<VehicleNotification | null>(null)
 
   const fetchNotifications = async () => {
     try {
@@ -105,6 +113,22 @@ export default function AllVehicleNotifications() {
     }
   }
 
+  const handleDuplicate = (notification: VehicleNotification) => {
+    setDuplicateData(notification)
+    setShowBuilder(true)
+  }
+
+  const handleBuilderSuccess = () => {
+    setShowBuilder(false)
+    setDuplicateData(null)
+    fetchNotifications()
+  }
+
+  const handleBuilderCancel = () => {
+    setShowBuilder(false)
+    setDuplicateData(null)
+  }
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -135,6 +159,31 @@ export default function AllVehicleNotifications() {
     )
   }
 
+  if (showBuilder) {
+    return (
+      <NotificationBuilder
+        organization={duplicateData?.company || undefined}
+        duplicateData={duplicateData || undefined}
+        onSuccess={handleBuilderSuccess}
+        onCancel={handleBuilderCancel}
+      />
+    )
+  }
+
+  if (showSettings) {
+    return (
+      <div>
+        <button
+          onClick={() => setShowSettings(false)}
+          className="mb-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
+        >
+          ← Back to Notifications
+        </button>
+        <NotificationSettings />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -142,6 +191,22 @@ export default function AllVehicleNotifications() {
         <div>
           <h2 className="text-2xl font-bold text-white">All Vehicle Notifications</h2>
           <p className="text-gray-400 mt-1">{filteredNotifications.length} notification{filteredNotifications.length !== 1 ? 's' : ''} total</p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowSettings(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
+          >
+            <Settings className="h-4 w-4" />
+            <span>Settings</span>
+          </button>
+          <button
+            onClick={() => setShowBuilder(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Create New Notification</span>
+          </button>
         </div>
       </div>
 
@@ -228,6 +293,9 @@ export default function AllVehicleNotifications() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Created
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10">
@@ -310,6 +378,16 @@ export default function AllVehicleNotifications() {
                       <Calendar className="h-4 w-4 mr-2" />
                       {new Date(notification.createdAt).toLocaleDateString()}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() => handleDuplicate(notification)}
+                      className="flex items-center gap-1 px-3 py-1 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
+                      title="Duplicate this notification"
+                    >
+                      <Copy className="h-3 w-3" />
+                      <span>Duplicate</span>
+                    </button>
                   </td>
                 </tr>
               ))}

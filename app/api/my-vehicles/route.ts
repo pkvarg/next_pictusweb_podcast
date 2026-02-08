@@ -7,26 +7,44 @@ const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const { searchParams } = new URL(request.url)
+    const organizationParam = searchParams.get('organization')
 
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    let organization: string | null = null
 
-    if (!session.user.isFleetManager) {
-      return NextResponse.json({ error: 'Forbidden - Fleet Manager access required' }, { status: 403 })
-    }
+    if (organizationParam) {
+      organization = organizationParam
+    } else {
+      const session = await getServerSession(authOptions)
 
-    if (!session.user.organization) {
-      return NextResponse.json({ error: 'No organization assigned' }, { status: 400 })
+      if (!session?.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+
+      if (!session.user.isFleetManager) {
+        return NextResponse.json({ error: 'Forbidden - Fleet Manager access required' }, { status: 403 })
+      }
+
+      if (!session.user.organization) {
+        return NextResponse.json({ error: 'No organization assigned' }, { status: 400 })
+      }
+
+      organization = session.user.organization
     }
 
     const vehicles = await prisma.myVehicle.findMany({
       where: {
-        organization: session.user.organization,
+        organization,
         deletedAt: null,
       },
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         expenses: {
           where: { deletedAt: null },
           orderBy: { date: 'desc' },
@@ -41,7 +59,7 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    return NextResponse.json(vehicles)
+    return NextResponse.json({ vehicles })
   } catch (error) {
     console.error('Error fetching vehicles:', error)
     return NextResponse.json({ error: 'Failed to fetch vehicles' }, { status: 500 })

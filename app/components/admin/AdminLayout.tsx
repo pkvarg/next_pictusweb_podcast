@@ -15,6 +15,9 @@ import {
   LogOut,
   User,
   Car,
+  Building,
+  ChevronDown,
+  Truck,
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -23,6 +26,7 @@ interface AdminLayoutProps {
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [fleetSyncOpen, setFleetSyncOpen] = useState(false)
   const pathname = usePathname()
 
   const navigation = [
@@ -46,6 +50,14 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       href: '/admin/file-upload',
       icon: Upload,
     },
+  ]
+
+  const fleetSyncItems = [
+    {
+      name: 'Organizations',
+      href: '/admin/organizations',
+      icon: Building,
+    },
     {
       name: 'Users',
       href: '/admin/users',
@@ -63,6 +75,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       return pathname === '/en/admin' || pathname === '/sk/admin' || pathname === '/hu/admin'
     }
     return pathname.includes(href)
+  }
+
+  const isFleetSyncActive = () => {
+    return fleetSyncItems.some((item) => isActivePath(item.href))
   }
 
   const handleLogout = () => {
@@ -114,6 +130,60 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                   </Link>
                 )
               })}
+
+              {/* FleetSync Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setFleetSyncOpen(!fleetSyncOpen)}
+                  onBlur={() => setTimeout(() => setFleetSyncOpen(false), 200)}
+                  className={`flex items-center px-4 py-2 text-[14px] font-light rounded-lg transition-all duration-200 ${
+                    isFleetSyncActive()
+                      ? 'bg-gradient-to-r from-pictus-lime/20 to-pictus-lime600/20 text-pictus-white border border-pictus-lime/30'
+                      : 'text-pictus-white/70 hover:text-pictus-white hover:bg-pictus-white/10'
+                  }`}
+                >
+                  <Truck
+                    className={`mr-2 h-4 w-4 transition-colors ${
+                      isFleetSyncActive() ? 'text-pictus-lime' : 'text-pictus-white/50'
+                    }`}
+                  />
+                  <span className="hidden lg:block">FleetSync</span>
+                  <span className="lg:hidden">Fleet</span>
+                  <ChevronDown
+                    className={`ml-1 h-3 w-3 transition-transform ${fleetSyncOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {fleetSyncOpen && (
+                  <div className="absolute top-full left-0 mt-1 w-56 bg-pictus-onyx900 border border-pictus-lime/30 rounded-lg shadow-xl overflow-hidden z-50">
+                    {fleetSyncItems.map((item) => {
+                      const Icon = item.icon
+                      const isActive = isActivePath(item.href)
+
+                      return (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          onClick={() => setFleetSyncOpen(false)}
+                          className={`flex items-center px-4 py-3 text-[14px] font-light transition-all duration-200 ${
+                            isActive
+                              ? 'bg-gradient-to-r from-pictus-lime/20 to-pictus-lime600/20 text-pictus-white'
+                              : 'text-pictus-white/70 hover:text-pictus-white hover:bg-pictus-white/10'
+                          }`}
+                        >
+                          <Icon
+                            className={`mr-3 h-4 w-4 transition-colors ${
+                              isActive ? 'text-pictus-lime' : 'text-pictus-white/50'
+                            }`}
+                          />
+                          {item.name}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
             </nav>
 
             {/* Right side actions */}
@@ -175,6 +245,38 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                   </Link>
                 )
               })}
+
+              {/* FleetSync Section - Mobile */}
+              <div className="pt-2 mt-2 border-t border-pictus-lime/20">
+                <div className="flex items-center px-4 py-2 text-pictus-lime text-sm font-light">
+                  <Truck className="mr-2 h-4 w-4" />
+                  FleetSync
+                </div>
+                {fleetSyncItems.map((item) => {
+                  const Icon = item.icon
+                  const isActive = isActivePath(item.href)
+
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center px-4 py-3 ml-4 text-lg font-light rounded-lg transition-all duration-200 ${
+                        isActive
+                          ? 'bg-gradient-to-r from-pictus-lime/20 to-pictus-lime600/20 text-pictus-white border border-pictus-lime/30'
+                          : 'text-pictus-white/70 hover:text-pictus-white hover:bg-pictus-white/10'
+                      }`}
+                    >
+                      <Icon
+                        className={`mr-3 h-5 w-5 transition-colors ${
+                          isActive ? 'text-pictus-lime' : 'text-pictus-white/50'
+                        }`}
+                      />
+                      {item.name}
+                    </Link>
+                  )
+                })}
+              </div>
 
               {/* Mobile Back to Website */}
               <Link

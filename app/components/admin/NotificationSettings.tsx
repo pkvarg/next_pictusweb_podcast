@@ -1,0 +1,648 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import {
+  Settings,
+  Plus,
+  Edit2,
+  Trash2,
+  Save,
+  X,
+  Bell,
+  MessageSquare,
+  Sparkles,
+  Building,
+} from 'lucide-react'
+
+interface TypeOption {
+  id: string
+  label: string
+  value: string
+  sortOrder: number
+  isActive: boolean
+}
+
+interface ChannelOption {
+  id: string
+  label: string
+  value: string
+  sortOrder: number
+  isActive: boolean
+}
+
+interface Template {
+  id: string
+  name: string
+  notificationType: string
+  notificationChannel: string
+  daysBeforeDuty: number | null
+  emailMessage: string | null
+  smsMessage: string | null
+  isActive: boolean
+}
+
+interface NotificationSettingsProps {
+  organization?: string
+}
+
+interface Organization {
+  id: string
+  name: string
+}
+
+export default function NotificationSettings({ organization: initialOrganization }: NotificationSettingsProps) {
+  const [activeTab, setActiveTab] = useState<'types' | 'channels' | 'templates'>('types')
+  const [typeOptions, setTypeOptions] = useState<TypeOption[]>([])
+  const [channelOptions, setChannelOptions] = useState<ChannelOption[]>([])
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [loading, setLoading] = useState(true)
+  const [editingItem, setEditingItem] = useState<any>(null)
+  const [newItem, setNewItem] = useState<any>(null)
+  const [organization, setOrganization] = useState(initialOrganization || '')
+
+  useEffect(() => {
+    fetchOrganizations()
+  }, [])
+
+  useEffect(() => {
+    if (organization) {
+      fetchData()
+    }
+  }, [organization, activeTab])
+
+  const fetchOrganizations = async () => {
+    try {
+      const response = await fetch('/api/organizations')
+      if (response.ok) {
+        const data = await response.json()
+        setOrganizations(data.organizations || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch organizations:', error)
+    }
+  }
+
+  const fetchData = async () => {
+    if (!organization) return
+
+    setLoading(true)
+    try {
+      if (activeTab === 'types') {
+        const response = await fetch(`/api/notification-type-options?organization=${organization}`)
+        if (response.ok) {
+          const data = await response.json()
+          setTypeOptions(data.options || [])
+        }
+      } else if (activeTab === 'channels') {
+        const response = await fetch(`/api/notification-channel-options?organization=${organization}`)
+        if (response.ok) {
+          const data = await response.json()
+          setChannelOptions(data.options || [])
+        }
+      } else if (activeTab === 'templates') {
+        const response = await fetch(`/api/notification-templates?organization=${organization}`)
+        if (response.ok) {
+          const data = await response.json()
+          setTemplates(data.templates || [])
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddNew = () => {
+    if (activeTab === 'types') {
+      setNewItem({ label: '', sortOrder: typeOptions.length })
+    } else if (activeTab === 'channels') {
+      setNewItem({ label: '', sortOrder: channelOptions.length })
+    } else if (activeTab === 'templates') {
+      setNewItem({
+        name: '',
+        notificationType: '',
+        notificationChannel: '',
+        daysBeforeDuty: null,
+        emailMessage: '',
+        smsMessage: '',
+      })
+    }
+  }
+
+  const handleSaveNew = async () => {
+    // Validate organization is selected
+    if (!organization || organization === '') {
+      alert('Please select an organization first')
+      return
+    }
+
+    try {
+      let endpoint = ''
+      let data = { ...newItem, organization }
+
+      if (activeTab === 'types') {
+        endpoint = '/api/notification-type-options'
+      } else if (activeTab === 'channels') {
+        endpoint = '/api/notification-channel-options'
+      } else if (activeTab === 'templates') {
+        endpoint = '/api/notification-templates'
+      }
+
+      console.log('Sending data:', data)
+      console.log('Organization:', organization)
+      console.log('New Item:', newItem)
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      if (response.ok) {
+        setNewItem(null)
+        fetchData()
+        alert('Item created successfully!')
+      } else {
+        const errorData = await response.json()
+        console.error('Error response:', errorData)
+        alert(`Failed to create item: ${JSON.stringify(errorData)}`)
+      }
+    } catch (error) {
+      console.error('Failed to create item:', error)
+      alert('Error creating item')
+    }
+  }
+
+  const handleEdit = (item: any) => {
+    setEditingItem({ ...item })
+  }
+
+  const handleSaveEdit = async () => {
+    try {
+      let endpoint = ''
+
+      if (activeTab === 'types') {
+        endpoint = '/api/notification-type-options'
+      } else if (activeTab === 'channels') {
+        endpoint = '/api/notification-channel-options'
+      } else if (activeTab === 'templates') {
+        endpoint = '/api/notification-templates'
+      }
+
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingItem),
+      })
+
+      if (response.ok) {
+        setEditingItem(null)
+        fetchData()
+      } else {
+        alert('Failed to update item')
+      }
+    } catch (error) {
+      console.error('Failed to update item:', error)
+      alert('Error updating item')
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this item?')) return
+
+    try {
+      let endpoint = ''
+
+      if (activeTab === 'types') {
+        endpoint = `/api/notification-type-options?id=${id}`
+      } else if (activeTab === 'channels') {
+        endpoint = `/api/notification-channel-options?id=${id}`
+      } else if (activeTab === 'templates') {
+        endpoint = `/api/notification-templates?id=${id}`
+      }
+
+      const response = await fetch(endpoint, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        fetchData()
+      } else {
+        alert('Failed to delete item')
+      }
+    } catch (error) {
+      console.error('Failed to delete item:', error)
+      alert('Error deleting item')
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Organization Dropdown */}
+      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
+        <label className="block text-pictus-lime text-sm mb-2">
+          <Building className="w-4 h-4 inline mr-1" />
+          Organization *
+        </label>
+        <select
+          value={organization}
+          onChange={(e) => setOrganization(e.target.value)}
+          className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+        >
+          <option value="">Select an organization...</option>
+          {organizations.map((org) => (
+            <option key={org.id} value={org.name}>
+              {org.name}
+            </option>
+          ))}
+        </select>
+        <p className="text-gray-400 text-sm mt-2">
+          Select the organization to configure notification options. This will be used for notification types, channels, and templates.
+        </p>
+      </div>
+
+      {!organization ? (
+        <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-12 border border-pictus-lime/30 text-center">
+          <Settings className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-2xl font-light text-pictus-white mb-2">No Organization Selected</h3>
+          <p className="text-gray-400">Please enter an organization name above to configure notification settings.</p>
+        </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-xl">
+              <Settings className="w-6 h-6 text-pictus-black" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-light text-pictus-white">Notification Settings</h2>
+              <p className="text-gray-400 text-lg">Configure notification options for {organization}</p>
+            </div>
+          </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setActiveTab('types')}
+          className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
+            activeTab === 'types'
+              ? 'bg-pictus-lime text-pictus-black'
+              : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
+          }`}
+        >
+          <Bell className="w-5 h-5 inline mr-2" />
+          Notification Types
+        </button>
+        <button
+          onClick={() => setActiveTab('channels')}
+          className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
+            activeTab === 'channels'
+              ? 'bg-pictus-lime text-pictus-black'
+              : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
+          }`}
+        >
+          <MessageSquare className="w-5 h-5 inline mr-2" />
+          Channels
+        </button>
+        <button
+          onClick={() => setActiveTab('templates')}
+          className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
+            activeTab === 'templates'
+              ? 'bg-pictus-lime text-pictus-black'
+              : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
+          }`}
+        >
+          <Sparkles className="w-5 h-5 inline mr-2" />
+          Templates
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-2xl font-light text-pictus-white">
+            {activeTab === 'types' && 'Notification Types'}
+            {activeTab === 'channels' && 'Notification Channels'}
+            {activeTab === 'templates' && 'Notification Templates'}
+          </h3>
+          <button
+            onClick={handleAddNew}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+          >
+            <Plus className="w-5 h-5" />
+            Add New
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime mx-auto"></div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {/* New Item Form */}
+            {newItem && (
+              <div className="bg-white/5 rounded-lg p-4 border border-pictus-lime">
+                {!organization && (
+                  <div className="mb-3 p-2 bg-yellow-500/20 border border-yellow-500/50 rounded text-yellow-200 text-sm">
+                    ⚠️ Please select an organization above before creating items
+                  </div>
+                )}
+                {(activeTab === 'types' || activeTab === 'channels') && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-pictus-lime text-xs mb-1">Label *</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., STK Inspection, Email & SMS"
+                        value={newItem.label}
+                        onChange={(e) => setNewItem({ ...newItem, label: e.target.value })}
+                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                      />
+                      <p className="text-gray-500 text-xs mt-1">
+                        Display name (value will be auto-generated)
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-pictus-lime text-xs mb-1">Sort Order</label>
+                      <input
+                        type="number"
+                        placeholder="0"
+                        value={newItem.sortOrder}
+                        onChange={(e) => setNewItem({ ...newItem, sortOrder: parseInt(e.target.value) })}
+                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                      />
+                      <p className="text-gray-500 text-xs mt-1">
+                        Order in dropdown (0 = first)
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'templates' && (
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      placeholder="Template Name *"
+                      value={newItem.name}
+                      onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                    />
+                    <div className="grid grid-cols-3 gap-4">
+                      <input
+                        type="text"
+                        placeholder="Notification Type *"
+                        value={newItem.notificationType}
+                        onChange={(e) => setNewItem({ ...newItem, notificationType: e.target.value })}
+                        className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Channel *"
+                        value={newItem.notificationChannel}
+                        onChange={(e) => setNewItem({ ...newItem, notificationChannel: e.target.value })}
+                        className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Days Before Duty"
+                        value={newItem.daysBeforeDuty || ''}
+                        onChange={(e) =>
+                          setNewItem({ ...newItem, daysBeforeDuty: e.target.value ? parseInt(e.target.value) : null })
+                        }
+                        className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                      />
+                    </div>
+                    <textarea
+                      placeholder="Email Message"
+                      value={newItem.emailMessage}
+                      onChange={(e) => setNewItem({ ...newItem, emailMessage: e.target.value })}
+                      rows={3}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                    />
+                  </div>
+                )}
+
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={handleSaveNew}
+                    disabled={
+                      !organization ||
+                      (activeTab === 'types' && !newItem.label) ||
+                      (activeTab === 'channels' && !newItem.label) ||
+                      (activeTab === 'templates' && (!newItem.name || !newItem.notificationType || !newItem.notificationChannel))
+                    }
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all"
+                  >
+                    <Save className="w-4 h-4" />
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setNewItem(null)}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Type Options List */}
+            {activeTab === 'types' &&
+              typeOptions.map((option) => (
+                <div
+                  key={option.id}
+                  className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
+                >
+                  {editingItem?.id === option.id ? (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-pictus-lime text-xs mb-1">Label</label>
+                          <input
+                            type="text"
+                            value={editingItem.label}
+                            onChange={(e) => setEditingItem({ ...editingItem, label: e.target.value })}
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-pictus-lime text-xs mb-1">Sort Order</label>
+                          <input
+                            type="number"
+                            value={editingItem.sortOrder}
+                            onChange={(e) =>
+                              setEditingItem({ ...editingItem, sortOrder: parseInt(e.target.value) })
+                            }
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <p className="text-gray-500 text-xs">Value: {editingItem.value} (read-only)</p>
+                      </div>
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={handleSaveEdit}
+                          className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all"
+                        >
+                          <Save className="w-4 h-4" />
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingItem(null)}
+                          className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
+                        >
+                          <X className="w-4 h-4" />
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white text-lg font-light">{option.label}</p>
+                        <p className="text-gray-400 text-sm">
+                          Value: {option.value} • Sort: {option.sortOrder}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(option)}
+                          className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                        >
+                          <Edit2 className="w-4 h-4 text-pictus-lime" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(option.id)}
+                          className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-400" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+            {/* Channel Options List */}
+            {activeTab === 'channels' &&
+              channelOptions.map((option) => (
+                <div
+                  key={option.id}
+                  className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
+                >
+                  {editingItem?.id === option.id ? (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-pictus-lime text-xs mb-1">Label</label>
+                          <input
+                            type="text"
+                            value={editingItem.label}
+                            onChange={(e) => setEditingItem({ ...editingItem, label: e.target.value })}
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-pictus-lime text-xs mb-1">Sort Order</label>
+                          <input
+                            type="number"
+                            value={editingItem.sortOrder}
+                            onChange={(e) =>
+                              setEditingItem({ ...editingItem, sortOrder: parseInt(e.target.value) })
+                            }
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <p className="text-gray-500 text-xs">Value: {editingItem.value} (read-only)</p>
+                      </div>
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={handleSaveEdit}
+                          className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all"
+                        >
+                          <Save className="w-4 h-4" />
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingItem(null)}
+                          className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
+                        >
+                          <X className="w-4 h-4" />
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white text-lg font-light">{option.label}</p>
+                        <p className="text-gray-400 text-sm">
+                          Value: {option.value} • Sort: {option.sortOrder}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(option)}
+                          className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                        >
+                          <Edit2 className="w-4 h-4 text-pictus-lime" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(option.id)}
+                          className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-400" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+            {/* Templates List */}
+            {activeTab === 'templates' &&
+              templates.map((template) => (
+                <div
+                  key={template.id}
+                  className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white text-lg font-light">{template.name}</p>
+                      <p className="text-gray-400 text-sm">
+                        {template.notificationType} • {template.notificationChannel}
+                        {template.daysBeforeDuty && ` • ${template.daysBeforeDuty} days before`}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(template)}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                      >
+                        <Edit2 className="w-4 h-4 text-pictus-lime" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(template.id)}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-400" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
+        </>
+      )}
+    </div>
+  )
+}

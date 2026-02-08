@@ -233,3 +233,61 @@ enum Tier {
   FREE
   PREMIUM
 }
+
+model Organization {
+  id                   String         @id @default(uuid())
+  name                 String         @db.VarChar(100)
+  mainContact          String?        @map("main_contact") @db.VarChar(100)
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+  deletedAt            DateTime?      @map("deleted_at")
+  parentOrganizationId String?        @map("parent_organization_id")
+  parentOrganization   Organization?  @relation("OrganizationHierarchy", fields: [parentOrganizationId], references: [id])
+  childOrganizations   Organization[] @relation("OrganizationHierarchy")
+
+  @@index([parentOrganizationId])
+  @@map("organizations")
+}
+
+model NotificationTemplate {
+  id                    String   @id @default(uuid())
+  organization          String   @db.VarChar(100)
+  name                  String   @db.VarChar(100)
+  notificationType      String   @db.VarChar(50)
+  notificationChannel   String   @db.VarChar(50)
+  daysBeforeDuty        Int?
+  emailMessage          String?  @db.Text
+  smsMessage            String?  @db.Text
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@index([organization])
+  @@map("notification_templates")
+}
+
+model NotificationTypeOption {
+  id           String   @id @default(uuid())
+  organization String   @db.VarChar(100)
+  label        String   @db.VarChar(100)
+  value        String   @db.VarChar(50)
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([organization])
+  @@map("notification_type_options")
+}
+
+model NotificationChannelOption {
+  id           String   @id @default(uuid())
+  organization String   @db.VarChar(100)
+  label        String   @db.VarChar(50)
+  value        String   @db.VarChar(50)
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([organization])
+  @@map("notification_channel_options")
+}
