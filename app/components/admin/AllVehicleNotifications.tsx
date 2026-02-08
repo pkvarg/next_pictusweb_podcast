@@ -211,6 +211,28 @@ export default function AllVehicleNotifications() {
     setShowBuilder(true)
   }
 
+  const handleDeleteNotification = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this notification?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/vehicle-notifications/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete notification')
+      }
+
+      // Refresh the list
+      fetchNotifications()
+    } catch (err) {
+      console.error('Error deleting notification:', err)
+      alert('Failed to delete notification')
+    }
+  }
+
   const handleBuilderSuccess = () => {
     setShowBuilder(false)
     setDuplicateData(null)
@@ -659,14 +681,24 @@ export default function AllVehicleNotifications() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => handleDuplicate(notification)}
-                      className="flex items-center gap-1 px-3 py-1 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
-                      title="Duplicate this notification"
-                    >
-                      <Copy className="h-3 w-3" />
-                      <span>Duplicate</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleDuplicate(notification)}
+                        className="flex items-center gap-1 px-3 py-1 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
+                        title="Duplicate this notification"
+                      >
+                        <Copy className="h-3 w-3" />
+                        <span>Duplicate</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteNotification(notification.id)}
+                        className="flex items-center gap-1 px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all text-sm"
+                        title="Delete this notification"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

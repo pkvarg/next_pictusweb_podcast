@@ -8,15 +8,18 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const company = searchParams.get('company')
 
-    let whereClause = {}
+    let whereClause: any = {
+      deletedAt: null, // Filter out soft-deleted records
+    }
 
     if (company) {
       if (company === 'all') {
-        // Show all organizations
-        whereClause = {}
+        // Show all organizations (but still exclude deleted)
+        whereClause = { deletedAt: null }
       } else if (company === 'demo') {
         // Show all organizations that start with 'demo' or 'DEMO' (case insensitive)
         whereClause = {
+          deletedAt: null,
           company: {
             startsWith: 'demo',
             mode: 'insensitive' as const
@@ -25,6 +28,7 @@ export async function GET(request: NextRequest) {
       } else {
         // Show only specific organization (exact match)
         whereClause = {
+          deletedAt: null,
           company: {
             equals: company,
             mode: 'insensitive' as const

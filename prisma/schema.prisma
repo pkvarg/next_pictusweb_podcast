@@ -112,6 +112,7 @@ model VehicleNotification {
   confirmedAt          DateTime?
   lastReminderSent     DateTime?
   finalStatusUpdated   DateTime?
+  deletedAt            DateTime?  @map("deleted_at")
   userId               String?    @map("user_id")
   user                 User?      @relation(fields: [userId], references: [id])
   myVehicleId          String?    @map("my_vehicle_id")

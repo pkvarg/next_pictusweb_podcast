@@ -15,11 +15,19 @@ import {
   AlertCircle,
   ShieldAlert,
   Gauge,
+  Bell,
+  Users,
+  Settings,
+  Building,
+  Copy,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import ExpensesModal from '@/app/components/client/ExpensesModal'
 import MileageModal from '@/app/components/client/MileageModal'
+import FleetManagerUserModal from '@/app/components/client/FleetManagerUserModal'
+import NotificationBuilder from '@/app/components/admin/NotificationBuilder'
+import NotificationSettings from '@/app/components/admin/NotificationSettings'
 import { FaEuroSign } from 'react-icons/fa'
 
 interface MyVehicle {
@@ -34,6 +42,51 @@ interface MyVehicle {
   updatedAt: string
 }
 
+interface Organization {
+  id: string
+  name: string
+  tier: string | null
+  numberUsers: number | null
+  numberVehicles: number | null
+  numberNotificationTypes: number | null
+}
+
+interface User {
+  id: string
+  email: string
+  firstName: string | null
+  lastName: string | null
+  phoneNumber: string | null
+  organization: string | null
+  active: boolean
+  isFleetManager: boolean
+  role: string
+  createdAt: string
+}
+
+interface VehicleNotification {
+  id: number
+  company: string | null
+  personName: string | null
+  email: string | null
+  phoneNumber: string | null
+  vehicleRegistration: string | null
+  vehicleType: string | null
+  myVehicleId: string | null
+  notificationType: string | null
+  notificationChannel: string | null
+  notificationDate: string | null
+  dutyDate: string | null
+  emailMessage: string | null
+  status: string
+  emailSentAt: string | null
+  smsSentAt: string | null
+  confirmedAt: string | null
+  createdAt: string
+}
+
+type TabType = 'vehicles' | 'users' | 'notifications' | 'settings'
+
 const MyFleetPage = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -44,31 +97,51 @@ const MyFleetPage = () => {
   const [expensesModalOpen, setExpensesModalOpen] = useState(false)
   const [mileageModalOpen, setMileageModalOpen] = useState(false)
   const [selectedVehicle, setSelectedVehicle] = useState<MyVehicle | null>(null)
+  const [activeTab, setActiveTab] = useState<TabType>('vehicles')
+  const [organization, setOrganization] = useState<Organization | null>(null)
+  const [orgLoading, setOrgLoading] = useState(false)
+
+  // Users state
+  const [users, setUsers] = useState<User[]>([])
+  const [usersLoading, setUsersLoading] = useState(false)
+  const [userModalOpen, setUserModalOpen] = useState(false)
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+
+  // Notifications state
+  const [showNotificationBuilder, setShowNotificationBuilder] = useState(false)
+  const [notifications, setNotifications] = useState<VehicleNotification[]>([])
+  const [notificationsLoading, setNotificationsLoading] = useState(false)
+  const [duplicateNotificationData, setDuplicateNotificationData] = useState<VehicleNotification | null>(null)
 
   const handleLogout = () => {
     signOut({ callbackUrl: '/' })
   }
 
-  useEffect(() => {
-    // Check if user is authenticated and is fleet manager
-    if (status === 'loading') return
+  // Define fetch functions with useCallback before useEffect
+  const fetchOrganization = useCallback(async () => {
+    if (!session?.user?.organization) return
 
-    if (!session?.user) {
-      router.push('/auth/login')
-      return
+    try {
+      setOrgLoading(true)
+      const response = await fetch('/api/organizations')
+      if (response.ok) {
+        const data = await response.json()
+        const orgs = data.organizations || []
+        const userOrg = orgs.find((org: Organization) =>
+          org.name.toLowerCase() === session.user.organization?.toLowerCase()
+        )
+        if (userOrg) {
+          setOrganization(userOrg)
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching organization:', err)
+    } finally {
+      setOrgLoading(false)
     }
+  }, [session?.user?.organization])
 
-    if (!session.user.isFleetManager) {
-      // Not a fleet manager, redirect back to client page
-      router.push('/client')
-      return
-    }
-
-    // Fetch vehicles
-    fetchVehicles()
-  }, [session, status, router])
-
-  const fetchVehicles = async () => {
+  const fetchVehicles = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
@@ -86,7 +159,7 @@ const MyFleetPage = () => {
       }
 
       const data = await response.json()
-      setVehicles(data)
+      setVehicles(data.vehicles || [])
     } catch (err) {
       console.error('Error fetching vehicles:', err)
       // Show empty state instead of error message
@@ -94,7 +167,71 @@ const MyFleetPage = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  const fetchUsers = useCallback(async () => {
+    if (!session?.user?.organization) return
+
+    try {
+      setUsersLoading(true)
+      const response = await fetch(`/api/users?organization=${encodeURIComponent(session.user.organization)}`)
+      if (response.ok) {
+        const data = await response.json()
+        setUsers(Array.isArray(data) ? data : [])
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err)
+      setUsers([])
+    } finally {
+      setUsersLoading(false)
+    }
+  }, [session?.user?.organization])
+
+  const fetchNotifications = useCallback(async () => {
+    if (!session?.user?.organization) return
+
+    try {
+      setNotificationsLoading(true)
+      const response = await fetch('/api/vehicle-notifications')
+      if (response.ok) {
+        const data = await response.json()
+        const allNotifications = Array.isArray(data.notifications) ? data.notifications : []
+        // Filter by organization
+        const orgNotifications = allNotifications.filter(
+          (n: VehicleNotification) =>
+            n.company?.toLowerCase() === session.user.organization?.toLowerCase()
+        )
+        setNotifications(orgNotifications)
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err)
+      setNotifications([])
+    } finally {
+      setNotificationsLoading(false)
+    }
+  }, [session?.user?.organization])
+
+  useEffect(() => {
+    // Check if user is authenticated and is fleet manager
+    if (status === 'loading') return
+
+    if (!session?.user) {
+      router.push('/auth/login')
+      return
+    }
+
+    if (!session.user.isFleetManager) {
+      // Not a fleet manager, redirect back to client page
+      router.push('/client')
+      return
+    }
+
+    // Fetch vehicles and organization
+    fetchVehicles()
+    fetchOrganization()
+    fetchUsers()
+    fetchNotifications()
+  }, [session, status, router, fetchVehicles, fetchOrganization, fetchUsers, fetchNotifications])
 
   const handleDelete = async (id: string) => {
     if (!confirm('Naozaj chcete odstrániť toto vozidlo?')) {
@@ -116,6 +253,71 @@ const MyFleetPage = () => {
       console.error('Error deleting vehicle:', err)
       alert('Nepodarilo sa odstrániť vozidlo')
     }
+  }
+
+  const handleDeleteNotification = async (id: number) => {
+    if (!confirm('Naozaj chcete odstrániť túto notifikáciu?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/vehicle-notifications/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete notification')
+      }
+
+      // Refresh the list
+      fetchNotifications()
+    } catch (err) {
+      console.error('Error deleting notification:', err)
+      alert('Nepodarilo sa odstrániť notifikáciu')
+    }
+  }
+
+  const handleDeleteUser = async (userId: string) => {
+    // Prevent deleting yourself
+    if (session?.user?.id === userId) {
+      alert('Nemôžete odstrániť seba')
+      return
+    }
+
+    if (!confirm('Naozaj chcete odstrániť tohto používateľa?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user')
+      }
+
+      fetchUsers()
+    } catch (err) {
+      console.error('Error deleting user:', err)
+      alert('Nepodarilo sa odstrániť používateľa')
+    }
+  }
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user)
+    setUserModalOpen(true)
+  }
+
+  const handleCreateUser = () => {
+    setEditingUser(null)
+    setUserModalOpen(true)
+  }
+
+  const handleUserModalSuccess = () => {
+    fetchUsers()
+    setUserModalOpen(false)
+    setEditingUser(null)
   }
 
   // Show loading while checking authentication
@@ -204,18 +406,72 @@ const MyFleetPage = () => {
               <Car className="w-10 h-10 text-pictus-lime" />
             </div>
             <div>
-              <h1 className="text-5xl font-light text-pictus-white">Moja flotila</h1>
-              <p className="text-2xl text-pictus-lime">{vehicles.length} vozidiel</p>
+              <h1 className="text-5xl font-light text-pictus-white">FleetSync Manager</h1>
+              {organization && (
+                <p className="text-2xl text-pictus-lime flex items-center gap-2">
+                  <Building size={20} />
+                  {organization.name}
+                  {organization.tier && (
+                    <span className="text-sm bg-pictus-lime/20 px-2 py-1 rounded">
+                      {organization.tier}
+                    </span>
+                  )}
+                </p>
+              )}
             </div>
           </div>
+        </div>
 
-          <Link
-            href="/client/my-fleet/new"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white px-6 py-3 rounded-lg font-light hover:from-pictus-lime700 hover:to-pictus-black transition-all text-lg"
-          >
-            <Plus size={20} />
-            Pridať vozidlo
-          </Link>
+        {/* Tabs Navigation */}
+        <div className="mb-8 border-b border-white/10">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab('vehicles')}
+              className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                activeTab === 'vehicles'
+                  ? 'text-pictus-lime border-b-2 border-pictus-lime'
+                  : 'text-gray-400 hover:text-pictus-white'
+              }`}
+            >
+              <Car size={20} />
+              Vozidlá ({vehicles.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                activeTab === 'users'
+                  ? 'text-pictus-lime border-b-2 border-pictus-lime'
+                  : 'text-gray-400 hover:text-pictus-white'
+              }`}
+            >
+              <Users size={20} />
+              Používatelia
+            </button>
+            <button
+              onClick={() => setActiveTab('notifications')}
+              className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                activeTab === 'notifications'
+                  ? 'text-pictus-lime border-b-2 border-pictus-lime'
+                  : 'text-gray-400 hover:text-pictus-white'
+              }`}
+            >
+              <Bell size={20} />
+              Notifikácie
+            </button>
+            {organization?.tier === 'Business' && (
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                  activeTab === 'settings'
+                    ? 'text-pictus-lime border-b-2 border-pictus-lime'
+                    : 'text-gray-400 hover:text-pictus-white'
+                }`}
+              >
+                <Settings size={20} />
+                Nastavenia
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Error Message */}
@@ -226,8 +482,42 @@ const MyFleetPage = () => {
           </div>
         )}
 
-        {/* Vehicles Grid */}
-        {vehicles.length === 0 ? (
+        {/* Tab Content */}
+        {activeTab === 'vehicles' && (
+          <>
+            {/* Vehicle Header Actions */}
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                {organization?.numberVehicles && (
+                  <p className="text-sm text-gray-400">
+                    Počet vozidiel: {vehicles.length} / {organization.numberVehicles}
+                    {vehicles.length >= organization.numberVehicles && (
+                      <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
+                    )}
+                  </p>
+                )}
+              </div>
+              <Link
+                href="/client/my-fleet/new"
+                className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-light transition-all text-lg ${
+                  organization?.numberVehicles && vehicles.length >= organization.numberVehicles
+                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white hover:from-pictus-lime700 hover:to-pictus-black'
+                }`}
+                onClick={(e) => {
+                  if (organization?.numberVehicles && vehicles.length >= organization.numberVehicles) {
+                    e.preventDefault()
+                    alert('Dosiahli ste maximálny počet vozidiel pre vašu organizáciu')
+                  }
+                }}
+              >
+                <Plus size={20} />
+                Pridať vozidlo
+              </Link>
+            </div>
+
+            {/* Vehicles Grid */}
+            {vehicles.length === 0 ? (
           // Empty State
           <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-3xl p-12 border border-pictus-lime/30 text-center">
             <div className="max-w-2xl mx-auto">
@@ -326,6 +616,333 @@ const MyFleetPage = () => {
             ))}
           </div>
         )}
+          </>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === 'users' && (
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Správa používateľov</h2>
+                <p className="text-gray-400 mt-1">Organizácia: {session?.user?.organization}</p>
+                {organization?.numberUsers && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Počet používateľov: {users.length} / {organization.numberUsers}
+                    {users.length >= organization.numberUsers && (
+                      <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
+                    )}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={handleCreateUser}
+                disabled={organization?.numberUsers ? users.length >= organization.numberUsers : false}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  organization?.numberUsers && users.length >= organization.numberUsers
+                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black'
+                }`}
+              >
+                <Plus className="h-4 w-4" />
+                Pridať používateľa
+              </button>
+            </div>
+
+            {usersLoading ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400">Načítavam používateľov...</p>
+              </div>
+            ) : users.length === 0 ? (
+              <div className="text-center py-12">
+                <Users className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400">Žiadni používatelia</p>
+                <button
+                  onClick={handleCreateUser}
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
+                >
+                  <Plus className="h-4 w-4" />
+                  Pridať prvého používateľa
+                </button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-white/5 border-b border-white/10">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Meno</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Email</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Telefón</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Rola</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Stav</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Akcie</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {users.map((user) => (
+                      <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="text-sm font-medium text-white">
+                            {user.firstName} {user.lastName}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-300">{user.email}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-300">{user.phoneNumber || '-'}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-300">
+                            {user.isFleetManager ? 'Správca flotily' : 'Používateľ'}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs rounded-full ${
+                              user.active
+                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                            }`}
+                          >
+                            {user.active ? 'Aktívny' : 'Neaktívny'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEditUser(user)}
+                              className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
+                              title="Upraviť"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            {session?.user?.id !== user.id ? (
+                              <button
+                                onClick={() => handleDeleteUser(user.id)}
+                                className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
+                                title="Odstrániť"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            ) : (
+                              <button
+                                disabled
+                                className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-lg cursor-not-allowed"
+                                title="Nemôžete odstrániť seba"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Notifications Tab */}
+        {activeTab === 'notifications' && (
+          <>
+            {!showNotificationBuilder ? (
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Notifikácie</h2>
+                    <p className="text-gray-400 mt-1">
+                      Organizácia: {session?.user?.organization} ({notifications.length} notifikácií)
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setDuplicateNotificationData(null)
+                      setShowNotificationBuilder(true)
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Vytvoriť notifikáciu
+                  </button>
+                </div>
+
+                {notificationsLoading ? (
+                  <div className="text-center py-12">
+                    <p className="text-gray-400">Načítavam notifikácie...</p>
+                  </div>
+                ) : notifications.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Bell className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-xl font-medium text-white mb-2">Žiadne notifikácie</h3>
+                    <p className="text-gray-400 mb-6">
+                      Notifikácie pomôžu vašim používateľom nezabudnúť na dôležité udalosti
+                    </p>
+                    <button
+                      onClick={() => {
+                        setDuplicateNotificationData(null)
+                        setShowNotificationBuilder(true)
+                      }}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
+                    >
+                      <Plus className="h-5 w-5" />
+                      Vytvoriť prvú notifikáciu
+                    </button>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-white/5 border-b border-white/10">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">ID</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Osoba</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Vozidlo</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Typ</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Kanál</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Stav</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Dátum</th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase">Akcie</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/10">
+                        {notifications.map((notification) => (
+                          <tr key={notification.id} className="hover:bg-white/5 transition-colors">
+                            <td className="px-4 py-3">
+                              <div className="text-sm font-medium text-white">#{notification.id}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-sm text-white">{notification.personName || '-'}</div>
+                              <div className="text-xs text-gray-400">{notification.email}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-sm text-white">{notification.vehicleRegistration || '-'}</div>
+                              <div className="text-xs text-gray-400">{notification.vehicleType}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-sm text-gray-300">{notification.notificationType || '-'}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-sm text-gray-300">{notification.notificationChannel || '-'}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span
+                                className={`inline-flex px-2 py-1 text-xs rounded-full ${
+                                  notification.status === 'sent' || notification.status === 'confirmed'
+                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                    : notification.status === 'pending'
+                                    ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                    : notification.status === 'failed'
+                                    ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                    : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                                }`}
+                              >
+                                {notification.status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-sm text-gray-300">
+                                {notification.notificationDate
+                                  ? new Date(notification.notificationDate).toLocaleDateString()
+                                  : '-'}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => {
+                                    setDuplicateNotificationData(notification)
+                                    setShowNotificationBuilder(true)
+                                  }}
+                                  className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
+                                  title="Duplikovať"
+                                >
+                                  <Copy className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setDuplicateNotificationData(notification)
+                                    setShowNotificationBuilder(true)
+                                  }}
+                                  className="p-2 bg-gray-500/20 hover:bg-gray-500/30 text-gray-300 border border-gray-500/30 rounded-lg transition-all"
+                                  title="Upraviť"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteNotification(notification.id)}
+                                  className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
+                                  title="Odstrániť"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div>
+                <button
+                  onClick={() => {
+                    setShowNotificationBuilder(false)
+                    setDuplicateNotificationData(null)
+                  }}
+                  className="mb-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
+                >
+                  ← Späť na zoznam
+                </button>
+                <NotificationBuilder
+                  organization={session?.user?.organization}
+                  organizationTier={organization?.tier}
+                  hideChannelDropdown={true}
+                  duplicateData={duplicateNotificationData}
+                  onSuccess={() => {
+                    setShowNotificationBuilder(false)
+                    setDuplicateNotificationData(null)
+                    fetchNotifications()
+                  }}
+                  onCancel={() => {
+                    setShowNotificationBuilder(false)
+                    setDuplicateNotificationData(null)
+                  }}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Settings Tab (Business tier only) */}
+        {activeTab === 'settings' && organization?.tier === 'Business' && (
+          <div className="space-y-6">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Nastavenia notifikácií</h2>
+              <p className="text-gray-400">
+                Ako Business organizácia môžete spravovať vlastné typy notifikácií a šablóny.
+              </p>
+              <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p className="text-blue-300 text-sm">
+                  ℹ️ Ak nie sú definované vlastné typy, použijú sa predvolené možnosti z DEFAULT organizácie.
+                </p>
+              </div>
+              {organization?.numberNotificationTypes && (
+                <div className="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
+                  <p className="text-orange-300 text-sm">
+                    ⚠️ Limit typov notifikácií: {organization.numberNotificationTypes}
+                  </p>
+                </div>
+              )}
+            </div>
+            {session?.user?.organization && (
+              <NotificationSettings organization={session.user.organization} />
+            )}
+          </div>
+        )}
       </main>
 
       {/* Modals */}
@@ -350,6 +967,20 @@ const MyFleetPage = () => {
             vehicleRegistration={selectedVehicle.registration}
           />
         </>
+      )}
+
+      {/* User Modal */}
+      {session?.user?.organization && (
+        <FleetManagerUserModal
+          isOpen={userModalOpen}
+          onClose={() => {
+            setUserModalOpen(false)
+            setEditingUser(null)
+          }}
+          onSuccess={handleUserModalSuccess}
+          user={editingUser}
+          organization={session.user.organization}
+        />
       )}
     </div>
   )
