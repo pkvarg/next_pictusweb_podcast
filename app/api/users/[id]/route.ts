@@ -34,37 +34,28 @@ export async function PUT(
   try {
     const resolvedParams = await params
     const body = await request.json()
-    const { email, firstName, lastName, organization, active, isFleetManager, password, loginProvider } = body
+    const { email, firstName, lastName, phoneNumber, organization, active, isFleetManager, password, loginProvider } = body
 
     // Prepare update data
     const updateData: any = {}
     if (email) updateData.email = email
-    if (firstName) updateData.firstName = firstName
-    if (lastName) updateData.lastName = lastName
+    if (firstName !== undefined) updateData.firstName = firstName
+    if (lastName !== undefined) updateData.lastName = lastName
+    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber
     if (organization !== undefined) updateData.organization = organization
     if (active !== undefined) updateData.active = active
     if (isFleetManager !== undefined) updateData.isFleetManager = isFleetManager
     if (loginProvider !== undefined) updateData.loginProvider = loginProvider
-    
+
     // If setting login provider to hybrid, ALWAYS set default password
     if (loginProvider === 'hybrid') {
-      const defaultPassword = 'Pic*Client*2025'
+      const defaultPassword = process.env.DEFAULT_USER_PASSWORD
       updateData.password = await hashPassword(defaultPassword)
       console.log(`TESTING: Set HYBRID user password to default: ${defaultPassword}`)
     } else if (password !== undefined && password.trim() !== '') {
       // Hash password if provided (for non-hybrid users)
       updateData.password = await hashPassword(password)
       console.log(`TESTING: Set custom password for user`)
-    }
-
-    // Update name if firstName or lastName changed
-    if (firstName || lastName) {
-      const currentUser = await prisma.user.findUnique({
-        where: { id: resolvedParams.id }
-      })
-      if (currentUser) {
-        updateData.name = `${firstName || currentUser.firstName} ${lastName || currentUser.lastName}`
-      }
     }
 
     const user = await prisma.user.update({

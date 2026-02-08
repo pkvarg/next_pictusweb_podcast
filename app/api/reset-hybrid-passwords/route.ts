@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
 // TESTING ONLY: Reset all hybrid users to default password
 export async function POST(request: NextRequest) {
   try {
-    const defaultPassword = 'Pic*Client*2025'
+    const defaultPassword = process.env.DEFAULT_USER_PASSWORD
     const hashedPassword = await hashPassword(defaultPassword)
     
     // Find all hybrid users

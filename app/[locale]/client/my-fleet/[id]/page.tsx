@@ -14,7 +14,7 @@ import {
   Upload,
   X,
 } from 'lucide-react'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 
@@ -56,24 +56,7 @@ const EditVehiclePage = () => {
     signOut({ callbackUrl: '/' })
   }
 
-  useEffect(() => {
-    if (status === 'loading') return
-
-    if (!session?.user) {
-      router.push('/auth/login')
-      return
-    }
-
-    if (!session.user.isFleetManager) {
-      router.push('/client')
-      return
-    }
-
-    // Fetch vehicle data
-    fetchVehicle()
-  }, [session, status, router, vehicleId])
-
-  const fetchVehicle = async () => {
+  const fetchVehicle = useCallback(async () => {
     try {
       setFetchingVehicle(true)
       setError('')
@@ -111,7 +94,24 @@ const EditVehiclePage = () => {
     } finally {
       setFetchingVehicle(false)
     }
-  }
+  }, [vehicleId])
+
+  useEffect(() => {
+    if (status === 'loading') return
+
+    if (!session?.user) {
+      router.push('/auth/login')
+      return
+    }
+
+    if (!session.user.isFleetManager) {
+      router.push('/client')
+      return
+    }
+
+    // Fetch vehicle data
+    fetchVehicle()
+  }, [session, status, router, vehicleId, fetchVehicle])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target

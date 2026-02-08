@@ -136,7 +136,7 @@ export const authOptions = {
           session.user.id = token.id
           session.user.role = token.role?.toLowerCase() || 'client'
           session.user.email = token.email
-          session.user.name = token.name
+          session.user.name = token.name || `${token.firstName || ''} ${token.lastName || ''}`.trim()
           session.user.organization = token.organization
           session.user.isFleetManager = token.isFleetManager || false
           console.log('TESTING: Session data set successfully')
@@ -234,7 +234,7 @@ export const authOptions = {
           // Return user object compatible with database adapter
           return {
             id: user.id,
-            name: user.name || `${user.firstName} ${user.lastName}`,
+            name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
             email: user.email,
             image: user.image,
           }

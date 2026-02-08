@@ -17,6 +17,7 @@ import {
   Gauge,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import ExpensesModal from '@/app/components/client/ExpensesModal'
 import MileageModal from '@/app/components/client/MileageModal'
 import { FaEuroSign } from 'react-icons/fa'
@@ -255,11 +256,13 @@ const MyFleetPage = () => {
                 className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl overflow-hidden border border-pictus-lime/30 hover:border-pictus-lime/50 transition-all"
               >
                 {vehicle.image && (
-                  <div className="w-full h-48 bg-pictus-black/50 overflow-hidden">
-                    <img
+                  <div className="relative w-full h-48 bg-pictus-black/50 overflow-hidden">
+                    <Image
                       src={vehicle.image}
                       alt={vehicle.registration}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
                 )}

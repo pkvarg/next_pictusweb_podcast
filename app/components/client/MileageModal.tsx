@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { X, Plus, Trash2, Gauge } from 'lucide-react'
 
 interface MileageRecord {
@@ -27,13 +27,7 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: Milea
   })
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchMileage()
-    }
-  }, [isOpen])
-
-  const fetchMileage = async () => {
+  const fetchMileage = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/my-vehicles/${vehicleId}/mileage`)
@@ -46,7 +40,13 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: Milea
     } finally {
       setLoading(false)
     }
-  }
+  }, [vehicleId])
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchMileage()
+    }
+  }, [isOpen, fetchMileage])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

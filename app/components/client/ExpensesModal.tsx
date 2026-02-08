@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { X, Plus, Trash2 } from 'lucide-react'
 import { FaEuroSign } from 'react-icons/fa'
 
@@ -28,13 +28,7 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: Expe
   })
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchExpenses()
-    }
-  }, [isOpen])
-
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/my-vehicles/${vehicleId}/expenses`)
@@ -47,7 +41,13 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: Expe
     } finally {
       setLoading(false)
     }
-  }
+  }, [vehicleId])
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchExpenses()
+    }
+  }, [isOpen, fetchExpenses])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

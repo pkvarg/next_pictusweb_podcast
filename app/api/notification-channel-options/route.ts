@@ -41,17 +41,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    let { organization, label, value, sortOrder } = body
-
-    // Auto-generate value from label if not provided
-    if (!value && label) {
-      value = label
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-        .replace(/\s+/g, '-') // Replace spaces with hyphens
-        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-        .trim()
-    }
+    const { organization, label, sortOrder } = body
 
     if (!organization || !label) {
       return NextResponse.json(
@@ -64,7 +54,6 @@ export async function POST(request: NextRequest) {
       data: {
         organization,
         label,
-        value,
         sortOrder: sortOrder ? parseInt(sortOrder) : 0,
       },
     })
@@ -82,25 +71,14 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    let { id, label, value, sortOrder, isActive } = body
+    const { id, label, sortOrder, isActive } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Missing option ID' }, { status: 400 })
     }
 
-    // Auto-generate value from label if label is provided and value is not
-    if (label && !value) {
-      value = label
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-        .replace(/\s+/g, '-') // Replace spaces with hyphens
-        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-        .trim()
-    }
-
     const updateData: any = {}
     if (label !== undefined) updateData.label = label
-    if (value !== undefined) updateData.value = value
     if (sortOrder !== undefined) updateData.sortOrder = parseInt(sortOrder)
     if (isActive !== undefined) updateData.isActive = isActive
 

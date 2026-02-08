@@ -1,12 +1,18 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { X, User, Mail, Building, ToggleLeft, Lock, Shield } from 'lucide-react'
+import { X, User, Mail, Building, ToggleLeft, Lock, Shield, Phone } from 'lucide-react'
+
+interface Organization {
+  id: string
+  name: string
+}
 
 interface User {
   id: string
   email: string
   firstName: string | null
   lastName: string | null
+  phoneNumber: string | null
   organization: string | null
   active: boolean
   isFleetManager: boolean
@@ -32,6 +38,7 @@ export default function EditUserModal({
     email: '',
     firstName: '',
     lastName: '',
+    phoneNumber: '',
     organization: '',
     active: true,
     isFleetManager: false,
@@ -40,6 +47,25 @@ export default function EditUserModal({
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchOrganizations()
+    }
+  }, [isOpen])
+
+  const fetchOrganizations = async () => {
+    try {
+      const response = await fetch('/api/organizations')
+      if (response.ok) {
+        const data = await response.json()
+        setOrganizations(data.organizations || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch organizations:', error)
+    }
+  }
 
   useEffect(() => {
     if (user) {
@@ -47,6 +73,7 @@ export default function EditUserModal({
         email: user.email,
         firstName: user.firstName || '',
         lastName: user.lastName || '',
+        phoneNumber: user.phoneNumber || '',
         organization: user.organization || '',
         active: user.active,
         isFleetManager: user.isFleetManager || false,
@@ -158,17 +185,37 @@ export default function EditUserModal({
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
+              <Phone className="h-4 w-4 inline mr-2" />
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+              placeholder="+421..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               <Building className="h-4 w-4 inline mr-2" />
               Organization
             </label>
-            <input
-              type="text"
+            <select
               name="organization"
               value={formData.organization}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              placeholder="Company Inc."
-            />
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            >
+              <option value="">Select organization...</option>
+              {organizations.map((org) => (
+                <option key={org.id} value={org.name}>
+                  {org.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

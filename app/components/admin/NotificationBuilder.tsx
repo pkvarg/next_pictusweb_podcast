@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Bell,
   Calendar,
@@ -29,14 +29,12 @@ interface Template {
 interface TypeOption {
   id: string
   label: string
-  value: string
   sortOrder: number
 }
 
 interface ChannelOption {
   id: string
   label: string
-  value: string
   sortOrder: number
 }
 
@@ -50,6 +48,14 @@ interface Vehicle {
 interface Organization {
   id: string
   name: string
+}
+
+interface User {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  phoneNumber: string | null
 }
 
 interface NotificationBuilderProps {
@@ -73,6 +79,11 @@ export default function NotificationBuilder({
   const [channelOptions, setChannelOptions] = useState<ChannelOption[]>([])
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [users, setUsers] = useState<User[]>([])
+  const [usingDefaultTypeOptions, setUsingDefaultTypeOptions] = useState(false)
+  const [usingDefaultChannelOptions, setUsingDefaultChannelOptions] = useState(false)
+  const [notificationDaysOffset, setNotificationDaysOffset] = useState<number | ''>('')
+  const [useCustomType, setUseCustomType] = useState(false)
 
   const [formData, setFormData] = useState({
     templateId: '',
@@ -88,6 +99,109 @@ export default function NotificationBuilder({
     emailMessage: '',
   })
 
+  const fetchTemplates = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/notification-templates?organization=${organization}`)
+      if (response.ok) {
+        const data = await response.json()
+        setTemplates(data.templates || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch templates:', error)
+    }
+  }, [organization])
+
+  const fetchTypeOptions = useCallback(async () => {
+    try {
+      // Try to fetch options for the current organization
+      const response = await fetch(`/api/notification-type-options?organization=${organization}`)
+      if (response.ok) {
+        const data = await response.json()
+        const options = data.options || []
+
+        // If no options found for current organization, fetch from DEFAULT
+        if (options.length === 0 && organization !== 'DEFAULT') {
+          const defaultResponse = await fetch(`/api/notification-type-options?organization=DEFAULT`)
+          if (defaultResponse.ok) {
+            const defaultData = await defaultResponse.json()
+            setTypeOptions(defaultData.options || [])
+            setUsingDefaultTypeOptions(true)
+            return
+          }
+        }
+
+        setTypeOptions(options)
+        setUsingDefaultTypeOptions(false)
+      }
+    } catch (error) {
+      console.error('Failed to fetch type options:', error)
+    }
+  }, [organization])
+
+  const fetchChannelOptions = useCallback(async () => {
+    try {
+      // Try to fetch options for the current organization
+      const response = await fetch(`/api/notification-channel-options?organization=${organization}`)
+      if (response.ok) {
+        const data = await response.json()
+        const options = data.options || []
+
+        // If no options found for current organization, fetch from DEFAULT
+        if (options.length === 0 && organization !== 'DEFAULT') {
+          const defaultResponse = await fetch(`/api/notification-channel-options?organization=DEFAULT`)
+          if (defaultResponse.ok) {
+            const defaultData = await defaultResponse.json()
+            setChannelOptions(defaultData.options || [])
+            setUsingDefaultChannelOptions(true)
+            return
+          }
+        }
+
+        setChannelOptions(options)
+        setUsingDefaultChannelOptions(false)
+      }
+    } catch (error) {
+      console.error('Failed to fetch channel options:', error)
+    }
+  }, [organization])
+
+  const fetchVehicles = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/my-vehicles?organization=${organization}`)
+      if (response.ok) {
+        const data = await response.json()
+        setVehicles(data.vehicles || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch vehicles:', error)
+    }
+  }, [organization])
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/users?organization=${organization}`)
+      if (response.ok) {
+        const data = await response.json()
+        setUsers(data || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch users:', error)
+    }
+  }, [organization])
+
+  const fetchOrganizations = async () => {
+    try {
+      const response = await fetch('/api/organizations')
+      if (response.ok) {
+        const data = await response.json()
+        setOrganizations(data.organizations || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch organizations:', error)
+    }
+  }
+
+  // useEffect hooks
   useEffect(() => {
     fetchOrganizations()
   }, [])
@@ -98,9 +212,10 @@ export default function NotificationBuilder({
       fetchTypeOptions()
       fetchChannelOptions()
       fetchVehicles()
+      fetchUsers()
       setFormData((prev) => ({ ...prev, company: organization }))
     }
-  }, [organization])
+  }, [organization, fetchTemplates, fetchTypeOptions, fetchChannelOptions, fetchVehicles, fetchUsers])
 
   useEffect(() => {
     if (duplicateData) {
@@ -119,69 +234,17 @@ export default function NotificationBuilder({
         company: dupOrg,
         emailMessage: duplicateData.emailMessage || '',
       })
+      setNotificationDaysOffset('') // Reset days offset when duplicating
+
+      // Check if duplicated type exists in options, if not, use custom input
+      if (duplicateData.notificationType && typeOptions.length > 0) {
+        const typeExists = typeOptions.some(opt => opt.label === duplicateData.notificationType)
+        setUseCustomType(!typeExists)
+      }
+
       setStep(dupOrg ? 2 : 0)
     }
-  }, [duplicateData, initialOrganization])
-
-  const fetchTemplates = async () => {
-    try {
-      const response = await fetch(`/api/notification-templates?organization=${organization}`)
-      if (response.ok) {
-        const data = await response.json()
-        setTemplates(data.templates || [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch templates:', error)
-    }
-  }
-
-  const fetchTypeOptions = async () => {
-    try {
-      const response = await fetch(`/api/notification-type-options?organization=${organization}`)
-      if (response.ok) {
-        const data = await response.json()
-        setTypeOptions(data.options || [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch type options:', error)
-    }
-  }
-
-  const fetchChannelOptions = async () => {
-    try {
-      const response = await fetch(`/api/notification-channel-options?organization=${organization}`)
-      if (response.ok) {
-        const data = await response.json()
-        setChannelOptions(data.options || [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch channel options:', error)
-    }
-  }
-
-  const fetchVehicles = async () => {
-    try {
-      const response = await fetch(`/api/my-vehicles?organization=${organization}`)
-      if (response.ok) {
-        const data = await response.json()
-        setVehicles(data.vehicles || [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch vehicles:', error)
-    }
-  }
-
-  const fetchOrganizations = async () => {
-    try {
-      const response = await fetch('/api/organizations')
-      if (response.ok) {
-        const data = await response.json()
-        setOrganizations(data.organizations || [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch organizations:', error)
-    }
-  }
+  }, [duplicateData, initialOrganization, typeOptions])
 
   const handleTemplateSelect = (templateId: string) => {
     const template = templates.find((t) => t.id === templateId)
@@ -193,6 +256,10 @@ export default function NotificationBuilder({
         notificationChannel: template.notificationChannel,
         emailMessage: template.emailMessage || '',
       })
+      // Clear manual days offset when template is selected (template has its own daysBeforeDuty)
+      setNotificationDaysOffset('')
+      // Reset custom type flag when template is selected
+      setUseCustomType(false)
     } else {
       setFormData({
         ...formData,
@@ -212,9 +279,30 @@ export default function NotificationBuilder({
     }
   }
 
-  const calculateNotificationDate = (dutyDate: string) => {
+  const handleUserSelect = (userId: string) => {
+    const user = users.find((u) => u.id === userId)
+    if (user) {
+      setFormData({
+        ...formData,
+        personName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        email: user.email,
+        phoneNumber: user.phoneNumber || '',
+      })
+    }
+  }
+
+  const calculateNotificationDate = (dutyDate: string, daysOffset?: number | '') => {
     if (!dutyDate) return ''
 
+    // Use manual days offset if provided
+    if (daysOffset !== '' && daysOffset !== undefined) {
+      const duty = new Date(dutyDate)
+      const notification = new Date(duty)
+      notification.setDate(notification.getDate() + daysOffset)
+      return notification.toISOString().split('T')[0]
+    }
+
+    // Fall back to template days if available
     const selectedTemplate = templates.find((t) => t.id === formData.templateId)
     if (selectedTemplate && selectedTemplate.daysBeforeDuty) {
       const duty = new Date(dutyDate)
@@ -227,12 +315,23 @@ export default function NotificationBuilder({
   }
 
   const handleDutyDateChange = (dutyDate: string) => {
-    const notificationDate = calculateNotificationDate(dutyDate)
+    const notificationDate = calculateNotificationDate(dutyDate, notificationDaysOffset)
     setFormData({
       ...formData,
       dutyDate,
       notificationDate: notificationDate || formData.notificationDate,
     })
+  }
+
+  const handleDaysOffsetChange = (days: number | '') => {
+    setNotificationDaysOffset(days)
+    if (formData.dutyDate) {
+      const notificationDate = calculateNotificationDate(formData.dutyDate, days)
+      setFormData({
+        ...formData,
+        notificationDate: notificationDate || formData.notificationDate,
+      })
+    }
   }
 
   const handleSubmit = async () => {
@@ -426,19 +525,57 @@ export default function NotificationBuilder({
                   <Bell className="w-4 h-4 inline mr-1" />
                   Notification Type
                 </label>
-                <select
-                  value={formData.notificationType}
-                  onChange={(e) => setFormData({ ...formData, notificationType: e.target.value })}
-                  disabled={!!formData.templateId}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
-                >
-                  <option value="">Select type...</option>
-                  {typeOptions.map((option) => (
-                    <option key={option.id} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                {!useCustomType ? (
+                  <>
+                    <select
+                      value={formData.notificationType}
+                      onChange={(e) => {
+                        if (e.target.value === '__CUSTOM__') {
+                          setUseCustomType(true)
+                          setFormData({ ...formData, notificationType: '' })
+                        } else {
+                          setFormData({ ...formData, notificationType: e.target.value })
+                        }
+                      }}
+                      disabled={!!formData.templateId}
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
+                    >
+                      <option value="">Select type...</option>
+                      {typeOptions.map((option) => (
+                        <option key={option.id} value={option.label}>
+                          {option.label}
+                        </option>
+                      ))}
+                      <option value="__CUSTOM__">✏️ Custom (type your own)...</option>
+                    </select>
+                    {usingDefaultTypeOptions && (
+                      <p className="text-yellow-400 text-xs mt-1">
+                        Using DEFAULT organization options (no options configured for {organization})
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={formData.notificationType}
+                      onChange={(e) => setFormData({ ...formData, notificationType: e.target.value })}
+                      disabled={!!formData.templateId}
+                      placeholder="Type custom notification type..."
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUseCustomType(false)
+                        setFormData({ ...formData, notificationType: '' })
+                      }}
+                      className="text-xs text-gray-400 hover:text-pictus-lime transition-colors"
+                    >
+                      ← Back to dropdown
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Notification Channel */}
@@ -455,11 +592,16 @@ export default function NotificationBuilder({
                 >
                   <option value="">Select channel...</option>
                   {channelOptions.map((option) => (
-                    <option key={option.id} value={option.value}>
+                    <option key={option.id} value={option.label}>
                       {option.label}
                     </option>
                   ))}
                 </select>
+                {usingDefaultChannelOptions && (
+                  <p className="text-yellow-400 text-xs mt-1">
+                    Using DEFAULT organization options (no options configured for {organization})
+                  </p>
+                )}
               </div>
 
               {/* Duty Date */}
@@ -477,32 +619,84 @@ export default function NotificationBuilder({
                 />
               </div>
 
+              {/* Notification Days Offset */}
+              <div>
+                <label className="block text-pictus-lime text-sm mb-2">
+                  <Calendar className="w-4 h-4 inline mr-1" />
+                  Days Before/After Duty Date
+                </label>
+                <select
+                  value={notificationDaysOffset}
+                  onChange={(e) => handleDaysOffsetChange(e.target.value === '' ? '' : parseInt(e.target.value))}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                >
+                  <option value="">Select days offset or set date manually...</option>
+                  <option value="-30">30 days before</option>
+                  <option value="-21">21 days before</option>
+                  <option value="-14">14 days before</option>
+                  <option value="-7">7 days before</option>
+                  <option value="-3">3 days before</option>
+                  <option value="-1">1 day before</option>
+                  <option value="0">Same day</option>
+                  <option value="1">1 day after</option>
+                  <option value="2">2 days after</option>
+                </select>
+                <p className="text-gray-400 text-xs mt-1">
+                  Auto-calculates notification date based on duty date
+                </p>
+              </div>
+
               {/* Notification Date */}
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Calendar className="w-4 h-4 inline mr-1" />
-                  Notification Date
+                  Notification Date (or use offset)
                 </label>
                 <input
                   type="date"
                   value={formData.notificationDate}
-                  onChange={(e) => setFormData({ ...formData, notificationDate: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, notificationDate: e.target.value })
+                    setNotificationDaysOffset('') // Clear offset when manually setting date
+                  }}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                 />
+                <p className="text-gray-400 text-xs mt-1">
+                  Manual date (overrides days offset)
+                </p>
+              </div>
+
+              {/* User Selection (auto-fills name, email, and phone) */}
+              <div className="md:col-span-2">
+                <label className="block text-pictus-lime text-sm mb-2">
+                  <User className="w-4 h-4 inline mr-1" />
+                  Select User (optional - auto-fills name, email, and phone)
+                </label>
+                <select
+                  onChange={(e) => handleUserSelect(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                >
+                  <option value="">Select a user or enter manually below...</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {`${user.firstName || ''} ${user.lastName || ''}`.trim()} - {user.email}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Person Name */}
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <User className="w-4 h-4 inline mr-1" />
-                  Person Name
+                  Person Name (or select user above)
                 </label>
                 <input
                   type="text"
                   value={formData.personName}
                   onChange={(e) => setFormData({ ...formData, personName: e.target.value })}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-                  placeholder="Enter name..."
+                  placeholder="Enter name manually..."
                 />
               </div>
 
@@ -510,14 +704,14 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Mail className="w-4 h-4 inline mr-1" />
-                  Email
+                  Email (or select user above)
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-                  placeholder="email@example.com"
+                  placeholder="Enter email manually..."
                 />
               </div>
 
@@ -525,14 +719,14 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Phone className="w-4 h-4 inline mr-1" />
-                  Phone Number
+                  Phone Number (or select user above)
                 </label>
                 <input
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-                  placeholder="+421..."
+                  placeholder="Enter phone manually..."
                 />
               </div>
 

@@ -1,6 +1,11 @@
 'use client'
-import React, { useState } from 'react'
-import { X, User, Mail, Building, ToggleLeft, Lock, Shield } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { X, User, Mail, Building, ToggleLeft, Lock, Shield, Phone } from 'lucide-react'
+
+interface Organization {
+  id: string
+  name: string
+}
 
 interface CreateUserModalProps {
   isOpen: boolean
@@ -13,6 +18,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
     email: '',
     firstName: '',
     lastName: '',
+    phoneNumber: '',
     organization: '',
     active: true,
     isFleetManager: false,
@@ -21,6 +27,25 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchOrganizations()
+    }
+  }, [isOpen])
+
+  const fetchOrganizations = async () => {
+    try {
+      const response = await fetch('/api/organizations')
+      if (response.ok) {
+        const data = await response.json()
+        setOrganizations(data.organizations || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch organizations:', error)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,6 +67,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
           email: '',
           firstName: '',
           lastName: '',
+          phoneNumber: '',
           organization: '',
           active: true,
           isFleetManager: false,
@@ -136,17 +162,37 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
+              <Phone className="h-4 w-4 inline mr-2" />
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+              placeholder="+421..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               <Building className="h-4 w-4 inline mr-2" />
               Organization
             </label>
-            <input
-              type="text"
+            <select
               name="organization"
               value={formData.organization}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              placeholder="Company Inc."
-            />
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            >
+              <option value="">Select organization...</option>
+              {organizations.map((org) => (
+                <option key={org.id} value={org.name}>
+                  {org.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -161,7 +207,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-                placeholder="Optional password"
+                placeholder="Leave empty for system default"
               />
             </div>
 

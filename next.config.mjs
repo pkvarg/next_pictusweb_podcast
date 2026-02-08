@@ -52,6 +52,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: '/:locale/fonts/:path*',
+        destination: '/fonts/:path*',
+      },
+      {
         source: '/storage/:path*',
         destination: '/public/storage/:path*', // Serve from the mapped directory
       },

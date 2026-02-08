@@ -312,7 +312,7 @@ export default function OrganizationManager() {
               <div className="text-center py-12">
                 <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-2xl font-light text-pictus-white mb-2">No Organizations</h3>
-                <p className="text-gray-400">Click "Add Organization" to create your first organization</p>
+                <p className="text-gray-400">Click &quot;Add Organization&quot; to create your first organization</p>
               </div>
             )}
           </div>

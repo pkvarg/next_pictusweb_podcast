@@ -66,9 +66,7 @@ model User {
   id                   String                 @id @default(uuid())
   email                String                 @unique
   password             String?
-  name                 String?
   role                 Role                   @default(CLIENT)
-  tier                 Tier                   @default(FREE)
   emailVerified        DateTime?
   image                String?
   lastLoggedIn         DateTime?
@@ -79,6 +77,7 @@ model User {
   deletedAt            DateTime?
   firstName            String?
   lastName             String?
+  phoneNumber          String?                @map("phone_number") @db.VarChar(20)
   organization         String?
   isFleetManager       Boolean                @default(false)
   loginProvider        String?
@@ -235,15 +234,19 @@ enum Tier {
 }
 
 model Organization {
-  id                   String         @id @default(uuid())
-  name                 String         @db.VarChar(100)
-  mainContact          String?        @map("main_contact") @db.VarChar(100)
-  createdAt            DateTime       @default(now()) @map("created_at")
-  updatedAt            DateTime       @updatedAt @map("updated_at")
-  deletedAt            DateTime?      @map("deleted_at")
-  parentOrganizationId String?        @map("parent_organization_id")
-  parentOrganization   Organization?  @relation("OrganizationHierarchy", fields: [parentOrganizationId], references: [id])
-  childOrganizations   Organization[] @relation("OrganizationHierarchy")
+  id                        String         @id @default(uuid())
+  name                      String         @db.VarChar(100)
+  mainContact               String?        @map("main_contact") @db.VarChar(100)
+  tier                      Tier?
+  numberUsers               Int?           @map("number_users")
+  numberVehicles            Int?           @map("number_vehicles")
+  numberNotificationTypes   Int?           @map("number_notification_types")
+  createdAt                 DateTime       @default(now()) @map("created_at")
+  updatedAt                 DateTime       @updatedAt @map("updated_at")
+  deletedAt                 DateTime?      @map("deleted_at")
+  parentOrganizationId      String?        @map("parent_organization_id")
+  parentOrganization        Organization?  @relation("OrganizationHierarchy", fields: [parentOrganizationId], references: [id])
+  childOrganizations        Organization[] @relation("OrganizationHierarchy")
 
   @@index([parentOrganizationId])
   @@map("organizations")
@@ -270,7 +273,6 @@ model NotificationTypeOption {
   id           String   @id @default(uuid())
   organization String   @db.VarChar(100)
   label        String   @db.VarChar(100)
-  value        String   @db.VarChar(50)
   isActive     Boolean  @default(true)
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now()) @map("created_at")
@@ -283,7 +285,6 @@ model NotificationChannelOption {
   id           String   @id @default(uuid())
   organization String   @db.VarChar(100)
   label        String   @db.VarChar(50)
-  value        String   @db.VarChar(50)
   isActive     Boolean  @default(true)
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now()) @map("created_at")

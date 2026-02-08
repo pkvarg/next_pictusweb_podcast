@@ -11,7 +11,8 @@ import {
   UserCheck,
   UserX,
   Search,
-  Shield
+  Shield,
+  Phone
 } from 'lucide-react'
 import CreateUserModal from './CreateUserModal'
 import EditUserModal from './EditUserModal'
@@ -22,6 +23,7 @@ interface User {
   email: string
   firstName: string | null
   lastName: string | null
+  phoneNumber: string | null
   organization: string | null
   active: boolean
   isFleetManager: boolean
@@ -64,6 +66,7 @@ export default function AllUsers() {
       user.email.toLowerCase().includes(searchLower) ||
       (user.firstName && user.firstName.toLowerCase().includes(searchLower)) ||
       (user.lastName && user.lastName.toLowerCase().includes(searchLower)) ||
+      (user.phoneNumber && user.phoneNumber.toLowerCase().includes(searchLower)) ||
       (user.organization && user.organization.toLowerCase().includes(searchLower))
     )
   })
@@ -144,7 +147,7 @@ export default function AllUsers() {
         <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
         <input
           type="text"
-          placeholder="Search users by email, name, or organization..."
+          placeholder="Search users by email, name, phone, or organization..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
@@ -164,7 +167,7 @@ export default function AllUsers() {
                   Organization
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Auth
+                  Phone
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Status
@@ -219,19 +222,14 @@ export default function AllUsers() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      {user.loginProvider && (
-                        <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
-                          {user.loginProvider}
-                        </div>
-                      )}
-                      {user.password && (
-                        <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
-                          Password
-                        </div>
-                      )}
-                      {!user.loginProvider && !user.password && (
-                        <span className="text-xs text-gray-500">No auth</span>
+                    <div className="flex items-center text-sm text-gray-300">
+                      {user.phoneNumber ? (
+                        <>
+                          <Phone className="h-4 w-4 mr-2 text-gray-400" />
+                          {user.phoneNumber}
+                        </>
+                      ) : (
+                        <span className="text-gray-500">N/A</span>
                       )}
                     </div>
                   </td>

@@ -41,8 +41,8 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     //   icon: Brain,
     // },
     {
-      name: 'Create Podcast',
-      href: '/admin/audio',
+      name: 'Podcasts',
+      href: '/admin/podcasts',
       icon: Mic,
     },
     {

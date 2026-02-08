@@ -33,7 +33,6 @@ export async function POST(request: NextRequest) {
       },
       select: {
         id: true,
-        name: true,
         firstName: true,
         lastName: true,
       },
@@ -44,7 +43,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ exists: false }, { status: 200 })
     }
 
-    const name = user.name || `${user.firstName} ${user.lastName}`
+    const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || email
 
     return NextResponse.json({ exists: true, name }, { status: 200 })
   } catch (error) {

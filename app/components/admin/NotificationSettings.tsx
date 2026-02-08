@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Settings,
   Plus,
@@ -17,7 +17,6 @@ import {
 interface TypeOption {
   id: string
   label: string
-  value: string
   sortOrder: number
   isActive: boolean
 }
@@ -25,7 +24,6 @@ interface TypeOption {
 interface ChannelOption {
   id: string
   label: string
-  value: string
   sortOrder: number
   isActive: boolean
 }
@@ -69,7 +67,7 @@ export default function NotificationSettings({ organization: initialOrganization
     if (organization) {
       fetchData()
     }
-  }, [organization, activeTab])
+  }, [organization, activeTab, fetchData])
 
   const fetchOrganizations = async () => {
     try {
@@ -83,7 +81,7 @@ export default function NotificationSettings({ organization: initialOrganization
     }
   }
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!organization) return
 
     setLoading(true)
@@ -112,7 +110,7 @@ export default function NotificationSettings({ organization: initialOrganization
     } finally {
       setLoading(false)
     }
-  }
+  }, [organization, activeTab])
 
   const handleAddNew = () => {
     if (activeTab === 'types') {
@@ -362,7 +360,7 @@ export default function NotificationSettings({ organization: initialOrganization
                         className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                       />
                       <p className="text-gray-500 text-xs mt-1">
-                        Display name (value will be auto-generated)
+                        Display name for this option
                       </p>
                     </div>
                     <div>
@@ -481,9 +479,6 @@ export default function NotificationSettings({ organization: initialOrganization
                           />
                         </div>
                       </div>
-                      <div className="mt-2">
-                        <p className="text-gray-500 text-xs">Value: {editingItem.value} (read-only)</p>
-                      </div>
                       <div className="flex gap-2 mt-3">
                         <button
                           onClick={handleSaveEdit}
@@ -506,7 +501,7 @@ export default function NotificationSettings({ organization: initialOrganization
                       <div>
                         <p className="text-white text-lg font-light">{option.label}</p>
                         <p className="text-gray-400 text-sm">
-                          Value: {option.value} • Sort: {option.sortOrder}
+                          Sort: {option.sortOrder}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -559,9 +554,6 @@ export default function NotificationSettings({ organization: initialOrganization
                           />
                         </div>
                       </div>
-                      <div className="mt-2">
-                        <p className="text-gray-500 text-xs">Value: {editingItem.value} (read-only)</p>
-                      </div>
                       <div className="flex gap-2 mt-3">
                         <button
                           onClick={handleSaveEdit}
@@ -584,7 +576,7 @@ export default function NotificationSettings({ organization: initialOrganization
                       <div>
                         <p className="text-white text-lg font-light">{option.label}</p>
                         <p className="text-gray-400 text-sm">
-                          Value: {option.value} • Sort: {option.sortOrder}
+                          Sort: {option.sortOrder}
                         </p>
                       </div>
                       <div className="flex gap-2">

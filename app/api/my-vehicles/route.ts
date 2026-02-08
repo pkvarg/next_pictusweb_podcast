@@ -34,14 +34,18 @@ export async function GET(request: NextRequest) {
 
     const vehicles = await prisma.myVehicle.findMany({
       where: {
-        organization,
+        organization: {
+          equals: organization,
+          mode: 'insensitive' as const,
+        },
         deletedAt: null,
       },
       include: {
         user: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
@@ -74,16 +78,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (!session.user.isFleetManager) {
-      return NextResponse.json({ error: 'Forbidden - Fleet Manager access required' }, { status: 403 })
-    }
-
-    if (!session.user.organization) {
-      return NextResponse.json({ error: 'No organization assigned' }, { status: 400 })
+    // Allow admins or fleet managers
+    if (session.user.role !== 'ADMIN' && !session.user.isFleetManager) {
+      return NextResponse.json({ error: 'Forbidden - Admin or Fleet Manager access required' }, { status: 403 })
     }
 
     const body = await request.json()
-    const { type, registration, year, image, note } = body
+    const { organization, type, registration, year, image, note } = body
 
     if (!type || !registration) {
       return NextResponse.json(
@@ -92,9 +93,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // For admins, organization can be passed in body. For fleet managers, use their organization
+    let vehicleOrganization: string
+    if (session.user.role === 'ADMIN' && organization) {
+      vehicleOrganization = organization
+    } else if (session.user.organization) {
+      vehicleOrganization = session.user.organization
+    } else {
+      return NextResponse.json({ error: 'No organization specified' }, { status: 400 })
+    }
+
     const vehicle = await prisma.myVehicle.create({
       data: {
-        organization: session.user.organization,
+        organization: vehicleOrganization,
         type,
         registration,
         year: year || null,

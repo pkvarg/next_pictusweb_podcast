@@ -19,9 +19,34 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    const { searchParams } = new URL(request.url)
+    const organization = searchParams.get('organization')
+
+    const whereClause: any = {
+      deletedAt: null,
+    }
+
+    // Filter by organization if provided
+    if (organization) {
+      whereClause.organization = {
+        equals: organization,
+        mode: 'insensitive' as const,
+      }
+    }
+
     const users = await prisma.user.findMany({
-      where: {
-        deletedAt: null,
+      where: whereClause,
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
+        organization: true,
+        role: true,
+        active: true,
+        isFleetManager: true,
+        createdAt: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -49,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { email, firstName, lastName, organization, active, isFleetManager, password, loginProvider } = body
+    const { email, firstName, lastName, phoneNumber, organization, active, isFleetManager, password, loginProvider } = body
 
     if (!email || !firstName || !lastName) {
       return NextResponse.json(
@@ -58,23 +83,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Hash password if provided
+    // Hash password if provided, otherwise use default
     let hashedPassword = null
+    const defaultPassword = process.env.DEFAULT_USER_PASSWORD
+
     if (password && password.trim() !== '') {
+      // Use provided password
       hashedPassword = await hashPassword(password)
+    } else if (!loginProvider || loginProvider === '' || loginProvider === 'hybrid') {
+      // Set default password for users without OAuth provider or hybrid users
+      hashedPassword = await hashPassword(defaultPassword)
+      console.log(`Set default password for new user: ${email}`)
     }
+    // For OAuth-only users (google, github), password remains null
 
     const user = await prisma.user.create({
       data: {
         email,
         firstName,
         lastName,
+        phoneNumber: phoneNumber || null,
         organization: organization || null,
         active: active !== undefined ? active : true,
         isFleetManager: isFleetManager || false,
         password: hashedPassword,
         loginProvider: loginProvider || null,
-        name: `${firstName} ${lastName}`, // Combine first and last name
       },
     })
 
