@@ -32,14 +32,20 @@ export async function GET(request: NextRequest) {
       organization = session.user.organization
     }
 
+    // Build the where clause - if organization is "all", don't filter by organization
+    const whereClause: any = {
+      deletedAt: null,
+    }
+
+    if (organization && organization.toLowerCase() !== 'all') {
+      whereClause.organization = {
+        equals: organization,
+        mode: 'insensitive' as const,
+      }
+    }
+
     const vehicles = await prisma.myVehicle.findMany({
-      where: {
-        organization: {
-          equals: organization,
-          mode: 'insensitive' as const,
-        },
-        deletedAt: null,
-      },
+      where: whereClause,
       include: {
         user: {
           select: {

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
+import FleetOverview from '@/app/components/client/FleetOverview'
 
 const ClientZone = () => {
   const { data: session } = useSession()
@@ -175,19 +176,6 @@ const ClientZone = () => {
             </h1>
             <p className="text-3xl text-pictus-lime mb-6">{session?.user?.name}</p>
             <h2 className="text-5xl lg:text-6xl font-light leading-tight text-center mb-8">FleetSync</h2>
-
-            {/* Navigation to My Fleet - Only for Fleet Managers */}
-            {session?.user?.isFleetManager && (
-              <div className="flex justify-center gap-4">
-                <Link
-                  href="/client/my-fleet"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-8 py-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/50"
-                >
-                  <Car size={24} />
-                  Moja flotila
-                </Link>
-              </div>
-            )}
           </div>
         </section>
 
@@ -205,6 +193,13 @@ const ClientZone = () => {
             </div>
           </section>
         )} */}
+
+        {/* Fleet Overview Section - Only for Fleet Managers */}
+        {session?.user?.isFleetManager && session?.user?.organization && (
+          <section id="fleet-overview" className="mb-16">
+            <FleetOverview organization={session.user.organization} />
+          </section>
+        )}
 
         {session?.user?.organization && (
           <section id="dashboard" className="mb-16">
