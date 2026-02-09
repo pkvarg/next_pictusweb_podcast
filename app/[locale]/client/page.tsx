@@ -19,6 +19,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
 import FleetOverview from '@/app/components/client/FleetOverview'
+import SimpleDutyOverview from '@/app/components/client/SimpleDutyOverview'
 
 const ClientZone = () => {
   const { data: session } = useSession()
@@ -203,11 +204,8 @@ const ClientZone = () => {
 
         {session?.user?.organization && (
           <section id="dashboard" className="mb-16">
-            <div className="text-center mb-8">
-              {/* <h2 className="text-4xl font-light text-pictus-white mb-4">Dashboard</h2> */}
-            </div>
             <div className="md:bg-gradient-to-br md:from-pictus-onyx900/30 md:to-pictus-black/50 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-pictus-lime/30">
-              <VehicleNotificationsDashboard
+              <SimpleDutyOverview
                 company={
                   session.user.organization === 'all'
                     ? 'all'
@@ -245,41 +243,42 @@ const ClientZone = () => {
         )} */}
 
         {/* User Info Section */}
-        <section className="py-20">
-          <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-2xl p-8 backdrop-blur-sm border border-pictus-lime/30">
-            <div className="text-center mb-12">
-              <h2 className="text-6xl font-light text-pictus-white mb-6">Informácie o účte</h2>
+        <section className="py-8">
+          <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-xl p-6 backdrop-blur-sm border border-pictus-lime/30">
+            <div className="flex items-center gap-3 mb-6">
+              <User className="w-6 h-6 text-pictus-lime" />
+              <h2 className="text-3xl font-light text-pictus-white">Informácie o účte</h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 gap-6">
               {/* User Profile */}
               <div className="">
-                <div className="flex items-center gap-4 mb-4">
-                  <User className="w-8 h-8 text-pictus-lime" />
-                  <h3 className="text-4xl font-normal text-pictus-white">Profil používateľa</h3>
+                <div className="flex items-center gap-2 mb-3">
+                  <User className="w-5 h-5 text-pictus-lime" />
+                  <h3 className="text-xl font-normal text-pictus-white">Profil používateľa</h3>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <div>
-                    <label className="text-pictus-white text-xl font-light">Meno</label>
-                    <p className="text-pictus-white text-2xl">{session?.user?.name}</p>
+                    <label className="text-pictus-white text-sm font-light">Meno</label>
+                    <p className="text-pictus-white text-base">{session?.user?.name}</p>
                   </div>
                   <div>
-                    <label className="text-pictus-white text-xl font-light">Email</label>
-                    <p className="text-pictus-white text-2xl">{session?.user?.email}</p>
+                    <label className="text-pictus-white text-sm font-light">Email</label>
+                    <p className="text-pictus-white text-base">{session?.user?.email}</p>
                   </div>
                 </div>
               </div>
 
               {/* Password Change */}
               <div className="">
-                <div className="flex items-center gap-4 mb-4">
-                  <Lock className="w-8 h-8 text-pictus-lime" />
-                  <h3 className="text-4xl font-normal text-pictus-white">Zmena hesla</h3>
+                <div className="flex items-center gap-2 mb-3">
+                  <Lock className="w-5 h-5 text-pictus-lime" />
+                  <h3 className="text-xl font-normal text-pictus-white">Zmena hesla</h3>
                 </div>
 
                 {!showPasswordChange ? (
                   <button
                     onClick={() => setShowPasswordChange(true)}
-                    className="mt-4 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-lg shadow-lg hover:shadow-pictus-lime/50"
+                    className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-4 py-2 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-sm"
                   >
                     Zmeniť heslo
                   </button>
