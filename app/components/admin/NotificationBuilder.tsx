@@ -259,7 +259,7 @@ export default function NotificationBuilder({
         setUseCustomType(!typeExists)
       }
 
-      setStep(dupOrg ? 2 : 0)
+      setStep(dupOrg ? 1 : 0) // Skip to Step 1 (template selection)
     }
   }, [duplicateData, initialOrganization, typeOptions, hideChannelDropdown])
 
@@ -596,7 +596,7 @@ export default function NotificationBuilder({
                           {option.label}
                         </option>
                       ))}
-                      {(organizationTier === 'Business' || organizationTier === undefined) && (
+                      {(organizationTier === 'BUSINESS' || organizationTier === undefined) && (
                         <option value="__CUSTOM__">✏️ Vlastný (zadajte svoj)...</option>
                       )}
                     </select>
@@ -605,7 +605,7 @@ export default function NotificationBuilder({
                         Používajú sa predvolené možnosti (nie sú nakonfigurované možnosti pre {organization})
                       </p>
                     )}
-                    {organizationTier && organizationTier !== 'Business' && (
+                    {organizationTier && organizationTier !== 'BUSINESS' && (
                       <p className="text-blue-400 text-xs mt-1">
                         ℹ️ Vlastné typy notifikácií sú dostupné iba pre Business tier
                       </p>
@@ -676,7 +676,7 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Calendar className="w-4 h-4 inline mr-1" />
-                  Dátum služby *
+                  Dátum úlohy *
                 </label>
                 <input
                   type="date"
@@ -703,7 +703,7 @@ export default function NotificationBuilder({
                   </button>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                  <p className="text-gray-400 text-xs mb-3">
+                  <p className="text-gray-400 text-base mb-3">
                     Vytvorí sa {reminderIntervals.length} {reminderIntervals.length === 1 ? 'notifikácia' : reminderIntervals.length < 5 ? 'notifikácie' : 'notifikácií'}:
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -714,7 +714,7 @@ export default function NotificationBuilder({
                             key={index}
                             className="px-3 py-2 bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg text-pictus-lime text-sm"
                           >
-                            {interval === 0 ? 'V deň služby' : interval > 0 ? `+${interval} dní` : `${interval} dní`}
+                            {interval === 0 ? 'V deň úlohy' : interval > 0 ? `+${interval} dní` : `${interval} dní`}
                           </div>
                         )
                       }
@@ -731,14 +731,14 @@ export default function NotificationBuilder({
                         >
                           <div className="font-medium">{dateStr}</div>
                           <div className="text-xs text-pictus-lime/70">
-                            {interval === 0 ? 'V deň služby' : interval > 0 ? `+${interval} dní` : `${interval} dní`}
+                            {interval === 0 ? 'V deň úlohy' : interval > 0 ? `+${interval} dní` : `${interval} dní`}
                           </div>
                         </div>
                       )
                     })}
                   </div>
-                  <p className="text-gray-400 text-xs mt-3">
-                    {reminderIntervals.length === 1 ? 'Pre jednorázovú notifikáciu nastavte len jeden interval.' : 'Upravte intervaly alebo pridajte vlastné dni pred/po dátume služby.'}
+                  <p className="text-gray-400 text-base mt-3">
+                    {reminderIntervals.length === 1 ? 'Pre jednorázovú notifikáciu nastavte len jeden interval.' : 'Upravte intervaly alebo pridajte vlastné dni pred/po dátume úlohy.'}
                   </p>
                 </div>
               </div>
@@ -884,7 +884,7 @@ export default function NotificationBuilder({
                 <p className="text-white text-lg">{formData.notificationChannel || 'Nenastavené'}</p>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Dátum služby</p>
+                <p className="text-gray-400 text-sm">Dátum úlohy</p>
                 <p className="text-white text-lg">{formData.dutyDate || 'Nenastavené'}</p>
               </div>
               <div>
@@ -956,7 +956,7 @@ export default function NotificationBuilder({
 
             <div className="space-y-4 mb-6">
               <p className="text-gray-400 text-sm">
-                Nastavte dni pred/po dátume služby kedy sa majú odoslať notifikácie.
+                Nastavte dni pred/po dátume úlohy kedy sa majú odoslať notifikácie.
               </p>
 
               {reminderIntervals.map((interval, index) => (
@@ -972,7 +972,7 @@ export default function NotificationBuilder({
                   >
                     {Array.from({ length: 33 }, (_, i) => -30 + i).map((day) => (
                       <option key={day} value={day}>
-                        {day === 0 ? 'V deň služby' :
+                        {day === 0 ? 'V deň úlohy' :
                          day < 0 ? `${Math.abs(day)} ${Math.abs(day) === 1 ? 'deň' : Math.abs(day) < 5 ? 'dni' : 'dní'} pred` :
                          `${day} ${day === 1 ? 'deň' : day < 5 ? 'dni' : 'dní'} po`}
                       </option>

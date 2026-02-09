@@ -20,6 +20,7 @@ import {
   Settings,
   Building,
   Copy,
+  Sparkles,
 } from 'lucide-react'
 import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
@@ -85,7 +86,7 @@ interface VehicleNotification {
   createdAt: string
 }
 
-type TabType = 'vehicles' | 'users' | 'notifications' | 'settings'
+type TabType = 'vehicles' | 'users' | 'notifications' | 'templates' | 'types'
 
 const MyFleetPage = () => {
   const { data: session, status } = useSession()
@@ -520,18 +521,31 @@ const MyFleetPage = () => {
               <Bell size={20} />
               Notifikácie
             </button>
-            {organization?.tier === 'Business' && (
-              <button
-                onClick={() => setActiveTab('settings')}
-                className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
-                  activeTab === 'settings'
-                    ? 'text-pictus-lime border-b-2 border-pictus-lime'
-                    : 'text-gray-400 hover:text-pictus-white'
-                }`}
-              >
-                <Settings size={20} />
-                Nastavenia
-              </button>
+            {organization?.tier === 'BUSINESS' && (
+              <>
+                <button
+                  onClick={() => setActiveTab('templates')}
+                  className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                    activeTab === 'templates'
+                      ? 'text-pictus-lime border-b-2 border-pictus-lime'
+                      : 'text-gray-400 hover:text-pictus-white'
+                  }`}
+                >
+                  <Sparkles size={20} />
+                  Šablóny
+                </button>
+                <button
+                  onClick={() => setActiveTab('types')}
+                  className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                    activeTab === 'types'
+                      ? 'text-pictus-lime border-b-2 border-pictus-lime'
+                      : 'text-gray-400 hover:text-pictus-white'
+                  }`}
+                >
+                  <Settings size={20} />
+                  Typy notifikácií
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -1115,17 +1129,32 @@ const MyFleetPage = () => {
           </>
         )}
 
-        {/* Settings Tab (Business tier only) */}
-        {activeTab === 'settings' && organization?.tier === 'Business' && (
+        {/* Templates Tab (Business tier only) */}
+        {activeTab === 'templates' && organization?.tier === 'BUSINESS' && (
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Nastavenia notifikácií</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">Šablóny notifikácií</h2>
               <p className="text-gray-400">
-                Ako Business organizácia môžete spravovať vlastné typy notifikácií a šablóny.
+                Spravujte šablóny notifikácií pre vašu organizáciu.
+              </p>
+            </div>
+            {session?.user?.organization && (
+              <NotificationSettings organization={session.user.organization} initialTab="templates" hideTabs={true} hideOrganizationSelector={true} />
+            )}
+          </div>
+        )}
+
+        {/* Types Tab (Business tier only) */}
+        {activeTab === 'types' && organization?.tier === 'BUSINESS' && (
+          <div className="space-y-6">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Typy notifikácií</h2>
+              <p className="text-gray-400">
+                Spravujte typy notifikácií pre vašu organizáciu.
               </p>
               <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
                 <p className="text-blue-300 text-sm">
-                  ℹ️ Ak nie sú definované vlastné typy, použijú sa predvolené možnosti z DEFAULT organizácie.
+                  ℹ️ Ak nie sú definované vlastné typy, použijú sa predvolené možnosti.
                 </p>
               </div>
               {organization?.numberNotificationTypes && (
@@ -1137,7 +1166,7 @@ const MyFleetPage = () => {
               )}
             </div>
             {session?.user?.organization && (
-              <NotificationSettings organization={session.user.organization} />
+              <NotificationSettings organization={session.user.organization} initialTab="types" hideTabs={true} hideOrganizationSelector={true} />
             )}
           </div>
         )}

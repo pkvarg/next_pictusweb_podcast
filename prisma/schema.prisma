@@ -232,6 +232,7 @@ enum Role {
 enum Tier {
   FREE
   PREMIUM
+  BUSINESS
 }
 
 model Organization {

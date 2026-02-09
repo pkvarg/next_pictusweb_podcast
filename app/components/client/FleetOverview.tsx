@@ -468,7 +468,7 @@ const FleetOverview = ({ userId, organization }: FleetOverviewProps) => {
       </div>
 
       {/* Vehicle Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className={`grid gap-6 ${vehicles.length <= 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'}`}>
         {vehicles.map((vehicle) => {
           const expenseFilter = expenseFilters[vehicle.id] || 'all'
           const dutyFilter = dutyFilters[vehicle.id] || 'all'
