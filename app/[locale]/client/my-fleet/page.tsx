@@ -113,6 +113,14 @@ const MyFleetPage = () => {
   const [notificationsLoading, setNotificationsLoading] = useState(false)
   const [duplicateNotificationData, setDuplicateNotificationData] = useState<VehicleNotification | null>(null)
 
+  // Notification filters
+  const [filterVehicle, setFilterVehicle] = useState('')
+  const [filterPerson, setFilterPerson] = useState('')
+  const [filterType, setFilterType] = useState('')
+  const [filterDatePreset, setFilterDatePreset] = useState<'all' | 'thisMonth' | 'thisYear' | 'custom'>('all')
+  const [filterDateFrom, setFilterDateFrom] = useState('')
+  const [filterDateTo, setFilterDateTo] = useState('')
+
   const handleLogout = () => {
     signOut({ callbackUrl: '/' })
   }
@@ -350,6 +358,60 @@ const MyFleetPage = () => {
       </div>
     )
   }
+
+  // Filter notifications
+  const filteredNotifications = notifications.filter(notification => {
+    // Vehicle filter
+    if (filterVehicle && notification.vehicleRegistration !== filterVehicle) {
+      return false
+    }
+
+    // Person filter
+    if (filterPerson && (!notification.personName || !notification.personName.toLowerCase().includes(filterPerson.toLowerCase()))) {
+      return false
+    }
+
+    // Type filter
+    if (filterType && notification.notificationType !== filterType) {
+      return false
+    }
+
+    // Date filter
+    if (filterDatePreset !== 'all' && notification.notificationDate) {
+      const notificationDate = new Date(notification.notificationDate)
+      const now = new Date()
+
+      if (filterDatePreset === 'thisMonth') {
+        if (notificationDate.getMonth() !== now.getMonth() || notificationDate.getFullYear() !== now.getFullYear()) {
+          return false
+        }
+      } else if (filterDatePreset === 'thisYear') {
+        if (notificationDate.getFullYear() !== now.getFullYear()) {
+          return false
+        }
+      } else if (filterDatePreset === 'custom') {
+        if (filterDateFrom) {
+          const fromDate = new Date(filterDateFrom)
+          if (notificationDate < fromDate) {
+            return false
+          }
+        }
+        if (filterDateTo) {
+          const toDate = new Date(filterDateTo)
+          toDate.setHours(23, 59, 59, 999) // Include the entire end date
+          if (notificationDate > toDate) {
+            return false
+          }
+        }
+      }
+    }
+
+    return true
+  })
+
+  // Get unique values for filter dropdowns
+  const uniqueVehicles = Array.from(new Set(notifications.map(n => n.vehicleRegistration).filter(Boolean)))
+  const uniqueTypes = Array.from(new Set(notifications.map(n => n.notificationType).filter(Boolean)))
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
@@ -754,7 +816,7 @@ const MyFleetPage = () => {
                   <div>
                     <h2 className="text-2xl font-bold text-white">Notifikácie</h2>
                     <p className="text-gray-400 mt-1">
-                      Organizácia: {session?.user?.organization} ({notifications.length} notifikácií)
+                      Organizácia: {session?.user?.organization} ({filteredNotifications.length} z {notifications.length} notifikácií)
                     </p>
                   </div>
                   <button
@@ -768,6 +830,135 @@ const MyFleetPage = () => {
                     Vytvoriť notifikáciu
                   </button>
                 </div>
+
+                {/* Filters */}
+                {notifications.length > 0 && (
+                  <div className="mb-6 bg-white/5 border border-white/10 rounded-lg p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* Vehicle Filter */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Vozidlo
+                        </label>
+                        <select
+                          value={filterVehicle}
+                          onChange={(e) => setFilterVehicle(e.target.value)}
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                        >
+                          <option value="">Všetky vozidlá</option>
+                          {uniqueVehicles.map((vehicle) => (
+                            <option key={vehicle} value={vehicle}>
+                              {vehicle}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Person Filter */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Osoba
+                        </label>
+                        <input
+                          type="text"
+                          value={filterPerson}
+                          onChange={(e) => setFilterPerson(e.target.value)}
+                          placeholder="Hľadať meno..."
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                        />
+                      </div>
+
+                      {/* Type Filter */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Typ notifikácie
+                        </label>
+                        <select
+                          value={filterType}
+                          onChange={(e) => setFilterType(e.target.value)}
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                        >
+                          <option value="">Všetky typy</option>
+                          {uniqueTypes.map((type) => (
+                            <option key={type} value={type}>
+                              {type}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Date Preset Filter */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Obdobie
+                        </label>
+                        <select
+                          value={filterDatePreset}
+                          onChange={(e) => {
+                            setFilterDatePreset(e.target.value as 'all' | 'thisMonth' | 'thisYear' | 'custom')
+                            if (e.target.value !== 'custom') {
+                              setFilterDateFrom('')
+                              setFilterDateTo('')
+                            }
+                          }}
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                        >
+                          <option value="all">Všetky dátumy</option>
+                          <option value="thisMonth">Tento mesiac</option>
+                          <option value="thisYear">Tento rok</option>
+                          <option value="custom">Vlastné obdobie</option>
+                        </select>
+                      </div>
+
+                      {/* Custom Date Range (only shown when custom is selected) */}
+                      {filterDatePreset === 'custom' && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Od dátumu
+                            </label>
+                            <input
+                              type="date"
+                              value={filterDateFrom}
+                              onChange={(e) => setFilterDateFrom(e.target.value)}
+                              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Do dátumu
+                            </label>
+                            <input
+                              type="date"
+                              value={filterDateTo}
+                              onChange={(e) => setFilterDateTo(e.target.value)}
+                              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Clear Filters Button */}
+                    {(filterVehicle || filterPerson || filterType || filterDatePreset !== 'all') && (
+                      <div className="mt-4">
+                        <button
+                          onClick={() => {
+                            setFilterVehicle('')
+                            setFilterPerson('')
+                            setFilterType('')
+                            setFilterDatePreset('all')
+                            setFilterDateFrom('')
+                            setFilterDateTo('')
+                          }}
+                          className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all text-sm"
+                        >
+                          Vymazať filtre
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {notificationsLoading ? (
                   <div className="text-center py-12">
@@ -807,7 +998,7 @@ const MyFleetPage = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/10">
-                        {notifications.map((notification) => (
+                        {filteredNotifications.map((notification) => (
                           <tr key={notification.id} className="hover:bg-white/5 transition-colors">
                             <td className="px-4 py-3">
                               <div className="text-sm font-medium text-white">#{notification.id}</div>
@@ -883,6 +1074,13 @@ const MyFleetPage = () => {
                         ))}
                       </tbody>
                     </table>
+
+                    {/* No results message */}
+                    {filteredNotifications.length === 0 && (
+                      <div className="text-center py-8 text-gray-400">
+                        Žiadne notifikácie podľa vybraných filtrov
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
