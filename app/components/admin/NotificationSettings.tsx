@@ -33,7 +33,8 @@ interface Template {
   name: string
   notificationType: string
   notificationChannel: string
-  daysBeforeDuty: number | null
+  daysBeforeDuty: number | null // Deprecated: use reminderIntervals
+  reminderIntervals: number[] | null // Array of day offsets: e.g., [-30, -14, -7, 0, 1, 2]
   emailMessage: string | null
   smsMessage: string | null
   isActive: boolean
@@ -66,6 +67,8 @@ export default function NotificationSettings({
   const [editingItem, setEditingItem] = useState<any>(null)
   const [newItem, setNewItem] = useState<any>(null)
   const [organization, setOrganization] = useState(initialOrganization || '')
+  const [usingDefaultTypeOptions, setUsingDefaultTypeOptions] = useState(false)
+  const [usingDefaultChannelOptions, setUsingDefaultChannelOptions] = useState(false)
 
   const fetchOrganizations = async () => {
     try {
@@ -79,25 +82,73 @@ export default function NotificationSettings({
     }
   }
 
+  const fetchTypeOptions = useCallback(async () => {
+    if (!organization) return
+
+    try {
+      // Try to fetch options for the current organization
+      const response = await fetch(`/api/notification-type-options?organization=${organization}`)
+      if (response.ok) {
+        const data = await response.json()
+        const options = data.options || []
+
+        // If no options found for current organization, fetch from DEFAULT
+        if (options.length === 0 && organization !== 'DEFAULT') {
+          const defaultResponse = await fetch(`/api/notification-type-options?organization=DEFAULT`)
+          if (defaultResponse.ok) {
+            const defaultData = await defaultResponse.json()
+            setTypeOptions(defaultData.options || [])
+            setUsingDefaultTypeOptions(true)
+            return
+          }
+        }
+
+        setTypeOptions(options)
+        setUsingDefaultTypeOptions(false)
+      }
+    } catch (error) {
+      console.error('Failed to fetch type options:', error)
+    }
+  }, [organization])
+
+  const fetchChannelOptions = useCallback(async () => {
+    if (!organization) return
+
+    try {
+      // Try to fetch options for the current organization
+      const response = await fetch(`/api/notification-channel-options?organization=${organization}`)
+      if (response.ok) {
+        const data = await response.json()
+        const options = data.options || []
+
+        // If no options found for current organization, fetch from DEFAULT
+        if (options.length === 0 && organization !== 'DEFAULT') {
+          const defaultResponse = await fetch(`/api/notification-channel-options?organization=DEFAULT`)
+          if (defaultResponse.ok) {
+            const defaultData = await defaultResponse.json()
+            setChannelOptions(defaultData.options || [])
+            setUsingDefaultChannelOptions(true)
+            return
+          }
+        }
+
+        setChannelOptions(options)
+        setUsingDefaultChannelOptions(false)
+      }
+    } catch (error) {
+      console.error('Failed to fetch channel options:', error)
+    }
+  }, [organization])
+
   const fetchData = useCallback(async () => {
     if (!organization) return
 
     setLoading(true)
     try {
       if (activeTab === 'types') {
-        const response = await fetch(`/api/notification-type-options?organization=${organization}`)
-        if (response.ok) {
-          const data = await response.json()
-          setTypeOptions(data.options || [])
-        }
+        await fetchTypeOptions()
       } else if (activeTab === 'channels') {
-        const response = await fetch(
-          `/api/notification-channel-options?organization=${organization}`,
-        )
-        if (response.ok) {
-          const data = await response.json()
-          setChannelOptions(data.options || [])
-        }
+        await fetchChannelOptions()
       } else if (activeTab === 'templates') {
         const response = await fetch(`/api/notification-templates?organization=${organization}`)
         if (response.ok) {
@@ -110,7 +161,7 @@ export default function NotificationSettings({
     } finally {
       setLoading(false)
     }
-  }, [organization, activeTab])
+  }, [organization, activeTab, fetchTypeOptions, fetchChannelOptions])
 
   useEffect(() => {
     fetchOrganizations()
@@ -119,8 +170,16 @@ export default function NotificationSettings({
   useEffect(() => {
     if (organization) {
       fetchData()
+      // Always fetch type and channel options when organization changes
+      // This ensures they're available for template creation
+      if (activeTab !== 'types') {
+        fetchTypeOptions()
+      }
+      if (activeTab !== 'channels') {
+        fetchChannelOptions()
+      }
     }
-  }, [organization, activeTab, fetchData])
+  }, [organization, activeTab, fetchData, fetchTypeOptions, fetchChannelOptions])
 
   const handleAddNew = () => {
     if (activeTab === 'types') {
@@ -133,6 +192,7 @@ export default function NotificationSettings({
         notificationType: '',
         notificationChannel: '',
         daysBeforeDuty: null,
+        reminderIntervals: [-7], // Default: 7 days before
         emailMessage: '',
         smsMessage: '',
       })
@@ -157,10 +217,6 @@ export default function NotificationSettings({
       } else if (activeTab === 'templates') {
         endpoint = '/api/notification-templates'
       }
-
-      console.log('Sending data:', data)
-      console.log('Organization:', organization)
-      console.log('New Item:', newItem)
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -410,36 +466,82 @@ export default function NotificationSettings({
                           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                         />
                         <div className="grid grid-cols-3 gap-4">
-                          <input
-                            type="text"
-                            placeholder="Typ notifikácie *"
-                            value={newItem.notificationType}
-                            onChange={(e) =>
-                              setNewItem({ ...newItem, notificationType: e.target.value })
-                            }
-                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
-                          />
-                          <input
-                            type="text"
-                            placeholder="Kanál *"
-                            value={newItem.notificationChannel}
-                            onChange={(e) =>
-                              setNewItem({ ...newItem, notificationChannel: e.target.value })
-                            }
-                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
-                          />
-                          <input
-                            type="number"
-                            placeholder="Dni pred úlohou"
-                            value={newItem.daysBeforeDuty || ''}
-                            onChange={(e) =>
-                              setNewItem({
-                                ...newItem,
-                                daysBeforeDuty: e.target.value ? parseInt(e.target.value) : null,
-                              })
-                            }
-                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
-                          />
+                          <div>
+                            <select
+                              value={newItem.notificationType}
+                              onChange={(e) =>
+                                setNewItem({ ...newItem, notificationType: e.target.value })
+                              }
+                              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                            >
+                              <option value="">Vybrať typ notifikácie *</option>
+                              {typeOptions.map((option) => (
+                                <option key={option.id} value={option.label}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                            {usingDefaultTypeOptions && (
+                              <p className="text-yellow-400 text-xs mt-1">
+                                Používajú sa predvolené možnosti (z DEFAULT)
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <select
+                              value={newItem.notificationChannel}
+                              onChange={(e) =>
+                                setNewItem({ ...newItem, notificationChannel: e.target.value })
+                              }
+                              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                            >
+                              <option value="">Vybrať kanál *</option>
+                              {channelOptions.map((option) => (
+                                <option key={option.id} value={option.label}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                            {usingDefaultChannelOptions && (
+                              <p className="text-yellow-400 text-xs mt-1">
+                                Používajú sa predvolené možnosti (z DEFAULT)
+                              </p>
+                            )}
+                          </div>
+                          <div className="col-span-2">
+                            <label className="block text-xs text-gray-400 mb-2">
+                              Intervaly pripomienok (dni relatívne k termínu)
+                            </label>
+                            <div className="flex gap-2 items-center">
+                              <input
+                                type="text"
+                                placeholder="napr: -30,-14,-7,0,1,2"
+                                value={newItem.reminderIntervalsInput !== undefined ? newItem.reminderIntervalsInput : (newItem.reminderIntervals?.join(',') || '')}
+                                onChange={(e) => {
+                                  const value = e.target.value
+                                  // Store the raw input value
+                                  setNewItem({ ...newItem, reminderIntervalsInput: value })
+                                }}
+                                onBlur={(e) => {
+                                  // Parse the intervals when user is done editing (on blur)
+                                  const value = e.target.value.trim()
+                                  if (value === '') {
+                                    setNewItem({ ...newItem, reminderIntervals: [], reminderIntervalsInput: undefined })
+                                  } else {
+                                    const intervals = value.split(',').map(v => parseInt(v.trim())).filter(n => !isNaN(n))
+                                    setNewItem({ ...newItem, reminderIntervals: intervals, reminderIntervalsInput: undefined })
+                                  }
+                                }}
+                                className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                              />
+                              <span className="text-xs text-gray-400">
+                                {newItem.reminderIntervals?.length || 0} intervalov
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Záporné = pred termínom, 0 = v deň, kladné = po termíne
+                            </p>
+                          </div>
                         </div>
                         <textarea
                           placeholder="Emailová správa"
@@ -642,29 +744,170 @@ export default function NotificationSettings({
                       key={template.id}
                       className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-white text-lg font-light">{template.name}</p>
-                          <p className="text-gray-400 text-sm">
-                            {template.notificationType} • {template.notificationChannel}
-                            {template.daysBeforeDuty && ` • ${template.daysBeforeDuty} dní pred`}
-                          </p>
+                      {editingItem?.id === template.id ? (
+                        <>
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-pictus-lime text-xs mb-1">Názov</label>
+                                <input
+                                  type="text"
+                                  value={editingItem.name}
+                                  onChange={(e) =>
+                                    setEditingItem({ ...editingItem, name: e.target.value })
+                                  }
+                                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-pictus-lime text-xs mb-1">Typ notifikácie</label>
+                                <select
+                                  value={editingItem.notificationType}
+                                  onChange={(e) =>
+                                    setEditingItem({ ...editingItem, notificationType: e.target.value })
+                                  }
+                                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                                >
+                                  <option value="">Vybrať typ notifikácie</option>
+                                  {typeOptions.map((option) => (
+                                    <option key={option.id} value={option.label}>
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </select>
+                                {usingDefaultTypeOptions && (
+                                  <p className="text-yellow-400 text-xs mt-1">
+                                    Používajú sa predvolené možnosti (z DEFAULT)
+                                  </p>
+                                )}
+                              </div>
+                              <div>
+                                <label className="block text-pictus-lime text-xs mb-1">Kanál</label>
+                                <select
+                                  value={editingItem.notificationChannel}
+                                  onChange={(e) =>
+                                    setEditingItem({ ...editingItem, notificationChannel: e.target.value })
+                                  }
+                                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                                >
+                                  <option value="">Vybrať kanál</option>
+                                  {channelOptions.map((option) => (
+                                    <option key={option.id} value={option.label}>
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </select>
+                                {usingDefaultChannelOptions && (
+                                  <p className="text-yellow-400 text-xs mt-1">
+                                    Používajú sa predvolené možnosti (z DEFAULT)
+                                  </p>
+                                )}
+                              </div>
+                              <div>
+                                <label className="block text-pictus-lime text-xs mb-1">
+                                  Intervaly pripomienok
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="napr: -30,-14,-7,0,1,2"
+                                  value={editingItem.reminderIntervalsInput !== undefined ? editingItem.reminderIntervalsInput : (editingItem.reminderIntervals?.join(',') || '')}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    // Store the raw input value
+                                    setEditingItem({ ...editingItem, reminderIntervalsInput: value })
+                                  }}
+                                  onBlur={(e) => {
+                                    // Parse the intervals when user is done editing (on blur)
+                                    const value = e.target.value.trim()
+                                    if (value === '') {
+                                      setEditingItem({ ...editingItem, reminderIntervals: [], reminderIntervalsInput: undefined })
+                                    } else {
+                                      const intervals = value.split(',').map(v => parseInt(v.trim())).filter(n => !isNaN(n))
+                                      setEditingItem({ ...editingItem, reminderIntervals: intervals, reminderIntervalsInput: undefined })
+                                    }
+                                  }}
+                                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Záporné = pred, 0 = v deň, kladné = po
+                                </p>
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-pictus-lime text-xs mb-1">Emailová správa</label>
+                              <textarea
+                                value={editingItem.emailMessage || ''}
+                                onChange={(e) =>
+                                  setEditingItem({ ...editingItem, emailMessage: e.target.value })
+                                }
+                                rows={3}
+                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-pictus-lime text-xs mb-1">SMS správa</label>
+                              <textarea
+                                value={editingItem.smsMessage || ''}
+                                onChange={(e) =>
+                                  setEditingItem({ ...editingItem, smsMessage: e.target.value })
+                                }
+                                rows={2}
+                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 mt-4">
+                            <button
+                              onClick={handleSaveEdit}
+                              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all"
+                            >
+                              <Save className="w-4 h-4" />
+                              Uložiť
+                            </button>
+                            <button
+                              onClick={() => setEditingItem(null)}
+                              className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
+                            >
+                              <X className="w-4 h-4" />
+                              Zrušiť
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-lg font-light">{template.name}</p>
+                            <p className="text-gray-400 text-sm">
+                              {template.notificationType} • {template.notificationChannel}
+                            </p>
+                            {template.reminderIntervals && template.reminderIntervals.length > 0 ? (
+                              <p className="text-pictus-lime text-sm mt-1">
+                                Intervaly: {template.reminderIntervals.map(i =>
+                                  i === 0 ? '0' : i > 0 ? `+${i}` : `${i}`
+                                ).join(', ')} dní
+                              </p>
+                            ) : template.daysBeforeDuty ? (
+                              <p className="text-gray-400 text-sm">
+                                {template.daysBeforeDuty} dní pred (zastarané)
+                              </p>
+                            ) : null}
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEdit(template)}
+                              className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                            >
+                              <Edit2 className="w-4 h-4 text-pictus-lime" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(template.id)}
+                              className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-400" />
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleEdit(template)}
-                            className="p-2 hover:bg-white/10 rounded-lg transition-all"
-                          >
-                            <Edit2 className="w-4 h-4 text-pictus-lime" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(template.id)}
-                            className="p-2 hover:bg-white/10 rounded-lg transition-all"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-400" />
-                          </button>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   ))}
               </div>

@@ -23,7 +23,8 @@ interface Template {
   name: string
   notificationType: string
   notificationChannel: string
-  daysBeforeDuty: number | null
+  daysBeforeDuty: number | null // Deprecated: use reminderIntervals
+  reminderIntervals: number[] | null // Array of day offsets: e.g., [-30, -14, -7, 0, 1, 2]
   emailMessage: string | null
   smsMessage: string | null
 }
@@ -110,10 +111,23 @@ export default function NotificationBuilder({
 
   const fetchTemplates = useCallback(async () => {
     try {
+      // Try to fetch templates for the current organization
       const response = await fetch(`/api/notification-templates?organization=${organization}`)
       if (response.ok) {
         const data = await response.json()
-        setTemplates(data.templates || [])
+        const templates = data.templates || []
+
+        // If no templates found for current organization, fetch from DEFAULT
+        if (templates.length === 0 && organization !== 'DEFAULT') {
+          const defaultResponse = await fetch(`/api/notification-templates?organization=DEFAULT`)
+          if (defaultResponse.ok) {
+            const defaultData = await defaultResponse.json()
+            setTemplates(defaultData.templates || [])
+            return
+          }
+        }
+
+        setTemplates(templates)
       }
     } catch (error) {
       console.error('Failed to fetch templates:', error)
@@ -273,7 +287,14 @@ export default function NotificationBuilder({
         notificationChannel: hideChannelDropdown ? 'Email/Sms' : template.notificationChannel,
         emailMessage: template.emailMessage || '',
       })
-      // Clear manual days offset when template is selected (template has its own daysBeforeDuty)
+      // Set reminder intervals from template
+      if (template.reminderIntervals && Array.isArray(template.reminderIntervals)) {
+        setReminderIntervals(template.reminderIntervals)
+      } else if (template.daysBeforeDuty) {
+        // Fallback to old daysBeforeDuty field (convert to negative for "before")
+        setReminderIntervals([-template.daysBeforeDuty])
+      }
+      // Clear manual days offset when template is selected
       setNotificationDaysOffset('')
       // Reset custom type flag when template is selected
       setUseCustomType(false)
@@ -352,6 +373,82 @@ export default function NotificationBuilder({
   }
 
   const handleSubmit = async () => {
+    // Validation checks
+    const errors: string[] = []
+
+    // Check if notification type is provided
+    if (!formData.notificationType || formData.notificationType.trim() === '') {
+      errors.push('Typ notifikácie je povinný')
+    }
+
+    // Check if notification channel is provided
+    if (!formData.notificationChannel || formData.notificationChannel.trim() === '') {
+      errors.push('Kanál notifikácie je povinný')
+    }
+
+    // Check if duty date is provided
+    if (!formData.dutyDate) {
+      errors.push('Dátum úlohy je povinný')
+    }
+
+    // Check if intervals are provided
+    if (reminderIntervals.length === 0) {
+      errors.push('Musí byť zadaný aspoň jeden interval pripomienky')
+    }
+
+    // Check for past intervals
+    if (formData.dutyDate && reminderIntervals.length > 0) {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0) // Reset time to start of day for comparison
+
+      const pastIntervals: number[] = []
+      reminderIntervals.forEach(offset => {
+        const dutyDate = new Date(formData.dutyDate)
+        const notificationDate = new Date(dutyDate)
+        notificationDate.setDate(notificationDate.getDate() + offset)
+        notificationDate.setHours(0, 0, 0, 0)
+
+        if (notificationDate < today) {
+          pastIntervals.push(offset)
+        }
+      })
+
+      if (pastIntervals.length > 0) {
+        errors.push(
+          `Niektoré intervaly vedú do minulosti a nemôžu byť vytvorené: ${pastIntervals.join(', ')} dní. ` +
+          'Zvoľte iný dátum úlohy alebo upravte intervaly.'
+        )
+      }
+    }
+
+    // Channel-specific validation
+    const channel = formData.notificationChannel.toLowerCase()
+    if (channel.includes('email') && channel.includes('sms')) {
+      // Email/Sms channel requires both
+      if (!formData.email || formData.email.trim() === '') {
+        errors.push('Email je povinný pre kanál Email/Sms')
+      }
+      if (!formData.phoneNumber || formData.phoneNumber.trim() === '') {
+        errors.push('Telefónne číslo je povinné pre kanál Email/Sms')
+      }
+    } else if (channel.includes('email')) {
+      // Email channel requires email
+      if (!formData.email || formData.email.trim() === '') {
+        errors.push('Email je povinný pre kanál Email')
+      }
+    } else if (channel.includes('sms')) {
+      // SMS channel requires phone
+      if (!formData.phoneNumber || formData.phoneNumber.trim() === '') {
+        errors.push('Telefónne číslo je povinné pre kanál SMS')
+      }
+    }
+
+    // If there are validation errors, show them and stop
+    if (errors.length > 0) {
+      alert('Chyby validácie:\n\n' + errors.join('\n\n'))
+      return
+    }
+
     setLoading(true)
     try {
       // Always use reminderIntervals to create notifications (even if just one)
@@ -361,15 +458,19 @@ export default function NotificationBuilder({
           const notificationDate = new Date(dutyDate)
           notificationDate.setDate(notificationDate.getDate() + offset)
 
+          const payload = {
+            ...formData,
+            notificationDate: notificationDate.toISOString().split('T')[0],
+          }
+
+          console.log('Creating notification with payload:', payload)
+
           return fetch('/api/vehicle-notifications/create-from-template', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              ...formData,
-              notificationDate: notificationDate.toISOString().split('T')[0],
-            }),
+            body: JSON.stringify(payload),
           })
         })
 
@@ -386,8 +487,6 @@ export default function NotificationBuilder({
         } else {
           alert('Niektoré notifikácie sa nepodarilo vytvoriť')
         }
-      } else {
-        alert('Dátum úlohy je povinný')
       }
     } catch (error) {
       console.error('Failed to create notification:', error)
@@ -577,7 +676,7 @@ export default function NotificationBuilder({
                           setFormData({ ...formData, notificationType: e.target.value })
                         }
                       }}
-                      disabled={!!formData.templateId}
+                      disabled={!!formData.templateId && !!templates.find(t => t.id === formData.templateId)?.notificationType}
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     >
                       <option value="">Vybrať typ...</option>
@@ -607,7 +706,7 @@ export default function NotificationBuilder({
                       type="text"
                       value={formData.notificationType}
                       onChange={(e) => setFormData({ ...formData, notificationType: e.target.value })}
-                      disabled={!!formData.templateId}
+                      disabled={!!formData.templateId && !!templates.find(t => t.id === formData.templateId)?.notificationType}
                       placeholder="Zadajte vlastný typ notifikácie..."
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     />
@@ -643,7 +742,7 @@ export default function NotificationBuilder({
                     <select
                       value={formData.notificationChannel}
                       onChange={(e) => setFormData({ ...formData, notificationChannel: e.target.value })}
-                      disabled={!!formData.templateId}
+                      disabled={!!formData.templateId && !!templates.find(t => t.id === formData.templateId)?.notificationChannel}
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     >
                       <option value="">Vybrať kanál...</option>
@@ -712,16 +811,28 @@ export default function NotificationBuilder({
                       const dutyDate = new Date(formData.dutyDate)
                       const notifDate = new Date(dutyDate)
                       notifDate.setDate(notifDate.getDate() + interval)
+
+                      const today = new Date()
+                      today.setHours(0, 0, 0, 0)
+                      const notifDateNoTime = new Date(notifDate)
+                      notifDateNoTime.setHours(0, 0, 0, 0)
+                      const isPast = notifDateNoTime < today
+
                       const dateStr = notifDate.toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
                       return (
                         <div
                           key={index}
-                          className="px-3 py-2 bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg text-pictus-lime text-sm"
+                          className={`px-3 py-2 rounded-lg text-sm ${
+                            isPast
+                              ? 'bg-red-500/20 border border-red-500/30 text-red-400'
+                              : 'bg-pictus-lime/20 border border-pictus-lime/30 text-pictus-lime'
+                          }`}
                         >
-                          <div className="font-medium">{dateStr}</div>
-                          <div className="text-xs text-pictus-lime/70">
+                          <div className="font-medium">{isPast && '⚠️ '}{dateStr}</div>
+                          <div className={`text-xs ${isPast ? 'text-red-400/70' : 'text-pictus-lime/70'}`}>
                             {interval === 0 ? 'V deň úlohy' : interval > 0 ? `+${interval} dní` : `${interval} dní`}
+                            {isPast && ' (minulosť)'}
                           </div>
                         </div>
                       )
@@ -775,7 +886,12 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Mail className="w-4 h-4 inline mr-1" />
-                  Email (alebo vyberte používateľa)
+                  Email
+                  {(() => {
+                    const channel = formData.notificationChannel.toLowerCase()
+                    const isRequired = channel.includes('email')
+                    return isRequired ? <span className="text-red-400 ml-1">*</span> : ' (alebo vyberte používateľa)'
+                  })()}
                 </label>
                 <input
                   type="email"
@@ -784,13 +900,26 @@ export default function NotificationBuilder({
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                   placeholder="Zadajte email manuálne..."
                 />
+                {(() => {
+                  const channel = formData.notificationChannel.toLowerCase()
+                  const isRequired = channel.includes('email')
+                  if (isRequired && (!formData.email || formData.email.trim() === '')) {
+                    return <p className="text-red-400 text-xs mt-1">⚠️ Email je povinný pre zvolený kanál</p>
+                  }
+                  return null
+                })()}
               </div>
 
               {/* Phone Number */}
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Phone className="w-4 h-4 inline mr-1" />
-                  Telefónne číslo (alebo vyberte používateľa)
+                  Telefónne číslo
+                  {(() => {
+                    const channel = formData.notificationChannel.toLowerCase()
+                    const isRequired = channel.includes('sms')
+                    return isRequired ? <span className="text-red-400 ml-1">*</span> : ' (alebo vyberte používateľa)'
+                  })()}
                 </label>
                 <input
                   type="tel"
@@ -799,6 +928,14 @@ export default function NotificationBuilder({
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                   placeholder="Zadajte telefón manuálne..."
                 />
+                {(() => {
+                  const channel = formData.notificationChannel.toLowerCase()
+                  const isRequired = channel.includes('sms')
+                  if (isRequired && (!formData.phoneNumber || formData.phoneNumber.trim() === '')) {
+                    return <p className="text-red-400 text-xs mt-1">⚠️ Telefónne číslo je povinné pre zvolený kanál</p>
+                  }
+                  return null
+                })()}
               </div>
 
               {/* Company (Read-only, set in Step 0) */}
@@ -877,8 +1014,8 @@ export default function NotificationBuilder({
                 <p className="text-gray-400 text-sm">Dátum úlohy</p>
                 <p className="text-white text-lg">{formData.dutyDate || 'Nenastavené'}</p>
               </div>
-              <div>
-                <p className="text-gray-400 text-sm">Dátumy notifikácií</p>
+              <div className="md:col-span-2">
+                <p className="text-gray-400 text-sm mb-2">Dátumy notifikácií</p>
                 <div className="text-white text-lg">
                   {formData.dutyDate && reminderIntervals.length > 0 ? (
                     <div className="space-y-1">
@@ -886,10 +1023,21 @@ export default function NotificationBuilder({
                         const dutyDate = new Date(formData.dutyDate)
                         const notifDate = new Date(dutyDate)
                         notifDate.setDate(notifDate.getDate() + interval)
+
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        const notifDateNoTime = new Date(notifDate)
+                        notifDateNoTime.setHours(0, 0, 0, 0)
+                        const isPast = notifDateNoTime < today
+
                         const dateStr = notifDate.toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' })
                         return (
-                          <div key={index} className="text-sm">
-                            {dateStr} ({interval === 0 ? 'v deň úlohy' : interval > 0 ? `+${interval} dní` : `${interval} dní`})
+                          <div
+                            key={index}
+                            className={`text-sm px-3 py-2 rounded-lg ${isPast ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-pictus-lime/10 text-pictus-lime'}`}
+                          >
+                            {isPast && '⚠️ '}{dateStr} ({interval === 0 ? 'v deň úlohy' : interval > 0 ? `+${interval} dní` : `${interval} dní`})
+                            {isPast && ' - Dátum je v minulosti!'}
                           </div>
                         )
                       })}
@@ -919,6 +1067,62 @@ export default function NotificationBuilder({
                 </div>
               </div>
             )}
+
+            {/* Validation Warnings */}
+            {(() => {
+              const warnings: string[] = []
+              const channel = formData.notificationChannel.toLowerCase()
+
+              // Check channel-specific requirements
+              if (channel.includes('email') && channel.includes('sms')) {
+                if (!formData.email || formData.email.trim() === '') {
+                  warnings.push('Email je povinný pre kanál Email/Sms')
+                }
+                if (!formData.phoneNumber || formData.phoneNumber.trim() === '') {
+                  warnings.push('Telefónne číslo je povinné pre kanál Email/Sms')
+                }
+              } else if (channel.includes('email')) {
+                if (!formData.email || formData.email.trim() === '') {
+                  warnings.push('Email je povinný pre kanál Email')
+                }
+              } else if (channel.includes('sms')) {
+                if (!formData.phoneNumber || formData.phoneNumber.trim() === '') {
+                  warnings.push('Telefónne číslo je povinné pre kanál SMS')
+                }
+              }
+
+              // Check for past intervals
+              if (formData.dutyDate && reminderIntervals.length > 0) {
+                const today = new Date()
+                today.setHours(0, 0, 0, 0)
+
+                const pastCount = reminderIntervals.filter(offset => {
+                  const dutyDate = new Date(formData.dutyDate)
+                  const notificationDate = new Date(dutyDate)
+                  notificationDate.setDate(notificationDate.getDate() + offset)
+                  notificationDate.setHours(0, 0, 0, 0)
+                  return notificationDate < today
+                }).length
+
+                if (pastCount > 0) {
+                  warnings.push(`${pastCount} ${pastCount === 1 ? 'interval vedie' : 'intervaly vedú'} do minulosti`)
+                }
+              }
+
+              if (warnings.length > 0) {
+                return (
+                  <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
+                    <p className="text-red-400 font-medium mb-2">⚠️ Upozornenia:</p>
+                    <ul className="text-red-300 text-sm space-y-1 list-disc list-inside">
+                      {warnings.map((warning, idx) => (
+                        <li key={idx}>{warning}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )
+              }
+              return null
+            })()}
 
             <div className="flex gap-4">
               <button

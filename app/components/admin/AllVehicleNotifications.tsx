@@ -169,6 +169,7 @@ export default function AllVehicleNotifications() {
       (notification.personName && notification.personName.toLowerCase().includes(searchLower)) ||
       (notification.company && notification.company.toLowerCase().includes(searchLower)) ||
       (notification.vehicleRegistration && notification.vehicleRegistration.toLowerCase().includes(searchLower)) ||
+      (notification.notificationType && notification.notificationType.toLowerCase().includes(searchLower)) ||
       notification.status.toLowerCase().includes(searchLower)
     )
   })
@@ -583,6 +584,9 @@ export default function AllVehicleNotifications() {
                   Vehicle
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                  Type
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Contact
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
@@ -628,6 +632,18 @@ export default function AllVehicleNotifications() {
                       {notification.vehicleType && (
                         <div className="text-sm text-gray-400">
                           {notification.vehicleType}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-white">
+                        {notification.notificationType || 'N/A'}
+                      </div>
+                      {notification.notificationChannel && (
+                        <div className="text-sm text-gray-400">
+                          {notification.notificationChannel}
                         </div>
                       )}
                     </div>

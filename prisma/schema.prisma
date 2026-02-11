@@ -260,7 +260,7 @@ model NotificationTemplate {
   name                  String   @db.VarChar(100)
   notificationType      String   @db.VarChar(50)
   notificationChannel   String   @db.VarChar(50)
-  daysBeforeDuty        Int?
+  reminderIntervals     Json?    // Array of integers: e.g., [-30, -14, -7, 0, 1, 2]
   emailMessage          String?  @db.Text
   smsMessage            String?  @db.Text
   isActive              Boolean  @default(true)
