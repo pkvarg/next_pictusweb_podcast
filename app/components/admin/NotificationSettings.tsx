@@ -51,7 +51,12 @@ interface Organization {
   name: string
 }
 
-export default function NotificationSettings({ organization: initialOrganization, initialTab = 'types', hideTabs = false, hideOrganizationSelector = false }: NotificationSettingsProps) {
+export default function NotificationSettings({
+  organization: initialOrganization,
+  initialTab = 'types',
+  hideTabs = false,
+  hideOrganizationSelector = false,
+}: NotificationSettingsProps) {
   const [activeTab, setActiveTab] = useState<'types' | 'channels' | 'templates'>(initialTab)
   const [typeOptions, setTypeOptions] = useState<TypeOption[]>([])
   const [channelOptions, setChannelOptions] = useState<ChannelOption[]>([])
@@ -86,7 +91,9 @@ export default function NotificationSettings({ organization: initialOrganization
           setTypeOptions(data.options || [])
         }
       } else if (activeTab === 'channels') {
-        const response = await fetch(`/api/notification-channel-options?organization=${organization}`)
+        const response = await fetch(
+          `/api/notification-channel-options?organization=${organization}`,
+        )
         if (response.ok) {
           const data = await response.json()
           setChannelOptions(data.options || [])
@@ -261,7 +268,8 @@ export default function NotificationSettings({ organization: initialOrganization
             ))}
           </select>
           <p className="text-gray-400 text-sm mt-2">
-            Vyberte organizáciu pre nastavenie notifikácií. Použije sa pre typy notifikácií, kanály a šablóny.
+            Vyberte organizáciu pre nastavenie notifikácií. Použije sa pre typy notifikácií, kanály
+            a šablóny.
           </p>
         </div>
       )}
@@ -269,8 +277,12 @@ export default function NotificationSettings({ organization: initialOrganization
       {!organization ? (
         <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-12 border border-pictus-lime/30 text-center">
           <Settings className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-2xl font-light text-pictus-white mb-2">Žiadna organizácia nebola vybraná</h3>
-          <p className="text-gray-400">Prosím vyberte organizáciu vyššie pre nastavenie notifikácií.</p>
+          <h3 className="text-2xl font-light text-pictus-white mb-2">
+            Žiadna organizácia nebola vybraná
+          </h3>
+          <p className="text-gray-400">
+            Prosím vyberte organizáciu vyššie pre nastavenie notifikácií.
+          </p>
         </div>
       ) : (
         <>
@@ -287,361 +299,377 @@ export default function NotificationSettings({ organization: initialOrganization
             </div>
           )}
 
-      {/* Tabs */}
-      {!hideTabs && (
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveTab('types')}
-            className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
-              activeTab === 'types'
-                ? 'bg-pictus-lime text-pictus-black'
-                : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
-            }`}
-          >
-            <Bell className="w-5 h-5 inline mr-2" />
-            Typy notifikácií
-          </button>
-          <button
-            onClick={() => setActiveTab('channels')}
-            className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
-              activeTab === 'channels'
-                ? 'bg-pictus-lime text-pictus-black'
-                : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
-            }`}
-          >
-            <MessageSquare className="w-5 h-5 inline mr-2" />
-            Kanály
-          </button>
-          <button
-            onClick={() => setActiveTab('templates')}
-            className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
-              activeTab === 'templates'
-                ? 'bg-pictus-lime text-pictus-black'
-                : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
-            }`}
-          >
-            <Sparkles className="w-5 h-5 inline mr-2" />
-            Šablóny
-          </button>
-        </div>
-      )}
+          {/* Tabs */}
+          {!hideTabs && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('types')}
+                className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
+                  activeTab === 'types'
+                    ? 'bg-pictus-lime text-pictus-black'
+                    : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
+                }`}
+              >
+                <Bell className="w-5 h-5 inline mr-2" />
+                Typy notifikácií
+              </button>
+              <button
+                onClick={() => setActiveTab('channels')}
+                className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
+                  activeTab === 'channels'
+                    ? 'bg-pictus-lime text-pictus-black'
+                    : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
+                }`}
+              >
+                <MessageSquare className="w-5 h-5 inline mr-2" />
+                Kanály
+              </button>
+              <button
+                onClick={() => setActiveTab('templates')}
+                className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
+                  activeTab === 'templates'
+                    ? 'bg-pictus-lime text-pictus-black'
+                    : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
+                }`}
+              >
+                <Sparkles className="w-5 h-5 inline mr-2" />
+                Šablóny
+              </button>
+            </div>
+          )}
 
-      {/* Content */}
-      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-2xl font-light text-pictus-white">
-            {activeTab === 'types' && 'Typy notifikácií'}
-            {activeTab === 'channels' && 'Kanály notifikácií'}
-            {activeTab === 'templates' && 'Šablóny notifikácií'}
-          </h3>
-          <button
-            onClick={handleAddNew}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
-          >
-            <Plus className="w-5 h-5" />
-            Pridať
-          </button>
-        </div>
+          {/* Content */}
+          <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl font-light text-pictus-white">
+                {activeTab === 'types' && 'Typy notifikácií'}
+                {activeTab === 'channels' && 'Kanály notifikácií'}
+                {activeTab === 'templates' && 'Šablóny notifikácií'}
+              </h3>
+              <button
+                onClick={handleAddNew}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+              >
+                <Plus className="w-5 h-5" />
+                Pridať
+              </button>
+            </div>
 
-        {loading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime mx-auto"></div>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {/* New Item Form */}
-            {newItem && (
-              <div className="bg-white/5 rounded-lg p-4 border border-pictus-lime">
-                {!organization && (
-                  <div className="mb-3 p-2 bg-yellow-500/20 border border-yellow-500/50 rounded text-yellow-200 text-sm">
-                    ⚠️ Prosím vyberte organizáciu pred vytvorením položky
-                  </div>
-                )}
-                {(activeTab === 'types' || activeTab === 'channels') && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-pictus-lime text-xs mb-1">Názov *</label>
-                      <input
-                        type="text"
-                        placeholder="napr., STK kontrola, Email & SMS"
-                        value={newItem.label}
-                        onChange={(e) => setNewItem({ ...newItem, label: e.target.value })}
-                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
-                      />
-                      <p className="text-gray-500 text-xs mt-1">
-                        Zobrazovaný názov pre túto možnosť
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-pictus-lime text-xs mb-1">Poradie</label>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        value={newItem.sortOrder}
-                        onChange={(e) => setNewItem({ ...newItem, sortOrder: parseInt(e.target.value) })}
-                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
-                      />
-                      <p className="text-gray-500 text-xs mt-1">
-                        Poradie v zozname (0 = prvý)
-                      </p>
-                    </div>
-                  </div>
-                )}
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime mx-auto"></div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {/* New Item Form */}
+                {newItem && (
+                  <div className="bg-white/5 rounded-lg p-4 border border-pictus-lime">
+                    {!organization && (
+                      <div className="mb-3 p-2 bg-yellow-500/20 border border-yellow-500/50 rounded text-yellow-200 text-sm">
+                        ⚠️ Prosím vyberte organizáciu pred vytvorením položky
+                      </div>
+                    )}
+                    {(activeTab === 'types' || activeTab === 'channels') && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-pictus-lime text-xs mb-1">Názov *</label>
+                          <input
+                            type="text"
+                            placeholder="napr., Email, SMS.."
+                            value={newItem.label}
+                            onChange={(e) => setNewItem({ ...newItem, label: e.target.value })}
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                          />
+                          <p className="text-gray-500 text-xs mt-1">
+                            Zobrazovaný názov pre túto možnosť
+                          </p>
+                        </div>
+                        <div>
+                          <label className="block text-pictus-lime text-xs mb-1">Poradie</label>
+                          <input
+                            type="number"
+                            placeholder="0"
+                            value={newItem.sortOrder}
+                            onChange={(e) =>
+                              setNewItem({ ...newItem, sortOrder: parseInt(e.target.value) })
+                            }
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                          />
+                          <p className="text-gray-500 text-xs mt-1">Poradie v zozname (0 = prvý)</p>
+                        </div>
+                      </div>
+                    )}
 
-                {activeTab === 'templates' && (
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      placeholder="Názov šablóny *"
-                      value={newItem.name}
-                      onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
-                    />
-                    <div className="grid grid-cols-3 gap-4">
-                      <input
-                        type="text"
-                        placeholder="Typ notifikácie *"
-                        value={newItem.notificationType}
-                        onChange={(e) => setNewItem({ ...newItem, notificationType: e.target.value })}
-                        className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Kanál *"
-                        value={newItem.notificationChannel}
-                        onChange={(e) => setNewItem({ ...newItem, notificationChannel: e.target.value })}
-                        className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Dni pred úlohou"
-                        value={newItem.daysBeforeDuty || ''}
-                        onChange={(e) =>
-                          setNewItem({ ...newItem, daysBeforeDuty: e.target.value ? parseInt(e.target.value) : null })
+                    {activeTab === 'templates' && (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          placeholder="Názov šablóny *"
+                          value={newItem.name}
+                          onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                        />
+                        <div className="grid grid-cols-3 gap-4">
+                          <input
+                            type="text"
+                            placeholder="Typ notifikácie *"
+                            value={newItem.notificationType}
+                            onChange={(e) =>
+                              setNewItem({ ...newItem, notificationType: e.target.value })
+                            }
+                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Kanál *"
+                            value={newItem.notificationChannel}
+                            onChange={(e) =>
+                              setNewItem({ ...newItem, notificationChannel: e.target.value })
+                            }
+                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                          />
+                          <input
+                            type="number"
+                            placeholder="Dni pred úlohou"
+                            value={newItem.daysBeforeDuty || ''}
+                            onChange={(e) =>
+                              setNewItem({
+                                ...newItem,
+                                daysBeforeDuty: e.target.value ? parseInt(e.target.value) : null,
+                              })
+                            }
+                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                          />
+                        </div>
+                        <textarea
+                          placeholder="Emailová správa"
+                          value={newItem.emailMessage}
+                          onChange={(e) => setNewItem({ ...newItem, emailMessage: e.target.value })}
+                          rows={3}
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 mt-4">
+                      <button
+                        onClick={handleSaveNew}
+                        disabled={
+                          !organization ||
+                          (activeTab === 'types' && !newItem.label) ||
+                          (activeTab === 'channels' && !newItem.label) ||
+                          (activeTab === 'templates' &&
+                            (!newItem.name ||
+                              !newItem.notificationType ||
+                              !newItem.notificationChannel))
                         }
-                        className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
-                      />
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all"
+                      >
+                        <Save className="w-4 h-4" />
+                        Uložiť
+                      </button>
+                      <button
+                        onClick={() => setNewItem(null)}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
+                      >
+                        <X className="w-4 h-4" />
+                        Zrušiť
+                      </button>
                     </div>
-                    <textarea
-                      placeholder="Emailová správa"
-                      value={newItem.emailMessage}
-                      onChange={(e) => setNewItem({ ...newItem, emailMessage: e.target.value })}
-                      rows={3}
-                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
-                    />
                   </div>
                 )}
 
-                <div className="flex gap-2 mt-4">
-                  <button
-                    onClick={handleSaveNew}
-                    disabled={
-                      !organization ||
-                      (activeTab === 'types' && !newItem.label) ||
-                      (activeTab === 'channels' && !newItem.label) ||
-                      (activeTab === 'templates' && (!newItem.name || !newItem.notificationType || !newItem.notificationChannel))
-                    }
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all"
-                  >
-                    <Save className="w-4 h-4" />
-                    Uložiť
-                  </button>
-                  <button
-                    onClick={() => setNewItem(null)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
-                  >
-                    <X className="w-4 h-4" />
-                    Zrušiť
-                  </button>
-                </div>
+                {/* Type Options List */}
+                {activeTab === 'types' &&
+                  typeOptions.map((option) => (
+                    <div
+                      key={option.id}
+                      className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
+                    >
+                      {editingItem?.id === option.id ? (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-pictus-lime text-xs mb-1">Názov</label>
+                              <input
+                                type="text"
+                                value={editingItem.label}
+                                onChange={(e) =>
+                                  setEditingItem({ ...editingItem, label: e.target.value })
+                                }
+                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-pictus-lime text-xs mb-1">Poradie</label>
+                              <input
+                                type="number"
+                                value={editingItem.sortOrder}
+                                onChange={(e) =>
+                                  setEditingItem({
+                                    ...editingItem,
+                                    sortOrder: parseInt(e.target.value),
+                                  })
+                                }
+                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 mt-3">
+                            <button
+                              onClick={handleSaveEdit}
+                              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all"
+                            >
+                              <Save className="w-4 h-4" />
+                              Save
+                            </button>
+                            <button
+                              onClick={() => setEditingItem(null)}
+                              className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
+                            >
+                              <X className="w-4 h-4" />
+                              Cancel
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-lg font-light">{option.label}</p>
+                            <p className="text-gray-400 text-sm">Poradie: {option.sortOrder}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEdit(option)}
+                              className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                            >
+                              <Edit2 className="w-4 h-4 text-pictus-lime" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(option.id)}
+                              className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-400" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                {/* Channel Options List */}
+                {activeTab === 'channels' &&
+                  channelOptions.map((option) => (
+                    <div
+                      key={option.id}
+                      className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
+                    >
+                      {editingItem?.id === option.id ? (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-pictus-lime text-xs mb-1">Názov</label>
+                              <input
+                                type="text"
+                                value={editingItem.label}
+                                onChange={(e) =>
+                                  setEditingItem({ ...editingItem, label: e.target.value })
+                                }
+                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-pictus-lime text-xs mb-1">Poradie</label>
+                              <input
+                                type="number"
+                                value={editingItem.sortOrder}
+                                onChange={(e) =>
+                                  setEditingItem({
+                                    ...editingItem,
+                                    sortOrder: parseInt(e.target.value),
+                                  })
+                                }
+                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 mt-3">
+                            <button
+                              onClick={handleSaveEdit}
+                              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all"
+                            >
+                              <Save className="w-4 h-4" />
+                              Save
+                            </button>
+                            <button
+                              onClick={() => setEditingItem(null)}
+                              className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
+                            >
+                              <X className="w-4 h-4" />
+                              Cancel
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white text-lg font-light">{option.label}</p>
+                            <p className="text-gray-400 text-sm">Poradie: {option.sortOrder}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEdit(option)}
+                              className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                            >
+                              <Edit2 className="w-4 h-4 text-pictus-lime" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(option.id)}
+                              className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-400" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                {/* Templates List */}
+                {activeTab === 'templates' &&
+                  templates.map((template) => (
+                    <div
+                      key={template.id}
+                      className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-white text-lg font-light">{template.name}</p>
+                          <p className="text-gray-400 text-sm">
+                            {template.notificationType} • {template.notificationChannel}
+                            {template.daysBeforeDuty && ` • ${template.daysBeforeDuty} dní pred`}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEdit(template)}
+                            className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                          >
+                            <Edit2 className="w-4 h-4 text-pictus-lime" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(template.id)}
+                            className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-400" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
               </div>
             )}
-
-            {/* Type Options List */}
-            {activeTab === 'types' &&
-              typeOptions.map((option) => (
-                <div
-                  key={option.id}
-                  className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
-                >
-                  {editingItem?.id === option.id ? (
-                    <>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-pictus-lime text-xs mb-1">Názov</label>
-                          <input
-                            type="text"
-                            value={editingItem.label}
-                            onChange={(e) => setEditingItem({ ...editingItem, label: e.target.value })}
-                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-pictus-lime text-xs mb-1">Poradie</label>
-                          <input
-                            type="number"
-                            value={editingItem.sortOrder}
-                            onChange={(e) =>
-                              setEditingItem({ ...editingItem, sortOrder: parseInt(e.target.value) })
-                            }
-                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex gap-2 mt-3">
-                        <button
-                          onClick={handleSaveEdit}
-                          className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all"
-                        >
-                          <Save className="w-4 h-4" />
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingItem(null)}
-                          className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
-                        >
-                          <X className="w-4 h-4" />
-                          Cancel
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-white text-lg font-light">{option.label}</p>
-                        <p className="text-gray-400 text-sm">
-                          Poradie: {option.sortOrder}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(option)}
-                          className="p-2 hover:bg-white/10 rounded-lg transition-all"
-                        >
-                          <Edit2 className="w-4 h-4 text-pictus-lime" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(option.id)}
-                          className="p-2 hover:bg-white/10 rounded-lg transition-all"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-400" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-
-            {/* Channel Options List */}
-            {activeTab === 'channels' &&
-              channelOptions.map((option) => (
-                <div
-                  key={option.id}
-                  className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
-                >
-                  {editingItem?.id === option.id ? (
-                    <>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-pictus-lime text-xs mb-1">Názov</label>
-                          <input
-                            type="text"
-                            value={editingItem.label}
-                            onChange={(e) => setEditingItem({ ...editingItem, label: e.target.value })}
-                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-pictus-lime text-xs mb-1">Poradie</label>
-                          <input
-                            type="number"
-                            value={editingItem.sortOrder}
-                            onChange={(e) =>
-                              setEditingItem({ ...editingItem, sortOrder: parseInt(e.target.value) })
-                            }
-                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex gap-2 mt-3">
-                        <button
-                          onClick={handleSaveEdit}
-                          className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all"
-                        >
-                          <Save className="w-4 h-4" />
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingItem(null)}
-                          className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
-                        >
-                          <X className="w-4 h-4" />
-                          Cancel
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-white text-lg font-light">{option.label}</p>
-                        <p className="text-gray-400 text-sm">
-                          Poradie: {option.sortOrder}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(option)}
-                          className="p-2 hover:bg-white/10 rounded-lg transition-all"
-                        >
-                          <Edit2 className="w-4 h-4 text-pictus-lime" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(option.id)}
-                          className="p-2 hover:bg-white/10 rounded-lg transition-all"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-400" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-
-            {/* Templates List */}
-            {activeTab === 'templates' &&
-              templates.map((template) => (
-                <div
-                  key={template.id}
-                  className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-pictus-lime/30 transition-all"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white text-lg font-light">{template.name}</p>
-                      <p className="text-gray-400 text-sm">
-                        {template.notificationType} • {template.notificationChannel}
-                        {template.daysBeforeDuty && ` • ${template.daysBeforeDuty} dní pred`}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(template)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-all"
-                      >
-                        <Edit2 className="w-4 h-4 text-pictus-lime" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(template.id)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-all"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-400" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
           </div>
-        )}
-      </div>
         </>
       )}
     </div>

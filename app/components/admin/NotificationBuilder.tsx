@@ -354,8 +354,8 @@ export default function NotificationBuilder({
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      // If dutyDate is set and there are multiple intervals, create multiple notifications
-      if (formData.dutyDate && reminderIntervals.length > 1) {
+      // Always use reminderIntervals to create notifications (even if just one)
+      if (formData.dutyDate && reminderIntervals.length > 0) {
         const promises = reminderIntervals.map(offset => {
           const dutyDate = new Date(formData.dutyDate)
           const notificationDate = new Date(dutyDate)
@@ -377,27 +377,17 @@ export default function NotificationBuilder({
         const allSuccessful = responses.every(r => r.ok)
 
         if (allSuccessful) {
-          alert(`${reminderIntervals.length} notifikácií bolo úspešne vytvorených!`)
+          const count = reminderIntervals.length
+          const message = count === 1
+            ? 'Notifikácia bola úspešne vytvorená!'
+            : `${count} notifikácií bolo úspešne vytvorených!`
+          alert(message)
           if (onSuccess) onSuccess()
         } else {
           alert('Niektoré notifikácie sa nepodarilo vytvoriť')
         }
       } else {
-        // Single notification
-        const response = await fetch('/api/vehicle-notifications/create-from-template', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        })
-
-        if (response.ok) {
-          alert('Notifikácia bola úspešne vytvorená!')
-          if (onSuccess) onSuccess()
-        } else {
-          alert('Nepodarilo sa vytvoriť notifikáciu')
-        }
+        alert('Dátum úlohy je povinný')
       }
     } catch (error) {
       console.error('Failed to create notification:', error)
@@ -888,8 +878,24 @@ export default function NotificationBuilder({
                 <p className="text-white text-lg">{formData.dutyDate || 'Nenastavené'}</p>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Dátum notifikácie</p>
-                <p className="text-white text-lg">{formData.notificationDate || 'Nenastavené'}</p>
+                <p className="text-gray-400 text-sm">Dátumy notifikácií</p>
+                <div className="text-white text-lg">
+                  {formData.dutyDate && reminderIntervals.length > 0 ? (
+                    <div className="space-y-1">
+                      {reminderIntervals.sort((a, b) => a - b).map((interval, index) => {
+                        const dutyDate = new Date(formData.dutyDate)
+                        const notifDate = new Date(dutyDate)
+                        notifDate.setDate(notifDate.getDate() + interval)
+                        const dateStr = notifDate.toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                        return (
+                          <div key={index} className="text-sm">
+                            {dateStr} ({interval === 0 ? 'v deň úlohy' : interval > 0 ? `+${interval} dní` : `${interval} dní`})
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ) : 'Nenastavené'}
+                </div>
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Kontaktná osoba</p>

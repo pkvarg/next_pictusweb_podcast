@@ -650,27 +650,37 @@ export default function AllVehicleNotifications() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(notification.status)}`}>
-                      {notification.status}
+                      {notification.status === 'sent' ? 'Odoslané' :
+                       notification.status === 'confirmed' ? 'Potvrdené' :
+                       notification.status === 'pending' ? 'Čaká' :
+                       notification.status === 'failed' ? 'Zlyhalo' :
+                       notification.status === 'imported' ? 'Importované' :
+                       notification.status.toLowerCase().startsWith('reminded') ? 'Pripomenuté' :
+                       notification.status === 'no_response' ? 'Bez odpovede' :
+                       notification.status}
                     </span>
                     {notification.confirmationAttempts > 0 && (
                       <div className="text-xs text-gray-400 mt-1">
-                        Attempts: {notification.confirmationAttempts}
+                        Pokusy: {notification.confirmationAttempts}
                       </div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                     <div className="space-y-1">
-                      {notification.emailSentAt && (
-                        <div suppressHydrationWarning>Email Sent: {new Date(notification.emailSentAt).toLocaleDateString()}</div>
-                      )}
-                      {notification.smsSentAt && (
-                        <div suppressHydrationWarning>SMS Sent: {new Date(notification.smsSentAt).toLocaleDateString()}</div>
-                      )}
-                      {notification.confirmedAt && (
-                        <div suppressHydrationWarning>Confirmed: {new Date(notification.confirmedAt).toLocaleDateString()}</div>
+                      {notification.notificationDate && (
+                        <div suppressHydrationWarning className="text-pictus-lime font-medium">Notifikácia: {new Date(notification.notificationDate).toLocaleDateString('sk-SK')}</div>
                       )}
                       {notification.dutyDate && (
-                        <div suppressHydrationWarning>Duty: {new Date(notification.dutyDate).toLocaleDateString()}</div>
+                        <div suppressHydrationWarning>Termín: {new Date(notification.dutyDate).toLocaleDateString('sk-SK')}</div>
+                      )}
+                      {notification.emailSentAt && (
+                        <div suppressHydrationWarning>Email odoslaný: {new Date(notification.emailSentAt).toLocaleDateString('sk-SK')}</div>
+                      )}
+                      {notification.smsSentAt && (
+                        <div suppressHydrationWarning>SMS odoslaný: {new Date(notification.smsSentAt).toLocaleDateString('sk-SK')}</div>
+                      )}
+                      {notification.confirmedAt && (
+                        <div suppressHydrationWarning>Potvrdené: {new Date(notification.confirmedAt).toLocaleDateString('sk-SK')}</div>
                       )}
                     </div>
                   </td>

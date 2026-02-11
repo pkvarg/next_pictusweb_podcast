@@ -1040,17 +1040,36 @@ const MyFleetPage = () => {
                                     ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
                                     : notification.status === 'failed'
                                     ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                    : notification.status === 'imported'
+                                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
                                     : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                                 }`}
                               >
-                                {notification.status}
+                                {notification.status === 'sent' ? 'Odoslané' :
+                                 notification.status === 'confirmed' ? 'Potvrdené' :
+                                 notification.status === 'pending' ? 'Čaká' :
+                                 notification.status === 'failed' ? 'Zlyhalo' :
+                                 notification.status === 'imported' ? 'Importované' :
+                                 notification.status.startsWith('reminded') ? 'Pripomenuté' :
+                                 notification.status === 'no_response' ? 'Bez odpovede' :
+                                 notification.status}
                               </span>
                             </td>
                             <td className="px-4 py-3">
-                              <div className="text-sm text-gray-300">
-                                {notification.notificationDate
-                                  ? new Date(notification.notificationDate).toLocaleDateString()
-                                  : '-'}
+                              <div className="space-y-1">
+                                {notification.notificationDate && (
+                                  <div className="text-sm text-pictus-lime font-medium">
+                                    Notifikácia: {new Date(notification.notificationDate).toLocaleDateString('sk-SK')}
+                                  </div>
+                                )}
+                                {notification.dutyDate && (
+                                  <div className="text-sm text-gray-300">
+                                    Termín: {new Date(notification.dutyDate).toLocaleDateString('sk-SK')}
+                                  </div>
+                                )}
+                                {!notification.notificationDate && !notification.dutyDate && (
+                                  <div className="text-sm text-gray-500">-</div>
+                                )}
                               </div>
                             </td>
                             <td className="px-4 py-3">

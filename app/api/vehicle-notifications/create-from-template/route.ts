@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         notificationData.myVehicleId = vehicle.id
         notificationData.userId = vehicle.userId
         notificationData.company = vehicle.organization
-        notificationData.personName = personName || vehicle.user?.name || null
+        notificationData.personName = personName || (vehicle.user ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim() : null) || null
         notificationData.email = email || vehicle.user?.email || null
       }
     }
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
       notificationData.notificationType = notificationType
       notificationData.notificationChannel = notificationChannel
-      notificationData.notificationDate = notificationDate ? new Date(notificationDate) : null
+      notificationData.notificationDate = notificationDate && notificationDate.trim() !== '' ? new Date(notificationDate) : null
       notificationData.emailMessage = emailMessage
     }
 

@@ -678,10 +678,9 @@ const FleetOverview = ({ userId, organization }: FleetOverviewProps) => {
                           <p className="text-xs text-orange-400 font-medium mb-1">Nasledujúca úloha</p>
                           <p className="text-base font-medium text-pictus-white truncate">{nextDuty.notificationType || 'Bez názvu'}</p>
                           <p className="text-sm text-pictus-white mb-1.5">Termín: <span className="font-medium">{formatDate(nextDuty.dutyDate)}</span></p>
-                          {/* Notification dates - only show non-imported */}
+                          {/* Notification dates */}
                           <div className="flex flex-wrap gap-1">
                             {nextDuty.notifications
-                              .filter(notif => notif.status.toLowerCase() !== 'imported')
                               .sort((a, b) => {
                                 const dateA = a.notificationDate ? new Date(a.notificationDate) : new Date(0)
                                 const dateB = b.notificationDate ? new Date(b.notificationDate) : new Date(0)
@@ -695,11 +694,6 @@ const FleetOverview = ({ userId, organization }: FleetOverviewProps) => {
                                   {notif.notificationDate ? formatDate(notif.notificationDate) : 'N/A'}
                                 </span>
                               ))}
-                            {nextDuty.notifications.every(n => n.status.toLowerCase() === 'imported') && (
-                              <span className="text-xs text-pictus-white/50 italic">
-                                Žiadne notifikácie
-                              </span>
-                            )}
                           </div>
                         </div>
                         <div className="text-right ml-3">
@@ -738,10 +732,9 @@ const FleetOverview = ({ userId, organization }: FleetOverviewProps) => {
                                 {days === 0 ? 'Dnes' : days < 0 ? `${Math.abs(days)}d po` : `${days}d`}
                               </div>
                             </div>
-                            {/* Notification dates with statuses - only show non-imported */}
+                            {/* Notification dates with statuses */}
                             <div className="flex flex-wrap gap-1">
                               {duty.notifications
-                                .filter(notif => notif.status.toLowerCase() !== 'imported')
                                 .sort((a, b) => {
                                   const dateA = a.notificationDate ? new Date(a.notificationDate) : new Date(0)
                                   const dateB = b.notificationDate ? new Date(b.notificationDate) : new Date(0)
@@ -756,11 +749,6 @@ const FleetOverview = ({ userId, organization }: FleetOverviewProps) => {
                                     {notif.notificationDate ? formatDate(notif.notificationDate) : 'N/A'}
                                   </span>
                                 ))}
-                              {duty.notifications.every(n => n.status.toLowerCase() === 'imported') && (
-                                <span className="text-xs text-pictus-white/50 italic">
-                                  Žiadne notifikácie
-                                </span>
-                              )}
                             </div>
                           </div>
                         )
