@@ -131,14 +131,14 @@ function ResetPasswordContent() {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-r from-blue-900 to-purple-900">
+    <section className="min-h-screen bg-[#141511]" style={{ fontFamily: "'Brutal Milk', 'Arial', sans-serif", fontWeight: 300 }}>
       <PagesHeader />
       <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {/* Back to Login Link */}
           <Link
             href="/auth/login"
-            className="inline-flex items-center text-white hover:text-purple-300 transition-colors mb-6"
+            className="inline-flex items-center text-[#F8F8F8] hover:text-[#B6E036] transition-colors mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Späť na prihlásenie
@@ -146,22 +146,22 @@ function ResetPasswordContent() {
 
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Lock size={32} className="text-white" />
+            <div className="w-16 h-16 bg-[#B6E036]/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-[#B6E036]">
+              <Lock size={32} className="text-[#B6E036]" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Nastavte nové heslo</h1>
-            <p className="text-white mt-2">Zadajte nové heslo pre váš účet</p>
+            <h1 className="text-2xl font-bold text-[#F8F8F8] mb-2">Nastavte nové heslo</h1>
+            <p className="text-[#F8F8F8] mt-2">Zadajte nové heslo pre váš účet</p>
           </div>
 
           {/* Form */}
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/20">
+          <div className="bg-[#141511] rounded-2xl p-8 border border-[#B6E036]/20 shadow-[0px_4px_12px_rgba(0,0,0,0.5)]">
             {!success && !error.includes('vypršal') && !error.includes('Neplatný') ? (
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email Display */}
                 {email && (
-                  <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3">
-                    <p className="text-sm text-gray-400">Obnovenie hesla pre:</p>
-                    <p className="text-white font-medium">{email}</p>
+                  <div className="bg-[#B6E036]/5 border border-[#B6E036]/20 rounded-lg px-4 py-3">
+                    <p className="text-sm text-[#F8F8F8]/70">Obnovenie hesla pre:</p>
+                    <p className="text-[#F8F8F8] font-medium">{email}</p>
                   </div>
                 )}
 
@@ -169,7 +169,7 @@ function ResetPasswordContent() {
                 <div>
                   <label
                     htmlFor="newPassword"
-                    className="block text-sm font-medium text-gray-200 mb-2"
+                    className="block text-sm font-medium text-[#F8F8F8] mb-2"
                   >
                     Nové heslo
                   </label>
@@ -181,13 +181,13 @@ function ResetPasswordContent() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all pr-12"
+                      className="w-full px-4 py-3 bg-[#141511] border border-[#B6E036]/20 rounded-lg text-[#F8F8F8] placeholder-[#F8F8F8]/40 focus:outline-none focus:ring-2 focus:ring-[#B6E036] focus:border-transparent transition-all pr-12"
                       placeholder="Zadajte nové heslo (min. 8 znakov)"
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#F8F8F8]/60 hover:text-[#B6E036] transition-colors"
                     >
                       {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -198,7 +198,7 @@ function ResetPasswordContent() {
                 <div>
                   <label
                     htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-gray-200 mb-2"
+                    className="block text-sm font-medium text-[#F8F8F8] mb-2"
                   >
                     Potvrďte nové heslo
                   </label>
@@ -210,13 +210,13 @@ function ResetPasswordContent() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all pr-12"
+                      className="w-full px-4 py-3 bg-[#141511] border border-[#B6E036]/20 rounded-lg text-[#F8F8F8] placeholder-[#F8F8F8]/40 focus:outline-none focus:ring-2 focus:ring-[#B6E036] focus:border-transparent transition-all pr-12"
                       placeholder="Zopakujte nové heslo"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#F8F8F8]/60 hover:text-[#B6E036] transition-colors"
                     >
                       {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -233,10 +233,10 @@ function ResetPasswordContent() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="w-full bg-[#B6E036] text-[#141511] py-3 px-4 rounded-[50px] font-bold hover:bg-[#A5CF2E] focus:outline-none focus:ring-2 focus:ring-[#B6E036] focus:ring-offset-2 focus:ring-offset-[#141511] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-[#141511]/30 border-t-[#141511] rounded-full animate-spin" />
                   ) : (
                     <>
                       <Lock className="mr-2 h-4 w-4" />
@@ -247,19 +247,19 @@ function ResetPasswordContent() {
               </form>
             ) : success ? (
               <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-green-500">
-                  <Check size={32} className="text-green-400" />
+                <div className="w-16 h-16 bg-[#B6E036]/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#B6E036]">
+                  <Check size={32} className="text-[#B6E036]" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Heslo bolo zmenené!</h3>
-                <p className="text-gray-300 mb-6">
+                <h3 className="text-xl font-semibold text-[#F8F8F8] mb-3">Heslo bolo zmenené!</h3>
+                <p className="text-[#F8F8F8]/80 mb-6">
                   Vaše heslo bolo úspešne zmenené. Teraz sa môžete prihlásiť s novým heslom.
                 </p>
-                <p className="text-sm text-gray-400 mb-6">
+                <p className="text-sm text-[#F8F8F8]/60 mb-6">
                   Presmerovanie na prihlasovaciu stránku...
                 </p>
                 <Link
                   href="/auth/login"
-                  className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center text-[#B6E036] hover:text-[#A5CF2E] transition-colors"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Prihlásiť sa teraz
@@ -270,18 +270,18 @@ function ResetPasswordContent() {
                 <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-500">
                   <Lock size={32} className="text-red-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Neplatný odkaz</h3>
-                <p className="text-gray-300 mb-6">{error}</p>
+                <h3 className="text-xl font-semibold text-[#F8F8F8] mb-3">Neplatný odkaz</h3>
+                <p className="text-[#F8F8F8]/80 mb-6">{error}</p>
                 <Link
                   href="/auth/forgot-password"
-                  className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-all mb-4"
+                  className="inline-block bg-[#B6E036] text-[#141511] px-6 py-3 rounded-[50px] font-bold hover:bg-[#A5CF2E] transition-all mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
                 >
                   Požiadať o nový odkaz
                 </Link>
                 <div className="mt-4">
                   <Link
                     href="/auth/login"
-                    className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors"
+                    className="inline-flex items-center text-[#B6E036] hover:text-[#A5CF2E] transition-colors"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Späť na prihlásenie
@@ -300,8 +300,8 @@ function ResetPasswordContent() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <section className="min-h-screen bg-gradient-to-r from-blue-900 to-purple-900 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+      <section className="min-h-screen bg-[#141511] flex items-center justify-center" style={{ fontFamily: "'Brutal Milk', 'Arial', sans-serif" }}>
+        <div className="w-8 h-8 border-4 border-[#B6E036]/30 border-t-[#B6E036] rounded-full animate-spin" />
       </section>
     }>
       <ResetPasswordContent />

@@ -713,10 +713,10 @@ const FleetOverview = ({ userId, organization }: FleetOverviewProps) => {
                     </div>
                   )}
 
-                  {/* Duties List */}
-                  {vehicleDuties.length > 0 ? (
+                  {/* Duties List - skip first one as it's shown in "Nasledujúca úloha" */}
+                  {vehicleDuties.length > 1 ? (
                     <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {vehicleDuties.slice(0, dutyFilter === 'all' ? 10 : 3).map((duty, idx) => {
+                      {vehicleDuties.slice(1, dutyFilter === 'all' ? 11 : 4).map((duty, idx) => {
                         const days = getDaysUntilDuty(duty.dutyDate)
                         return (
                           <div
@@ -755,7 +755,7 @@ const FleetOverview = ({ userId, organization }: FleetOverviewProps) => {
                       })}
                       {(() => {
                         const maxShown = dutyFilter === 'all' ? 10 : 3
-                        const remaining = vehicleDuties.length - maxShown
+                        const remaining = vehicleDuties.length - 1 - maxShown // -1 because first duty is shown separately
                         return remaining > 0 ? (
                           <p className="text-xs text-pictus-white/50 text-center pt-1">
                             +{remaining} ďalších

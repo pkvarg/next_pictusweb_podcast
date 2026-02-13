@@ -69,7 +69,22 @@ export async function POST(request: NextRequest) {
       origin,
     })
 
-    // Record IP violation and get ban status
+    // Record IP violation and get ban status (skip in localhost)
+    const isLocalhost = (process.env.NEXT_PUBLIC_HONO_API_URL || '').includes('localhost')
+
+    if (isLocalhost) {
+      console.log('🔓 DEV MODE: Skipping violation recording for', ipAddress)
+      return NextResponse.json(
+        {
+          success: true,
+          message: 'Bot attempt logged successfully (dev mode - no ban)',
+          logId: botLog.id,
+          isDevelopmentMode: true,
+        },
+        { status: 201 },
+      )
+    }
+
     const violationResult = await recordViolation(ipAddress, detectionType, detectionDetails)
 
     return NextResponse.json(

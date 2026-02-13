@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react'
 import { Building, Plus, Edit2, Trash2, Save, X, Users } from 'lucide-react'
 
+type Tier = 'FREE' | 'PREMIUM' | 'BUSINESS'
+
 interface Organization {
   id: string
   name: string
   mainContact: string | null
+  tier: Tier | null
   createdAt: string
   updatedAt: string
   deletedAt: string | null
@@ -47,7 +50,7 @@ export default function OrganizationManager() {
   }
 
   const handleAddNew = () => {
-    setNewItem({ name: '', mainContact: '', parentOrganizationId: '' })
+    setNewItem({ name: '', mainContact: '', parentOrganizationId: '', tier: '' })
   }
 
   const handleSaveNew = async () => {
@@ -59,6 +62,7 @@ export default function OrganizationManager() {
           name: newItem.name,
           mainContact: newItem.mainContact || null,
           parentOrganizationId: newItem.parentOrganizationId || null,
+          tier: newItem.tier || null,
         }),
       })
 
@@ -80,6 +84,7 @@ export default function OrganizationManager() {
       name: organization.name,
       mainContact: organization.mainContact || '',
       parentOrganizationId: organization.parentOrganizationId || '',
+      tier: organization.tier || '',
     })
   }
 
@@ -93,6 +98,7 @@ export default function OrganizationManager() {
           name: editingItem.name,
           mainContact: editingItem.mainContact || null,
           parentOrganizationId: editingItem.parentOrganizationId || null,
+          tier: editingItem.tier || null,
         }),
       })
 
@@ -160,7 +166,7 @@ export default function OrganizationManager() {
             {/* New Item Form */}
             {newItem && (
               <div className="bg-white/5 rounded-lg p-4 border border-pictus-lime">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <input
                     type="text"
                     placeholder="Organization Name *"
@@ -175,6 +181,16 @@ export default function OrganizationManager() {
                     onChange={(e) => setNewItem({ ...newItem, mainContact: e.target.value })}
                     className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
                   />
+                  <select
+                    value={newItem.tier}
+                    onChange={(e) => setNewItem({ ...newItem, tier: e.target.value })}
+                    className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                  >
+                    <option value="">Select Tier</option>
+                    <option value="FREE">Free</option>
+                    <option value="PREMIUM">Premium</option>
+                    <option value="BUSINESS">Business</option>
+                  </select>
                   <select
                     value={newItem.parentOrganizationId}
                     onChange={(e) => setNewItem({ ...newItem, parentOrganizationId: e.target.value })}
@@ -216,7 +232,7 @@ export default function OrganizationManager() {
               >
                 {editingItem?.id === org.id ? (
                   <>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-4 gap-4">
                       <input
                         type="text"
                         value={editingItem.name}
@@ -229,6 +245,16 @@ export default function OrganizationManager() {
                         onChange={(e) => setEditingItem({ ...editingItem, mainContact: e.target.value })}
                         className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
                       />
+                      <select
+                        value={editingItem.tier}
+                        onChange={(e) => setEditingItem({ ...editingItem, tier: e.target.value })}
+                        className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                      >
+                        <option value="">Select Tier</option>
+                        <option value="FREE">Free</option>
+                        <option value="PREMIUM">Premium</option>
+                        <option value="BUSINESS">Business</option>
+                      </select>
                       <select
                         value={editingItem.parentOrganizationId}
                         onChange={(e) =>
@@ -268,6 +294,15 @@ export default function OrganizationManager() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <p className="text-white text-xl font-light">{org.name}</p>
+                        {org.tier && (
+                          <span className={`px-2 py-1 text-xs rounded font-medium ${
+                            org.tier === 'FREE' ? 'bg-gray-500/20 text-gray-300' :
+                            org.tier === 'PREMIUM' ? 'bg-blue-500/20 text-blue-300' :
+                            'bg-purple-500/20 text-purple-300'
+                          }`}>
+                            {org.tier}
+                          </span>
+                        )}
                         {org.childOrganizations && org.childOrganizations.length > 0 && (
                           <span className="px-2 py-1 bg-pictus-lime/20 text-pictus-lime text-xs rounded">
                             <Users className="w-3 h-3 inline mr-1" />

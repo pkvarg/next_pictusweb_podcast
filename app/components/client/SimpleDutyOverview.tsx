@@ -27,11 +27,18 @@ interface VehicleNotification {
   myVehicle?: MyVehicle | null
 }
 
+interface DutyInfo {
+  date: string
+  type: string
+  daysUntil: number
+}
+
 interface VehicleWithDuty {
   vehicleId: string
   registration: string
   type: string
   image: string | null
+  duties: DutyInfo[]
   nextDutyDate: string | null
   nextDutyType: string | null
   daysUntilNext: number | null
@@ -71,22 +78,49 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
 
         // Process each vehicle
         const processed: VehicleWithDuty[] = vehicles.map((vehicle: any) => {
-          // Get duties for this vehicle (not imported status)
+          // Get duties for this vehicle (include all statuses)
           const vehicleDuties = notifications.filter(
             (n: VehicleNotification) =>
               (n.myVehicleId === vehicle.id ||
                 n.vehicleRegistration?.toLowerCase() === vehicle.registration.toLowerCase()) &&
-              n.dutyDate &&
-              n.status.toLowerCase() !== 'imported'
+              n.dutyDate
           )
+
+          console.log(`[SimpleDutyOverview] Vehicle ${vehicle.registration}: ${vehicleDuties.length} duties (all statuses)`)
 
           // Find next upcoming duty
           const now = new Date()
+          now.setHours(0, 0, 0, 0) // Reset to start of day
+
+          // Filter duties within next 2 months (60 days)
+          const twoMonthsFromNow = new Date(now)
+          twoMonthsFromNow.setDate(twoMonthsFromNow.getDate() + 60)
+
           const upcomingDuties = vehicleDuties
-            .filter((d: VehicleNotification) => new Date(d.dutyDate!) >= now)
+            .filter((d: VehicleNotification) => {
+              const dutyDate = new Date(d.dutyDate!)
+              dutyDate.setHours(0, 0, 0, 0) // Reset to start of day
+              return dutyDate >= now && dutyDate <= twoMonthsFromNow
+            })
             .sort((a: VehicleNotification, b: VehicleNotification) =>
               new Date(a.dutyDate!).getTime() - new Date(b.dutyDate!).getTime()
             )
+
+          console.log(`[SimpleDutyOverview] Vehicle ${vehicle.registration}: ${upcomingDuties.length} upcoming duties (next 60 days)`)
+
+          // Build duty info array
+          const duties: DutyInfo[] = upcomingDuties.map((duty) => {
+            const dutyDate = new Date(duty.dutyDate!)
+            dutyDate.setHours(0, 0, 0, 0)
+            const timeDiff = dutyDate.getTime() - now.getTime()
+            const daysUntil = Math.ceil(timeDiff / (1000 * 3600 * 24))
+
+            return {
+              date: duty.dutyDate!,
+              type: duty.notificationType || 'N/A',
+              daysUntil,
+            }
+          })
 
           const nextDuty = upcomingDuties[0] || null
           let daysUntilNext: number | null = null
@@ -94,6 +128,7 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
 
           if (nextDuty && nextDuty.dutyDate) {
             const dutyDate = new Date(nextDuty.dutyDate)
+            dutyDate.setHours(0, 0, 0, 0) // Normalize to start of day
             const timeDiff = dutyDate.getTime() - now.getTime()
             daysUntilNext = Math.ceil(timeDiff / (1000 * 3600 * 24))
 
@@ -111,6 +146,7 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
             registration: vehicle.registration,
             type: vehicle.type,
             image: vehicle.image,
+            duties,
             nextDutyDate: nextDuty?.dutyDate || null,
             nextDutyType: nextDuty?.notificationType || null,
             daysUntilNext,
@@ -130,6 +166,9 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
           }
           return 0
         })
+
+        console.log('[SimpleDutyOverview] Final processed vehicles:', processed.length)
+        console.log('[SimpleDutyOverview] Vehicles with duties:', processed.filter(v => v.nextDutyDate).length)
 
         setVehiclesWithDuties(processed)
       } catch (error) {
@@ -242,27 +281,49 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
 
               {/* Duty info */}
               <div className="flex-1 min-w-0">
-                {vehicle.nextDutyDate ? (
-                  <div className="flex items-center gap-6">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-pictus-white/70">Nasledujúca úloha:</p>
-                      <p className="text-base font-medium text-pictus-white truncate">{vehicle.nextDutyType}</p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <p className="text-sm text-pictus-white/70">Termín:</p>
-                      <p className="text-base text-pictus-white">{formatDate(vehicle.nextDutyDate)}</p>
+                {vehicle.duties.length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-sm text-pictus-white/70">
+                      Nasledujúce úlohy ({vehicle.duties.length}):
+                    </p>
+                    <div className="space-y-1">
+                      {vehicle.duties.map((duty, idx) => (
+                        <div key={idx} className="flex items-center gap-4 text-sm">
+                          <span className="text-pictus-white font-medium min-w-[140px]">
+                            {duty.type}
+                          </span>
+                          <span className="text-pictus-lime">
+                            {formatDate(duty.date)}
+                          </span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            duty.daysUntil === 0
+                              ? 'bg-red-700/30 text-red-400'
+                              : duty.daysUntil <= 7
+                              ? 'bg-red-700/30 text-red-400'
+                              : duty.daysUntil <= 30
+                              ? 'bg-orange-600/30 text-orange-400'
+                              : 'bg-green-600/30 text-green-400'
+                          }`}>
+                            {duty.daysUntil === 0
+                              ? 'Dnes'
+                              : duty.daysUntil === 1
+                              ? 'Zajtra'
+                              : `${duty.daysUntil}d`}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-green-400/50" />
-                    <p className="text-sm text-pictus-white/50">Žiadne úlohy</p>
+                    <p className="text-sm text-pictus-white/50">Žiadne úlohy (ďalších 60 dní)</p>
                   </div>
                 )}
               </div>
 
-              {/* Days counter */}
-              {vehicle.daysUntilNext !== null && (
+              {/* Duty count badge */}
+              {vehicle.duties.length > 0 && (
                 <div className="flex-shrink-0">
                   <div className={`text-2xl font-bold px-4 py-2 rounded-lg ${
                     vehicle.urgencyLevel === 'red'
@@ -273,8 +334,8 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
                   }`}>
                     {vehicle.daysUntilNext === 0
                       ? 'Dnes!'
-                      : vehicle.daysUntilNext < 0
-                      ? `${Math.abs(vehicle.daysUntilNext)}d po`
+                      : vehicle.daysUntilNext === 1
+                      ? 'Zajtra!'
                       : `${vehicle.daysUntilNext}d`}
                   </div>
                 </div>

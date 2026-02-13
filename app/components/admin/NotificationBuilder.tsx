@@ -396,7 +396,7 @@ export default function NotificationBuilder({
       errors.push('Musí byť zadaný aspoň jeden interval pripomienky')
     }
 
-    // Check for past intervals
+    // Check for past intervals (not today - today is allowed)
     if (formData.dutyDate && reminderIntervals.length > 0) {
       const today = new Date()
       today.setHours(0, 0, 0, 0) // Reset time to start of day for comparison
@@ -414,10 +414,16 @@ export default function NotificationBuilder({
       })
 
       if (pastIntervals.length > 0) {
-        errors.push(
-          `Niektoré intervaly vedú do minulosti a nemôžu byť vytvorené: ${pastIntervals.join(', ')} dní. ` +
-          'Zvoľte iný dátum úlohy alebo upravte intervaly.'
-        )
+        const futureCount = reminderIntervals.length - pastIntervals.length
+        if (futureCount === 0) {
+          errors.push(
+            `Všetky intervaly vedú do minulosti: ${pastIntervals.join(', ')} dní. ` +
+            'Nebudú vytvorené žiadne notifikácie. Zvoľte iný dátum úlohy.'
+          )
+        } else {
+          // Just warn, don't block - these will be filtered out during creation
+          console.log(`Preskakujem ${pastIntervals.length} intervalov v minulosti: ${pastIntervals.join(', ')}`)
+        }
       }
     }
 
@@ -453,7 +459,19 @@ export default function NotificationBuilder({
     try {
       // Always use reminderIntervals to create notifications (even if just one)
       if (formData.dutyDate && reminderIntervals.length > 0) {
-        const promises = reminderIntervals.map(offset => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        // Filter out past intervals (but allow today)
+        const validIntervals = reminderIntervals.filter(offset => {
+          const dutyDate = new Date(formData.dutyDate)
+          const notificationDate = new Date(dutyDate)
+          notificationDate.setDate(notificationDate.getDate() + offset)
+          notificationDate.setHours(0, 0, 0, 0)
+          return notificationDate >= today
+        })
+
+        const promises = validIntervals.map(offset => {
           const dutyDate = new Date(formData.dutyDate)
           const notificationDate = new Date(dutyDate)
           notificationDate.setDate(notificationDate.getDate() + offset)
@@ -478,10 +496,17 @@ export default function NotificationBuilder({
         const allSuccessful = responses.every(r => r.ok)
 
         if (allSuccessful) {
-          const count = reminderIntervals.length
-          const message = count === 1
+          const count = validIntervals.length
+          const skipped = reminderIntervals.length - validIntervals.length
+
+          let message = count === 1
             ? 'Notifikácia bola úspešne vytvorená!'
             : `${count} notifikácií bolo úspešne vytvorených!`
+
+          if (skipped > 0) {
+            message += `\n\n${skipped} interval${skipped === 1 ? '' : 'ov'} v minulosti bol${skipped === 1 ? '' : 'o'} preskočených.`
+          }
+
           alert(message)
           if (onSuccess) onSuccess()
         } else {
@@ -959,14 +984,14 @@ export default function NotificationBuilder({
             <div className="mt-4">
               <label className="block text-pictus-lime text-sm mb-2">
                 <Mail className="w-4 h-4 inline mr-1" />
-                Emailová správa
+                Správa
               </label>
               <textarea
                 value={formData.emailMessage}
                 onChange={(e) => setFormData({ ...formData, emailMessage: e.target.value })}
                 rows={4}
                 className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-                placeholder="Zadajte emailovú správu..."
+                placeholder="Správa už obsahuje ŠPZ, úlohu a dátum."
               />
             </div>
 
