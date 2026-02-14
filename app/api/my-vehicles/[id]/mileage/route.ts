@@ -93,6 +93,7 @@ export async function POST(
     const mileageRecord = await prisma.myVehicleMileage.create({
       data: {
         vehicleId: resolvedParams.id,
+        organizationId: vehicle.organizationId,
         kilometers: parseInt(kilometers),
         date: new Date(date),
         note: note || null,

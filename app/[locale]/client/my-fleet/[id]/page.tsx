@@ -20,7 +20,11 @@ import Image from 'next/image'
 
 interface MyVehicle {
   id: string
-  organization: string
+  organizationId: string
+  organizationRelation?: {
+    id: string
+    name: string
+  }
   type: string
   registration: string
   year: number | null
@@ -356,7 +360,9 @@ const EditVehiclePage = () => {
           <div className="space-y-6">
             {/* Type */}
             <div>
-              <label className="block text-pictus-white text-lg font-light mb-2">Typ vozidla *</label>
+              <label className="block text-pictus-white text-lg font-light mb-2">
+                Typ vozidla *
+              </label>
               <input
                 type="text"
                 name="type"
@@ -401,7 +407,9 @@ const EditVehiclePage = () => {
 
             {/* Image Upload */}
             <div>
-              <label className="block text-pictus-white text-lg font-light mb-2">Obrázok vozidla</label>
+              <label className="block text-pictus-white text-lg font-light mb-2">
+                Obrázok vozidla
+              </label>
 
               {!filePreview ? (
                 <div className="border-2 border-dashed border-pictus-lime/30 rounded-lg p-6 text-center hover:border-pictus-lime/50 transition">
@@ -419,10 +427,11 @@ const EditVehiclePage = () => {
                   >
                     <Upload className="w-12 h-12 text-pictus-lime" />
                     <p className="text-pictus-white">Kliknite pre výber nového obrázku</p>
-                    <p className="text-pictus-lime text-sm">alebo vložte URL nižšie</p>
                   </label>
                   {formData.image && (
-                    <p className="text-pictus-lime text-sm mt-2">Aktuálny obrázok: {formData.image}</p>
+                    <p className="text-pictus-lime text-sm mt-2">
+                      Aktuálny obrázok: {formData.image}
+                    </p>
                   )}
                 </div>
               ) : (
@@ -445,8 +454,6 @@ const EditVehiclePage = () => {
                   </button>
                 </div>
               )}
-
-             
             </div>
 
             {/* Note */}
@@ -465,7 +472,7 @@ const EditVehiclePage = () => {
             {/* Organization Info */}
             <div className="bg-pictus-lime/20 border border-pictus-lime/30 rounded-xl p-4">
               <p className="text-pictus-lime text-sm">
-                <strong>Organizácia:</strong> {vehicle?.organization}
+                <strong>Organizácia:</strong> {vehicle?.organizationRelation?.name || 'Načítavam...'}
               </p>
               <p className="text-pictus-lime text-xs mt-1">Organizácia nemôže byť zmenená</p>
             </div>

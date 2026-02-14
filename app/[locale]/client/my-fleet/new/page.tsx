@@ -352,7 +352,6 @@ const NewVehiclePage = () => {
                   >
                     <Upload className="w-12 h-12 text-pictus-lime" />
                     <p className="text-pictus-white">Kliknite pre výber obrázku</p>
-                    <p className="text-pictus-lime text-sm">alebo vložte URL nižšie</p>
                   </label>
                 </div>
               ) : (

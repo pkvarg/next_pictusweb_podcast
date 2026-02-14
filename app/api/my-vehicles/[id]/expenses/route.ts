@@ -93,7 +93,7 @@ export async function POST(
     const expense = await prisma.myVehicleExpense.create({
       data: {
         vehicleId: resolvedParams.id,
-        organizationId: session.user.organization!,
+        organizationId: vehicle.organizationId,
         item,
         cost: parseFloat(cost),
         date: new Date(date),

@@ -21,6 +21,10 @@ interface TypeOption {
   label: string
   sortOrder: number
   isActive: boolean
+  organizationRelation?: {
+    id: string
+    name: string
+  }
 }
 
 interface ChannelOption {
@@ -95,23 +99,46 @@ export default function NotificationSettings({
 
     try {
       // Try to fetch options for the current organization
+      console.log('[NotificationSettings] Fetching type options for org:', organizationId)
       const response = await fetch(`/api/notification-type-options?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         const options = data.options || []
+        console.log('[NotificationSettings] Received options:', options.length, 'Setting usingDefaultTypeOptions to:', options.length === 0)
+
+        // If we have options for this organization, use them
+        if (options.length > 0) {
+          console.log('[NotificationSettings] Using org-specific options')
+          console.log('[NotificationSettings] Options belong to org:', options[0]?.organizationRelation?.name)
+          console.log('[NotificationSettings] Full options:', options.map(o => ({ label: o.label, org: o.organizationRelation?.name })))
+          setTypeOptions(options)
+          setUsingDefaultTypeOptions(false)
+          return
+        }
 
         // If no options found for current organization, fetch from DEFAULT
-        if (options.length === 0 && organizationId !== '9a28807e-4aa9-4ef5-b2c8-f38f4143a016') {
-          const defaultResponse = await fetch(`/api/notification-type-options?organizationId=9a28807e-4aa9-4ef5-b2c8-f38f4143a016`)
-          if (defaultResponse.ok) {
-            const defaultData = await defaultResponse.json()
-            setTypeOptions(defaultData.options || [])
-            setUsingDefaultTypeOptions(true)
-            return
+        console.log('[NotificationSettings] No options found, fetching DEFAULT organization')
+        const orgsResponse = await fetch('/api/organizations')
+        if (orgsResponse.ok) {
+          const orgsData = await orgsResponse.json()
+          const defaultOrg = orgsData.organizations?.find((org: Organization) => org.name === 'DEFAULT')
+
+          if (defaultOrg && organizationId !== defaultOrg.id) {
+            console.log('[NotificationSettings] Fetching from DEFAULT org:', defaultOrg.id)
+            const defaultResponse = await fetch(`/api/notification-type-options?organizationId=${defaultOrg.id}`)
+            if (defaultResponse.ok) {
+              const defaultData = await defaultResponse.json()
+              console.log('[NotificationSettings] Using DEFAULT options:', defaultData.options?.length || 0)
+              setTypeOptions(defaultData.options || [])
+              setUsingDefaultTypeOptions(true)
+              return
+            }
           }
         }
 
-        setTypeOptions(options)
+        // Fallback: no options at all
+        console.log('[NotificationSettings] No options available')
+        setTypeOptions([])
         setUsingDefaultTypeOptions(false)
       }
     } catch (error) {
@@ -124,23 +151,44 @@ export default function NotificationSettings({
 
     try {
       // Try to fetch options for the current organization
+      console.log('[NotificationSettings] Fetching channel options for org:', organizationId)
       const response = await fetch(`/api/notification-channel-options?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         const options = data.options || []
+        console.log('[NotificationSettings] Received channel options:', options.length, 'Setting usingDefaultChannelOptions to:', options.length === 0)
+
+        // If we have options for this organization, use them
+        if (options.length > 0) {
+          console.log('[NotificationSettings] Using org-specific channel options')
+          setChannelOptions(options)
+          setUsingDefaultChannelOptions(false)
+          return
+        }
 
         // If no options found for current organization, fetch from DEFAULT
-        if (options.length === 0 && organizationId !== '9a28807e-4aa9-4ef5-b2c8-f38f4143a016') {
-          const defaultResponse = await fetch(`/api/notification-channel-options?organizationId=9a28807e-4aa9-4ef5-b2c8-f38f4143a016`)
-          if (defaultResponse.ok) {
-            const defaultData = await defaultResponse.json()
-            setChannelOptions(defaultData.options || [])
-            setUsingDefaultChannelOptions(true)
-            return
+        console.log('[NotificationSettings] No channel options found, fetching DEFAULT organization')
+        const orgsResponse = await fetch('/api/organizations')
+        if (orgsResponse.ok) {
+          const orgsData = await orgsResponse.json()
+          const defaultOrg = orgsData.organizations?.find((org: Organization) => org.name === 'DEFAULT')
+
+          if (defaultOrg && organizationId !== defaultOrg.id) {
+            console.log('[NotificationSettings] Fetching from DEFAULT org:', defaultOrg.id)
+            const defaultResponse = await fetch(`/api/notification-channel-options?organizationId=${defaultOrg.id}`)
+            if (defaultResponse.ok) {
+              const defaultData = await defaultResponse.json()
+              console.log('[NotificationSettings] Using DEFAULT channel options:', defaultData.options?.length || 0)
+              setChannelOptions(defaultData.options || [])
+              setUsingDefaultChannelOptions(true)
+              return
+            }
           }
         }
 
-        setChannelOptions(options)
+        // Fallback: no options at all
+        console.log('[NotificationSettings] No channel options available')
+        setChannelOptions([])
         setUsingDefaultChannelOptions(false)
       }
     } catch (error) {
@@ -199,6 +247,22 @@ export default function NotificationSettings({
   useEffect(() => {
     fetchOrganizations()
   }, [])
+
+  // Log when organizations are loaded
+  useEffect(() => {
+    if (organizations.length > 0) {
+      console.log('[NotificationSettings] Organizations loaded:', organizations.map(o => o.name))
+    }
+  }, [organizations])
+
+  // Debug: Log state changes
+  useEffect(() => {
+    console.log('[NotificationSettings] State update - typeOptions:', typeOptions.length, 'usingDefaultTypeOptions:', usingDefaultTypeOptions)
+  }, [typeOptions, usingDefaultTypeOptions])
+
+  useEffect(() => {
+    console.log('[NotificationSettings] State update - channelOptions:', channelOptions.length, 'usingDefaultChannelOptions:', usingDefaultChannelOptions)
+  }, [channelOptions, usingDefaultChannelOptions])
 
   useEffect(() => {
     if (organizationId) {
@@ -363,6 +427,11 @@ export default function NotificationSettings({
       return
     }
 
+    if (!organizationId) {
+      alert('Organizácia nebola nájdená')
+      return
+    }
+
     const selectedItems = activeTab === 'types' ? selectedTypes : selectedChannels
 
     if (selectedItems.size === 0) {
@@ -388,10 +457,11 @@ export default function NotificationSettings({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          organization,
+          organizationId, // Changed from 'organization' to 'organizationId'
           items: itemsToImport.map(item => ({
             label: item.label,
             sortOrder: item.sortOrder,
+            isPdr: (item as any).isPdr || false, // Include isPdr for type options
           }))
         }),
       })
@@ -542,13 +612,30 @@ export default function NotificationSettings({
                 {activeTab === 'channels' && 'Kanály notifikácií'}
                 {activeTab === 'templates' && 'Šablóny notifikácií'}
               </h3>
-              <button
-                onClick={handleAddNew}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
-              >
-                <Plus className="w-5 h-5" />
-                Pridať
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    console.log('[DEBUG] Current state:', {
+                      organizationId,
+                      typeOptions: typeOptions.length,
+                      usingDefaultTypeOptions,
+                      channelOptions: channelOptions.length,
+                      usingDefaultChannelOptions
+                    })
+                    fetchData()
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all text-sm"
+                >
+                  🔄 Obnoviť
+                </button>
+                <button
+                  onClick={handleAddNew}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+                >
+                  <Plus className="w-5 h-5" />
+                  Pridať
+                </button>
+              </div>
             </div>
 
             {/* Import Banner */}

@@ -397,10 +397,9 @@ const MyFleetPage = () => {
 
   // Filter notifications
   const filteredNotifications = notifications.filter(notification => {
-    // Organization filter - only show notifications for current organization
-    if (organization && notification.company?.toLowerCase() !== organization.name?.toLowerCase()) {
-      return false
-    }
+    // Organization filter - notifications are already filtered by organizationId in the API,
+    // so we don't need to filter again here. This was causing all notifications to be hidden.
+    // The API fetchNotifications already filters by organizationId
 
     // Vehicle filter
     if (filterVehicle && notification.vehicleRegistration !== filterVehicle) {
@@ -1236,11 +1235,13 @@ const MyFleetPage = () => {
               <p className="text-gray-400">
                 Spravujte typy notifikácií pre vašu organizáciu.
               </p>
-              <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                <p className="text-blue-300 text-sm">
-                  ℹ️ Ak nie sú definované vlastné typy, použijú sa predvolené možnosti.
-                </p>
-              </div>
+              {organization && organization.currentNotificationTypesCount === 0 && (
+                <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                  <p className="text-blue-300 text-sm">
+                    ℹ️ Ak nie sú definované vlastné typy, použijú sa predvolené možnosti.
+                  </p>
+                </div>
+              )}
               {organization?.tierRelation && (
                 <div className="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
                   <p className="text-orange-300 text-sm">
