@@ -19,7 +19,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
     firstName: '',
     lastName: '',
     phoneNumber: '',
-    organization: '',
+    organizationId: '',
     active: true,
     isFleetManager: false,
     password: '',
@@ -68,7 +68,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
           firstName: '',
           lastName: '',
           phoneNumber: '',
-          organization: '',
+          organizationId: '',
           active: true,
           isFleetManager: false,
           password: '',
@@ -181,14 +181,14 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
               Organization
             </label>
             <select
-              name="organization"
-              value={formData.organization}
+              name="organizationId"
+              value={formData.organizationId}
               onChange={handleChange}
               className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
             >
               <option value="">Select organization...</option>
               {organizations.map((org) => (
-                <option key={org.id} value={org.name}>
+                <option key={org.id} value={org.id}>
                   {org.name}
                 </option>
               ))}

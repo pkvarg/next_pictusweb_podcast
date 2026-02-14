@@ -1,27 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { checkTierLimit, TierLimitError } from '@/lib/tier-limits'
 
 const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const organization = searchParams.get('organization')
+    const organizationId = searchParams.get('organizationId')
 
-    if (!organization) {
+    if (!organizationId) {
       return NextResponse.json(
-        { error: 'Organization parameter is required' },
+        { error: 'OrganizationId parameter is required' },
         { status: 400 }
       )
     }
 
     const options = await prisma.notificationTypeOption.findMany({
       where: {
-        organization: {
-          equals: organization,
-          mode: 'insensitive' as const,
-        },
+        organizationId: organizationId,
         isActive: true,
+        deletedAt: null,
+      },
+      include: {
+        organizationRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
       },
       orderBy: {
         sortOrder: 'asc',
@@ -41,17 +48,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { organization, label, sortOrder } = body
+    const { organizationId, label, sortOrder, isPdr } = body
 
-    console.log('Received POST request:', { organization, label, sortOrder })
+    console.log('Received POST request:', { organizationId, label, sortOrder, isPdr })
 
-    if (!organization || !label) {
+    if (!organizationId || !label) {
       return NextResponse.json(
         {
           error: 'Missing required fields',
-          received: { organization, label },
+          received: { organizationId, label },
           missing: {
-            organization: !organization,
+            organizationId: !organizationId,
             label: !label,
           }
         },
@@ -59,12 +66,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check tier limit
+    try {
+      await checkTierLimit(organizationId, 'notificationTypes')
+    } catch (error) {
+      if (error instanceof TierLimitError) {
+        return NextResponse.json({ error: error.message }, { status: 403 })
+      }
+      throw error
+    }
+
     const option = await prisma.notificationTypeOption.create({
       data: {
-        organization,
+        organizationId,
         label,
+        isPdr: isPdr || false,
         sortOrder: sortOrder ? parseInt(sortOrder) : 0,
       },
+      include: {
+        organizationRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
+      }
     })
 
     return NextResponse.json({ option }, { status: 201 })

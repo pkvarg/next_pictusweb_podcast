@@ -6,25 +6,18 @@ const prisma = new PrismaClient()
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { organization, items } = body
+    const { organizationId, items } = body
 
-    if (!organization || !items || !Array.isArray(items)) {
+    if (!organizationId || !items || !Array.isArray(items)) {
       return NextResponse.json(
-        { error: 'Organization and items array are required' },
+        { error: 'OrganizationId and items array are required' },
         { status: 400 }
       )
     }
 
-    if (organization === 'DEFAULT') {
-      return NextResponse.json(
-        { error: 'Cannot import into DEFAULT organization' },
-        { status: 400 }
-      )
-    }
-
-    // Check if organization exists
-    const org = await prisma.organization.findFirst({
-      where: { name: organization }
+    // Get organization by ID
+    const org = await prisma.organization.findUnique({
+      where: { id: organizationId }
     })
 
     if (!org) {
@@ -41,8 +34,9 @@ export async function POST(request: NextRequest) {
           data: {
             label: item.label,
             sortOrder: item.sortOrder,
-            organization,
+            organizationId: org.id,
             isActive: true,
+            isPdr: item.isPdr || false,
           },
         })
       )

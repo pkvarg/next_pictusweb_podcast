@@ -34,6 +34,11 @@ import { FaEuroSign } from 'react-icons/fa'
 interface MyVehicle {
   id: string
   organization: string
+  organizationId: string | null
+  organizationRelation?: {
+    id: string
+    name: string
+  }
   type: string
   registration: string
   year: number | null
@@ -43,10 +48,27 @@ interface MyVehicle {
   updatedAt: string
 }
 
+interface TierInfo {
+  id: string
+  name: string
+  usersLimit: number
+  vehiclesLimit: number
+  notificationsLimit: number
+  templatesLimit: number
+  notificationTypesLimit: number
+}
+
 interface Organization {
   id: string
   name: string
   tier: string | null
+  tierId: string | null
+  tierRelation?: TierInfo
+  currentUsersCount: number
+  currentVehiclesCount: number
+  currentNotificationsCount: number
+  currentTemplatesCount: number
+  currentNotificationTypesCount: number
   numberUsers: number | null
   numberVehicles: number | null
   numberNotificationTypes: number | null
@@ -58,7 +80,8 @@ interface User {
   firstName: string | null
   lastName: string | null
   phoneNumber: string | null
-  organization: string | null
+  organization: string | null // Old field (now contains UUID for backward compatibility)
+  organizationId: string | null
   active: boolean
   isFleetManager: boolean
   role: string
@@ -67,12 +90,15 @@ interface User {
 
 interface VehicleNotification {
   id: number
-  company: string | null
+  organizationId: string | null
+  organization?: {
+    id: string
+    name: string
+  }
   personName: string | null
   email: string | null
   phoneNumber: string | null
   vehicleRegistration: string | null
-  vehicleType: string | null
   myVehicleId: string | null
   notificationType: string | null
   notificationChannel: string | null
@@ -127,28 +153,56 @@ const MyFleetPage = () => {
   }
 
   // Define fetch functions with useCallback before useEffect
+  const fetchUsers = useCallback(async (orgId: string) => {
+    if (!orgId) return
+
+    try {
+      setUsersLoading(true)
+      const response = await fetch(`/api/users?organizationId=${encodeURIComponent(orgId)}`)
+      if (response.ok) {
+        const data = await response.json()
+        setUsers(Array.isArray(data) ? data : [])
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err)
+      setUsers([])
+    } finally {
+      setUsersLoading(false)
+    }
+  }, [])
+
   const fetchOrganization = useCallback(async () => {
-    if (!session?.user?.organization) return
+    // Use organizationId first, fallback to organization (which contains UUID after migration)
+    const orgId = (session?.user as any)?.organizationId || session?.user?.organization
+    if (!orgId) {
+      console.log('No organizationId found in session:', session?.user)
+      return
+    }
 
     try {
       setOrgLoading(true)
-      const response = await fetch('/api/organizations')
+      console.log('Fetching organization with ID:', orgId)
+      const response = await fetch(`/api/organizations?id=${orgId}`)
       if (response.ok) {
         const data = await response.json()
-        const orgs = data.organizations || []
-        const userOrg = orgs.find((org: Organization) =>
-          org.name.toLowerCase() === session.user.organization?.toLowerCase()
-        )
-        if (userOrg) {
-          setOrganization(userOrg)
+        console.log('Organization API response:', data)
+        if (data.organizations && data.organizations.length > 0) {
+          const org = data.organizations[0]
+          setOrganization(org)
+          // Fetch users for this organization
+          fetchUsers(org.id)
+        } else {
+          console.log('No organizations found in response')
         }
+      } else {
+        console.log('Organization API error:', response.status, response.statusText)
       }
     } catch (err) {
       console.error('Error fetching organization:', err)
     } finally {
       setOrgLoading(false)
     }
-  }, [session?.user?.organization])
+  }, [session?.user, fetchUsers])
 
   const fetchVehicles = useCallback(async () => {
     try {
@@ -178,39 +232,14 @@ const MyFleetPage = () => {
     }
   }, [])
 
-  const fetchUsers = useCallback(async () => {
-    if (!session?.user?.organization) return
-
-    try {
-      setUsersLoading(true)
-      const response = await fetch(`/api/users?organization=${encodeURIComponent(session.user.organization)}`)
-      if (response.ok) {
-        const data = await response.json()
-        setUsers(Array.isArray(data) ? data : [])
-      }
-    } catch (err) {
-      console.error('Error fetching users:', err)
-      setUsers([])
-    } finally {
-      setUsersLoading(false)
-    }
-  }, [session?.user?.organization])
-
   const fetchNotifications = useCallback(async () => {
-    if (!session?.user?.organization) return
-
     try {
       setNotificationsLoading(true)
       const response = await fetch('/api/vehicle-notifications')
       if (response.ok) {
         const data = await response.json()
         const allNotifications = Array.isArray(data.notifications) ? data.notifications : []
-        // Filter by organization
-        const orgNotifications = allNotifications.filter(
-          (n: VehicleNotification) =>
-            n.company?.toLowerCase() === session.user.organization?.toLowerCase()
-        )
-        setNotifications(orgNotifications)
+        setNotifications(allNotifications)
       }
     } catch (err) {
       console.error('Error fetching notifications:', err)
@@ -218,7 +247,7 @@ const MyFleetPage = () => {
     } finally {
       setNotificationsLoading(false)
     }
-  }, [session?.user?.organization])
+  }, [])
 
   useEffect(() => {
     // Check if user is authenticated and is fleet manager
@@ -235,12 +264,11 @@ const MyFleetPage = () => {
       return
     }
 
-    // Fetch vehicles and organization
+    // Fetch vehicles and organization (organization fetch will trigger users fetch)
     fetchVehicles()
     fetchOrganization()
-    fetchUsers()
     fetchNotifications()
-  }, [session, status, router, fetchVehicles, fetchOrganization, fetchUsers, fetchNotifications])
+  }, [session, status, router, fetchVehicles, fetchOrganization, fetchNotifications])
 
   const handleDelete = async (id: string) => {
     if (!confirm('Naozaj chcete odstrániť toto vozidlo?')) {
@@ -306,7 +334,9 @@ const MyFleetPage = () => {
         throw new Error('Failed to delete user')
       }
 
-      fetchUsers()
+      if (organization?.id) {
+        fetchUsers(organization.id)
+      }
     } catch (err) {
       console.error('Error deleting user:', err)
       alert('Nepodarilo sa odstrániť používateľa')
@@ -324,7 +354,9 @@ const MyFleetPage = () => {
   }
 
   const handleUserModalSuccess = () => {
-    fetchUsers()
+    if (organization?.id) {
+      fetchUsers(organization.id)
+    }
     setUserModalOpen(false)
     setEditingUser(null)
   }
@@ -362,6 +394,11 @@ const MyFleetPage = () => {
 
   // Filter notifications
   const filteredNotifications = notifications.filter(notification => {
+    // Organization filter - only show notifications for current organization
+    if (organization && notification.company?.toLowerCase() !== organization.name?.toLowerCase()) {
+      return false
+    }
+
     // Vehicle filter
     if (filterVehicle && notification.vehicleRegistration !== filterVehicle) {
       return false
@@ -564,10 +601,10 @@ const MyFleetPage = () => {
             {/* Vehicle Header Actions */}
             <div className="mb-6 flex items-center justify-between">
               <div>
-                {organization?.numberVehicles && (
+                {organization?.tierRelation && (
                   <p className="text-sm text-gray-400">
-                    Počet vozidiel: {vehicles.length} / {organization.numberVehicles}
-                    {vehicles.length >= organization.numberVehicles && (
+                    Počet vozidiel: {organization.currentVehiclesCount} / {organization.tierRelation.vehiclesLimit}
+                    {organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit && (
                       <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
                     )}
                   </p>
@@ -576,12 +613,12 @@ const MyFleetPage = () => {
               <Link
                 href="/client/my-fleet/new"
                 className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-light transition-all text-lg ${
-                  organization?.numberVehicles && vehicles.length >= organization.numberVehicles
+                  organization?.tierRelation && organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit
                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white hover:from-pictus-lime700 hover:to-pictus-black'
                 }`}
                 onClick={(e) => {
-                  if (organization?.numberVehicles && vehicles.length >= organization.numberVehicles) {
+                  if (organization?.tierRelation && organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit) {
                     e.preventDefault()
                     alert('Dosiahli ste maximálny počet vozidiel pre vašu organizáciu')
                   }
@@ -646,47 +683,59 @@ const MyFleetPage = () => {
                     <p className="text-pictus-white/80 text-sm mb-4 line-clamp-2">{vehicle.note}</p>
                   )}
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          setSelectedVehicle(vehicle)
-                          setExpensesModalOpen(true)
-                        }}
-                        className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                  {/* Only show Expenses/Mileage buttons for vehicles from user's organization */}
+                  {vehicle.organizationId === organization?.id && (
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedVehicle(vehicle)
+                            setExpensesModalOpen(true)
+                          }}
+                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                        >
+                          <FaEuroSign size={16} />
+                          Výdavky
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedVehicle(vehicle)
+                            setMileageModalOpen(true)
+                          }}
+                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                        >
+                          <Gauge size={16} />
+                          Kilometre
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Only show Edit/Delete buttons for vehicles from user's organization */}
+                  {vehicle.organizationId === organization?.id ? (
+                    <div className="flex items-center gap-2 pt-4 border-t border-pictus-lime/20">
+                      <Link
+                        href={`/client/my-fleet/${vehicle.id}`}
+                        className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
                       >
-                        <FaEuroSign size={16} />
-                        Výdavky
-                      </button>
+                        <Edit size={16} />
+                        Upraviť
+                      </Link>
                       <button
-                        onClick={() => {
-                          setSelectedVehicle(vehicle)
-                          setMileageModalOpen(true)
-                        }}
-                        className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                        onClick={() => handleDelete(vehicle.id)}
+                        className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-red-600/50 transition text-sm"
                       >
-                        <Gauge size={16} />
-                        Kilometre
+                        <Trash2 size={16} />
+                        Odstrániť
                       </button>
                     </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 pt-4 border-t border-pictus-lime/20">
-                    <Link
-                      href={`/client/my-fleet/${vehicle.id}`}
-                      className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
-                    >
-                      <Edit size={16} />
-                      Upraviť
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(vehicle.id)}
-                      className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-red-600/50 transition text-sm"
-                    >
-                      <Trash2 size={16} />
-                      Odstrániť
-                    </button>
-                  </div>
+                  ) : (
+                    <div className="pt-4 border-t border-pictus-lime/20">
+                      <p className="text-gray-400 text-xs text-center italic">
+                        Iba na prezeranie - Vozidlo patrí organizácii: {vehicle.organizationRelation?.name || vehicle.organization}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -701,11 +750,11 @@ const MyFleetPage = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-white">Správa používateľov</h2>
-                <p className="text-gray-400 mt-1">Organizácia: {session?.user?.organization}</p>
-                {organization?.numberUsers && (
+                <p className="text-gray-400 mt-1">Organizácia: {organization?.name || 'Načítavam...'}</p>
+                {organization?.tierRelation && (
                   <p className="text-sm text-gray-500 mt-1">
-                    Počet používateľov: {users.length} / {organization.numberUsers}
-                    {users.length >= organization.numberUsers && (
+                    Počet používateľov: {organization.currentUsersCount} / {organization.tierRelation.usersLimit}
+                    {organization.currentUsersCount >= organization.tierRelation.usersLimit && (
                       <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
                     )}
                   </p>
@@ -713,9 +762,9 @@ const MyFleetPage = () => {
               </div>
               <button
                 onClick={handleCreateUser}
-                disabled={organization?.numberUsers ? users.length >= organization.numberUsers : false}
+                disabled={organization?.tierRelation ? organization.currentUsersCount >= organization.tierRelation.usersLimit : false}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                  organization?.numberUsers && users.length >= organization.numberUsers
+                  organization?.tierRelation && organization.currentUsersCount >= organization.tierRelation.usersLimit
                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black'
                 }`}
@@ -830,7 +879,7 @@ const MyFleetPage = () => {
                   <div>
                     <h2 className="text-2xl font-bold text-white">Notifikácie</h2>
                     <p className="text-gray-400 mt-1">
-                      Organizácia: {session?.user?.organization} ({filteredNotifications.length} z {notifications.length} notifikácií)
+                      Organizácia: {organization?.name || 'Načítavam...'} ({filteredNotifications.length} z {notifications.length} notifikácií)
                     </p>
                   </div>
                   <button
@@ -1129,7 +1178,7 @@ const MyFleetPage = () => {
                   ← Späť na zoznam
                 </button>
                 <NotificationBuilder
-                  organization={session?.user?.organization}
+                  organization={organization?.name || ''}
                   organizationTier={organization?.tier}
                   hideChannelDropdown={true}
                   duplicateData={duplicateNotificationData}
@@ -1157,8 +1206,14 @@ const MyFleetPage = () => {
                 Spravujte šablóny notifikácií pre vašu organizáciu.
               </p>
             </div>
-            {session?.user?.organization && (
-              <NotificationSettings organization={session.user.organization} initialTab="templates" hideTabs={true} hideOrganizationSelector={true} />
+            {organization && (
+              <NotificationSettings
+                organization={organization.name}
+                organizationId={organization.id}
+                initialTab="templates"
+                hideTabs={true}
+                hideOrganizationSelector={true}
+              />
             )}
           </div>
         )}
@@ -1176,16 +1231,22 @@ const MyFleetPage = () => {
                   ℹ️ Ak nie sú definované vlastné typy, použijú sa predvolené možnosti.
                 </p>
               </div>
-              {organization?.numberNotificationTypes && (
+              {organization?.tierRelation && (
                 <div className="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
                   <p className="text-orange-300 text-sm">
-                    ⚠️ Limit typov notifikácií: {organization.numberNotificationTypes}
+                    ⚠️ Limit typov notifikácií: {organization.currentNotificationTypesCount} / {organization.tierRelation.notificationTypesLimit}
                   </p>
                 </div>
               )}
             </div>
-            {session?.user?.organization && (
-              <NotificationSettings organization={session.user.organization} initialTab="types" hideTabs={true} hideOrganizationSelector={true} />
+            {organization && (
+              <NotificationSettings
+                organization={organization.name}
+                organizationId={organization.id}
+                initialTab="types"
+                hideTabs={true}
+                hideOrganizationSelector={true}
+              />
             )}
           </div>
         )}
@@ -1216,7 +1277,7 @@ const MyFleetPage = () => {
       )}
 
       {/* User Modal */}
-      {session?.user?.organization && (
+      {organization && (
         <FleetManagerUserModal
           isOpen={userModalOpen}
           onClose={() => {
@@ -1225,7 +1286,8 @@ const MyFleetPage = () => {
           }}
           onSuccess={handleUserModalSuccess}
           user={editingUser}
-          organization={session.user.organization}
+          organization={organization.name}
+          organizationId={organization.id}
         />
       )}
     </div>

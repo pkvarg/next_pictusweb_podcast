@@ -5,11 +5,28 @@ import { Building, Plus, Edit2, Trash2, Save, X, Users } from 'lucide-react'
 
 type Tier = 'FREE' | 'PREMIUM' | 'BUSINESS'
 
+interface TierInfo {
+  id: string
+  name: string
+  usersLimit: number
+  vehiclesLimit: number
+  notificationsLimit: number
+  templatesLimit: number
+  notificationTypesLimit: number
+}
+
 interface Organization {
   id: string
   name: string
   mainContact: string | null
   tier: Tier | null
+  tierId: string | null
+  tierRelation?: TierInfo
+  currentUsersCount: number
+  currentVehiclesCount: number
+  currentNotificationsCount: number
+  currentTemplatesCount: number
+  currentNotificationTypesCount: number
   createdAt: string
   updatedAt: string
   deletedAt: string | null
@@ -26,13 +43,27 @@ interface Organization {
 
 export default function OrganizationManager() {
   const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [tiers, setTiers] = useState<TierInfo[]>([])
   const [loading, setLoading] = useState(true)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [newItem, setNewItem] = useState<any>(null)
 
   useEffect(() => {
     fetchOrganizations()
+    fetchTiers()
   }, [])
+
+  const fetchTiers = async () => {
+    try {
+      const response = await fetch('/api/tiers')
+      if (response.ok) {
+        const data = await response.json()
+        setTiers(data.tiers || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch tiers:', error)
+    }
+  }
 
   const fetchOrganizations = async () => {
     setLoading(true)
@@ -50,7 +81,7 @@ export default function OrganizationManager() {
   }
 
   const handleAddNew = () => {
-    setNewItem({ name: '', mainContact: '', parentOrganizationId: '', tier: '' })
+    setNewItem({ name: '', mainContact: '', parentOrganizationId: '', tierId: '' })
   }
 
   const handleSaveNew = async () => {
@@ -62,7 +93,7 @@ export default function OrganizationManager() {
           name: newItem.name,
           mainContact: newItem.mainContact || null,
           parentOrganizationId: newItem.parentOrganizationId || null,
-          tier: newItem.tier || null,
+          tierId: newItem.tierId || null,
         }),
       })
 
@@ -84,7 +115,7 @@ export default function OrganizationManager() {
       name: organization.name,
       mainContact: organization.mainContact || '',
       parentOrganizationId: organization.parentOrganizationId || '',
-      tier: organization.tier || '',
+      tierId: organization.tierId || '',
     })
   }
 
@@ -98,7 +129,7 @@ export default function OrganizationManager() {
           name: editingItem.name,
           mainContact: editingItem.mainContact || null,
           parentOrganizationId: editingItem.parentOrganizationId || null,
-          tier: editingItem.tier || null,
+          tierId: editingItem.tierId || null,
         }),
       })
 
@@ -182,14 +213,16 @@ export default function OrganizationManager() {
                     className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
                   />
                   <select
-                    value={newItem.tier}
-                    onChange={(e) => setNewItem({ ...newItem, tier: e.target.value })}
+                    value={newItem.tierId}
+                    onChange={(e) => setNewItem({ ...newItem, tierId: e.target.value })}
                     className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
                   >
                     <option value="">Select Tier</option>
-                    <option value="FREE">Free</option>
-                    <option value="PREMIUM">Premium</option>
-                    <option value="BUSINESS">Business</option>
+                    {tiers.map((tier) => (
+                      <option key={tier.id} value={tier.id}>
+                        {tier.name} (Users: {tier.usersLimit}, Vehicles: {tier.vehiclesLimit})
+                      </option>
+                    ))}
                   </select>
                   <select
                     value={newItem.parentOrganizationId}
@@ -246,14 +279,16 @@ export default function OrganizationManager() {
                         className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
                       />
                       <select
-                        value={editingItem.tier}
-                        onChange={(e) => setEditingItem({ ...editingItem, tier: e.target.value })}
+                        value={editingItem.tierId}
+                        onChange={(e) => setEditingItem({ ...editingItem, tierId: e.target.value })}
                         className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
                       >
                         <option value="">Select Tier</option>
-                        <option value="FREE">Free</option>
-                        <option value="PREMIUM">Premium</option>
-                        <option value="BUSINESS">Business</option>
+                        {tiers.map((tier) => (
+                          <option key={tier.id} value={tier.id}>
+                            {tier.name} (Users: {tier.usersLimit}, Vehicles: {tier.vehiclesLimit})
+                          </option>
+                        ))}
                       </select>
                       <select
                         value={editingItem.parentOrganizationId}
@@ -294,13 +329,13 @@ export default function OrganizationManager() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <p className="text-white text-xl font-light">{org.name}</p>
-                        {org.tier && (
+                        {org.tierRelation && (
                           <span className={`px-2 py-1 text-xs rounded font-medium ${
-                            org.tier === 'FREE' ? 'bg-gray-500/20 text-gray-300' :
-                            org.tier === 'PREMIUM' ? 'bg-blue-500/20 text-blue-300' :
+                            org.tierRelation.name === 'FREE' ? 'bg-gray-500/20 text-gray-300' :
+                            org.tierRelation.name === 'PREMIUM' ? 'bg-blue-500/20 text-blue-300' :
                             'bg-purple-500/20 text-purple-300'
                           }`}>
-                            {org.tier}
+                            {org.tierRelation.name}
                           </span>
                         )}
                         {org.childOrganizations && org.childOrganizations.length > 0 && (
@@ -323,6 +358,22 @@ export default function OrganizationManager() {
                           Created: {new Date(org.createdAt).toLocaleDateString()}
                         </p>
                       </div>
+                      {org.tierRelation && (
+                        <div className="flex gap-4 mt-2 text-xs">
+                          <span className="text-gray-400">
+                            Users: <span className="text-pictus-lime">{org.currentUsersCount}</span>/{org.tierRelation.usersLimit}
+                          </span>
+                          <span className="text-gray-400">
+                            Vehicles: <span className="text-pictus-lime">{org.currentVehiclesCount}</span>/{org.tierRelation.vehiclesLimit}
+                          </span>
+                          <span className="text-gray-400">
+                            Notifications: <span className="text-pictus-lime">{org.currentNotificationsCount}</span>/{org.tierRelation.notificationsLimit}
+                          </span>
+                          <span className="text-gray-400">
+                            Templates: <span className="text-pictus-lime">{org.currentTemplatesCount}</span>/{org.tierRelation.templatesLimit}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="flex gap-2">
                       <button

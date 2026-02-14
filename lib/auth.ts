@@ -16,7 +16,8 @@ declare module 'next-auth' {
       email: string
       name: string
       role?: string
-      organization?: string
+      organization?: string // Contains organizationId (UUID) after migration
+      organizationId?: string // Explicit organizationId field
       isFleetManager?: boolean
     }
   }
@@ -26,7 +27,8 @@ declare module 'next-auth' {
     email: string
     name: string
     role?: string
-    organization?: string
+    organization?: string // Contains organizationId (UUID) after migration
+    organizationId?: string // Explicit organizationId field
     isFleetManager?: boolean
   }
 }
@@ -91,7 +93,8 @@ export const authOptions = {
             token.role = dbUser.role
             token.email = dbUser.email
             token.name = dbUser.name || `${dbUser.firstName} ${dbUser.lastName}`
-            token.organization = dbUser.organization
+            token.organizationId = dbUser.organizationId
+            token.organization = dbUser.organizationId || dbUser.organization // Use organizationId (UUID) first
             token.isFleetManager = dbUser.isFleetManager
             
             console.log('TESTING: Updating login tracking...')
@@ -115,7 +118,8 @@ export const authOptions = {
           })
 
           if (dbUser) {
-            token.organization = dbUser.organization
+            token.organizationId = dbUser.organizationId
+            token.organization = dbUser.organizationId || dbUser.organization // Use organizationId (UUID) first
             token.isFleetManager = dbUser.isFleetManager
             console.log('TESTING: Organization data refreshed')
           }
@@ -137,6 +141,7 @@ export const authOptions = {
           session.user.role = token.role?.toLowerCase() || 'client'
           session.user.email = token.email
           session.user.name = token.name || `${token.firstName || ''} ${token.lastName || ''}`.trim()
+          session.user.organizationId = token.organizationId
           session.user.organization = token.organization
           session.user.isFleetManager = token.isFleetManager || false
           console.log('TESTING: Session data set successfully')

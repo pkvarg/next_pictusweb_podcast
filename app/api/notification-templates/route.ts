@@ -6,26 +6,27 @@ const prisma = new PrismaClient()
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const organization = searchParams.get('organization')
+    const organizationId = searchParams.get('organizationId')
 
-    let whereClause = {}
+    let whereClause: any = {
+      isActive: true,
+      deletedAt: null,
+    }
 
-    if (organization) {
-      whereClause = {
-        organization: {
-          equals: organization,
-          mode: 'insensitive' as const,
-        },
-        isActive: true,
-      }
-    } else {
-      whereClause = {
-        isActive: true,
-      }
+    if (organizationId) {
+      whereClause.organizationId = organizationId
     }
 
     const templates = await prisma.notificationTemplate.findMany({
       where: whereClause,
+      include: {
+        organizationRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
+      },
       orderBy: {
         name: 'asc',
       },
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
-      organization,
+      organizationId,
       name,
       notificationType,
       notificationChannel,
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
       smsMessage,
     } = body
 
-    if (!organization || !name || !notificationType || !notificationChannel) {
+    if (!organizationId || !name || !notificationType || !notificationChannel) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     const template = await prisma.notificationTemplate.create({
       data: {
-        organization,
+        organizationId: organizationId,
         name,
         notificationType,
         notificationChannel,
@@ -88,7 +89,6 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const {
       id,
-      organization,
       name,
       notificationType,
       notificationChannel,
@@ -105,7 +105,6 @@ export async function PUT(request: NextRequest) {
     const template = await prisma.notificationTemplate.update({
       where: { id },
       data: {
-        organization,
         name,
         notificationType,
         notificationChannel,

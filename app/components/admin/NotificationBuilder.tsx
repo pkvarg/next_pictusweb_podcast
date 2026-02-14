@@ -16,6 +16,7 @@ import {
   X,
   Plus,
   Trash2,
+  AlertCircle,
 } from 'lucide-react'
 
 interface Template {
@@ -81,6 +82,7 @@ export default function NotificationBuilder({
   // If organization is provided, skip Step 0 (organization selection)
   const [step, setStep] = useState(initialOrganization ? 1 : 0)
   const [organization, setOrganization] = useState(initialOrganization || '')
+  const [organizationId, setOrganizationId] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [templates, setTemplates] = useState<Template[]>([])
   const [typeOptions, setTypeOptions] = useState<TypeOption[]>([])
@@ -105,25 +107,29 @@ export default function NotificationBuilder({
     personName: '',
     email: '',
     phoneNumber: '',
-    company: organization,
+    organizationId: organizationId,
     emailMessage: '',
   })
 
   const fetchTemplates = useCallback(async () => {
+    if (!organizationId) return
     try {
       // Try to fetch templates for the current organization
-      const response = await fetch(`/api/notification-templates?organization=${organization}`)
+      const response = await fetch(`/api/notification-templates?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         const templates = data.templates || []
 
-        // If no templates found for current organization, fetch from DEFAULT
-        if (templates.length === 0 && organization !== 'DEFAULT') {
-          const defaultResponse = await fetch(`/api/notification-templates?organization=DEFAULT`)
-          if (defaultResponse.ok) {
-            const defaultData = await defaultResponse.json()
-            setTemplates(defaultData.templates || [])
-            return
+        // If no templates found for current organization, check if DEFAULT org exists
+        if (templates.length === 0) {
+          const defaultOrg = organizations.find(org => org.name === 'DEFAULT')
+          if (defaultOrg) {
+            const defaultResponse = await fetch(`/api/notification-templates?organizationId=${defaultOrg.id}`)
+            if (defaultResponse.ok) {
+              const defaultData = await defaultResponse.json()
+              setTemplates(defaultData.templates || [])
+              return
+            }
           }
         }
 
@@ -132,24 +138,28 @@ export default function NotificationBuilder({
     } catch (error) {
       console.error('Failed to fetch templates:', error)
     }
-  }, [organization])
+  }, [organizationId, organizations])
 
   const fetchTypeOptions = useCallback(async () => {
+    if (!organizationId) return
     try {
       // Try to fetch options for the current organization
-      const response = await fetch(`/api/notification-type-options?organization=${organization}`)
+      const response = await fetch(`/api/notification-type-options?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         const options = data.options || []
 
         // If no options found for current organization, fetch from DEFAULT
-        if (options.length === 0 && organization !== 'DEFAULT') {
-          const defaultResponse = await fetch(`/api/notification-type-options?organization=DEFAULT`)
-          if (defaultResponse.ok) {
-            const defaultData = await defaultResponse.json()
-            setTypeOptions(defaultData.options || [])
-            setUsingDefaultTypeOptions(true)
-            return
+        if (options.length === 0) {
+          const defaultOrg = organizations.find(org => org.name === 'DEFAULT')
+          if (defaultOrg) {
+            const defaultResponse = await fetch(`/api/notification-type-options?organizationId=${defaultOrg.id}`)
+            if (defaultResponse.ok) {
+              const defaultData = await defaultResponse.json()
+              setTypeOptions(defaultData.options || [])
+              setUsingDefaultTypeOptions(true)
+              return
+            }
           }
         }
 
@@ -159,24 +169,28 @@ export default function NotificationBuilder({
     } catch (error) {
       console.error('Failed to fetch type options:', error)
     }
-  }, [organization])
+  }, [organizationId, organizations])
 
   const fetchChannelOptions = useCallback(async () => {
+    if (!organizationId) return
     try {
       // Try to fetch options for the current organization
-      const response = await fetch(`/api/notification-channel-options?organization=${organization}`)
+      const response = await fetch(`/api/notification-channel-options?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         const options = data.options || []
 
         // If no options found for current organization, fetch from DEFAULT
-        if (options.length === 0 && organization !== 'DEFAULT') {
-          const defaultResponse = await fetch(`/api/notification-channel-options?organization=DEFAULT`)
-          if (defaultResponse.ok) {
-            const defaultData = await defaultResponse.json()
-            setChannelOptions(defaultData.options || [])
-            setUsingDefaultChannelOptions(true)
-            return
+        if (options.length === 0) {
+          const defaultOrg = organizations.find(org => org.name === 'DEFAULT')
+          if (defaultOrg) {
+            const defaultResponse = await fetch(`/api/notification-channel-options?organizationId=${defaultOrg.id}`)
+            if (defaultResponse.ok) {
+              const defaultData = await defaultResponse.json()
+              setChannelOptions(defaultData.options || [])
+              setUsingDefaultChannelOptions(true)
+              return
+            }
           }
         }
 
@@ -186,11 +200,12 @@ export default function NotificationBuilder({
     } catch (error) {
       console.error('Failed to fetch channel options:', error)
     }
-  }, [organization])
+  }, [organizationId, organizations])
 
   const fetchVehicles = useCallback(async () => {
+    if (!organizationId) return
     try {
-      const response = await fetch(`/api/my-vehicles?organization=${organization}`)
+      const response = await fetch(`/api/my-vehicles?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         setVehicles(data.vehicles || [])
@@ -198,11 +213,12 @@ export default function NotificationBuilder({
     } catch (error) {
       console.error('Failed to fetch vehicles:', error)
     }
-  }, [organization])
+  }, [organizationId])
 
   const fetchUsers = useCallback(async () => {
+    if (!organizationId) return
     try {
-      const response = await fetch(`/api/users?organization=${organization}`)
+      const response = await fetch(`/api/users?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         setUsers(data || [])
@@ -210,7 +226,7 @@ export default function NotificationBuilder({
     } catch (error) {
       console.error('Failed to fetch users:', error)
     }
-  }, [organization])
+  }, [organizationId])
 
   const fetchOrganizations = async () => {
     try {
@@ -229,21 +245,59 @@ export default function NotificationBuilder({
     fetchOrganizations()
   }, [])
 
+  // Set organizationId when initialOrganization is provided or organizations load
   useEffect(() => {
-    if (organization) {
+    if (initialOrganization && organizations.length > 0 && !organizationId) {
+      const org = organizations.find(o => o.name === initialOrganization)
+      if (org) {
+        setOrganizationId(org.id)
+      }
+    }
+  }, [initialOrganization, organizations, organizationId])
+
+  useEffect(() => {
+    if (organizationId) {
       fetchTemplates()
       fetchTypeOptions()
       fetchChannelOptions()
       fetchVehicles()
       fetchUsers()
-      setFormData((prev) => ({ ...prev, company: organization }))
+      setFormData((prev) => ({ ...prev, organizationId: organizationId }))
     }
-  }, [organization, fetchTemplates, fetchTypeOptions, fetchChannelOptions, fetchVehicles, fetchUsers])
+  }, [organizationId, organization, fetchTemplates, fetchTypeOptions, fetchChannelOptions, fetchVehicles, fetchUsers])
 
   useEffect(() => {
     if (duplicateData) {
-      const dupOrg = duplicateData.company || initialOrganization || ''
-      setOrganization(dupOrg)
+      // Get organization from duplicateData - prioritize organizationId, fallback to organization relation or company field
+      let dupOrgId = duplicateData.organizationId
+      let dupOrgName = ''
+
+      if (!dupOrgId && duplicateData.organization) {
+        dupOrgId = duplicateData.organization.id
+        dupOrgName = duplicateData.organization.name
+      }
+
+      if (!dupOrgId && !dupOrgName) {
+        dupOrgName = initialOrganization || ''
+        const org = organizations.find(o => o.name === dupOrgName)
+        if (org) {
+          dupOrgId = org.id
+        }
+      }
+
+      if (dupOrgId) {
+        setOrganizationId(dupOrgId)
+        // Find organization name if we only have ID
+        if (!dupOrgName) {
+          const org = organizations.find(o => o.id === dupOrgId)
+          if (org) {
+            dupOrgName = org.name
+            setOrganization(dupOrgName)
+          }
+        } else {
+          setOrganization(dupOrgName)
+        }
+      }
 
       // Format dates to YYYY-MM-DD for date inputs
       const formatDate = (dateString: string | null | undefined) => {
@@ -262,7 +316,7 @@ export default function NotificationBuilder({
         personName: duplicateData.personName || '',
         email: duplicateData.email || '',
         phoneNumber: duplicateData.phoneNumber || '',
-        company: dupOrg,
+        organizationId: dupOrgId || '',
         emailMessage: duplicateData.emailMessage || '',
       })
       setNotificationDaysOffset('') // Reset days offset when duplicating
@@ -273,9 +327,9 @@ export default function NotificationBuilder({
         setUseCustomType(!typeExists)
       }
 
-      setStep(dupOrg ? 1 : 0) // Skip to Step 1 (template selection)
+      setStep(dupOrgId ? 1 : 0) // Skip to Step 1 (template selection)
     }
-  }, [duplicateData, initialOrganization, typeOptions, hideChannelDropdown])
+  }, [duplicateData, initialOrganization, organizations, typeOptions, hideChannelDropdown])
 
   const handleTemplateSelect = (templateId: string) => {
     const template = templates.find((t) => t.id === templateId)
@@ -312,7 +366,7 @@ export default function NotificationBuilder({
       setFormData({
         ...formData,
         vehicleId,
-        company: vehicle.organization,
+        organizationId: vehicle.organizationId || organizationId,
       })
     }
   }
@@ -575,7 +629,12 @@ export default function NotificationBuilder({
             </p>
             <select
               value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
+              onChange={(e) => {
+                const orgName = e.target.value
+                const org = organizations.find(o => o.name === orgName)
+                setOrganization(orgName)
+                setOrganizationId(org?.id || '')
+              }}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white text-lg focus:outline-none focus:border-pictus-lime mb-4"
             >
               <option value="">Vyberte organizáciu...</option>
@@ -796,9 +855,17 @@ export default function NotificationBuilder({
                   type="date"
                   value={formData.dutyDate}
                   onChange={(e) => handleDutyDateChange(e.target.value)}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                  className={`w-full px-4 py-2 bg-white/5 border rounded-lg text-white focus:outline-none focus:border-pictus-lime ${
+                    !formData.dutyDate ? 'border-red-500/50' : 'border-white/10'
+                  }`}
                   required
                 />
+                {!formData.dutyDate && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    Dátum úlohy je povinný pre vytvorenie notifikácie
+                  </p>
+                )}
               </div>
 
               {/* Reminder Intervals */}
@@ -995,6 +1062,21 @@ export default function NotificationBuilder({
               />
             </div>
 
+            {/* Validation Summary */}
+            {!formData.dutyDate && (
+              <div className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
+                <p className="text-red-400 font-medium mb-2 flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5" />
+                  Vyžadované pole chýba
+                </p>
+                <ul className="text-red-300 text-sm space-y-1 list-disc list-inside">
+                  {!formData.dutyDate && (
+                    <li>Prosím vyberte dátum úlohy pre pokračovanie</li>
+                  )}
+                </ul>
+              </div>
+            )}
+
             <div className="flex gap-4 mt-6">
               <button
                 onClick={() => setStep(1)}
@@ -1006,6 +1088,7 @@ export default function NotificationBuilder({
                 onClick={() => setStep(3)}
                 disabled={!formData.dutyDate}
                 className="flex-1 px-6 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 disabled:cursor-not-allowed text-pictus-black rounded-lg transition-all"
+                title={!formData.dutyDate ? 'Dátum úlohy je povinný' : ''}
               >
                 Pokračovať na kontrolu
               </button>

@@ -22,19 +22,41 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden - Admin or Fleet Manager access required' }, { status: 403 })
     }
 
-    // Admins can access any vehicle, fleet managers only their organization
+    // Admins and PICTUSACI users can access any vehicle, other fleet managers only their organization
     const whereClause: any = {
       id: resolvedParams.id,
       deletedAt: null,
     }
 
     if (session.user.role !== 'ADMIN') {
-      whereClause.organization = session.user.organization
+      // Get user's organizationId and organization name
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          organizationId: true,
+          organizationRelation: {
+            select: {
+              name: true
+            }
+          }
+        }
+      })
+
+      // PICTUSACI users can view any vehicle, others only their own organization
+      if (user?.organizationRelation?.name !== 'PICTUSACI') {
+        whereClause.organizationId = user?.organizationId
+      }
     }
 
     const vehicle = await prisma.myVehicle.findFirst({
       where: whereClause,
       include: {
+        organizationRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        },
         expenses: {
           where: { deletedAt: null },
           orderBy: { date: 'desc' },
@@ -77,14 +99,21 @@ export async function PUT(
     const body = await request.json()
     const { type, registration, year, image, note } = body
 
-    // Verify vehicle exists (admins can update any vehicle, fleet managers only their organization)
+    // Verify vehicle exists and check permissions
+    // Admins can update any vehicle
+    // Fleet managers (including PICTUSACI) can only update vehicles from their own organization
     const whereClause: any = {
       id: resolvedParams.id,
       deletedAt: null,
     }
 
     if (session.user.role !== 'ADMIN') {
-      whereClause.organization = session.user.organization
+      // Get user's organizationId - ALL fleet managers restricted to their own org
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { organizationId: true }
+      })
+      whereClause.organizationId = user?.organizationId
     }
 
     const existingVehicle = await prisma.myVehicle.findFirst({
@@ -142,7 +171,12 @@ export async function DELETE(
     }
 
     if (session.user.role !== 'ADMIN') {
-      whereClause.organization = session.user.organization
+      // Get user's organizationId
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { organizationId: true }
+      })
+      whereClause.organizationId = user?.organizationId
     }
 
     const existingVehicle = await prisma.myVehicle.findFirst({

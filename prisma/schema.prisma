@@ -78,7 +78,8 @@ model User {
   firstName            String?
   lastName             String?
   phoneNumber          String?                @map("phone_number") @db.VarChar(20)
-  organization         String?
+  organizationId       String?                @map("organization_id")
+  organizationRelation Organization?          @relation(fields: [organizationId], references: [id])
   isFleetManager       Boolean                @default(false)
   loginProvider        String?
   hybridPassword       String?
@@ -89,37 +90,41 @@ model User {
 }
 
 model VehicleNotification {
-  id                   Int        @id @default(autoincrement())
-  company              String?    @db.VarChar(100)
-  personName           String?    @db.VarChar(100)
-  email                String?    @db.VarChar(150)
-  phoneNumber          String?    @db.VarChar(150)
-  vehicleRegistration  String?    @db.VarChar(20)
-  vehicleType          String?    @db.VarChar(100)
-  notificationType     String?    @db.VarChar(50)
-  notificationChannel  String?    @db.VarChar(50)
+  id                   Int           @id @default(autoincrement())
+  dutyBatchId          String?       @map("duty_batch_id") @db.VarChar(50)
+  isPdr                Boolean       @default(false) @map("is_pdr")
+  organizationId       String?       @map("organization_id")  // TEXT to match organizations.id
+  organization         Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  personName           String?       @db.VarChar(100)
+  email                String?       @db.VarChar(150)
+  phoneNumber          String?       @db.VarChar(150)
+  vehicleRegistration  String?       @db.VarChar(20)
+  notificationType     String?       @db.VarChar(50)
+  notificationChannel  String?       @db.VarChar(50)
   notificationDate     DateTime?
   dutyDate             DateTime?
   emailMessage         String?
-  status               String     @default("pending") @db.VarChar(20)
+  status               String        @default("pending") @db.VarChar(20)
   emailSentAt          DateTime?
   smsSentAt            DateTime?
-  createdAt            DateTime   @default(now())
-  sheetRowId           String?    @unique @db.VarChar(50)
-  confirmationToken    String?    @unique @map("confirmation_token") @db.VarChar(64)
-  tokenExpiresAt       DateTime?  @map("token_expires_at")
-  confirmationAttempts Int        @default(0)
+  createdAt            DateTime      @default(now())
+  confirmationToken    String?       @unique @map("confirmation_token") @db.VarChar(64)
+  tokenExpiresAt       DateTime?     @map("token_expires_at")
+  confirmationAttempts Int           @default(0)
   confirmedAt          DateTime?
   lastReminderSent     DateTime?
   finalStatusUpdated   DateTime?
-  deletedAt            DateTime?  @map("deleted_at")
-  userId               String?    @map("user_id")
-  user                 User?      @relation(fields: [userId], references: [id])
-  myVehicleId          String?    @map("my_vehicle_id")
-  myVehicle            MyVehicle? @relation(fields: [myVehicleId], references: [id])
+  deletedAt            DateTime?     @map("deleted_at")
+  userId               String?       @map("user_id")
+  user                 User?         @relation(fields: [userId], references: [id])
+  myVehicleId          String?       @map("my_vehicle_id")
+  myVehicle            MyVehicle?    @relation(fields: [myVehicleId], references: [id])
 
   @@index([userId])
   @@index([myVehicleId])
+  @@index([dutyBatchId])
+  @@index([isPdr])
+  @@index([organizationId])
   @@map("vehiclenotification")
 }
 
@@ -168,7 +173,8 @@ model ConfirmationLog {
 
 model MyVehicle {
   id                    String                 @id @default(uuid())
-  organization          String                 @db.VarChar(100)
+  organizationId        String                 @map("organization_id")
+  organizationRelation  Organization           @relation(fields: [organizationId], references: [id])
   type                  String                 @db.VarChar(100)
   registration          String                 @db.VarChar(20)
   year                  Int?
@@ -184,15 +190,17 @@ model MyVehicle {
   vehicleNotifications  VehicleNotification[]
 
   @@index([userId])
+  @@index([organizationId])
   @@map("my_vehicles")
 }
 
 model MyVehicleExpense {
-  id           String     @id @default(uuid())
-  vehicleId    String     @map("vehicle_id")
-  vehicle      MyVehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  organization String     @db.VarChar(100)
-  item         String     @db.VarChar(200)
+  id                   String        @id @default(uuid())
+  vehicleId            String        @map("vehicle_id")
+  vehicle              MyVehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  organizationId       String        @map("organization_id")
+  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
+  item                 String        @db.VarChar(200)
   cost         Decimal    @db.Decimal(10, 2)
   date         DateTime
   createdAt    DateTime   @default(now()) @map("created_at")
@@ -203,14 +211,17 @@ model MyVehicleExpense {
 
   @@index([vehicleId])
   @@index([userId])
+  @@index([organizationId])
   @@map("my_vehicle_expenses")
 }
 
 model MyVehicleMileage {
-  id         String     @id @default(uuid())
-  vehicleId  String     @map("vehicle_id")
-  vehicle    MyVehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  kilometers Int
+  id                   String        @id @default(uuid())
+  vehicleId            String        @map("vehicle_id")
+  vehicle              MyVehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  organizationId       String        @map("organization_id")
+  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
+  kilometers           Int
   date       DateTime
   note       String?    @db.Text
   createdAt  DateTime   @default(now()) @map("created_at")
@@ -221,6 +232,7 @@ model MyVehicleMileage {
 
   @@index([vehicleId])
   @@index([userId])
+  @@index([organizationId])
   @@map("my_vehicle_mileage")
 }
 
@@ -229,68 +241,121 @@ enum Role {
   CLIENT
 }
 
-enum Tier {
+model Tier {
+  id                      String         @id @default(uuid())
+  name                    String         @unique @db.VarChar(50)
+  usersLimit              Int            @map("users_limit")
+  vehiclesLimit           Int            @map("vehicles_limit")
+  notificationsLimit      Int            @map("notifications_limit")
+  templatesLimit          Int            @map("templates_limit")
+  notificationTypesLimit  Int            @map("notification_types_limit")
+  createdAt               DateTime       @default(now()) @map("created_at")
+  updatedAt               DateTime       @updatedAt @map("updated_at")
+  deletedAt               DateTime?      @map("deleted_at")
+
+  // Note: This relation field is required by Prisma ORM for querying.
+  // It does NOT create a database column - only Organization has tier_id FK.
+  organizations           Organization[]
+
+  @@map("tiers")
+}
+
+enum TierEnum {
   FREE
   PREMIUM
   BUSINESS
 }
 
 model Organization {
-  id                        String         @id @default(uuid())
-  name                      String         @db.VarChar(100)
-  mainContact               String?        @map("main_contact") @db.VarChar(100)
-  tier                      Tier?
-  numberUsers               Int?           @map("number_users")
-  numberVehicles            Int?           @map("number_vehicles")
-  numberNotificationTypes   Int?           @map("number_notification_types")
-  createdAt                 DateTime       @default(now()) @map("created_at")
-  updatedAt                 DateTime       @updatedAt @map("updated_at")
-  deletedAt                 DateTime?      @map("deleted_at")
-  parentOrganizationId      String?        @map("parent_organization_id")
-  parentOrganization        Organization?  @relation("OrganizationHierarchy", fields: [parentOrganizationId], references: [id])
-  childOrganizations        Organization[] @relation("OrganizationHierarchy")
+  id                              String         @id @default(uuid())
+  name                            String         @db.VarChar(100)
+  mainContact                     String?        @map("main_contact") @db.VarChar(100)
 
+  // Old tier enum (will be dropped later)
+  tier                            TierEnum?
+
+  // New tier reference
+  tierId                          String?        @map("tier_id")
+  tierRelation                    Tier?          @relation(fields: [tierId], references: [id])
+
+  // Live tracking columns (count of rows with deletedAt = NULL)
+  currentUsersCount               Int            @default(0) @map("current_users_count")
+  currentVehiclesCount            Int            @default(0) @map("current_vehicles_count")
+  currentNotificationsCount       Int            @default(0) @map("current_notifications_count")
+  currentTemplatesCount           Int            @default(0) @map("current_templates_count")
+  currentNotificationTypesCount   Int            @default(0) @map("current_notification_types_count")
+
+  // Legacy columns (can be dropped after verification)
+  numberUsers                     Int?           @map("number_users")
+  numberVehicles                  Int?           @map("number_vehicles")
+  numberNotificationTypes         Int?           @map("number_notification_types")
+
+  createdAt                       DateTime       @default(now()) @map("created_at")
+  updatedAt                       DateTime       @updatedAt @map("updated_at")
+  deletedAt                       DateTime?      @map("deleted_at")
+  parentOrganizationId            String?                    @map("parent_organization_id")
+  parentOrganization              Organization?              @relation("OrganizationHierarchy", fields: [parentOrganizationId], references: [id])
+  childOrganizations              Organization[]             @relation("OrganizationHierarchy")
+
+  // Relations
+  users                           User[]
+  vehicles                        MyVehicle[]
+  expenses                        MyVehicleExpense[]
+  mileageRecords                  MyVehicleMileage[]
+  templates                       NotificationTemplate[]
+  notificationTypeOptions         NotificationTypeOption[]
+  notificationChannelOptions      NotificationChannelOption[]
+  vehicleNotifications            VehicleNotification[]
+
+  @@index([tierId])
   @@index([parentOrganizationId])
   @@map("organizations")
 }
 
 model NotificationTemplate {
-  id                    String   @id @default(uuid())
-  organization          String   @db.VarChar(100)
-  name                  String   @db.VarChar(100)
+  id                    String        @id @default(uuid())
+  organizationId        String        @map("organization_id")
+  organizationRelation  Organization  @relation(fields: [organizationId], references: [id])
+  name                  String        @db.VarChar(100)
   notificationType      String   @db.VarChar(50)
   notificationChannel   String   @db.VarChar(50)
   reminderIntervals     Json?    // Array of integers: e.g., [-30, -14, -7, 0, 1, 2]
   emailMessage          String?  @db.Text
   smsMessage            String?  @db.Text
-  isActive              Boolean  @default(true)
-  createdAt             DateTime @default(now()) @map("created_at")
-  updatedAt             DateTime @updatedAt @map("updated_at")
+  isActive              Boolean   @default(true)
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  deletedAt             DateTime? @map("deleted_at")
 
-  @@index([organization])
+  @@index([organizationId])
   @@map("notification_templates")
 }
 
 model NotificationTypeOption {
-  id           String   @id @default(uuid())
-  organization String   @db.VarChar(100)
-  label        String   @db.VarChar(100)
-  isActive     Boolean  @default(true)
-  sortOrder    Int      @default(0)
-  createdAt    DateTime @default(now()) @map("created_at")
+  id                   String        @id @default(uuid())
+  organizationId       String        @map("organization_id")
+  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
+  label                String        @db.VarChar(100)
+  isActive             Boolean       @default(true)
+  isPdr                Boolean       @default(false) @map("is_pdr")
+  sortOrder            Int           @default(0)
+  createdAt            DateTime      @default(now()) @map("created_at")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+  deletedAt            DateTime?     @map("deleted_at")
 
-  @@index([organization])
+  @@index([organizationId])
   @@map("notification_type_options")
 }
 
 model NotificationChannelOption {
-  id           String   @id @default(uuid())
-  organization String   @db.VarChar(100)
-  label        String   @db.VarChar(50)
+  id                   String        @id @default(uuid())
+  organizationId       String        @map("organization_id")
+  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
+  label                String        @db.VarChar(50)
   isActive     Boolean  @default(true)
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now()) @map("created_at")
 
-  @@index([organization])
+  @@index([organizationId])
   @@map("notification_channel_options")
 }

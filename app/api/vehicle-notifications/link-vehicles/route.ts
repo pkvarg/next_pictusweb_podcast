@@ -44,12 +44,14 @@ export async function POST(request: NextRequest) {
     for (const notification of unlinkedNotifications) {
       if (!notification.vehicleRegistration || !notification.company) continue
 
-      // Find matching vehicle
+      // Find matching vehicle by registration and organization name
       const vehicle = await prisma.myVehicle.findFirst({
         where: {
           registration: notification.vehicleRegistration,
-          organization: notification.company,
           deletedAt: null,
+          organizationRelation: {
+            name: notification.company,
+          },
         },
         select: {
           id: true,

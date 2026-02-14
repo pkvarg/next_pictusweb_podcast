@@ -16,10 +16,28 @@ import {
   X,
   Car,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
 import FleetOverview from '@/app/components/client/FleetOverview'
 import SimpleDutyOverview from '@/app/components/client/SimpleDutyOverview'
+
+interface TierInfo {
+  id: string
+  name: string
+  usersLimit: number
+  vehiclesLimit: number
+  notificationsLimit: number
+  templatesLimit: number
+  notificationTypesLimit: number
+}
+
+interface Organization {
+  id: string
+  name: string
+  tier: string | null
+  tierId: string | null
+  tierRelation?: TierInfo
+}
 
 const ClientZone = () => {
   const { data: session } = useSession()
@@ -27,6 +45,9 @@ const ClientZone = () => {
   const iframe1Ref = useRef<HTMLIFrameElement>(null)
   const iframe2Ref = useRef<HTMLIFrameElement>(null)
   const iframe3Ref = useRef<HTMLIFrameElement>(null)
+
+  // Organization state
+  const [organization, setOrganization] = useState<Organization | null>(null)
 
   // Password change states
   const [showPasswordChange, setShowPasswordChange] = useState(false)
@@ -39,6 +60,31 @@ const ClientZone = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false)
   const [passwordChangeError, setPasswordChangeError] = useState('')
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('')
+
+  // Fetch organization details
+  const fetchOrganization = useCallback(async () => {
+    // session.user.organization now contains the UUID (after migration)
+    const orgId = (session?.user as any)?.organization
+    if (!orgId) return
+
+    try {
+      const response = await fetch(`/api/organizations?id=${orgId}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.organizations && data.organizations.length > 0) {
+          setOrganization(data.organizations[0])
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching organization:', err)
+    }
+  }, [session?.user])
+
+  useEffect(() => {
+    if (session?.user) {
+      fetchOrganization()
+    }
+  }, [session?.user, fetchOrganization])
 
   const handleLogout = () => {
     signOut({ callbackUrl: '/' })
@@ -196,22 +242,30 @@ const ClientZone = () => {
         )} */}
 
         {/* Fleet Overview Section - Only for Fleet Managers */}
-        {session?.user?.isFleetManager && session?.user?.organization && (
+        {session?.user?.isFleetManager && organization?.name && (
           <section id="fleet-overview" className="mb-16">
-            <FleetOverview organization={session.user.organization} />
+            <FleetOverview
+              organization={
+                organization.name === 'PICTUSACI'
+                  ? 'all'
+                  : organization.name === 'demo'
+                  ? 'demo'
+                  : organization.name
+              }
+            />
           </section>
         )}
 
-        {session?.user?.organization && (
+        {organization?.name && (
           <section id="dashboard" className="mb-16">
             <div className="md:bg-gradient-to-br md:from-pictus-onyx900/30 md:to-pictus-black/50 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-pictus-lime/30">
               <SimpleDutyOverview
                 company={
-                  session.user.organization === 'all'
+                  organization.name === 'PICTUSACI'
                     ? 'all'
-                    : session.user.organization === 'demo'
+                    : organization.name === 'demo'
                     ? 'demo'
-                    : session.user.organization
+                    : organization.name
                 }
               />
             </div>

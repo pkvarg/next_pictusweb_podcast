@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       personName,
       email,
       phoneNumber,
-      company,
+      organizationId,
     } = body
 
     if (!dutyDate) {
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     let notificationData: any = {
-      company,
+      organizationId,
       personName,
       email,
       phoneNumber,
@@ -46,10 +46,9 @@ export async function POST(request: NextRequest) {
 
       if (vehicle) {
         notificationData.vehicleRegistration = vehicle.registration
-        notificationData.vehicleType = vehicle.type
         notificationData.myVehicleId = vehicle.id
         notificationData.userId = vehicle.userId
-        notificationData.company = vehicle.organization
+        notificationData.organizationId = vehicle.organizationId
         notificationData.personName = personName || (vehicle.user ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim() : null) || null
         notificationData.email = email || vehicle.user?.email || null
       }

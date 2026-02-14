@@ -26,7 +26,7 @@ export async function DELETE(
       where: {
         id: resolvedParams.expenseId,
         vehicleId: resolvedParams.id,
-        organization: session.user.organization,
+        organizationId: session.user.organization,
         deletedAt: null,
       },
     })

@@ -16,6 +16,7 @@ const NewVehiclePage = () => {
   const [file, setFile] = useState<File | null>(null)
   const [filePreview, setFilePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [organizationName, setOrganizationName] = useState<string>('')
   const [formData, setFormData] = useState({
     type: '',
     registration: '',
@@ -40,6 +41,25 @@ const NewVehiclePage = () => {
       router.push('/client')
       return
     }
+
+    // Fetch organization name
+    const fetchOrganization = async () => {
+      if (session.user.organizationId) {
+        try {
+          const response = await fetch(`/api/organizations?id=${session.user.organizationId}`)
+          if (response.ok) {
+            const data = await response.json()
+            if (data.organizations && data.organizations.length > 0) {
+              setOrganizationName(data.organizations[0].name || '')
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching organization:', error)
+        }
+      }
+    }
+
+    fetchOrganization()
   }, [session, status, router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -382,7 +402,7 @@ const NewVehiclePage = () => {
             {/* Organization Info */}
             <div className="bg-pictus-lime/20 border border-pictus-lime/30 rounded-xl p-4">
               <p className="text-pictus-lime text-sm">
-                <strong>Organizácia:</strong> {session?.user?.organization}
+                <strong>Organizácia:</strong> {organizationName || 'Načítavam...'}
               </p>
               <p className="text-pictus-lime text-xs mt-1">
                 Vozidlo bude automaticky priradené k vašej organizácii

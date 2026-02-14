@@ -7,8 +7,13 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const includeDeleted = searchParams.get('includeDeleted') === 'true'
+    const id = searchParams.get('id')
 
     const whereClause: any = {}
+
+    if (id) {
+      whereClause.id = id
+    }
 
     if (!includeDeleted) {
       whereClause.deletedAt = null
@@ -17,6 +22,17 @@ export async function GET(request: NextRequest) {
     const organizations = await prisma.organization.findMany({
       where: whereClause,
       include: {
+        tierRelation: {
+          select: {
+            id: true,
+            name: true,
+            usersLimit: true,
+            vehiclesLimit: true,
+            notificationsLimit: true,
+            templatesLimit: true,
+            notificationTypesLimit: true,
+          }
+        },
         parentOrganization: {
           select: {
             id: true,
@@ -46,7 +62,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, mainContact, parentOrganizationId, tier } = body
+    const { name, mainContact, parentOrganizationId, tier, tierId } = body
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 })
@@ -58,8 +74,20 @@ export async function POST(request: NextRequest) {
         mainContact,
         parentOrganizationId: parentOrganizationId || null,
         tier: tier || null,
+        tierId: tierId || null,
       },
       include: {
+        tierRelation: {
+          select: {
+            id: true,
+            name: true,
+            usersLimit: true,
+            vehiclesLimit: true,
+            notificationsLimit: true,
+            templatesLimit: true,
+            notificationTypesLimit: true,
+          }
+        },
         parentOrganization: {
           select: {
             id: true,

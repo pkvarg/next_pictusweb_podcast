@@ -6,22 +6,29 @@ const prisma = new PrismaClient()
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const organization = searchParams.get('organization')
+    const organizationId = searchParams.get('organizationId')
 
-    if (!organization) {
+    if (!organizationId) {
       return NextResponse.json(
-        { error: 'Organization parameter is required' },
+        { error: 'OrganizationId parameter is required' },
         { status: 400 }
       )
     }
 
+    const whereClause: any = {
+      isActive: true,
+      organizationId: organizationId,
+    }
+
     const options = await prisma.notificationChannelOption.findMany({
-      where: {
-        organization: {
-          equals: organization,
-          mode: 'insensitive' as const,
-        },
-        isActive: true,
+      where: whereClause,
+      include: {
+        organizationRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
       },
       orderBy: {
         sortOrder: 'asc',
@@ -41,9 +48,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { organization, label, sortOrder } = body
+    const { organizationId, label, sortOrder } = body
 
-    if (!organization || !label) {
+    if (!organizationId || !label) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -52,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     const option = await prisma.notificationChannelOption.create({
       data: {
-        organization,
+        organizationId: organizationId,
         label,
         sortOrder: sortOrder ? parseInt(sortOrder) : 0,
       },

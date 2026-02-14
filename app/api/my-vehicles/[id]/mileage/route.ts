@@ -25,7 +25,7 @@ export async function GET(
     const vehicle = await prisma.myVehicle.findFirst({
       where: {
         id: resolvedParams.id,
-        organization: session.user.organization,
+        organizationId: session.user.organization,
         deletedAt: null,
       },
     })
@@ -71,7 +71,7 @@ export async function POST(
     const vehicle = await prisma.myVehicle.findFirst({
       where: {
         id: resolvedParams.id,
-        organization: session.user.organization,
+        organizationId: session.user.organization,
         deletedAt: null,
       },
     })

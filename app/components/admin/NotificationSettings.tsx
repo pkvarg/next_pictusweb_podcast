@@ -42,7 +42,8 @@ interface Template {
 }
 
 interface NotificationSettingsProps {
-  organization?: string
+  organization?: string // Organization name for display (deprecated)
+  organizationId?: string // Organization UUID (preferred)
   initialTab?: 'types' | 'channels' | 'templates'
   hideTabs?: boolean
   hideOrganizationSelector?: boolean
@@ -55,6 +56,7 @@ interface Organization {
 
 export default function NotificationSettings({
   organization: initialOrganization,
+  organizationId: initialOrganizationId,
   initialTab = 'types',
   hideTabs = false,
   hideOrganizationSelector = false,
@@ -68,8 +70,10 @@ export default function NotificationSettings({
   const [editingItem, setEditingItem] = useState<any>(null)
   const [newItem, setNewItem] = useState<any>(null)
   const [organization, setOrganization] = useState(initialOrganization || '')
+  const [organizationId, setOrganizationId] = useState(initialOrganizationId || '')
   const [usingDefaultTypeOptions, setUsingDefaultTypeOptions] = useState(false)
   const [usingDefaultChannelOptions, setUsingDefaultChannelOptions] = useState(false)
+  const [usingDefaultTemplates, setUsingDefaultTemplates] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(new Set())
   const [selectedChannels, setSelectedChannels] = useState<Set<string>>(new Set())
   const [importing, setImporting] = useState(false)
@@ -87,18 +91,18 @@ export default function NotificationSettings({
   }
 
   const fetchTypeOptions = useCallback(async () => {
-    if (!organization) return
+    if (!organizationId) return
 
     try {
       // Try to fetch options for the current organization
-      const response = await fetch(`/api/notification-type-options?organization=${organization}`)
+      const response = await fetch(`/api/notification-type-options?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         const options = data.options || []
 
         // If no options found for current organization, fetch from DEFAULT
-        if (options.length === 0 && organization !== 'DEFAULT') {
-          const defaultResponse = await fetch(`/api/notification-type-options?organization=DEFAULT`)
+        if (options.length === 0 && organizationId !== '9a28807e-4aa9-4ef5-b2c8-f38f4143a016') {
+          const defaultResponse = await fetch(`/api/notification-type-options?organizationId=9a28807e-4aa9-4ef5-b2c8-f38f4143a016`)
           if (defaultResponse.ok) {
             const defaultData = await defaultResponse.json()
             setTypeOptions(defaultData.options || [])
@@ -113,21 +117,21 @@ export default function NotificationSettings({
     } catch (error) {
       console.error('Failed to fetch type options:', error)
     }
-  }, [organization])
+  }, [organizationId])
 
   const fetchChannelOptions = useCallback(async () => {
-    if (!organization) return
+    if (!organizationId) return
 
     try {
       // Try to fetch options for the current organization
-      const response = await fetch(`/api/notification-channel-options?organization=${organization}`)
+      const response = await fetch(`/api/notification-channel-options?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         const options = data.options || []
 
         // If no options found for current organization, fetch from DEFAULT
-        if (options.length === 0 && organization !== 'DEFAULT') {
-          const defaultResponse = await fetch(`/api/notification-channel-options?organization=DEFAULT`)
+        if (options.length === 0 && organizationId !== '9a28807e-4aa9-4ef5-b2c8-f38f4143a016') {
+          const defaultResponse = await fetch(`/api/notification-channel-options?organizationId=9a28807e-4aa9-4ef5-b2c8-f38f4143a016`)
           if (defaultResponse.ok) {
             const defaultData = await defaultResponse.json()
             setChannelOptions(defaultData.options || [])
@@ -142,10 +146,39 @@ export default function NotificationSettings({
     } catch (error) {
       console.error('Failed to fetch channel options:', error)
     }
-  }, [organization])
+  }, [organizationId])
+
+  const fetchTemplates = useCallback(async () => {
+    if (!organizationId) return
+
+    try {
+      // Try to fetch templates for the current organization
+      const response = await fetch(`/api/notification-templates?organizationId=${organizationId}`)
+      if (response.ok) {
+        const data = await response.json()
+        const templates = data.templates || []
+
+        // If no templates found for current organization, fetch from DEFAULT
+        if (templates.length === 0 && organizationId !== '9a28807e-4aa9-4ef5-b2c8-f38f4143a016') {
+          const defaultResponse = await fetch(`/api/notification-templates?organizationId=9a28807e-4aa9-4ef5-b2c8-f38f4143a016`)
+          if (defaultResponse.ok) {
+            const defaultData = await defaultResponse.json()
+            setTemplates(defaultData.templates || [])
+            setUsingDefaultTemplates(true)
+            return
+          }
+        }
+
+        setTemplates(templates)
+        setUsingDefaultTemplates(false)
+      }
+    } catch (error) {
+      console.error('Failed to fetch templates:', error)
+    }
+  }, [organizationId])
 
   const fetchData = useCallback(async () => {
-    if (!organization) return
+    if (!organizationId) return
 
     setLoading(true)
     try {
@@ -154,25 +187,21 @@ export default function NotificationSettings({
       } else if (activeTab === 'channels') {
         await fetchChannelOptions()
       } else if (activeTab === 'templates') {
-        const response = await fetch(`/api/notification-templates?organization=${organization}`)
-        if (response.ok) {
-          const data = await response.json()
-          setTemplates(data.templates || [])
-        }
+        await fetchTemplates()
       }
     } catch (error) {
       console.error('Failed to fetch data:', error)
     } finally {
       setLoading(false)
     }
-  }, [organization, activeTab, fetchTypeOptions, fetchChannelOptions])
+  }, [organizationId, activeTab, fetchTypeOptions, fetchChannelOptions, fetchTemplates])
 
   useEffect(() => {
     fetchOrganizations()
   }, [])
 
   useEffect(() => {
-    if (organization) {
+    if (organizationId) {
       fetchData()
       // Always fetch type and channel options when organization changes
       // This ensures they're available for template creation
@@ -183,7 +212,7 @@ export default function NotificationSettings({
         fetchChannelOptions()
       }
     }
-  }, [organization, activeTab, fetchData, fetchTypeOptions, fetchChannelOptions])
+  }, [organizationId, activeTab, fetchData, fetchTypeOptions, fetchChannelOptions])
 
   const handleAddNew = () => {
     if (activeTab === 'types') {
@@ -204,7 +233,7 @@ export default function NotificationSettings({
 
   const handleSaveNew = async () => {
     // Validate organization is selected
-    if (!organization || organization === '') {
+    if (!organizationId || organizationId === '') {
       alert('Please select an organization first')
       return
     }
@@ -234,7 +263,7 @@ export default function NotificationSettings({
 
     try {
       let endpoint = ''
-      let data = { ...newItem, organization }
+      let data = { ...newItem, organizationId }
 
       if (activeTab === 'types') {
         endpoint = '/api/notification-type-options'

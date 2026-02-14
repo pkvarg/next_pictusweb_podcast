@@ -29,12 +29,15 @@ interface MyVehicle {
 
 interface VehicleNotification {
   id: number
-  company: string | null
+  organizationId: string | null
+  organization?: {
+    id: string
+    name: string
+  }
   personName: string | null
   email: string | null
   phoneNumber: string | null
   vehicleRegistration: string | null
-  vehicleType: string | null
   notificationType: string | null
   notificationChannel: string | null
   notificationDate: string | null
@@ -50,7 +53,7 @@ interface VehicleNotification {
 
 interface VehicleGroup {
   vehicleRegistration: string | null
-  vehicleType: string | null
+  vehicleType: string | null  // Keep for display, derived from myVehicle.type
   vehicleImage: string | null
   notifications: VehicleNotification[]
 }
@@ -126,7 +129,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
             if (!vehicleMap.has(key)) {
               vehicleMap.set(key, {
                 vehicleRegistration: notification.vehicleRegistration,
-                vehicleType: notification.vehicleType,
+                vehicleType: notification.myVehicle?.type || null,  // Get from myVehicle relation
                 vehicleImage: notification.myVehicle?.image || null,
                 notifications: [],
               })
@@ -751,7 +754,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
                         <p className="text-pictus-white font-light text-3xl">
                           {notification.vehicleRegistration || 'Nedostupné'}
                         </p>
-                        <p className="text-pictus-white text-lg">{notification.vehicleType}</p>
+                        <p className="text-pictus-white text-lg">{notification.myVehicle?.type || 'N/A'}</p>
                       </div>
                       <div>
                         <p className="text-pictus-lime text-lg">Oznámenie</p>

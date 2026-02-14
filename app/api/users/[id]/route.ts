@@ -15,6 +15,14 @@ export async function GET(
         id: resolvedParams.id,
         deletedAt: null,
       },
+      include: {
+        organizationRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
+      }
     })
 
     if (!user) {
@@ -34,7 +42,7 @@ export async function PUT(
   try {
     const resolvedParams = await params
     const body = await request.json()
-    const { email, firstName, lastName, phoneNumber, organization, active, isFleetManager, password, loginProvider } = body
+    const { email, firstName, lastName, phoneNumber, organizationId, active, isFleetManager, password, loginProvider } = body
 
     // Prepare update data
     const updateData: any = {}
@@ -42,7 +50,12 @@ export async function PUT(
     if (firstName !== undefined) updateData.firstName = firstName
     if (lastName !== undefined) updateData.lastName = lastName
     if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber
-    if (organization !== undefined) updateData.organization = organization
+
+    // Update organizationId if provided
+    if (organizationId !== undefined) {
+      updateData.organizationId = organizationId
+    }
+
     if (active !== undefined) updateData.active = active
     if (isFleetManager !== undefined) updateData.isFleetManager = isFleetManager
     if (loginProvider !== undefined) updateData.loginProvider = loginProvider
@@ -64,6 +77,14 @@ export async function PUT(
         deletedAt: null,
       },
       data: updateData,
+      include: {
+        organizationRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
+      }
     })
 
     console.log(`TESTING: User ${user.email} updated successfully`)

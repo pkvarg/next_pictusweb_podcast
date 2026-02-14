@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../../../lib/isValidPassword'
 import { checkIPBan } from '@/lib/checkIPBan'
+import { checkTierLimit, TierLimitError } from '@/lib/tier-limits'
 
 const prisma = new PrismaClient()
 
@@ -20,18 +21,15 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const organization = searchParams.get('organization')
+    const organizationId = searchParams.get('organizationId')
 
     const whereClause: any = {
       deletedAt: null,
     }
 
     // Filter by organization if provided
-    if (organization) {
-      whereClause.organization = {
-        equals: organization,
-        mode: 'insensitive' as const,
-      }
+    if (organizationId) {
+      whereClause.organizationId = organizationId
     }
 
     const users = await prisma.user.findMany({
@@ -42,7 +40,13 @@ export async function GET(request: NextRequest) {
         firstName: true,
         lastName: true,
         phoneNumber: true,
-        organization: true,
+        organizationId: true,
+        organizationRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        },
         role: true,
         active: true,
         isFleetManager: true,
@@ -74,13 +78,25 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { email, firstName, lastName, phoneNumber, organization, active, isFleetManager, password, loginProvider } = body
+    const { email, firstName, lastName, phoneNumber, organizationId, active, isFleetManager, password, loginProvider } = body
 
     if (!email || !firstName || !lastName) {
       return NextResponse.json(
         { error: 'Email, firstName, and lastName are required' },
         { status: 400 }
       )
+    }
+
+    // Check tier limit if organizationId is provided
+    if (organizationId) {
+      try {
+        await checkTierLimit(organizationId, 'users')
+      } catch (error) {
+        if (error instanceof TierLimitError) {
+          return NextResponse.json({ error: error.message }, { status: 403 })
+        }
+        throw error
+      }
     }
 
     // Hash password if provided, otherwise use default
@@ -103,12 +119,20 @@ export async function POST(request: NextRequest) {
         firstName,
         lastName,
         phoneNumber: phoneNumber || null,
-        organization: organization || null,
+        organizationId: organizationId || null,
         active: active !== undefined ? active : true,
         isFleetManager: isFleetManager || false,
         password: hashedPassword,
         loginProvider: loginProvider || null,
       },
+      include: {
+        organizationRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        }
+      }
     })
 
     return NextResponse.json(user, { status: 201 })

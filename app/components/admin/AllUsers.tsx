@@ -25,6 +25,11 @@ interface User {
   lastName: string | null
   phoneNumber: string | null
   organization: string | null
+  organizationId: string | null
+  organizationRelation?: {
+    id: string
+    name: string
+  }
   active: boolean
   isFleetManager: boolean
   role: string
@@ -62,12 +67,13 @@ export default function AllUsers() {
 
   const filteredUsers = users.filter(user => {
     const searchLower = searchTerm.toLowerCase()
+    const orgName = user.organizationRelation?.name || user.organization || ''
     return (
       user.email.toLowerCase().includes(searchLower) ||
       (user.firstName && user.firstName.toLowerCase().includes(searchLower)) ||
       (user.lastName && user.lastName.toLowerCase().includes(searchLower)) ||
       (user.phoneNumber && user.phoneNumber.toLowerCase().includes(searchLower)) ||
-      (user.organization && user.organization.toLowerCase().includes(searchLower))
+      orgName.toLowerCase().includes(searchLower)
     )
   })
 
@@ -212,7 +218,7 @@ export default function AllUsers() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm text-gray-300">
                       <Building className="h-4 w-4 mr-2 text-gray-400" />
-                      <span>{user.organization || 'N/A'}</span>
+                      <span>{user.organizationRelation?.name || user.organization || 'N/A'}</span>
                       {user.isFleetManager && (
                         <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
                           <Shield className="h-3 w-3 mr-1" />

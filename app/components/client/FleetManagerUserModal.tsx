@@ -19,7 +19,8 @@ interface FleetManagerUserModalProps {
   onClose: () => void
   onSuccess: () => void
   user: User | null
-  organization: string
+  organization: string // This will be the organization name for display
+  organizationId?: string // Optional: UUID of the organization
 }
 
 export default function FleetManagerUserModal({
@@ -28,6 +29,7 @@ export default function FleetManagerUserModal({
   onSuccess,
   user,
   organization,
+  organizationId,
 }: FleetManagerUserModalProps) {
   const [formData, setFormData] = useState({
     email: '',
@@ -93,7 +95,13 @@ export default function FleetManagerUserModal({
 
       // Only include organization for new users
       if (!user) {
-        body.organization = organization
+        // Send organizationId if available, otherwise fall back to organization name
+        if (organizationId) {
+          body.organizationId = organizationId
+          body.organization = organizationId // Also set organization field for backward compatibility
+        } else {
+          body.organization = organization
+        }
       }
 
       // Include password if provided

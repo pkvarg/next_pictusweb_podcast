@@ -40,12 +40,15 @@ interface MyVehicleMileage {
 
 interface VehicleNotification {
   id: number
-  company: string | null
+  organizationId: string | null
+  organization?: {
+    id: string
+    name: string
+  }
   personName: string | null
   email: string | null
   phoneNumber: string | null
   vehicleRegistration: string | null
-  vehicleType: string | null
   myVehicleId: string | null
   notificationType: string | null
   notificationChannel: string | null

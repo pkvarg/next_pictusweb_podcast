@@ -22,12 +22,15 @@ interface MyVehicle {
 
 interface VehicleNotification {
   id: number
-  company: string | null
+  organizationId: string | null
+  organization?: {
+    id: string
+    name: string
+  }
   personName: string | null
   email: string | null
   phoneNumber: string | null
   vehicleRegistration: string | null
-  vehicleType: string | null
   notificationType: string | null
   notificationChannel: string | null
   notificationDate: string | null
@@ -51,7 +54,7 @@ interface TaskGroup {
 
 interface VehicleCard {
   vehicleRegistration: string
-  vehicleType: string | null
+  vehicleType: string | null  // Keep for display, derived from myVehicle.type
   vehicleImage: string | null
   nextTask: VehicleNotification | null
   allTasks: VehicleNotification[]
@@ -177,7 +180,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
 
             cards.push({
               vehicleRegistration,
-              vehicleType: notifications[0]?.vehicleType || null,
+              vehicleType: notifications[0]?.myVehicle?.type || null,  // Get from myVehicle relation
               vehicleImage: notifications[0]?.myVehicle?.image || null,
               nextTask,
               allTasks: notifications,
