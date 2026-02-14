@@ -251,7 +251,7 @@ export default function AllVehicleNotifications() {
         notification.id.toString().includes(searchLower) ||
         (notification.email && notification.email.toLowerCase().includes(searchLower)) ||
         (notification.personName && notification.personName.toLowerCase().includes(searchLower)) ||
-        (notification.company && notification.company.toLowerCase().includes(searchLower)) ||
+        (notification.organization?.name && notification.organization.name.toLowerCase().includes(searchLower)) ||
         (notification.vehicleRegistration &&
           notification.vehicleRegistration.toLowerCase().includes(searchLower)) ||
         (notification.notificationType &&
