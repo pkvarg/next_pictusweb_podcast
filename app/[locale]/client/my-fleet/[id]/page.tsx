@@ -446,18 +446,7 @@ const EditVehiclePage = () => {
                 </div>
               )}
 
-              <div className="mt-4">
-                <p className="text-pictus-lime text-sm mb-2">Alebo vložte URL obrázku:</p>
-                <input
-                  type="url"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="https://example.com/vehicle.jpg"
-                  disabled={!!file}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all disabled:opacity-50"
-                />
-              </div>
+             
             </div>
 
             {/* Note */}

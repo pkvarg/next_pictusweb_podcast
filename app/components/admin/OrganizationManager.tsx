@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import { Building, Plus, Edit2, Trash2, Save, X, Users } from 'lucide-react'
 
-type Tier = 'FREE' | 'PREMIUM' | 'BUSINESS'
-
 interface TierInfo {
   id: string
   name: string
@@ -19,7 +17,6 @@ interface Organization {
   id: string
   name: string
   mainContact: string | null
-  tier: Tier | null
   tierId: string | null
   tierRelation?: TierInfo
   currentUsersCount: number

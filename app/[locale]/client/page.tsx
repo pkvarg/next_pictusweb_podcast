@@ -34,7 +34,6 @@ interface TierInfo {
 interface Organization {
   id: string
   name: string
-  tier: string | null
   tierId: string | null
   tierRelation?: TierInfo
 }

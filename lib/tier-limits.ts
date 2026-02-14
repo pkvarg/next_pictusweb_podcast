@@ -20,8 +20,14 @@ export async function checkTierLimit(
     include: { tierRelation: true }
   });
 
-  if (!org || !org.tierRelation) {
-    throw new Error('Organization or tier not found');
+  if (!org) {
+    throw new Error('Organization not found');
+  }
+
+  // If organization has no tier assigned, skip limit check (no limits)
+  if (!org.tierRelation) {
+    console.log(`[checkTierLimit] Organization ${organizationId} has no tier, skipping limit check`);
+    return;
   }
 
   const limitMap = {

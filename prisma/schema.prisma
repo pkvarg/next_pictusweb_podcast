@@ -260,21 +260,12 @@ model Tier {
   @@map("tiers")
 }
 
-enum TierEnum {
-  FREE
-  PREMIUM
-  BUSINESS
-}
-
 model Organization {
   id                              String         @id @default(uuid())
   name                            String         @db.VarChar(100)
   mainContact                     String?        @map("main_contact") @db.VarChar(100)
 
-  // Old tier enum (will be dropped later)
-  tier                            TierEnum?
-
-  // New tier reference
+  // Tier reference
   tierId                          String?        @map("tier_id")
   tierRelation                    Tier?          @relation(fields: [tierId], references: [id])
 
@@ -284,11 +275,6 @@ model Organization {
   currentNotificationsCount       Int            @default(0) @map("current_notifications_count")
   currentTemplatesCount           Int            @default(0) @map("current_templates_count")
   currentNotificationTypesCount   Int            @default(0) @map("current_notification_types_count")
-
-  // Legacy columns (can be dropped after verification)
-  numberUsers                     Int?           @map("number_users")
-  numberVehicles                  Int?           @map("number_vehicles")
-  numberNotificationTypes         Int?           @map("number_notification_types")
 
   createdAt                       DateTime       @default(now()) @map("created_at")
   updatedAt                       DateTime       @updatedAt @map("updated_at")

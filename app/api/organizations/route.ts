@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, mainContact, parentOrganizationId, tier, tierId } = body
+    const { name, mainContact, parentOrganizationId, tierId } = body
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 })
@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
         name,
         mainContact,
         parentOrganizationId: parentOrganizationId || null,
-        tier: tier || null,
         tierId: tierId || null,
       },
       include: {
@@ -107,7 +106,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, name, mainContact, parentOrganizationId, tier } = body
+    const { id, name, mainContact, parentOrganizationId, tierId } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Organization ID is required' }, { status: 400 })
@@ -119,7 +118,7 @@ export async function PUT(request: NextRequest) {
         name,
         mainContact,
         parentOrganizationId: parentOrganizationId || null,
-        tier: tier || null,
+        tierId: tierId || null,
       },
       include: {
         parentOrganization: {

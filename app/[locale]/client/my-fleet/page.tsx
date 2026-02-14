@@ -61,7 +61,6 @@ interface TierInfo {
 interface Organization {
   id: string
   name: string
-  tier: string | null
   tierId: string | null
   tierRelation?: TierInfo
   currentUsersCount: number
@@ -69,9 +68,6 @@ interface Organization {
   currentNotificationsCount: number
   currentTemplatesCount: number
   currentNotificationTypesCount: number
-  numberUsers: number | null
-  numberVehicles: number | null
-  numberNotificationTypes: number | null
 }
 
 interface User {
@@ -518,9 +514,9 @@ const MyFleetPage = () => {
                 <p className="text-2xl text-pictus-lime flex items-center gap-2">
                   <Building size={20} />
                   {organization.name}
-                  {organization.tier && (
+                  {organization.tierRelation && (
                     <span className="text-sm bg-pictus-lime/20 px-2 py-1 rounded">
-                      {organization.tier}
+                      {organization.tierRelation.name}
                     </span>
                   )}
                 </p>
@@ -565,7 +561,7 @@ const MyFleetPage = () => {
               <Bell size={20} />
               Notifikácie
             </button>
-            {organization?.tier === 'BUSINESS' && (
+            {organization?.tierRelation?.name === 'BUSINESS' && (
               <>
                 <button
                   onClick={() => setActiveTab('templates')}
@@ -1187,7 +1183,7 @@ const MyFleetPage = () => {
                 {organization ? (
                   <NotificationBuilder
                     organization={organization.name}
-                    organizationTier={organization.tier}
+                    organizationTier={organization.tierRelation?.name || null}
                     hideChannelDropdown={true}
                     duplicateData={duplicateNotificationData}
                     onSuccess={() => {
@@ -1212,7 +1208,7 @@ const MyFleetPage = () => {
         )}
 
         {/* Templates Tab (Business tier only) */}
-        {activeTab === 'templates' && organization?.tier === 'BUSINESS' && (
+        {activeTab === 'templates' && organization?.tierRelation?.name === 'BUSINESS' && (
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
               <h2 className="text-2xl font-bold text-white mb-2">Šablóny notifikácií</h2>
@@ -1233,7 +1229,7 @@ const MyFleetPage = () => {
         )}
 
         {/* Types Tab (Business tier only) */}
-        {activeTab === 'types' && organization?.tier === 'BUSINESS' && (
+        {activeTab === 'types' && organization?.tierRelation?.name === 'BUSINESS' && (
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
               <h2 className="text-2xl font-bold text-white mb-2">Typy notifikácií</h2>

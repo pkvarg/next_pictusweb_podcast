@@ -285,7 +285,9 @@ const NewVehiclePage = () => {
           <div className="space-y-6">
             {/* Type */}
             <div>
-              <label className="block text-pictus-white text-lg font-light mb-2">Typ vozidla *</label>
+              <label className="block text-pictus-white text-lg font-light mb-2">
+                Typ vozidla *
+              </label>
               <input
                 type="text"
                 name="type"
@@ -330,7 +332,9 @@ const NewVehiclePage = () => {
 
             {/* Image Upload */}
             <div>
-              <label className="block text-pictus-white text-lg font-light mb-2">Obrázok vozidla</label>
+              <label className="block text-pictus-white text-lg font-light mb-2">
+                Obrázok vozidla
+              </label>
 
               {!filePreview ? (
                 <div className="border-2 border-dashed border-pictus-lime/30 rounded-lg p-6 text-center hover:border-pictus-lime/50 transition">
@@ -371,19 +375,6 @@ const NewVehiclePage = () => {
                   </button>
                 </div>
               )}
-
-              <div className="mt-4">
-                <p className="text-pictus-lime text-sm mb-2">Alebo vložte URL obrázku:</p>
-                <input
-                  type="url"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="https://example.com/vehicle.jpg"
-                  disabled={!!file}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all disabled:opacity-50"
-                />
-              </div>
             </div>
 
             {/* Note */}
