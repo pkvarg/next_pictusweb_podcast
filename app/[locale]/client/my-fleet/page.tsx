@@ -233,9 +233,16 @@ const MyFleetPage = () => {
   }, [])
 
   const fetchNotifications = useCallback(async () => {
+    // Get organizationId from session
+    const orgId = (session?.user as any)?.organizationId || session?.user?.organization
+    if (!orgId) {
+      console.log('No organizationId found, skipping notifications fetch')
+      return
+    }
+
     try {
       setNotificationsLoading(true)
-      const response = await fetch('/api/vehicle-notifications')
+      const response = await fetch(`/api/vehicle-notifications?organizationId=${orgId}`)
       if (response.ok) {
         const data = await response.json()
         const allNotifications = Array.isArray(data.notifications) ? data.notifications : []
@@ -247,7 +254,7 @@ const MyFleetPage = () => {
     } finally {
       setNotificationsLoading(false)
     }
-  }, [])
+  }, [session?.user])
 
   useEffect(() => {
     // Check if user is authenticated and is fleet manager
@@ -1177,21 +1184,28 @@ const MyFleetPage = () => {
                 >
                   ← Späť na zoznam
                 </button>
-                <NotificationBuilder
-                  organization={organization?.name || ''}
-                  organizationTier={organization?.tier}
-                  hideChannelDropdown={true}
-                  duplicateData={duplicateNotificationData}
-                  onSuccess={() => {
-                    setShowNotificationBuilder(false)
-                    setDuplicateNotificationData(null)
-                    fetchNotifications()
-                  }}
-                  onCancel={() => {
-                    setShowNotificationBuilder(false)
-                    setDuplicateNotificationData(null)
-                  }}
-                />
+                {organization ? (
+                  <NotificationBuilder
+                    organization={organization.name}
+                    organizationTier={organization.tier}
+                    hideChannelDropdown={true}
+                    duplicateData={duplicateNotificationData}
+                    onSuccess={() => {
+                      setShowNotificationBuilder(false)
+                      setDuplicateNotificationData(null)
+                      fetchNotifications()
+                    }}
+                    onCancel={() => {
+                      setShowNotificationBuilder(false)
+                      setDuplicateNotificationData(null)
+                    }}
+                  />
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime mx-auto mb-4"></div>
+                    <p className="text-gray-400">Načítavam organizáciu...</p>
+                  </div>
+                )}
               </div>
             )}
           </>

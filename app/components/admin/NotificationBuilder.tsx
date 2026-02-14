@@ -144,18 +144,25 @@ export default function NotificationBuilder({
     if (!organizationId) return
     try {
       // Try to fetch options for the current organization
+      console.log('[NotificationBuilder] Fetching type options for organizationId:', organizationId)
       const response = await fetch(`/api/notification-type-options?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
         const options = data.options || []
+        console.log('[NotificationBuilder] Received type options:', options.length, 'options')
+        if (options.length > 0) {
+          console.log('[NotificationBuilder] First type option org:', options[0].organizationRelation?.name)
+        }
 
         // If no options found for current organization, fetch from DEFAULT
         if (options.length === 0) {
+          console.log('[NotificationBuilder] No options found, trying DEFAULT org')
           const defaultOrg = organizations.find(org => org.name === 'DEFAULT')
           if (defaultOrg) {
             const defaultResponse = await fetch(`/api/notification-type-options?organizationId=${defaultOrg.id}`)
             if (defaultResponse.ok) {
               const defaultData = await defaultResponse.json()
+              console.log('[NotificationBuilder] Using DEFAULT org options:', defaultData.options?.length || 0)
               setTypeOptions(defaultData.options || [])
               setUsingDefaultTypeOptions(true)
               return
@@ -205,9 +212,14 @@ export default function NotificationBuilder({
   const fetchVehicles = useCallback(async () => {
     if (!organizationId) return
     try {
+      console.log('[NotificationBuilder] Fetching vehicles for organizationId:', organizationId)
       const response = await fetch(`/api/my-vehicles?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
+        console.log('[NotificationBuilder] Received vehicles:', data.vehicles?.length || 0, 'vehicles')
+        if (data.vehicles?.length > 0) {
+          console.log('[NotificationBuilder] First vehicle org:', data.vehicles[0].organizationRelation?.name)
+        }
         setVehicles(data.vehicles || [])
       }
     } catch (error) {
@@ -248,9 +260,14 @@ export default function NotificationBuilder({
   // Set organizationId when initialOrganization is provided or organizations load
   useEffect(() => {
     if (initialOrganization && organizations.length > 0 && !organizationId) {
+      console.log('[NotificationBuilder] Looking up organization:', initialOrganization)
+      console.log('[NotificationBuilder] Available organizations:', organizations.map(o => o.name))
       const org = organizations.find(o => o.name === initialOrganization)
       if (org) {
+        console.log('[NotificationBuilder] Found organization:', org.name, 'ID:', org.id)
         setOrganizationId(org.id)
+      } else {
+        console.warn('[NotificationBuilder] Organization not found:', initialOrganization)
       }
     }
   }, [initialOrganization, organizations, organizationId])
