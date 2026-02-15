@@ -309,6 +309,19 @@ const OnboardClientPage = () => {
           <p className="text-xl text-pictus-white/70">
             Vytvorte novú organizáciu a priraďte používateľa
           </p>
+          <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg max-w-2xl mx-auto">
+            <p className="text-blue-300 text-base">
+              📄 Pošli klientovi súhlas s GDPR tu:{' '}
+              <a
+                href="https://docuseal.pictusweb.sk/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-pictus-lime hover:text-pictus-lime400 underline transition-colors"
+              >
+                https://docuseal.pictusweb.sk/
+              </a>
+            </p>
+          </div>
         </div>
 
         {/* Progress Steps */}
