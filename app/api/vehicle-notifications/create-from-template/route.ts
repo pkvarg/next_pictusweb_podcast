@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
       email,
       phoneNumber,
       organizationId,
+      dutyBatchId,
     } = body
 
     if (!dutyDate) {
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
       phoneNumber,
       dutyDate: new Date(dutyDate),
       status: 'imported',
+      dutyBatchId: dutyBatchId || null,
     }
 
     if (vehicleId) {

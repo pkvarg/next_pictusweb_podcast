@@ -106,6 +106,7 @@ interface User {
 
 interface VehicleNotification {
   id: number
+  dutyBatchId: string | null
   organizationId: string | null
   organization?: {
     id: string

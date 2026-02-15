@@ -23,6 +23,7 @@ interface MyVehicle {
 
 interface VehicleNotification {
   id: number
+  dutyBatchId: string | null
   myVehicleId: string | null
   vehicleRegistration: string | null
   notificationType: string | null

@@ -542,6 +542,11 @@ export default function NotificationBuilder({
           return notificationDate >= today
         })
 
+        // Generate a batch ID only if there are multiple valid intervals
+        const dutyBatchId = validIntervals.length > 1
+          ? `batch_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+          : null
+
         const promises = validIntervals.map(offset => {
           const dutyDate = new Date(formData.dutyDate)
           const notificationDate = new Date(dutyDate)
@@ -550,6 +555,7 @@ export default function NotificationBuilder({
           const payload = {
             ...formData,
             notificationDate: notificationDate.toISOString().split('T')[0],
+            dutyBatchId, // Include batch ID in payload
           }
 
           console.log('Creating notification with payload:', payload)
