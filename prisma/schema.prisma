@@ -93,6 +93,8 @@ model VehicleNotification {
   id                   Int           @id @default(autoincrement())
   dutyBatchId          String?       @map("duty_batch_id") @db.VarChar(50)
   isPdr                Boolean       @default(false) @map("is_pdr")
+  pdrReminderFor       String?       @map("pdr_reminder_for") @db.VarChar(50) // For PDR reminder: which batch it reminds about
+  renewedFromBatchId   String?       @map("renewed_from_batch_id") @db.VarChar(50) // Tracks renewal lineage
   organizationId       String?       @map("organization_id")  // TEXT to match organizations.id
   organization         Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   personName           String?       @db.VarChar(100)
@@ -124,6 +126,8 @@ model VehicleNotification {
   @@index([myVehicleId])
   @@index([dutyBatchId])
   @@index([isPdr])
+  @@index([pdrReminderFor])
+  @@index([renewedFromBatchId])
   @@index([organizationId])
   @@map("vehiclenotification")
 }
@@ -292,6 +296,7 @@ model Organization {
   notificationTypeOptions         NotificationTypeOption[]
   notificationChannelOptions      NotificationChannelOption[]
   vehicleNotifications            VehicleNotification[]
+  dutyRenewalPresets              DutyRenewalPreset[]
 
   @@index([tierId])
   @@index([parentOrganizationId])
@@ -344,4 +349,24 @@ model NotificationChannelOption {
 
   @@index([organizationId])
   @@map("notification_channel_options")
+}
+
+model DutyRenewalPreset {
+  id                   String        @id @default(uuid())
+  notificationTypeId   String?       @map("notification_type_id")
+  notificationTypeLabel String?      @map("notification_type_label") @db.VarChar(50)
+  organizationId       String        @map("organization_id")
+  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
+
+  // Preset options - stored as comma-separated or JSON
+  presetMonths         String        @map("preset_months") @db.VarChar(100) // e.g., "6,12,24"
+  presetLabels         String        @map("preset_labels") @db.VarChar(255) // e.g., "+6 mesiacov,+1 rok,+2 roky"
+  defaultPresetIndex   Int           @default(0) @map("default_preset_index")
+
+  createdAt            DateTime      @default(now()) @map("created_at")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+
+  @@index([organizationId])
+  @@index([notificationTypeId])
+  @@map("duty_renewal_presets")
 }

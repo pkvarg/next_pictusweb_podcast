@@ -21,6 +21,7 @@ interface TypeOption {
   label: string
   sortOrder: number
   isActive: boolean
+  isPdr?: boolean
   organizationRelation?: {
     id: string
     name: string
@@ -95,140 +96,256 @@ export default function NotificationSettings({
   }
 
   const fetchTypeOptions = useCallback(async () => {
-    if (!organizationId) return
+    if (!organizationId) {
+      console.log('[NotificationSettings] No organizationId, skipping fetch')
+      setTypeOptions([])
+      setUsingDefaultTypeOptions(false)
+      return
+    }
 
     try {
       // Try to fetch options for the current organization
       console.log('[NotificationSettings] Fetching type options for org:', organizationId)
-      const response = await fetch(`/api/notification-type-options?organizationId=${organizationId}`)
-      if (response.ok) {
-        const data = await response.json()
-        const options = data.options || []
-        console.log('[NotificationSettings] Received options:', options.length, 'Setting usingDefaultTypeOptions to:', options.length === 0)
+      const response = await fetch(
+        `/api/notification-type-options?organizationId=${organizationId}`,
+      )
 
-        // If we have options for this organization, use them
-        if (options.length > 0) {
-          console.log('[NotificationSettings] Using org-specific options')
-          console.log('[NotificationSettings] Options belong to org:', options[0]?.organizationRelation?.name)
-          console.log('[NotificationSettings] Full options:', options.map(o => ({ label: o.label, org: o.organizationRelation?.name })))
-          setTypeOptions(options)
-          setUsingDefaultTypeOptions(false)
-          return
-        }
-
-        // If no options found for current organization, fetch from DEFAULT
-        console.log('[NotificationSettings] No options found, fetching DEFAULT organization')
-        const orgsResponse = await fetch('/api/organizations')
-        if (orgsResponse.ok) {
-          const orgsData = await orgsResponse.json()
-          const defaultOrg = orgsData.organizations?.find((org: Organization) => org.name === 'DEFAULT')
-
-          if (defaultOrg && organizationId !== defaultOrg.id) {
-            console.log('[NotificationSettings] Fetching from DEFAULT org:', defaultOrg.id)
-            const defaultResponse = await fetch(`/api/notification-type-options?organizationId=${defaultOrg.id}`)
-            if (defaultResponse.ok) {
-              const defaultData = await defaultResponse.json()
-              console.log('[NotificationSettings] Using DEFAULT options:', defaultData.options?.length || 0)
-              setTypeOptions(defaultData.options || [])
-              setUsingDefaultTypeOptions(true)
-              return
-            }
-          }
-        }
-
-        // Fallback: no options at all
-        console.log('[NotificationSettings] No options available')
+      if (!response.ok) {
+        console.error(
+          '[NotificationSettings] API response not OK:',
+          response.status,
+          response.statusText,
+        )
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('[NotificationSettings] Error data:', errorData)
         setTypeOptions([])
         setUsingDefaultTypeOptions(false)
+        return
       }
+
+      const data = await response.json()
+      const options = data.options || []
+      console.log(
+        '[NotificationSettings] Received options:',
+        options.length,
+        'Setting usingDefaultTypeOptions to:',
+        options.length === 0,
+      )
+
+      // If we have options for this organization, use them
+      if (options.length > 0) {
+        console.log('[NotificationSettings] Using org-specific options')
+        console.log(
+          '[NotificationSettings] Options belong to org:',
+          options[0]?.organizationRelation?.name,
+        )
+        console.log(
+          '[NotificationSettings] Full options:',
+          options.map((o) => ({ label: o.label, org: o.organizationRelation?.name })),
+        )
+        setTypeOptions(options)
+        setUsingDefaultTypeOptions(false)
+        return
+      }
+
+      // If no options found for current organization, fetch from DEFAULT
+      console.log('[NotificationSettings] No options found, fetching DEFAULT organization')
+      const orgsResponse = await fetch('/api/organizations')
+      if (!orgsResponse.ok) {
+        console.error('[NotificationSettings] Failed to fetch organizations')
+        setTypeOptions([])
+        setUsingDefaultTypeOptions(false)
+        return
+      }
+
+      const orgsData = await orgsResponse.json()
+      const defaultOrg = orgsData.organizations?.find((org: Organization) => org.name === 'DEFAULT')
+
+      if (defaultOrg && organizationId !== defaultOrg.id) {
+        console.log('[NotificationSettings] Fetching from DEFAULT org:', defaultOrg.id)
+        const defaultResponse = await fetch(
+          `/api/notification-type-options?organizationId=${defaultOrg.id}`,
+        )
+        if (defaultResponse.ok) {
+          const defaultData = await defaultResponse.json()
+          console.log(
+            '[NotificationSettings] Using DEFAULT options:',
+            defaultData.options?.length || 0,
+          )
+          setTypeOptions(defaultData.options || [])
+          setUsingDefaultTypeOptions(true)
+          return
+        } else {
+          console.error('[NotificationSettings] Failed to fetch DEFAULT options')
+        }
+      }
+
+      // Fallback: no options at all
+      console.log('[NotificationSettings] No options available')
+      setTypeOptions([])
+      setUsingDefaultTypeOptions(false)
     } catch (error) {
-      console.error('Failed to fetch type options:', error)
+      console.error('[NotificationSettings] Exception in fetchTypeOptions:', error)
+      setTypeOptions([])
+      setUsingDefaultTypeOptions(false)
     }
   }, [organizationId])
 
   const fetchChannelOptions = useCallback(async () => {
-    if (!organizationId) return
+    if (!organizationId) {
+      console.log('[NotificationSettings] No organizationId, skipping channel options fetch')
+      setChannelOptions([])
+      setUsingDefaultChannelOptions(false)
+      return
+    }
 
     try {
       // Try to fetch options for the current organization
       console.log('[NotificationSettings] Fetching channel options for org:', organizationId)
-      const response = await fetch(`/api/notification-channel-options?organizationId=${organizationId}`)
-      if (response.ok) {
-        const data = await response.json()
-        const options = data.options || []
-        console.log('[NotificationSettings] Received channel options:', options.length, 'Setting usingDefaultChannelOptions to:', options.length === 0)
+      const response = await fetch(
+        `/api/notification-channel-options?organizationId=${organizationId}`,
+      )
 
-        // If we have options for this organization, use them
-        if (options.length > 0) {
-          console.log('[NotificationSettings] Using org-specific channel options')
-          setChannelOptions(options)
-          setUsingDefaultChannelOptions(false)
-          return
-        }
-
-        // If no options found for current organization, fetch from DEFAULT
-        console.log('[NotificationSettings] No channel options found, fetching DEFAULT organization')
-        const orgsResponse = await fetch('/api/organizations')
-        if (orgsResponse.ok) {
-          const orgsData = await orgsResponse.json()
-          const defaultOrg = orgsData.organizations?.find((org: Organization) => org.name === 'DEFAULT')
-
-          if (defaultOrg && organizationId !== defaultOrg.id) {
-            console.log('[NotificationSettings] Fetching from DEFAULT org:', defaultOrg.id)
-            const defaultResponse = await fetch(`/api/notification-channel-options?organizationId=${defaultOrg.id}`)
-            if (defaultResponse.ok) {
-              const defaultData = await defaultResponse.json()
-              console.log('[NotificationSettings] Using DEFAULT channel options:', defaultData.options?.length || 0)
-              setChannelOptions(defaultData.options || [])
-              setUsingDefaultChannelOptions(true)
-              return
-            }
-          }
-        }
-
-        // Fallback: no options at all
-        console.log('[NotificationSettings] No channel options available')
+      if (!response.ok) {
+        console.error(
+          '[NotificationSettings] Channel options API response not OK:',
+          response.status,
+        )
         setChannelOptions([])
         setUsingDefaultChannelOptions(false)
+        return
       }
+
+      const data = await response.json()
+      const options = data.options || []
+      console.log(
+        '[NotificationSettings] Received channel options:',
+        options.length,
+        'Setting usingDefaultChannelOptions to:',
+        options.length === 0,
+      )
+
+      // If we have options for this organization, use them
+      if (options.length > 0) {
+        console.log('[NotificationSettings] Using org-specific channel options')
+        setChannelOptions(options)
+        setUsingDefaultChannelOptions(false)
+        return
+      }
+
+      // If no options found for current organization, fetch from DEFAULT
+      console.log('[NotificationSettings] No channel options found, fetching DEFAULT organization')
+      const orgsResponse = await fetch('/api/organizations')
+      if (!orgsResponse.ok) {
+        console.error('[NotificationSettings] Failed to fetch organizations for channel options')
+        setChannelOptions([])
+        setUsingDefaultChannelOptions(false)
+        return
+      }
+
+      const orgsData = await orgsResponse.json()
+      const defaultOrg = orgsData.organizations?.find((org: Organization) => org.name === 'DEFAULT')
+
+      if (defaultOrg && organizationId !== defaultOrg.id) {
+        console.log('[NotificationSettings] Fetching from DEFAULT org:', defaultOrg.id)
+        const defaultResponse = await fetch(
+          `/api/notification-channel-options?organizationId=${defaultOrg.id}`,
+        )
+        if (defaultResponse.ok) {
+          const defaultData = await defaultResponse.json()
+          console.log(
+            '[NotificationSettings] Using DEFAULT channel options:',
+            defaultData.options?.length || 0,
+          )
+          setChannelOptions(defaultData.options || [])
+          setUsingDefaultChannelOptions(true)
+          return
+        } else {
+          console.error('[NotificationSettings] Failed to fetch DEFAULT channel options')
+        }
+      }
+
+      // Fallback: no options at all
+      console.log('[NotificationSettings] No channel options available')
+      setChannelOptions([])
+      setUsingDefaultChannelOptions(false)
     } catch (error) {
-      console.error('Failed to fetch channel options:', error)
+      console.error('[NotificationSettings] Exception in fetchChannelOptions:', error)
+      setChannelOptions([])
+      setUsingDefaultChannelOptions(false)
     }
   }, [organizationId])
 
   const fetchTemplates = useCallback(async () => {
-    if (!organizationId) return
+    if (!organizationId) {
+      console.log('[NotificationSettings] No organizationId, skipping templates fetch')
+      setTemplates([])
+      setUsingDefaultTemplates(false)
+      return
+    }
 
     try {
       // Try to fetch templates for the current organization
+      console.log('[NotificationSettings] Fetching templates for org:', organizationId)
       const response = await fetch(`/api/notification-templates?organizationId=${organizationId}`)
-      if (response.ok) {
-        const data = await response.json()
-        const templates = data.templates || []
 
-        // If no templates found for current organization, fetch from DEFAULT
-        if (templates.length === 0 && organizationId !== '9a28807e-4aa9-4ef5-b2c8-f38f4143a016') {
-          const defaultResponse = await fetch(`/api/notification-templates?organizationId=9a28807e-4aa9-4ef5-b2c8-f38f4143a016`)
-          if (defaultResponse.ok) {
-            const defaultData = await defaultResponse.json()
-            setTemplates(defaultData.templates || [])
-            setUsingDefaultTemplates(true)
-            return
-          }
-        }
-
-        setTemplates(templates)
+      if (!response.ok) {
+        console.error('[NotificationSettings] Templates API response not OK:', response.status)
+        setTemplates([])
         setUsingDefaultTemplates(false)
+        return
       }
+
+      const data = await response.json()
+      const templates = data.templates || []
+      console.log('[NotificationSettings] Received templates:', templates.length)
+
+      // If no templates found for current organization, fetch from DEFAULT
+      if (templates.length === 0 && organizationId !== '9a28807e-4aa9-4ef5-b2c8-f38f4143a016') {
+        console.log('[NotificationSettings] No templates found, fetching from DEFAULT')
+        const defaultResponse = await fetch(
+          `/api/notification-templates?organizationId=9a28807e-4aa9-4ef5-b2c8-f38f4143a016`,
+        )
+        if (defaultResponse.ok) {
+          const defaultData = await defaultResponse.json()
+          console.log(
+            '[NotificationSettings] Using DEFAULT templates:',
+            defaultData.templates?.length || 0,
+          )
+          setTemplates(defaultData.templates || [])
+          setUsingDefaultTemplates(true)
+          return
+        } else {
+          console.error('[NotificationSettings] Failed to fetch DEFAULT templates')
+        }
+      }
+
+      setTemplates(templates)
+      setUsingDefaultTemplates(false)
     } catch (error) {
-      console.error('Failed to fetch templates:', error)
+      console.error('[NotificationSettings] Exception in fetchTemplates:', error)
+      setTemplates([])
+      setUsingDefaultTemplates(false)
     }
   }, [organizationId])
 
   const fetchData = useCallback(async () => {
-    if (!organizationId) return
+    console.log(
+      '[NotificationSettings] fetchData called - organizationId:',
+      organizationId,
+      'activeTab:',
+      activeTab,
+    )
+
+    if (!organizationId) {
+      console.log('[NotificationSettings] No organizationId, setting loading to false')
+      setLoading(false)
+      return
+    }
 
     setLoading(true)
+    console.log('[NotificationSettings] Starting data fetch for tab:', activeTab)
+
     try {
       if (activeTab === 'types') {
         await fetchTypeOptions()
@@ -237,12 +354,44 @@ export default function NotificationSettings({
       } else if (activeTab === 'templates') {
         await fetchTemplates()
       }
+      console.log('[NotificationSettings] Data fetch completed for tab:', activeTab)
     } catch (error) {
-      console.error('Failed to fetch data:', error)
+      console.error('[NotificationSettings] Failed to fetch data:', error)
     } finally {
+      console.log('[NotificationSettings] Setting loading to false')
       setLoading(false)
     }
   }, [organizationId, activeTab, fetchTypeOptions, fetchChannelOptions, fetchTemplates])
+
+  // Sync organizationId state when prop changes
+  useEffect(() => {
+    console.log(
+      '[NotificationSettings] Prop initialOrganizationId changed to:',
+      initialOrganizationId,
+    )
+    if (initialOrganizationId && initialOrganizationId !== organizationId) {
+      console.log(
+        '[NotificationSettings] Updating organizationId state from',
+        organizationId,
+        'to',
+        initialOrganizationId,
+      )
+      setOrganizationId(initialOrganizationId)
+    }
+  }, [initialOrganizationId])
+
+  // Sync organization name when prop changes
+  useEffect(() => {
+    if (initialOrganization && initialOrganization !== organization) {
+      console.log(
+        '[NotificationSettings] Updating organization name from',
+        organization,
+        'to',
+        initialOrganization,
+      )
+      setOrganization(initialOrganization)
+    }
+  }, [initialOrganization])
 
   useEffect(() => {
     fetchOrganizations()
@@ -251,21 +400,41 @@ export default function NotificationSettings({
   // Log when organizations are loaded
   useEffect(() => {
     if (organizations.length > 0) {
-      console.log('[NotificationSettings] Organizations loaded:', organizations.map(o => o.name))
+      console.log(
+        '[NotificationSettings] Organizations loaded:',
+        organizations.map((o) => o.name),
+      )
     }
   }, [organizations])
 
   // Debug: Log state changes
   useEffect(() => {
-    console.log('[NotificationSettings] State update - typeOptions:', typeOptions.length, 'usingDefaultTypeOptions:', usingDefaultTypeOptions)
+    console.log(
+      '[NotificationSettings] State update - typeOptions:',
+      typeOptions.length,
+      'usingDefaultTypeOptions:',
+      usingDefaultTypeOptions,
+    )
   }, [typeOptions, usingDefaultTypeOptions])
 
   useEffect(() => {
-    console.log('[NotificationSettings] State update - channelOptions:', channelOptions.length, 'usingDefaultChannelOptions:', usingDefaultChannelOptions)
+    console.log(
+      '[NotificationSettings] State update - channelOptions:',
+      channelOptions.length,
+      'usingDefaultChannelOptions:',
+      usingDefaultChannelOptions,
+    )
   }, [channelOptions, usingDefaultChannelOptions])
 
   useEffect(() => {
+    console.log(
+      '[NotificationSettings] useEffect triggered - organizationId:',
+      organizationId,
+      'activeTab:',
+      activeTab,
+    )
     if (organizationId) {
+      console.log('[NotificationSettings] Calling fetchData')
       fetchData()
       // Always fetch type and channel options when organization changes
       // This ensures they're available for template creation
@@ -275,12 +444,16 @@ export default function NotificationSettings({
       if (activeTab !== 'channels') {
         fetchChannelOptions()
       }
+    } else {
+      // No organizationId, stop loading immediately
+      console.log('[NotificationSettings] No organizationId in useEffect, setting loading to false')
+      setLoading(false)
     }
   }, [organizationId, activeTab, fetchData, fetchTypeOptions, fetchChannelOptions])
 
   const handleAddNew = () => {
     if (activeTab === 'types') {
-      setNewItem({ label: '', sortOrder: typeOptions.length })
+      setNewItem({ label: '', sortOrder: typeOptions.length, isPdr: false })
     } else if (activeTab === 'channels') {
       setNewItem({ label: '', sortOrder: channelOptions.length })
     } else if (activeTab === 'templates') {
@@ -315,8 +488,8 @@ export default function NotificationSettings({
       }
 
       // Check if intervals are reasonable (not too far in past or future)
-      const hasExtremValues = newItem.reminderIntervals.some((interval: number) =>
-        interval < -365 || interval > 1095
+      const hasExtremValues = newItem.reminderIntervals.some(
+        (interval: number) => interval < -365 || interval > 1095,
       )
       if (hasExtremValues) {
         if (!confirm('Máte intervaly mimo rozsahu -365 až +1095 dní (3 roky). Pokračovať?')) {
@@ -439,30 +612,36 @@ export default function NotificationSettings({
       return
     }
 
-    if (!confirm(`Importovať ${selectedItems.size} ${activeTab === 'types' ? 'typov' : 'kanálov'} do organizácie ${organization}?`)) {
+    if (
+      !confirm(
+        `Importovať ${selectedItems.size} ${activeTab === 'types' ? 'typov' : 'kanálov'} do organizácie ${organization}?`,
+      )
+    ) {
       return
     }
 
     try {
       setImporting(true)
-      const endpoint = activeTab === 'types'
-        ? '/api/notification-type-options/bulk-import'
-        : '/api/notification-channel-options/bulk-import'
+      const endpoint =
+        activeTab === 'types'
+          ? '/api/notification-type-options/bulk-import'
+          : '/api/notification-channel-options/bulk-import'
 
-      const itemsToImport = activeTab === 'types'
-        ? typeOptions.filter(opt => selectedItems.has(opt.id))
-        : channelOptions.filter(opt => selectedItems.has(opt.id))
+      const itemsToImport =
+        activeTab === 'types'
+          ? typeOptions.filter((opt) => selectedItems.has(opt.id))
+          : channelOptions.filter((opt) => selectedItems.has(opt.id))
 
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           organizationId, // Changed from 'organization' to 'organizationId'
-          items: itemsToImport.map(item => ({
+          items: itemsToImport.map((item) => ({
             label: item.label,
             sortOrder: item.sortOrder,
             isPdr: (item as any).isPdr || false, // Include isPdr for type options
-          }))
+          })),
         }),
       })
 
@@ -505,11 +684,11 @@ export default function NotificationSettings({
   }
 
   const selectAllTypes = () => {
-    setSelectedTypes(new Set(typeOptions.map(opt => opt.id)))
+    setSelectedTypes(new Set(typeOptions.map((opt) => opt.id)))
   }
 
   const selectAllChannels = () => {
-    setSelectedChannels(new Set(channelOptions.map(opt => opt.id)))
+    setSelectedChannels(new Set(channelOptions.map((opt) => opt.id)))
   }
 
   return (
@@ -522,13 +701,23 @@ export default function NotificationSettings({
             Organizácia *
           </label>
           <select
-            value={organization}
-            onChange={(e) => setOrganization(e.target.value)}
+            value={organizationId}
+            onChange={(e) => {
+              const selectedOrgId = e.target.value
+              const selectedOrg = organizations.find((o) => o.id === selectedOrgId)
+              console.log(
+                '[NotificationSettings] Organization selected:',
+                selectedOrgId,
+                selectedOrg?.name,
+              )
+              setOrganizationId(selectedOrgId)
+              setOrganization(selectedOrg?.name || '')
+            }}
             className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
           >
             <option value="">Vyberte organizáciu...</option>
             {organizations.map((org) => (
-              <option key={org.id} value={org.name}>
+              <option key={org.id} value={org.id}>
                 {org.name}
               </option>
             ))}
@@ -540,7 +729,7 @@ export default function NotificationSettings({
         </div>
       )}
 
-      {!organization ? (
+      {!organizationId || organizationId.trim() === '' ? (
         <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-12 border border-pictus-lime/30 text-center">
           <Settings className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-2xl font-light text-pictus-white mb-2">
@@ -620,7 +809,7 @@ export default function NotificationSettings({
                       typeOptions: typeOptions.length,
                       usingDefaultTypeOptions,
                       channelOptions: channelOptions.length,
-                      usingDefaultChannelOptions
+                      usingDefaultChannelOptions,
                     })
                     fetchData()
                   }}
@@ -639,7 +828,8 @@ export default function NotificationSettings({
             </div>
 
             {/* Import Banner */}
-            {((activeTab === 'types' && usingDefaultTypeOptions) || (activeTab === 'channels' && usingDefaultChannelOptions)) && (
+            {((activeTab === 'types' && usingDefaultTypeOptions) ||
+              (activeTab === 'channels' && usingDefaultChannelOptions)) && (
               <div className="mb-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -648,8 +838,9 @@ export default function NotificationSettings({
                       Používajú sa predvolené {activeTab === 'types' ? 'typy' : 'kanály'}
                     </h4>
                     <p className="text-blue-200 text-sm mb-3">
-                      Momentálne nemáte definované vlastné {activeTab === 'types' ? 'typy' : 'kanály'}, preto sa zobrazujú predvolené možnosti.
-                      Môžete ich importovať do svojej organizácie a následne upraviť.
+                      Momentálne nemáte definované vlastné{' '}
+                      {activeTab === 'types' ? 'typy' : 'kanály'}, preto sa zobrazujú predvolené
+                      možnosti. Môžete ich importovať do svojej organizácie a následne upraviť.
                     </p>
                     <div className="flex items-center gap-3">
                       <button
@@ -672,11 +863,18 @@ export default function NotificationSettings({
                   </div>
                   <button
                     onClick={handleImportDefaults}
-                    disabled={importing || (activeTab === 'types' ? selectedTypes.size === 0 : selectedChannels.size === 0)}
+                    disabled={
+                      importing ||
+                      (activeTab === 'types'
+                        ? selectedTypes.size === 0
+                        : selectedChannels.size === 0)
+                    }
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all whitespace-nowrap"
                   >
                     <Download className="w-5 h-5" />
-                    {importing ? 'Importujem...' : `Importovať vybrané (${activeTab === 'types' ? selectedTypes.size : selectedChannels.size})`}
+                    {importing
+                      ? 'Importujem...'
+                      : `Importovať vybrané (${activeTab === 'types' ? selectedTypes.size : selectedChannels.size})`}
                   </button>
                 </div>
               </div>
@@ -697,33 +895,62 @@ export default function NotificationSettings({
                       </div>
                     )}
                     {(activeTab === 'types' || activeTab === 'channels') && (
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-pictus-lime text-xs mb-1">Názov *</label>
-                          <input
-                            type="text"
-                            placeholder="napr., Email, SMS.."
-                            value={newItem.label}
-                            onChange={(e) => setNewItem({ ...newItem, label: e.target.value })}
-                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
-                          />
-                          <p className="text-gray-500 text-xs mt-1">
-                            Zobrazovaný názov pre túto možnosť
-                          </p>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-pictus-lime text-xs mb-1">Názov *</label>
+                            <input
+                              type="text"
+                              placeholder="napr., Email, SMS.."
+                              value={newItem.label}
+                              onChange={(e) => setNewItem({ ...newItem, label: e.target.value })}
+                              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                            />
+                            <p className="text-gray-500 text-xs mt-1">
+                              Zobrazovaný názov pre túto možnosť
+                            </p>
+                          </div>
+                          <div>
+                            <label className="block text-pictus-lime text-xs mb-1">Poradie</label>
+                            <input
+                              type="number"
+                              placeholder="0"
+                              value={newItem.sortOrder}
+                              onChange={(e) =>
+                                setNewItem({ ...newItem, sortOrder: parseInt(e.target.value) })
+                              }
+                              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
+                            />
+                            <p className="text-gray-500 text-xs mt-1">
+                              Poradie v zozname (0 = prvý)
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-pictus-lime text-xs mb-1">Poradie</label>
-                          <input
-                            type="number"
-                            placeholder="0"
-                            value={newItem.sortOrder}
-                            onChange={(e) =>
-                              setNewItem({ ...newItem, sortOrder: parseInt(e.target.value) })
-                            }
-                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
-                          />
-                          <p className="text-gray-500 text-xs mt-1">Poradie v zozname (0 = prvý)</p>
-                        </div>
+
+                        {activeTab === 'types' && (
+                          <div className="flex items-center gap-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                            <input
+                              type="checkbox"
+                              id="newItemIsPdr"
+                              checked={newItem.isPdr || false}
+                              onChange={(e) => setNewItem({ ...newItem, isPdr: e.target.checked })}
+                              className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900"
+                            />
+                            <div className="flex-1">
+                              <label
+                                htmlFor="newItemIsPdr"
+                                className="text-white font-medium text-sm cursor-pointer"
+                              >
+                                🔄 Post-Duty Renewal (PDR)
+                              </label>
+                              <p className="text-blue-300 text-xs mt-1">
+                                Ak je zapnuté, pri vytvorení úlohy tohto typu sa automaticky vytvorí
+                                pripomienka na obnovenie úlohy. Napríklad deň po absolvovaní STK Vám
+                                automaticky príde prípomienka na zadanie nového termínu STK.
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -787,7 +1014,11 @@ export default function NotificationSettings({
                               <input
                                 type="text"
                                 placeholder="-30,-14,-7,-3,-1,0,+1,+2"
-                                value={newItem.reminderIntervalsInput !== undefined ? newItem.reminderIntervalsInput : (newItem.reminderIntervals?.join(',') || '')}
+                                value={
+                                  newItem.reminderIntervalsInput !== undefined
+                                    ? newItem.reminderIntervalsInput
+                                    : newItem.reminderIntervals?.join(',') || ''
+                                }
                                 onChange={(e) => {
                                   const value = e.target.value
                                   // Store the raw input value
@@ -797,10 +1028,21 @@ export default function NotificationSettings({
                                   // Parse the intervals when user is done editing (on blur)
                                   const value = e.target.value.trim()
                                   if (value === '') {
-                                    setNewItem({ ...newItem, reminderIntervals: [], reminderIntervalsInput: undefined })
+                                    setNewItem({
+                                      ...newItem,
+                                      reminderIntervals: [],
+                                      reminderIntervalsInput: undefined,
+                                    })
                                   } else {
-                                    const intervals = value.split(',').map(v => parseInt(v.trim())).filter(n => !isNaN(n))
-                                    setNewItem({ ...newItem, reminderIntervals: intervals, reminderIntervalsInput: undefined })
+                                    const intervals = value
+                                      .split(',')
+                                      .map((v) => parseInt(v.trim()))
+                                      .filter((n) => !isNaN(n))
+                                    setNewItem({
+                                      ...newItem,
+                                      reminderIntervals: intervals,
+                                      reminderIntervalsInput: undefined,
+                                    })
                                   }
                                 }}
                                 className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
@@ -810,8 +1052,8 @@ export default function NotificationSettings({
                               </span>
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
-                              Záporné čísla = dni PRED termínom úlohy (napr. -7 = týždeň pred)<br />
-                              0 = v deň úlohy, kladné = dni PO termíne (napr. +2 = 2 dni po)
+                              Záporné čísla = dni PRED termínom úlohy (napr. -7 = týždeň pred)
+                              <br />0 = v deň úlohy, kladné = dni PO termíne (napr. +2 = 2 dni po)
                             </p>
                           </div>
                         </div>
@@ -820,7 +1062,13 @@ export default function NotificationSettings({
                           <textarea
                             placeholder="Správa už obsahuje ŠPZ, úlohu a dátum."
                             value={newItem.emailMessage}
-                            onChange={(e) => setNewItem({ ...newItem, emailMessage: e.target.value, smsMessage: e.target.value })}
+                            onChange={(e) =>
+                              setNewItem({
+                                ...newItem,
+                                emailMessage: e.target.value,
+                                smsMessage: e.target.value,
+                              })
+                            }
                             rows={3}
                             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                           />
@@ -869,31 +1117,61 @@ export default function NotificationSettings({
                     >
                       {editingItem?.id === option.id ? (
                         <>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-pictus-lime text-xs mb-1">Názov</label>
-                              <input
-                                type="text"
-                                value={editingItem.label}
-                                onChange={(e) =>
-                                  setEditingItem({ ...editingItem, label: e.target.value })
-                                }
-                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
-                              />
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-pictus-lime text-xs mb-1">Názov</label>
+                                <input
+                                  type="text"
+                                  value={editingItem.label}
+                                  onChange={(e) =>
+                                    setEditingItem({ ...editingItem, label: e.target.value })
+                                  }
+                                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-pictus-lime text-xs mb-1">
+                                  Poradie
+                                </label>
+                                <input
+                                  type="number"
+                                  value={editingItem.sortOrder}
+                                  onChange={(e) =>
+                                    setEditingItem({
+                                      ...editingItem,
+                                      sortOrder: parseInt(e.target.value),
+                                    })
+                                  }
+                                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                                />
+                              </div>
                             </div>
-                            <div>
-                              <label className="block text-pictus-lime text-xs mb-1">Poradie</label>
+
+                            <div className="flex items-center gap-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                               <input
-                                type="number"
-                                value={editingItem.sortOrder}
+                                type="checkbox"
+                                id={`editIsPdr-${editingItem.id}`}
+                                checked={editingItem.isPdr || false}
                                 onChange={(e) =>
-                                  setEditingItem({
-                                    ...editingItem,
-                                    sortOrder: parseInt(e.target.value),
-                                  })
+                                  setEditingItem({ ...editingItem, isPdr: e.target.checked })
                                 }
-                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                                className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900"
                               />
+                              <div className="flex-1">
+                                <label
+                                  htmlFor={`editIsPdr-${editingItem.id}`}
+                                  className="text-white font-medium text-sm cursor-pointer"
+                                >
+                                  🔄 Post-Duty Renewal (PDR)
+                                </label>
+                                <p className="text-blue-300 text-xs mt-1">
+                                  Ak je zapnuté, pri vytvorení úlohy tohto typu sa automaticky
+                                  vytvorí pripomienka na obnovenie úlohy. Napríklad deň po
+                                  absolvovaní STK Vám automaticky príde prípomienka na zadanie
+                                  nového termínu STK.
+                                </p>
+                              </div>
                             </div>
                           </div>
                           <div className="flex gap-2 mt-3">
@@ -924,8 +1202,15 @@ export default function NotificationSettings({
                                 className="w-5 h-5 rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                               />
                             )}
-                            <div>
-                              <p className="text-white text-lg font-light">{option.label}</p>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="text-white text-lg font-light">{option.label}</p>
+                                {option.isPdr && (
+                                  <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
+                                    🔄 PDR
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-gray-400 text-sm">Poradie: {option.sortOrder}</p>
                             </div>
                           </div>
@@ -1067,11 +1352,16 @@ export default function NotificationSettings({
                                 />
                               </div>
                               <div>
-                                <label className="block text-pictus-lime text-xs mb-1">Typ notifikácie</label>
+                                <label className="block text-pictus-lime text-xs mb-1">
+                                  Typ notifikácie
+                                </label>
                                 <select
                                   value={editingItem.notificationType}
                                   onChange={(e) =>
-                                    setEditingItem({ ...editingItem, notificationType: e.target.value })
+                                    setEditingItem({
+                                      ...editingItem,
+                                      notificationType: e.target.value,
+                                    })
                                   }
                                   className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                                 >
@@ -1093,7 +1383,10 @@ export default function NotificationSettings({
                                 <select
                                   value={editingItem.notificationChannel}
                                   onChange={(e) =>
-                                    setEditingItem({ ...editingItem, notificationChannel: e.target.value })
+                                    setEditingItem({
+                                      ...editingItem,
+                                      notificationChannel: e.target.value,
+                                    })
                                   }
                                   className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                                 >
@@ -1117,20 +1410,38 @@ export default function NotificationSettings({
                                 <input
                                   type="text"
                                   placeholder="-30,-14,-7,-3,-1,0,+1,+2"
-                                  value={editingItem.reminderIntervalsInput !== undefined ? editingItem.reminderIntervalsInput : (editingItem.reminderIntervals?.join(',') || '')}
+                                  value={
+                                    editingItem.reminderIntervalsInput !== undefined
+                                      ? editingItem.reminderIntervalsInput
+                                      : editingItem.reminderIntervals?.join(',') || ''
+                                  }
                                   onChange={(e) => {
                                     const value = e.target.value
                                     // Store the raw input value
-                                    setEditingItem({ ...editingItem, reminderIntervalsInput: value })
+                                    setEditingItem({
+                                      ...editingItem,
+                                      reminderIntervalsInput: value,
+                                    })
                                   }}
                                   onBlur={(e) => {
                                     // Parse the intervals when user is done editing (on blur)
                                     const value = e.target.value.trim()
                                     if (value === '') {
-                                      setEditingItem({ ...editingItem, reminderIntervals: [], reminderIntervalsInput: undefined })
+                                      setEditingItem({
+                                        ...editingItem,
+                                        reminderIntervals: [],
+                                        reminderIntervalsInput: undefined,
+                                      })
                                     } else {
-                                      const intervals = value.split(',').map(v => parseInt(v.trim())).filter(n => !isNaN(n))
-                                      setEditingItem({ ...editingItem, reminderIntervals: intervals, reminderIntervalsInput: undefined })
+                                      const intervals = value
+                                        .split(',')
+                                        .map((v) => parseInt(v.trim()))
+                                        .filter((n) => !isNaN(n))
+                                      setEditingItem({
+                                        ...editingItem,
+                                        reminderIntervals: intervals,
+                                        reminderIntervalsInput: undefined,
+                                      })
                                     }
                                   }}
                                   className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
@@ -1146,7 +1457,11 @@ export default function NotificationSettings({
                                 placeholder="Správa už obsahuje ŠPZ, úlohu a dátum."
                                 value={editingItem.emailMessage || ''}
                                 onChange={(e) =>
-                                  setEditingItem({ ...editingItem, emailMessage: e.target.value, smsMessage: e.target.value })
+                                  setEditingItem({
+                                    ...editingItem,
+                                    emailMessage: e.target.value,
+                                    smsMessage: e.target.value,
+                                  })
                                 }
                                 rows={3}
                                 className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
@@ -1177,13 +1492,16 @@ export default function NotificationSettings({
                             <p className="text-gray-400 text-sm">
                               {template.notificationType} • {template.notificationChannel}
                             </p>
-                            {template.reminderIntervals && template.reminderIntervals.length > 0 && (
-                              <p className="text-pictus-lime text-sm mt-1">
-                                Intervaly: {template.reminderIntervals.map(i =>
-                                  i === 0 ? '0' : i > 0 ? `+${i}` : `${i}`
-                                ).join(', ')} dní
-                              </p>
-                            )}
+                            {template.reminderIntervals &&
+                              template.reminderIntervals.length > 0 && (
+                                <p className="text-pictus-lime text-sm mt-1">
+                                  Intervaly:{' '}
+                                  {template.reminderIntervals
+                                    .map((i) => (i === 0 ? '0' : i > 0 ? `+${i}` : `${i}`))
+                                    .join(', ')}{' '}
+                                  dní
+                                </p>
+                              )}
                           </div>
                           <div className="flex gap-2">
                             <button

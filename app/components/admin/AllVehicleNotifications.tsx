@@ -53,6 +53,9 @@ interface Vehicle {
 interface VehicleNotification {
   id: number
   dutyBatchId: string | null
+  isPdr: boolean
+  pdrReminderFor: string | null
+  renewedFromBatchId: string | null
   organizationId: string | null
   organization?: {
     id: string
@@ -140,7 +143,10 @@ export default function AllVehicleNotifications() {
       const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
-        setNotifications(Array.isArray(data.notifications) ? data.notifications : [])
+        // Filter out PDR reminders from regular display
+        const allNotifications = Array.isArray(data.notifications) ? data.notifications : []
+        const regularNotifications = allNotifications.filter((n: VehicleNotification) => !n.isPdr)
+        setNotifications(regularNotifications)
       }
     } catch (error) {
       console.error('Failed to fetch vehicle notifications:', error)

@@ -30,6 +30,9 @@ interface MyVehicle {
 interface VehicleNotification {
   id: number
   dutyBatchId: string | null
+  isPdr: boolean
+  pdrReminderFor: string | null
+  renewedFromBatchId: string | null
   organizationId: string | null
   organization?: {
     id: string
@@ -93,7 +96,10 @@ const VehicleNotificationsDashboard = ({ company, organizationName }: VehicleNot
           const data = await response.json()
 
           // Process the data to create stats
-          const notifications = data.notifications || []
+          const allNotifications = data.notifications || []
+
+          // Filter out PDR reminders from regular display
+          const notifications = allNotifications.filter((n: VehicleNotification) => !n.isPdr)
 
           // Sort notifications by notificationDate first
           const sortedNotifications = notifications.sort(
@@ -655,9 +661,16 @@ const VehicleNotificationsDashboard = ({ company, organizationName }: VehicleNot
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                   <p className="text-pictus-lime text-lg">Notifikácia</p>
-                                  <p className="text-pictus-white font-light text-xl">
-                                    {notification.notificationType}
-                                  </p>
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-pictus-white font-light text-xl">
+                                      {notification.notificationType}
+                                    </p>
+                                    {notification.isPdr && (
+                                      <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
+                                        🔄 PDR
+                                      </span>
+                                    )}
+                                  </div>
                                   <p className="text-pictus-white text-lg">
                                     {notification.notificationChannel}
                                   </p>
@@ -760,9 +773,16 @@ const VehicleNotificationsDashboard = ({ company, organizationName }: VehicleNot
                       </div>
                       <div>
                         <p className="text-pictus-lime text-lg">Oznámenie</p>
-                        <p className="text-pictus-white font-light text-xl">
-                          {notification.notificationType}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-pictus-white font-light text-xl">
+                            {notification.notificationType}
+                          </p>
+                          {notification.isPdr && (
+                            <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
+                              🔄 PDR
+                            </span>
+                          )}
+                        </div>
                         <p className="text-pictus-white text-lg">{notification.notificationChannel}</p>
                       </div>
                       <div>

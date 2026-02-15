@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
       phoneNumber,
       organizationId,
       dutyBatchId,
+      isPdr,
+      pdrReminderFor,
     } = body
 
     if (!dutyDate) {
@@ -38,22 +40,35 @@ export async function POST(request: NextRequest) {
       dutyDate: new Date(dutyDate),
       status: 'imported',
       dutyBatchId: dutyBatchId || null,
+      isPdr: isPdr || false,
+      pdrReminderFor: pdrReminderFor || null,
     }
 
     if (vehicleId) {
+      console.log('[CREATE-NOTIFICATION] Looking up vehicle with ID:', vehicleId)
       const vehicle = await prisma.myVehicle.findUnique({
         where: { id: vehicleId },
         include: { user: true },
       })
 
       if (vehicle) {
+        console.log('[CREATE-NOTIFICATION] Found vehicle:', {
+          id: vehicle.id,
+          registration: vehicle.registration,
+          type: vehicle.type,
+        })
         notificationData.vehicleRegistration = vehicle.registration
         notificationData.myVehicleId = vehicle.id
         notificationData.userId = vehicle.userId
         notificationData.organizationId = vehicle.organizationId
         notificationData.personName = personName || (vehicle.user ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim() : null) || null
         notificationData.email = email || vehicle.user?.email || null
+        console.log('[CREATE-NOTIFICATION] Set vehicleRegistration to:', notificationData.vehicleRegistration)
+      } else {
+        console.log('[CREATE-NOTIFICATION] Vehicle not found with ID:', vehicleId)
       }
+    } else {
+      console.log('[CREATE-NOTIFICATION] No vehicleId provided in request')
     }
 
     // Always use values from body (formData)

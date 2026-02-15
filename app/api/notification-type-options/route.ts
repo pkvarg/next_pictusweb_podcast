@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, label, sortOrder, isActive } = body
+    const { id, label, sortOrder, isActive, isPdr } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Missing option ID' }, { status: 400 })
@@ -116,6 +116,7 @@ export async function PUT(request: NextRequest) {
     if (label !== undefined) updateData.label = label
     if (sortOrder !== undefined) updateData.sortOrder = parseInt(sortOrder)
     if (isActive !== undefined) updateData.isActive = isActive
+    if (isPdr !== undefined) updateData.isPdr = isPdr
 
     const option = await prisma.notificationTypeOption.update({
       where: { id },

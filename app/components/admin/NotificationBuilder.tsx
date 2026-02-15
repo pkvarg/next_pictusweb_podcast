@@ -96,6 +96,7 @@ export default function NotificationBuilder({
   const [useCustomType, setUseCustomType] = useState(false)
   const [reminderIntervals, setReminderIntervals] = useState<number[]>([-30, -14, -3, 0])
   const [showIntervalsModal, setShowIntervalsModal] = useState(false)
+  const [enablePdr, setEnablePdr] = useState(false)
 
   const [formData, setFormData] = useState({
     templateId: '',
@@ -122,9 +123,11 @@ export default function NotificationBuilder({
 
         // If no templates found for current organization, check if DEFAULT org exists
         if (templates.length === 0) {
-          const defaultOrg = organizations.find(org => org.name === 'DEFAULT')
+          const defaultOrg = organizations.find((org) => org.name === 'DEFAULT')
           if (defaultOrg) {
-            const defaultResponse = await fetch(`/api/notification-templates?organizationId=${defaultOrg.id}`)
+            const defaultResponse = await fetch(
+              `/api/notification-templates?organizationId=${defaultOrg.id}`,
+            )
             if (defaultResponse.ok) {
               const defaultData = await defaultResponse.json()
               setTemplates(defaultData.templates || [])
@@ -145,24 +148,34 @@ export default function NotificationBuilder({
     try {
       // Try to fetch options for the current organization
       console.log('[NotificationBuilder] Fetching type options for organizationId:', organizationId)
-      const response = await fetch(`/api/notification-type-options?organizationId=${organizationId}`)
+      const response = await fetch(
+        `/api/notification-type-options?organizationId=${organizationId}`,
+      )
       if (response.ok) {
         const data = await response.json()
         const options = data.options || []
         console.log('[NotificationBuilder] Received type options:', options.length, 'options')
         if (options.length > 0) {
-          console.log('[NotificationBuilder] First type option org:', options[0].organizationRelation?.name)
+          console.log(
+            '[NotificationBuilder] First type option org:',
+            options[0].organizationRelation?.name,
+          )
         }
 
         // If no options found for current organization, fetch from DEFAULT
         if (options.length === 0) {
           console.log('[NotificationBuilder] No options found, trying DEFAULT org')
-          const defaultOrg = organizations.find(org => org.name === 'DEFAULT')
+          const defaultOrg = organizations.find((org) => org.name === 'DEFAULT')
           if (defaultOrg) {
-            const defaultResponse = await fetch(`/api/notification-type-options?organizationId=${defaultOrg.id}`)
+            const defaultResponse = await fetch(
+              `/api/notification-type-options?organizationId=${defaultOrg.id}`,
+            )
             if (defaultResponse.ok) {
               const defaultData = await defaultResponse.json()
-              console.log('[NotificationBuilder] Using DEFAULT org options:', defaultData.options?.length || 0)
+              console.log(
+                '[NotificationBuilder] Using DEFAULT org options:',
+                defaultData.options?.length || 0,
+              )
               setTypeOptions(defaultData.options || [])
               setUsingDefaultTypeOptions(true)
               return
@@ -182,16 +195,20 @@ export default function NotificationBuilder({
     if (!organizationId) return
     try {
       // Try to fetch options for the current organization
-      const response = await fetch(`/api/notification-channel-options?organizationId=${organizationId}`)
+      const response = await fetch(
+        `/api/notification-channel-options?organizationId=${organizationId}`,
+      )
       if (response.ok) {
         const data = await response.json()
         const options = data.options || []
 
         // If no options found for current organization, fetch from DEFAULT
         if (options.length === 0) {
-          const defaultOrg = organizations.find(org => org.name === 'DEFAULT')
+          const defaultOrg = organizations.find((org) => org.name === 'DEFAULT')
           if (defaultOrg) {
-            const defaultResponse = await fetch(`/api/notification-channel-options?organizationId=${defaultOrg.id}`)
+            const defaultResponse = await fetch(
+              `/api/notification-channel-options?organizationId=${defaultOrg.id}`,
+            )
             if (defaultResponse.ok) {
               const defaultData = await defaultResponse.json()
               setChannelOptions(defaultData.options || [])
@@ -216,9 +233,16 @@ export default function NotificationBuilder({
       const response = await fetch(`/api/my-vehicles?organizationId=${organizationId}`)
       if (response.ok) {
         const data = await response.json()
-        console.log('[NotificationBuilder] Received vehicles:', data.vehicles?.length || 0, 'vehicles')
+        console.log(
+          '[NotificationBuilder] Received vehicles:',
+          data.vehicles?.length || 0,
+          'vehicles',
+        )
         if (data.vehicles?.length > 0) {
-          console.log('[NotificationBuilder] First vehicle org:', data.vehicles[0].organizationRelation?.name)
+          console.log(
+            '[NotificationBuilder] First vehicle org:',
+            data.vehicles[0].organizationRelation?.name,
+          )
         }
         setVehicles(data.vehicles || [])
       }
@@ -261,8 +285,11 @@ export default function NotificationBuilder({
   useEffect(() => {
     if (initialOrganization && organizations.length > 0 && !organizationId) {
       console.log('[NotificationBuilder] Looking up organization:', initialOrganization)
-      console.log('[NotificationBuilder] Available organizations:', organizations.map(o => o.name))
-      const org = organizations.find(o => o.name === initialOrganization)
+      console.log(
+        '[NotificationBuilder] Available organizations:',
+        organizations.map((o) => o.name),
+      )
+      const org = organizations.find((o) => o.name === initialOrganization)
       if (org) {
         console.log('[NotificationBuilder] Found organization:', org.name, 'ID:', org.id)
         setOrganizationId(org.id)
@@ -281,7 +308,15 @@ export default function NotificationBuilder({
       fetchUsers()
       setFormData((prev) => ({ ...prev, organizationId: organizationId }))
     }
-  }, [organizationId, organization, fetchTemplates, fetchTypeOptions, fetchChannelOptions, fetchVehicles, fetchUsers])
+  }, [
+    organizationId,
+    organization,
+    fetchTemplates,
+    fetchTypeOptions,
+    fetchChannelOptions,
+    fetchVehicles,
+    fetchUsers,
+  ])
 
   useEffect(() => {
     if (duplicateData) {
@@ -296,7 +331,7 @@ export default function NotificationBuilder({
 
       if (!dupOrgId && !dupOrgName) {
         dupOrgName = initialOrganization || ''
-        const org = organizations.find(o => o.name === dupOrgName)
+        const org = organizations.find((o) => o.name === dupOrgName)
         if (org) {
           dupOrgId = org.id
         }
@@ -306,7 +341,7 @@ export default function NotificationBuilder({
         setOrganizationId(dupOrgId)
         // Find organization name if we only have ID
         if (!dupOrgName) {
-          const org = organizations.find(o => o.id === dupOrgId)
+          const org = organizations.find((o) => o.id === dupOrgId)
           if (org) {
             dupOrgName = org.name
             setOrganization(dupOrgName)
@@ -327,7 +362,9 @@ export default function NotificationBuilder({
         templateId: '',
         vehicleId: duplicateData.myVehicleId || '',
         notificationType: duplicateData.notificationType || '',
-        notificationChannel: hideChannelDropdown ? 'Email/Sms' : (duplicateData.notificationChannel || ''),
+        notificationChannel: hideChannelDropdown
+          ? 'Email/Sms'
+          : duplicateData.notificationChannel || '',
         dutyDate: formatDate(duplicateData.dutyDate),
         notificationDate: formatDate(duplicateData.notificationDate),
         personName: duplicateData.personName || '',
@@ -340,7 +377,7 @@ export default function NotificationBuilder({
 
       // Check if duplicated type exists in options, if not, use custom input
       if (duplicateData.notificationType && typeOptions.length > 0) {
-        const typeExists = typeOptions.some(opt => opt.label === duplicateData.notificationType)
+        const typeExists = typeOptions.some((opt) => opt.label === duplicateData.notificationType)
         setUseCustomType(!typeExists)
       }
 
@@ -473,7 +510,7 @@ export default function NotificationBuilder({
       today.setHours(0, 0, 0, 0) // Reset time to start of day for comparison
 
       const pastIntervals: number[] = []
-      reminderIntervals.forEach(offset => {
+      reminderIntervals.forEach((offset) => {
         const dutyDate = new Date(formData.dutyDate)
         const notificationDate = new Date(dutyDate)
         notificationDate.setDate(notificationDate.getDate() + offset)
@@ -489,11 +526,13 @@ export default function NotificationBuilder({
         if (futureCount === 0) {
           errors.push(
             `Všetky intervaly vedú do minulosti: ${pastIntervals.join(', ')} dní. ` +
-            'Nebudú vytvorené žiadne notifikácie. Zvoľte iný dátum úlohy.'
+              'Nebudú vytvorené žiadne notifikácie. Zvoľte iný dátum úlohy.',
           )
         } else {
           // Just warn, don't block - these will be filtered out during creation
-          console.log(`Preskakujem ${pastIntervals.length} intervalov v minulosti: ${pastIntervals.join(', ')}`)
+          console.log(
+            `Preskakujem ${pastIntervals.length} intervalov v minulosti: ${pastIntervals.join(', ')}`,
+          )
         }
       }
     }
@@ -534,7 +573,7 @@ export default function NotificationBuilder({
         today.setHours(0, 0, 0, 0)
 
         // Filter out past intervals (but allow today)
-        const validIntervals = reminderIntervals.filter(offset => {
+        const validIntervals = reminderIntervals.filter((offset) => {
           const dutyDate = new Date(formData.dutyDate)
           const notificationDate = new Date(dutyDate)
           notificationDate.setDate(notificationDate.getDate() + offset)
@@ -542,12 +581,18 @@ export default function NotificationBuilder({
           return notificationDate >= today
         })
 
-        // Generate a batch ID only if there are multiple valid intervals
-        const dutyBatchId = validIntervals.length > 1
-          ? `batch_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
-          : null
+        // Generate a batch ID if there are multiple valid intervals OR if PDR is enabled
+        const dutyBatchId =
+          validIntervals.length > 1 || enablePdr
+            ? `batch_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+            : null
 
-        const promises = validIntervals.map(offset => {
+        console.log('[NotificationBuilder] Creating notifications with formData:', formData)
+        console.log('[NotificationBuilder] Valid intervals:', validIntervals)
+        console.log('[NotificationBuilder] Batch ID:', dutyBatchId)
+        console.log('[NotificationBuilder] PDR enabled:', enablePdr)
+
+        const promises = validIntervals.map((offset) => {
           const dutyDate = new Date(formData.dutyDate)
           const notificationDate = new Date(dutyDate)
           notificationDate.setDate(notificationDate.getDate() + offset)
@@ -558,7 +603,8 @@ export default function NotificationBuilder({
             dutyBatchId, // Include batch ID in payload
           }
 
-          console.log('Creating notification with payload:', payload)
+          console.log('[NotificationBuilder] Creating notification with payload:', payload)
+          console.log('[NotificationBuilder] Payload vehicleId:', payload.vehicleId)
 
           return fetch('/api/vehicle-notifications/create-from-template', {
             method: 'POST',
@@ -570,15 +616,60 @@ export default function NotificationBuilder({
         })
 
         const responses = await Promise.all(promises)
-        const allSuccessful = responses.every(r => r.ok)
+        const allSuccessful = responses.every((r) => r.ok)
 
         if (allSuccessful) {
           const count = validIntervals.length
           const skipped = reminderIntervals.length - validIntervals.length
 
-          let message = count === 1
-            ? 'Notifikácia bola úspešne vytvorená!'
-            : `${count} notifikácií bolo úspešne vytvorených!`
+          // If PDR is enabled, create PDR reminder notification
+          if (enablePdr && dutyBatchId) {
+            try {
+              const pdrReminderDate = new Date(formData.dutyDate)
+              pdrReminderDate.setDate(pdrReminderDate.getDate() + 1) // 1 day after duty
+
+              const vehicleReg =
+                vehicles.find((v) => v.id === formData.vehicleId)?.registration ||
+                formData.vehicleId
+              const pdrMessage = `${formData.notificationType} pre ${vehicleReg} bola včera. Naplánujete ďalšiu?`
+
+              const pdrPayload = {
+                ...formData,
+                notificationDate: pdrReminderDate.toISOString().split('T')[0],
+                dutyBatchId: null, // PDR reminder doesn't belong to a batch
+                isPdr: true,
+                pdrReminderFor: dutyBatchId,
+                emailMessage: pdrMessage,
+              }
+
+              console.log('Creating PDR reminder with payload:', pdrPayload)
+
+              const pdrResponse = await fetch('/api/vehicle-notifications/create-from-template', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(pdrPayload),
+              })
+
+              if (pdrResponse.ok) {
+                console.log('PDR reminder created successfully')
+              } else {
+                console.error('Failed to create PDR reminder')
+              }
+            } catch (pdrError) {
+              console.error('Error creating PDR reminder:', pdrError)
+            }
+          }
+
+          let message =
+            count === 1
+              ? 'Notifikácia bola úspešne vytvorená!'
+              : `${count} notifikácií bolo úspešne vytvorených!`
+
+          if (enablePdr) {
+            message += '\n\n🔄 PDR pripomienka bola tiež vytvorená pre deň po úlohe.'
+          }
 
           if (skipped > 0) {
             message += `\n\n${skipped} interval${skipped === 1 ? '' : 'ov'} v minulosti bol${skipped === 1 ? '' : 'o'} preskočených.`
@@ -611,15 +702,14 @@ export default function NotificationBuilder({
               {duplicateData ? 'Duplikovať notifikáciu' : 'Vytvoriť novú notifikáciu'}
             </h2>
             <p className="text-gray-400 text-lg">
-              {step === 0 ? 'Vybrať organizáciu' : `Krok ${step} z 3: ${step === 1 ? 'Vybrať šablónu' : step === 2 ? 'Vyplniť detaily' : 'Skontrolovať a vytvoriť'}`}
+              {step === 0
+                ? 'Vybrať organizáciu'
+                : `Krok ${step} z 3: ${step === 1 ? 'Vybrať šablónu' : step === 2 ? 'Vyplniť detaily' : 'Skontrolovať a vytvoriť'}`}
             </p>
           </div>
         </div>
         {onCancel && (
-          <button
-            onClick={onCancel}
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-          >
+          <button onClick={onCancel} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
             <X className="w-6 h-6 text-gray-400" />
           </button>
         )}
@@ -654,7 +744,7 @@ export default function NotificationBuilder({
               value={organization}
               onChange={(e) => {
                 const orgName = e.target.value
-                const org = organizations.find(o => o.name === orgName)
+                const org = organizations.find((o) => o.name === orgName)
                 setOrganization(orgName)
                 setOrganizationId(org?.id || '')
               }}
@@ -703,7 +793,9 @@ export default function NotificationBuilder({
               >
                 <Copy className="w-8 h-8 text-gray-400 mb-2" />
                 <h4 className="text-xl font-light text-pictus-white mb-1">Vlastná notifikácia</h4>
-                <p className="text-gray-400 text-sm">Vytvorte od začiatku pomocou rozbaľovacích ponúk</p>
+                <p className="text-gray-400 text-sm">
+                  Vytvorte od začiatku pomocou rozbaľovacích ponúk
+                </p>
               </button>
 
               {templates.map((template) => (
@@ -783,7 +875,10 @@ export default function NotificationBuilder({
                           setFormData({ ...formData, notificationType: e.target.value })
                         }
                       }}
-                      disabled={!!formData.templateId && !!templates.find(t => t.id === formData.templateId)?.notificationType}
+                      disabled={
+                        !!formData.templateId &&
+                        !!templates.find((t) => t.id === formData.templateId)?.notificationType
+                      }
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     >
                       <option value="">Vybrať typ...</option>
@@ -798,7 +893,8 @@ export default function NotificationBuilder({
                     </select>
                     {usingDefaultTypeOptions && (
                       <p className="text-yellow-400 text-xs mt-1">
-                        Používajú sa predvolené možnosti (nie sú nakonfigurované možnosti pre {organization})
+                        Používajú sa predvolené možnosti (nie sú nakonfigurované možnosti pre{' '}
+                        {organization})
                       </p>
                     )}
                     {organizationTier && organizationTier !== 'BUSINESS' && (
@@ -812,8 +908,13 @@ export default function NotificationBuilder({
                     <input
                       type="text"
                       value={formData.notificationType}
-                      onChange={(e) => setFormData({ ...formData, notificationType: e.target.value })}
-                      disabled={!!formData.templateId && !!templates.find(t => t.id === formData.templateId)?.notificationType}
+                      onChange={(e) =>
+                        setFormData({ ...formData, notificationType: e.target.value })
+                      }
+                      disabled={
+                        !!formData.templateId &&
+                        !!templates.find((t) => t.id === formData.templateId)?.notificationType
+                      }
                       placeholder="Zadajte vlastný typ notifikácie..."
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     />
@@ -848,8 +949,13 @@ export default function NotificationBuilder({
                   <>
                     <select
                       value={formData.notificationChannel}
-                      onChange={(e) => setFormData({ ...formData, notificationChannel: e.target.value })}
-                      disabled={!!formData.templateId && !!templates.find(t => t.id === formData.templateId)?.notificationChannel}
+                      onChange={(e) =>
+                        setFormData({ ...formData, notificationChannel: e.target.value })
+                      }
+                      disabled={
+                        !!formData.templateId &&
+                        !!templates.find((t) => t.id === formData.templateId)?.notificationChannel
+                      }
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     >
                       <option value="">Vybrať kanál...</option>
@@ -861,11 +967,37 @@ export default function NotificationBuilder({
                     </select>
                     {usingDefaultChannelOptions && (
                       <p className="text-yellow-400 text-xs mt-1">
-                        Používajú sa predvolené možnosti (nie sú nakonfigurované možnosti pre {organization})
+                        Používajú sa predvolené možnosti (nie sú nakonfigurované možnosti pre{' '}
+                        {organization})
                       </p>
                     )}
                   </>
                 )}
+              </div>
+
+              {/* Post-Duty Renewal (PDR) Toggle */}
+              <div className="md:col-span-2">
+                <div className="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                  <input
+                    type="checkbox"
+                    id="enablePdr"
+                    checked={enablePdr}
+                    onChange={(e) => setEnablePdr(e.target.checked)}
+                    className="w-5 h-5 rounded border-gray-300 text-pictus-lime focus:ring-pictus-lime focus:ring-offset-gray-900"
+                  />
+                  <div className="flex-1">
+                    <label
+                      htmlFor="enablePdr"
+                      className="text-white font-light text-base cursor-pointer"
+                    >
+                      🔄 Post-Duty Renewal (PDR)
+                    </label>
+                    <p className="text-blue-300 text-sm mt-1">
+                      Automaticky vytvorí pripomienku deň po termíne úlohy pre plánovanie ďalšej
+                      úlohy
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Duty Date */}
@@ -908,60 +1040,85 @@ export default function NotificationBuilder({
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                   <p className="text-gray-400 text-base mb-3">
-                    Vytvorí sa {reminderIntervals.length} {reminderIntervals.length === 1 ? 'notifikácia' : reminderIntervals.length < 5 ? 'notifikácie' : 'notifikácií'}:
+                    Vytvorí sa {reminderIntervals.length}{' '}
+                    {reminderIntervals.length === 1
+                      ? 'notifikácia'
+                      : reminderIntervals.length < 5
+                        ? 'notifikácie'
+                        : 'notifikácií'}
+                    :
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {reminderIntervals.sort((a, b) => a - b).map((interval, index) => {
-                      if (!formData.dutyDate) {
+                    {reminderIntervals
+                      .sort((a, b) => a - b)
+                      .map((interval, index) => {
+                        if (!formData.dutyDate) {
+                          return (
+                            <div
+                              key={index}
+                              className="px-3 py-2 bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg text-pictus-lime text-sm"
+                            >
+                              {interval === 0
+                                ? 'V deň úlohy'
+                                : interval > 0
+                                  ? `+${interval} dní`
+                                  : `${interval} dní`}
+                            </div>
+                          )
+                        }
+
+                        const dutyDate = new Date(formData.dutyDate)
+                        const notifDate = new Date(dutyDate)
+                        notifDate.setDate(notifDate.getDate() + interval)
+
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        const notifDateNoTime = new Date(notifDate)
+                        notifDateNoTime.setHours(0, 0, 0, 0)
+                        const isPast = notifDateNoTime < today
+
+                        const dateStr = notifDate.toLocaleDateString('sk-SK', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })
+
                         return (
                           <div
                             key={index}
-                            className="px-3 py-2 bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg text-pictus-lime text-sm"
+                            className={`px-3 py-2 rounded-lg text-sm ${
+                              isPast
+                                ? 'bg-red-500/20 border border-red-500/30 text-red-400'
+                                : 'bg-pictus-lime/20 border border-pictus-lime/30 text-pictus-lime'
+                            }`}
                           >
-                            {interval === 0 ? 'V deň úlohy' : interval > 0 ? `+${interval} dní` : `${interval} dní`}
+                            <div className="font-medium">
+                              {isPast && '⚠️ '}
+                              {dateStr}
+                            </div>
+                            <div
+                              className={`text-xs ${isPast ? 'text-red-400/70' : 'text-pictus-lime/70'}`}
+                            >
+                              {interval === 0
+                                ? 'V deň úlohy'
+                                : interval > 0
+                                  ? `+${interval} dní`
+                                  : `${interval} dní`}
+                              {isPast && ' (minulosť)'}
+                            </div>
                           </div>
                         )
-                      }
-
-                      const dutyDate = new Date(formData.dutyDate)
-                      const notifDate = new Date(dutyDate)
-                      notifDate.setDate(notifDate.getDate() + interval)
-
-                      const today = new Date()
-                      today.setHours(0, 0, 0, 0)
-                      const notifDateNoTime = new Date(notifDate)
-                      notifDateNoTime.setHours(0, 0, 0, 0)
-                      const isPast = notifDateNoTime < today
-
-                      const dateStr = notifDate.toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' })
-
-                      return (
-                        <div
-                          key={index}
-                          className={`px-3 py-2 rounded-lg text-sm ${
-                            isPast
-                              ? 'bg-red-500/20 border border-red-500/30 text-red-400'
-                              : 'bg-pictus-lime/20 border border-pictus-lime/30 text-pictus-lime'
-                          }`}
-                        >
-                          <div className="font-medium">{isPast && '⚠️ '}{dateStr}</div>
-                          <div className={`text-xs ${isPast ? 'text-red-400/70' : 'text-pictus-lime/70'}`}>
-                            {interval === 0 ? 'V deň úlohy' : interval > 0 ? `+${interval} dní` : `${interval} dní`}
-                            {isPast && ' (minulosť)'}
-                          </div>
-                        </div>
-                      )
-                    })}
+                      })}
                   </div>
                   <p className="text-gray-400 text-base mt-3">
-                    {reminderIntervals.length === 1 ? 'Pre jednorázovú notifikáciu nastavte len jeden interval.' : 'Upravte intervaly alebo pridajte vlastné dni pred/po dátume úlohy.'}
+                    {reminderIntervals.length === 1
+                      ? 'Pre jednorázovú notifikáciu nastavte len jeden interval.'
+                      : 'Upravte intervaly alebo pridajte vlastné dni pred/po dátume úlohy.'}
                   </p>
                 </div>
               </div>
 
-              {!hideChannelDropdown && (
-                <input type="hidden" value={notificationDaysOffset} />
-              )}
+              {!hideChannelDropdown && <input type="hidden" value={notificationDaysOffset} />}
 
               {/* User Selection (auto-fills name, email, and phone) */}
               <div className="md:col-span-2">
@@ -1005,7 +1162,11 @@ export default function NotificationBuilder({
                   {(() => {
                     const channel = formData.notificationChannel.toLowerCase()
                     const isRequired = channel.includes('email')
-                    return isRequired ? <span className="text-red-400 ml-1">*</span> : ' (alebo vyberte používateľa)'
+                    return isRequired ? (
+                      <span className="text-red-400 ml-1">*</span>
+                    ) : (
+                      ' (alebo vyberte používateľa)'
+                    )
                   })()}
                 </label>
                 <input
@@ -1019,7 +1180,11 @@ export default function NotificationBuilder({
                   const channel = formData.notificationChannel.toLowerCase()
                   const isRequired = channel.includes('email')
                   if (isRequired && (!formData.email || formData.email.trim() === '')) {
-                    return <p className="text-red-400 text-xs mt-1">⚠️ Email je povinný pre zvolený kanál</p>
+                    return (
+                      <p className="text-red-400 text-xs mt-1">
+                        ⚠️ Email je povinný pre zvolený kanál
+                      </p>
+                    )
                   }
                   return null
                 })()}
@@ -1033,7 +1198,11 @@ export default function NotificationBuilder({
                   {(() => {
                     const channel = formData.notificationChannel.toLowerCase()
                     const isRequired = channel.includes('sms')
-                    return isRequired ? <span className="text-red-400 ml-1">*</span> : ' (alebo vyberte používateľa)'
+                    return isRequired ? (
+                      <span className="text-red-400 ml-1">*</span>
+                    ) : (
+                      ' (alebo vyberte používateľa)'
+                    )
                   })()}
                 </label>
                 <input
@@ -1047,7 +1216,11 @@ export default function NotificationBuilder({
                   const channel = formData.notificationChannel.toLowerCase()
                   const isRequired = channel.includes('sms')
                   if (isRequired && (!formData.phoneNumber || formData.phoneNumber.trim() === '')) {
-                    return <p className="text-red-400 text-xs mt-1">⚠️ Telefónne číslo je povinné pre zvolený kanál</p>
+                    return (
+                      <p className="text-red-400 text-xs mt-1">
+                        ⚠️ Telefónne číslo je povinné pre zvolený kanál
+                      </p>
+                    )
                   }
                   return null
                 })()}
@@ -1093,9 +1266,7 @@ export default function NotificationBuilder({
                   Vyžadované pole chýba
                 </p>
                 <ul className="text-red-300 text-sm space-y-1 list-disc list-inside">
-                  {!formData.dutyDate && (
-                    <li>Prosím vyberte dátum úlohy pre pokračovanie</li>
-                  )}
+                  {!formData.dutyDate && <li>Prosím vyberte dátum úlohy pre pokračovanie</li>}
                 </ul>
               </div>
             )}
@@ -1139,41 +1310,74 @@ export default function NotificationBuilder({
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Kanál</p>
-                <p className="text-white text-lg">{formData.notificationChannel || 'Nenastavené'}</p>
+                <p className="text-white text-lg">
+                  {formData.notificationChannel || 'Nenastavené'}
+                </p>
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Dátum úlohy</p>
                 <p className="text-white text-lg">{formData.dutyDate || 'Nenastavené'}</p>
               </div>
               <div className="md:col-span-2">
+                <p className="text-gray-400 text-sm">Post-Duty Renewal (PDR)</p>
+                <div
+                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-base ${
+                    enablePdr
+                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                      : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                  }`}
+                >
+                  {enablePdr ? '🔄 Zapnuté' : 'Vypnuté'}
+                </div>
+                {enablePdr && (
+                  <p className="text-blue-300 text-sm mt-2">
+                    Bude vytvorená pripomienka deň po termíne úlohy na zadanie nového termínu.
+                  </p>
+                )}
+              </div>
+              <div className="md:col-span-2">
                 <p className="text-gray-400 text-sm mb-2">Dátumy notifikácií</p>
                 <div className="text-white text-lg">
                   {formData.dutyDate && reminderIntervals.length > 0 ? (
                     <div className="space-y-1">
-                      {reminderIntervals.sort((a, b) => a - b).map((interval, index) => {
-                        const dutyDate = new Date(formData.dutyDate)
-                        const notifDate = new Date(dutyDate)
-                        notifDate.setDate(notifDate.getDate() + interval)
+                      {reminderIntervals
+                        .sort((a, b) => a - b)
+                        .map((interval, index) => {
+                          const dutyDate = new Date(formData.dutyDate)
+                          const notifDate = new Date(dutyDate)
+                          notifDate.setDate(notifDate.getDate() + interval)
 
-                        const today = new Date()
-                        today.setHours(0, 0, 0, 0)
-                        const notifDateNoTime = new Date(notifDate)
-                        notifDateNoTime.setHours(0, 0, 0, 0)
-                        const isPast = notifDateNoTime < today
+                          const today = new Date()
+                          today.setHours(0, 0, 0, 0)
+                          const notifDateNoTime = new Date(notifDate)
+                          notifDateNoTime.setHours(0, 0, 0, 0)
+                          const isPast = notifDateNoTime < today
 
-                        const dateStr = notifDate.toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                        return (
-                          <div
-                            key={index}
-                            className={`text-sm px-3 py-2 rounded-lg ${isPast ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-pictus-lime/10 text-pictus-lime'}`}
-                          >
-                            {isPast && '⚠️ '}{dateStr} ({interval === 0 ? 'v deň úlohy' : interval > 0 ? `+${interval} dní` : `${interval} dní`})
-                            {isPast && ' - Dátum je v minulosti!'}
-                          </div>
-                        )
-                      })}
+                          const dateStr = notifDate.toLocaleDateString('sk-SK', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })
+                          return (
+                            <div
+                              key={index}
+                              className={`text-sm px-3 py-2 rounded-lg ${isPast ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-pictus-lime/10 text-pictus-lime'}`}
+                            >
+                              {isPast && '⚠️ '}
+                              {dateStr} (
+                              {interval === 0
+                                ? 'v deň úlohy'
+                                : interval > 0
+                                  ? `+${interval} dní`
+                                  : `${interval} dní`}
+                              ){isPast && ' - Dátum je v minulosti!'}
+                            </div>
+                          )
+                        })}
                     </div>
-                  ) : 'Nenastavené'}
+                  ) : (
+                    'Nenastavené'
+                  )}
                 </div>
               </div>
               <div>
@@ -1227,7 +1431,7 @@ export default function NotificationBuilder({
                 const today = new Date()
                 today.setHours(0, 0, 0, 0)
 
-                const pastCount = reminderIntervals.filter(offset => {
+                const pastCount = reminderIntervals.filter((offset) => {
                   const dutyDate = new Date(formData.dutyDate)
                   const notificationDate = new Date(dutyDate)
                   notificationDate.setDate(notificationDate.getDate() + offset)
@@ -1236,7 +1440,9 @@ export default function NotificationBuilder({
                 }).length
 
                 if (pastCount > 0) {
-                  warnings.push(`${pastCount} ${pastCount === 1 ? 'interval vedie' : 'intervaly vedú'} do minulosti`)
+                  warnings.push(
+                    `${pastCount} ${pastCount === 1 ? 'interval vedie' : 'intervaly vedú'} do minulosti`,
+                  )
                 }
               }
 
@@ -1313,9 +1519,11 @@ export default function NotificationBuilder({
                   >
                     {Array.from({ length: 33 }, (_, i) => -30 + i).map((day) => (
                       <option key={day} value={day}>
-                        {day === 0 ? 'V deň úlohy' :
-                         day < 0 ? `${Math.abs(day)} ${Math.abs(day) === 1 ? 'deň' : Math.abs(day) < 5 ? 'dni' : 'dní'} pred` :
-                         `${day} ${day === 1 ? 'deň' : day < 5 ? 'dni' : 'dní'} po`}
+                        {day === 0
+                          ? 'V deň úlohy'
+                          : day < 0
+                            ? `${Math.abs(day)} ${Math.abs(day) === 1 ? 'deň' : Math.abs(day) < 5 ? 'dni' : 'dní'} pred`
+                            : `${day} ${day === 1 ? 'deň' : day < 5 ? 'dni' : 'dní'} po`}
                       </option>
                     ))}
                   </select>

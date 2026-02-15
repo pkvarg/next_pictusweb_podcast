@@ -21,6 +21,7 @@ import {
   Building,
   Copy,
   Sparkles,
+  RotateCcw,
 } from 'lucide-react'
 import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
@@ -29,6 +30,7 @@ import MileageModal from '@/app/components/client/MileageModal'
 import FleetManagerUserModal from '@/app/components/client/FleetManagerUserModal'
 import NotificationBuilder from '@/app/components/admin/NotificationBuilder'
 import NotificationSettings from '@/app/components/admin/NotificationSettings'
+import RenewalsContent from '@/app/components/client/RenewalsContent'
 import { FaEuroSign } from 'react-icons/fa'
 
 interface MyVehicleExpense {
@@ -107,6 +109,7 @@ interface User {
 interface VehicleNotification {
   id: number
   dutyBatchId: string | null
+  isPdr?: boolean
   organizationId: string | null
   organization?: {
     id: string
@@ -117,6 +120,12 @@ interface VehicleNotification {
   phoneNumber: string | null
   vehicleRegistration: string | null
   myVehicleId: string | null
+  myVehicle?: {
+    id: string
+    registration: string
+    type: string
+    image: string | null
+  }
   notificationType: string | null
   notificationChannel: string | null
   notificationDate: string | null
@@ -129,7 +138,14 @@ interface VehicleNotification {
   createdAt: string
 }
 
-type TabType = 'vehicles' | 'users' | 'notifications' | 'templates' | 'types' | 'organizations'
+type TabType =
+  | 'vehicles'
+  | 'users'
+  | 'notifications'
+  | 'renewals'
+  | 'templates'
+  | 'types'
+  | 'organizations'
 
 const MyFleetPage = () => {
   const { data: session, status } = useSession()
@@ -142,7 +158,15 @@ const MyFleetPage = () => {
     const tab = params.get('tab') as TabType
     if (
       tab &&
-      ['vehicles', 'users', 'notifications', 'templates', 'types', 'organizations'].includes(tab)
+      [
+        'vehicles',
+        'users',
+        'notifications',
+        'renewals',
+        'templates',
+        'types',
+        'organizations',
+      ].includes(tab)
     ) {
       setActiveTab(tab)
     }
@@ -157,6 +181,19 @@ const MyFleetPage = () => {
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [orgLoading, setOrgLoading] = useState(false)
   const [isPictusaciUser, setIsPictusaciUser] = useState(false)
+
+  // Debug: Log organization changes
+  useEffect(() => {
+    console.log('[my-fleet] Organization state changed to:', organization)
+    if (organization) {
+      console.log(
+        '[my-fleet] Organization details - id:',
+        organization.id,
+        'name:',
+        organization.name,
+      )
+    }
+  }, [organization])
 
   // Organizations state (for PICTUSACI users)
   const [organizations, setOrganizations] = useState<Organization[]>([])
@@ -174,6 +211,10 @@ const MyFleetPage = () => {
   const [notificationsLoading, setNotificationsLoading] = useState(false)
   const [duplicateNotificationData, setDuplicateNotificationData] =
     useState<VehicleNotification | null>(null)
+  const [editingNotificationId, setEditingNotificationId] = useState<number | null>(null)
+
+  // Renewals state
+  const [pendingRenewalsCount, setPendingRenewalsCount] = useState(0)
 
   // Notification filters
   const [filterVehicle, setFilterVehicle] = useState('')
@@ -216,20 +257,25 @@ const MyFleetPage = () => {
   const fetchOrganization = useCallback(async () => {
     // Use organizationId first, fallback to organization (which contains UUID after migration)
     const orgId = (session?.user as any)?.organizationId || session?.user?.organization
+    console.log('[my-fleet] fetchOrganization called - orgId from session:', orgId)
+    console.log('[my-fleet] Session user:', session?.user)
+
     if (!orgId) {
-      console.log('No organizationId found in session:', session?.user)
+      console.log('[my-fleet] No organizationId found in session:', session?.user)
       return
     }
 
     try {
       setOrgLoading(true)
-      console.log('Fetching organization with ID:', orgId)
+      console.log('[my-fleet] Fetching organization with ID:', orgId)
       const response = await fetch(`/api/organizations?id=${orgId}`)
       if (response.ok) {
         const data = await response.json()
-        console.log('Organization API response:', data)
+        console.log('[my-fleet] Organization API response:', data)
         if (data.organizations && data.organizations.length > 0) {
           const org = data.organizations[0]
+          console.log('[my-fleet] Setting organization state to:', org)
+          console.log('[my-fleet] Organization ID:', org.id, 'Name:', org.name)
           setOrganization(org)
 
           // Check if user is PICTUSACI
@@ -240,13 +286,13 @@ const MyFleetPage = () => {
           // Fetch users for this organization
           fetchUsers(org.id)
         } else {
-          console.log('No organizations found in response')
+          console.log('[my-fleet] No organizations found in response')
         }
       } else {
-        console.log('Organization API error:', response.status, response.statusText)
+        console.log('[my-fleet] Organization API error:', response.status, response.statusText)
       }
     } catch (err) {
-      console.error('Error fetching organization:', err)
+      console.error('[my-fleet] Error fetching organization:', err)
     } finally {
       setOrgLoading(false)
     }
@@ -320,6 +366,25 @@ const MyFleetPage = () => {
     }
   }, [session?.user])
 
+  const fetchPendingRenewals = useCallback(async () => {
+    // Get organizationId from session
+    const orgId = (session?.user as any)?.organizationId || session?.user?.organization
+    if (!orgId) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/duty-renewals?organizationId=${orgId}&status=pending`)
+      if (response.ok) {
+        const data = await response.json()
+        setPendingRenewalsCount(data.dutyBatches?.length || 0)
+      }
+    } catch (err) {
+      console.error('Error fetching pending renewals:', err)
+      setPendingRenewalsCount(0)
+    }
+  }, [session?.user])
+
   useEffect(() => {
     // Check if user is authenticated and is fleet manager
     if (status === 'loading') return
@@ -343,7 +408,16 @@ const MyFleetPage = () => {
     fetchVehicles()
     fetchOrganization()
     fetchNotifications()
-  }, [session, status, router, fetchVehicles, fetchOrganization, fetchNotifications])
+    fetchPendingRenewals()
+  }, [
+    session,
+    status,
+    router,
+    fetchVehicles,
+    fetchOrganization,
+    fetchNotifications,
+    fetchPendingRenewals,
+  ])
 
   // Fetch organizations when tab is active and user is PICTUSACI
   useEffect(() => {
@@ -576,7 +650,9 @@ const MyFleetPage = () => {
   const uniqueTypes = Array.from(
     new Set(notifications.map((n) => n.notificationType).filter((t): t is string => Boolean(t))),
   )
-  const uniqueStatuses = Array.from(new Set(notifications.map((n) => n.status).filter((s): s is string => Boolean(s))))
+  const uniqueStatuses = Array.from(
+    new Set(notifications.map((n) => n.status).filter((s): s is string => Boolean(s))),
+  )
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
@@ -685,6 +761,7 @@ const MyFleetPage = () => {
               <Bell size={20} />
               Notifikácie
             </button>
+
             {isPictusaciUser && (
               <button
                 onClick={() => setActiveTab('organizations')}
@@ -701,17 +778,6 @@ const MyFleetPage = () => {
             {organization?.tierRelation?.name === 'BUSINESS' && (
               <>
                 <button
-                  onClick={() => setActiveTab('templates')}
-                  className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
-                    activeTab === 'templates'
-                      ? 'text-pictus-lime border-b-2 border-pictus-lime'
-                      : 'text-gray-400 hover:text-pictus-white'
-                  }`}
-                >
-                  <Sparkles size={20} />
-                  Šablóny
-                </button>
-                <button
                   onClick={() => setActiveTab('types')}
                   className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
                     activeTab === 'types'
@@ -722,8 +788,35 @@ const MyFleetPage = () => {
                   <Settings size={20} />
                   Typy notifikácií
                 </button>
+                <button
+                  onClick={() => setActiveTab('templates')}
+                  className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                    activeTab === 'templates'
+                      ? 'text-pictus-lime border-b-2 border-pictus-lime'
+                      : 'text-gray-400 hover:text-pictus-white'
+                  }`}
+                >
+                  <Sparkles size={20} />
+                  Šablóny
+                </button>
               </>
             )}
+            <button
+              onClick={() => setActiveTab('renewals')}
+              className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                activeTab === 'renewals'
+                  ? 'text-pictus-lime border-b-2 border-pictus-lime'
+                  : 'text-gray-400 hover:text-pictus-white'
+              }`}
+            >
+              <RotateCcw size={20} />
+              Obnovy
+              {pendingRenewalsCount > 0 && (
+                <span className="px-2 py-0.5 bg-blue-500 text-white text-xs rounded-full">
+                  {pendingRenewalsCount}
+                </span>
+              )}
+            </button>
           </div>
         </div>
 
@@ -1104,6 +1197,7 @@ const MyFleetPage = () => {
                   <button
                     onClick={() => {
                       setDuplicateNotificationData(null)
+                      setEditingNotificationId(null)
                       setShowNotificationBuilder(true)
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
@@ -1340,6 +1434,7 @@ const MyFleetPage = () => {
                     <button
                       onClick={() => {
                         setDuplicateNotificationData(null)
+                        setEditingNotificationId(null)
                         setShowNotificationBuilder(true)
                       }}
                       className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
@@ -1395,12 +1490,19 @@ const MyFleetPage = () => {
                             </td>
                             <td className="px-4 py-3">
                               <div className="text-sm text-white">
-                                {notification.vehicleRegistration || '-'}
+                                {notification.vehicleRegistration || notification.myVehicle?.registration || '-'}
                               </div>
                             </td>
                             <td className="px-4 py-3">
-                              <div className="text-sm text-gray-300">
-                                {notification.notificationType || '-'}
+                              <div className="flex items-center gap-2">
+                                <div className="text-sm text-gray-300">
+                                  {notification.notificationType || '-'}
+                                </div>
+                                {notification.isPdr && (
+                                  <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
+                                    🔄 PDR
+                                  </span>
+                                )}
                               </div>
                             </td>
                             <td className="px-4 py-3">
@@ -1464,26 +1566,6 @@ const MyFleetPage = () => {
                             <td className="px-4 py-3">
                               <div className="flex items-center justify-center gap-2">
                                 <button
-                                  onClick={() => {
-                                    setDuplicateNotificationData(notification)
-                                    setShowNotificationBuilder(true)
-                                  }}
-                                  className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
-                                  title="Duplikovať"
-                                >
-                                  <Copy className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setDuplicateNotificationData(notification)
-                                    setShowNotificationBuilder(true)
-                                  }}
-                                  className="p-2 bg-gray-500/20 hover:bg-gray-500/30 text-gray-300 border border-gray-500/30 rounded-lg transition-all"
-                                  title="Upraviť"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </button>
-                                <button
                                   onClick={() => handleDeleteNotification(notification.id)}
                                   className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
                                   title="Odstrániť"
@@ -1512,6 +1594,7 @@ const MyFleetPage = () => {
                   onClick={() => {
                     setShowNotificationBuilder(false)
                     setDuplicateNotificationData(null)
+                    setEditingNotificationId(null)
                   }}
                   className="mb-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
                 >
@@ -1523,14 +1606,26 @@ const MyFleetPage = () => {
                     organizationTier={organization.tierRelation?.name || null}
                     hideChannelDropdown={true}
                     duplicateData={duplicateNotificationData}
-                    onSuccess={() => {
+                    onSuccess={async () => {
+                      // If we're editing, delete the original notification
+                      if (editingNotificationId) {
+                        try {
+                          await fetch(`/api/vehicle-notifications/${editingNotificationId}`, {
+                            method: 'DELETE',
+                          })
+                        } catch (err) {
+                          console.error('Error deleting original notification:', err)
+                        }
+                      }
                       setShowNotificationBuilder(false)
                       setDuplicateNotificationData(null)
+                      setEditingNotificationId(null)
                       fetchNotifications()
                     }}
                     onCancel={() => {
                       setShowNotificationBuilder(false)
                       setDuplicateNotificationData(null)
+                      setEditingNotificationId(null)
                     }}
                   />
                 ) : (
@@ -1551,7 +1646,7 @@ const MyFleetPage = () => {
               <h2 className="text-2xl font-bold text-white mb-2">Šablóny notifikácií</h2>
               <p className="text-gray-400">Spravujte šablóny notifikácií pre vašu organizáciu.</p>
             </div>
-            {organization && (
+            {organization?.id && organization.id.trim() !== '' ? (
               <NotificationSettings
                 organization={organization.name}
                 organizationId={organization.id}
@@ -1559,6 +1654,10 @@ const MyFleetPage = () => {
                 hideTabs={true}
                 hideOrganizationSelector={true}
               />
+            ) : (
+              <div className="mt-6 p-8 bg-white/5 rounded-xl border border-white/10 text-center">
+                <p className="text-gray-400">Načítavam organizáciu...</p>
+              </div>
             )}
           </div>
         )}
@@ -1585,7 +1684,7 @@ const MyFleetPage = () => {
                 </div>
               )}
             </div>
-            {organization && (
+            {organization?.id && organization.id.trim() !== '' ? (
               <NotificationSettings
                 organization={organization.name}
                 organizationId={organization.id}
@@ -1593,7 +1692,25 @@ const MyFleetPage = () => {
                 hideTabs={true}
                 hideOrganizationSelector={true}
               />
+            ) : (
+              <div className="mt-6 p-8 bg-white/5 rounded-xl border border-white/10 text-center">
+                <p className="text-gray-400">Načítavam organizáciu...</p>
+              </div>
             )}
+          </div>
+        )}
+
+        {/* Renewals Tab */}
+        {activeTab === 'renewals' && (
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Obnova úloh</h2>
+                <p className="text-gray-400 mt-1">Rýchle obnovenie pravidelných povinností</p>
+              </div>
+            </div>
+
+            <RenewalsContent embedded={true} />
           </div>
         )}
 
