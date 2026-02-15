@@ -570,12 +570,12 @@ const MyFleetPage = () => {
 
   // Get unique values for filter dropdowns
   const uniqueVehicles = Array.from(
-    new Set(notifications.map((n) => n.vehicleRegistration).filter(Boolean)),
+    new Set(notifications.map((n) => n.vehicleRegistration).filter((v): v is string => Boolean(v))),
   )
   const uniqueTypes = Array.from(
-    new Set(notifications.map((n) => n.notificationType).filter(Boolean)),
+    new Set(notifications.map((n) => n.notificationType).filter((t): t is string => Boolean(t))),
   )
-  const uniqueStatuses = Array.from(new Set(notifications.map((n) => n.status).filter(Boolean)))
+  const uniqueStatuses = Array.from(new Set(notifications.map((n) => n.status).filter((s): s is string => Boolean(s))))
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
@@ -1395,9 +1395,6 @@ const MyFleetPage = () => {
                             <td className="px-4 py-3">
                               <div className="text-sm text-white">
                                 {notification.vehicleRegistration || '-'}
-                              </div>
-                              <div className="text-xs text-gray-400">
-                                {notification.vehicleType}
                               </div>
                             </td>
                             <td className="px-4 py-3">
