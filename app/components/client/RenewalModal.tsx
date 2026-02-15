@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { X, Calendar, Check, Loader, AlertCircle, Edit } from 'lucide-react'
 
 interface VehicleNotification {
@@ -66,12 +66,7 @@ const RenewalModal = ({ dutyBatch, onClose, onSuccess }: RenewalModalProps) => {
   const [presets, setPresets] = useState<RenewalPreset[]>([])
   const [loadingPresets, setLoadingPresets] = useState(true)
 
-  // Fetch presets
-  useEffect(() => {
-    fetchPresets()
-  }, [])
-
-  const fetchPresets = async () => {
+  const fetchPresets = useCallback(async () => {
     setLoadingPresets(true)
     try {
       const orgId = dutyBatch.allNotifications[0]?.organizationId
@@ -90,7 +85,12 @@ const RenewalModal = ({ dutyBatch, onClose, onSuccess }: RenewalModalProps) => {
     } finally {
       setLoadingPresets(false)
     }
-  }
+  }, [dutyBatch.allNotifications, dutyBatch.notificationType])
+
+  // Fetch presets
+  useEffect(() => {
+    fetchPresets()
+  }, [fetchPresets])
 
   const handlePresetClick = (months: number) => {
     const originalDate = new Date(dutyBatch.originalDutyDate)

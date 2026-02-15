@@ -1,6 +1,6 @@
 'use client'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { RotateCcw, Calendar, AlertCircle, Check, Loader } from 'lucide-react'
 import RenewalCard from './RenewalCard'
 
@@ -64,14 +64,7 @@ const RenewalsContent = ({ embedded = false }: RenewalsContentProps) => {
     }
   }, [session])
 
-  // Fetch renewals when organization or filter changes
-  useEffect(() => {
-    if (organizationId) {
-      fetchRenewals()
-    }
-  }, [organizationId, statusFilter])
-
-  const fetchRenewals = async () => {
+  const fetchRenewals = useCallback(async () => {
     setLoading(true)
     setError('')
 
@@ -92,7 +85,14 @@ const RenewalsContent = ({ embedded = false }: RenewalsContentProps) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [organizationId, statusFilter])
+
+  // Fetch renewals when organization or filter changes
+  useEffect(() => {
+    if (organizationId) {
+      fetchRenewals()
+    }
+  }, [organizationId, fetchRenewals])
 
   const handleRenewalSuccess = () => {
     fetchRenewals()

@@ -159,7 +159,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
     }
 
     fetchData()
-  }, [])
+  }, [organization])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('sk-SK', {

@@ -46,7 +46,11 @@ interface Vehicle {
   id: string
   registration: string
   type: string
-  organization: string
+  organizationId?: string
+  organizationRelation?: {
+    id: string
+    name: string
+  }
 }
 
 interface Organization {

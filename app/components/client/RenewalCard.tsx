@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Calendar, Check, Edit, X, Loader, AlertCircle, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react'
 import RenewalModal from './RenewalModal'
 
@@ -60,12 +60,7 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
   const [loadingPresets, setLoadingPresets] = useState(true)
   const [expanded, setExpanded] = useState(false)
 
-  // Fetch presets when component mounts
-  useEffect(() => {
-    fetchPresets()
-  }, [dutyBatch.notificationType, dutyBatch.allNotifications[0]?.organizationId])
-
-  const fetchPresets = async () => {
+  const fetchPresets = useCallback(async () => {
     setLoadingPresets(true)
     try {
       const orgId = dutyBatch.allNotifications[0]?.organizationId
@@ -84,7 +79,12 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
     } finally {
       setLoadingPresets(false)
     }
-  }
+  }, [dutyBatch.allNotifications, dutyBatch.notificationType])
+
+  // Fetch presets when component mounts
+  useEffect(() => {
+    fetchPresets()
+  }, [fetchPresets])
 
   const handleQuickRenew = async (months: number) => {
     setCreating(true)
@@ -285,7 +285,7 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
                   ))}
                 </div>
                 <p className="text-xs text-gray-400 mt-2">
-                  Môžete zmeniť intervaly pomocou tlačidla "Upraviť detaily" nižšie
+                  Môžete zmeniť intervaly pomocou tlačidla &quot;Upraviť detaily&quot; nižšie
                 </p>
               </div>
 

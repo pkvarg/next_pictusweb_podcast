@@ -141,7 +141,7 @@ export default function NotificationSettings({
         )
         console.log(
           '[NotificationSettings] Full options:',
-          options.map((o) => ({ label: o.label, org: o.organizationRelation?.name })),
+          options.map((o: TypeOption) => ({ label: o.label, org: o.organizationRelation?.name })),
         )
         setTypeOptions(options)
         setUsingDefaultTypeOptions(false)
@@ -378,7 +378,7 @@ export default function NotificationSettings({
       )
       setOrganizationId(initialOrganizationId)
     }
-  }, [initialOrganizationId])
+  }, [initialOrganizationId, organizationId])
 
   // Sync organization name when prop changes
   useEffect(() => {
@@ -391,7 +391,7 @@ export default function NotificationSettings({
       )
       setOrganization(initialOrganization)
     }
-  }, [initialOrganization])
+  }, [initialOrganization, organization])
 
   useEffect(() => {
     fetchOrganizations()
