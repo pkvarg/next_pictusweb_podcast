@@ -251,6 +251,7 @@ const ClientZone = () => {
                   ? 'demo'
                   : organization.name
               }
+              organizationName={organization.name}
             />
           </section>
         )}
@@ -266,6 +267,7 @@ const ClientZone = () => {
                     ? 'demo'
                     : organization.name
                 }
+                organizationName={organization.name}
               />
             </div>
           </section>

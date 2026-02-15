@@ -140,9 +140,12 @@ const MyFleetPage = () => {
   const [filterVehicle, setFilterVehicle] = useState('')
   const [filterPerson, setFilterPerson] = useState('')
   const [filterType, setFilterType] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
   const [filterDatePreset, setFilterDatePreset] = useState<'all' | 'thisMonth' | 'thisYear' | 'custom'>('all')
   const [filterDateFrom, setFilterDateFrom] = useState('')
   const [filterDateTo, setFilterDateTo] = useState('')
+  const [sortByDutyDate, setSortByDutyDate] = useState<'asc' | 'desc' | 'none'>('none')
+  const [sortByNotificationDate, setSortByNotificationDate] = useState<'asc' | 'desc' | 'none'>('none')
 
   const handleLogout = () => {
     signOut({ callbackUrl: '/' })
@@ -395,7 +398,7 @@ const MyFleetPage = () => {
     )
   }
 
-  // Filter notifications
+  // Filter and sort notifications
   const filteredNotifications = notifications.filter(notification => {
     // Organization filter - notifications are already filtered by organizationId in the API,
     // so we don't need to filter again here. This was causing all notifications to be hidden.
@@ -413,6 +416,11 @@ const MyFleetPage = () => {
 
     // Type filter
     if (filterType && notification.notificationType !== filterType) {
+      return false
+    }
+
+    // Status filter
+    if (filterStatus && notification.status !== filterStatus) {
       return false
     }
 
@@ -447,11 +455,35 @@ const MyFleetPage = () => {
     }
 
     return true
+  }).sort((a, b) => {
+    // Sort by duty date if selected
+    if (sortByDutyDate !== 'none') {
+      const dateA = a.dutyDate ? new Date(a.dutyDate).getTime() : 0
+      const dateB = b.dutyDate ? new Date(b.dutyDate).getTime() : 0
+
+      if (dateA !== dateB) {
+        return sortByDutyDate === 'asc' ? dateA - dateB : dateB - dateA
+      }
+    }
+
+    // Sort by notification date if selected
+    if (sortByNotificationDate !== 'none') {
+      const dateA = a.notificationDate ? new Date(a.notificationDate).getTime() : 0
+      const dateB = b.notificationDate ? new Date(b.notificationDate).getTime() : 0
+
+      if (dateA !== dateB) {
+        return sortByNotificationDate === 'asc' ? dateA - dateB : dateB - dateA
+      }
+    }
+
+    // Default: sort by creation date descending
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   })
 
   // Get unique values for filter dropdowns
   const uniqueVehicles = Array.from(new Set(notifications.map(n => n.vehicleRegistration).filter(Boolean)))
   const uniqueTypes = Array.from(new Set(notifications.map(n => n.notificationType).filter(Boolean)))
+  const uniqueStatuses = Array.from(new Set(notifications.map(n => n.status).filter(Boolean)))
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
@@ -952,6 +984,74 @@ const MyFleetPage = () => {
                         </select>
                       </div>
 
+                      {/* Status Filter */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Stav
+                        </label>
+                        <select
+                          value={filterStatus}
+                          onChange={(e) => setFilterStatus(e.target.value)}
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                        >
+                          <option value="">Všetky stavy</option>
+                          {uniqueStatuses.map((status) => (
+                            <option key={status} value={status}>
+                              {status === 'sent' ? 'Odoslané' :
+                               status === 'confirmed' ? 'Potvrdené' :
+                               status === 'pending' ? 'Čaká' :
+                               status === 'failed' ? 'Zlyhalo' :
+                               status === 'imported' ? 'Importované' :
+                               status.startsWith('reminded') ? 'Pripomenuté' :
+                               status === 'no_response' ? 'Bez odpovede' :
+                               status}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Sort by Duty Date */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Zoradiť podľa termínu
+                        </label>
+                        <select
+                          value={sortByDutyDate}
+                          onChange={(e) => {
+                            setSortByDutyDate(e.target.value as 'asc' | 'desc' | 'none')
+                            if (e.target.value !== 'none') {
+                              setSortByNotificationDate('none')
+                            }
+                          }}
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                        >
+                          <option value="none">Nezoraďovať</option>
+                          <option value="asc">Vzostupne (najskôr najstarší)</option>
+                          <option value="desc">Zostupne (najskôr najnovší)</option>
+                        </select>
+                      </div>
+
+                      {/* Sort by Notification Date */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Zoradiť podľa dátumu notifikácie
+                        </label>
+                        <select
+                          value={sortByNotificationDate}
+                          onChange={(e) => {
+                            setSortByNotificationDate(e.target.value as 'asc' | 'desc' | 'none')
+                            if (e.target.value !== 'none') {
+                              setSortByDutyDate('none')
+                            }
+                          }}
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                        >
+                          <option value="none">Nezoraďovať</option>
+                          <option value="asc">Vzostupne (najskôr najstarší)</option>
+                          <option value="desc">Zostupne (najskôr najnovší)</option>
+                        </select>
+                      </div>
+
                       {/* Date Preset Filter */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1005,13 +1105,16 @@ const MyFleetPage = () => {
                     </div>
 
                     {/* Clear Filters Button */}
-                    {(filterVehicle || filterPerson || filterType || filterDatePreset !== 'all') && (
+                    {(filterVehicle || filterPerson || filterType || filterStatus || sortByDutyDate !== 'none' || sortByNotificationDate !== 'none' || filterDatePreset !== 'all') && (
                       <div className="mt-4">
                         <button
                           onClick={() => {
                             setFilterVehicle('')
                             setFilterPerson('')
                             setFilterType('')
+                            setFilterStatus('')
+                            setSortByDutyDate('none')
+                            setSortByNotificationDate('none')
                             setFilterDatePreset('all')
                             setFilterDateFrom('')
                             setFilterDateTo('')

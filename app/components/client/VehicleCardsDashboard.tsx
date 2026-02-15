@@ -18,6 +18,10 @@ interface MyVehicle {
   image: string | null
   registration: string
   type: string
+  organizationRelation?: {
+    id: string
+    name: string
+  } | null
 }
 
 interface VehicleNotification {
@@ -56,6 +60,7 @@ interface VehicleCard {
   vehicleRegistration: string
   vehicleType: string | null  // Keep for display, derived from myVehicle.type
   vehicleImage: string | null
+  organizationName: string | null
   nextTask: VehicleNotification | null
   allTasks: VehicleNotification[]
   taskGroups: TaskGroup[]
@@ -65,9 +70,11 @@ interface VehicleCard {
 
 interface VehicleCardsDashboardProps {
   company: string
+  organizationName?: string
 }
 
-const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
+const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashboardProps) => {
+  const isPictusaciUser = organizationName === 'PICTUSACI'
   const [vehicleCards, setVehicleCards] = useState<VehicleCard[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedTaskTypes, setExpandedTaskTypes] = useState<Set<string>>(new Set())
@@ -182,6 +189,7 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
               vehicleRegistration,
               vehicleType: notifications[0]?.myVehicle?.type || null,  // Get from myVehicle relation
               vehicleImage: notifications[0]?.myVehicle?.image || null,
+              organizationName: notifications[0]?.myVehicle?.organizationRelation?.name || notifications[0]?.organization?.name || null,
               nextTask,
               allTasks: notifications,
               taskGroups,
@@ -373,6 +381,9 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                   <div>
                     <h4 className="text-4xl font-light text-pictus-white">{vehicle.vehicleRegistration}</h4>
                     <p className="text-pictus-white text-lg">{vehicle.vehicleType || 'Neznámy typ'}</p>
+                    {isPictusaciUser && vehicle.organizationName && (
+                      <p className="text-sm text-pictus-white/60">{vehicle.organizationName}</p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -403,6 +414,9 @@ const VehicleCardsDashboard = ({ company }: VehicleCardsDashboardProps) => {
                           <p className="text-pictus-white text-lg md:text-2xl opacity-75">
                             {vehicle.vehicleType || 'Neznámy typ'}
                           </p>
+                          {isPictusaciUser && vehicle.organizationName && (
+                            <p className="text-sm md:text-base text-pictus-white/60">{vehicle.organizationName}</p>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-3 md:gap-6 mr-8">

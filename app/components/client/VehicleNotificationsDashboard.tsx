@@ -75,9 +75,10 @@ type TimeFilter = 'all' | 'week' | 'month'
 
 interface VehicleNotificationsDashboardProps {
   company: string
+  organizationName?: string
 }
 
-const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboardProps) => {
+const VehicleNotificationsDashboard = ({ company, organizationName }: VehicleNotificationsDashboardProps) => {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all')
@@ -434,7 +435,7 @@ const VehicleNotificationsDashboard = ({ company }: VehicleNotificationsDashboar
 
       {/* Vehicle Cards Dashboard */}
       <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-2 lg:p-6 border border-pictus-lime/30">
-        <VehicleCardsDashboard company={company} />
+        <VehicleCardsDashboard company={company} organizationName={organizationName} />
       </div>
 
       {/* Original Notification Stats Cards */}

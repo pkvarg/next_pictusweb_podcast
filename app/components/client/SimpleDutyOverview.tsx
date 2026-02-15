@@ -15,6 +15,10 @@ interface MyVehicle {
   image: string | null
   registration: string
   type: string
+  organizationRelation?: {
+    id: string
+    name: string
+  } | null
 }
 
 interface VehicleNotification {
@@ -38,6 +42,7 @@ interface VehicleWithDuty {
   registration: string
   type: string
   image: string | null
+  organizationName: string | null
   duties: DutyInfo[]
   nextDutyDate: string | null
   nextDutyType: string | null
@@ -48,9 +53,11 @@ interface VehicleWithDuty {
 
 interface SimpleDutyOverviewProps {
   company: string
+  organizationName?: string
 }
 
-const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
+const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewProps) => {
+  const isPictusaciUser = organizationName === 'PICTUSACI'
   const [vehiclesWithDuties, setVehiclesWithDuties] = useState<VehicleWithDuty[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -108,8 +115,21 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
 
           console.log(`[SimpleDutyOverview] Vehicle ${vehicle.registration}: ${upcomingDuties.length} upcoming duties (next 60 days)`)
 
+          // Deduplicate notifications by duty date and notification type
+          // Keep only one notification per unique combination of (vehicleId, notificationType, dutyDate)
+          const deduplicatedDuties = upcomingDuties.reduce((acc: VehicleNotification[], duty) => {
+            const key = `${duty.notificationType}-${duty.dutyDate}`
+            const exists = acc.some(d => `${d.notificationType}-${d.dutyDate}` === key)
+            if (!exists) {
+              acc.push(duty)
+            }
+            return acc
+          }, [])
+
+          console.log(`[SimpleDutyOverview] Vehicle ${vehicle.registration}: ${deduplicatedDuties.length} unique duties after deduplication`)
+
           // Build duty info array
-          const duties: DutyInfo[] = upcomingDuties.map((duty) => {
+          const duties: DutyInfo[] = deduplicatedDuties.map((duty) => {
             const dutyDate = new Date(duty.dutyDate!)
             dutyDate.setHours(0, 0, 0, 0)
             const timeDiff = dutyDate.getTime() - now.getTime()
@@ -122,7 +142,7 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
             }
           })
 
-          const nextDuty = upcomingDuties[0] || null
+          const nextDuty = deduplicatedDuties[0] || null
           let daysUntilNext: number | null = null
           let urgencyLevel: 'green' | 'orange' | 'red' | 'gray' = 'gray'
 
@@ -146,6 +166,7 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
             registration: vehicle.registration,
             type: vehicle.type,
             image: vehicle.image,
+            organizationName: vehicle.organizationRelation?.name || null,
             duties,
             nextDutyDate: nextDuty?.dutyDate || null,
             nextDutyType: nextDuty?.notificationType || null,
@@ -277,6 +298,9 @@ const SimpleDutyOverview = ({ company }: SimpleDutyOverviewProps) => {
               <div className="flex-shrink-0 min-w-[120px]">
                 <h3 className="text-xl font-light text-pictus-white">{vehicle.registration}</h3>
                 <p className="text-sm text-pictus-lime">{vehicle.type}</p>
+                {isPictusaciUser && vehicle.organizationName && (
+                  <p className="text-xs text-pictus-white/60 mt-1">{vehicle.organizationName}</p>
+                )}
               </div>
 
               {/* Duty info */}

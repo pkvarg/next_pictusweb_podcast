@@ -65,6 +65,10 @@ interface VehicleNotification {
 interface MyVehicle {
   id: string
   organization: string
+  organizationRelation?: {
+    id: string
+    name: string
+  }
   type: string
   registration: string
   year: number | null
@@ -79,9 +83,11 @@ interface MyVehicle {
 interface FleetOverviewProps {
   userId?: string
   organization?: string
+  organizationName?: string
 }
 
-const FleetOverview = ({ userId, organization }: FleetOverviewProps) => {
+const FleetOverview = ({ userId, organization, organizationName }: FleetOverviewProps) => {
+  const isPictusaciUser = organizationName === 'PICTUSACI'
   const [vehicles, setVehicles] = useState<MyVehicle[]>([])
   const [notifications, setNotifications] = useState<VehicleNotification[]>([])
   const [loading, setLoading] = useState(true)
@@ -528,6 +534,9 @@ const FleetOverview = ({ userId, organization }: FleetOverviewProps) => {
                       <Calendar size={14} />
                       <span className="text-sm">Rok: {vehicle.year}</span>
                     </div>
+                  )}
+                  {isPictusaciUser && vehicle.organizationRelation?.name && (
+                    <p className="text-sm text-pictus-white/60 mt-1">{vehicle.organizationRelation.name}</p>
                   )}
                 </div>
 
