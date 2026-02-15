@@ -18,9 +18,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (!session.user.isFleetManager && session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Forbidden - Fleet Manager or Admin access required' }, { status: 403 })
-    }
+    // Note: Removed fleet manager check - all authenticated users can view vehicles from their organization
+    // Fleet manager features are controlled at the UI/page level, not the API level
 
     let organizationId: string | null = null
     let isPictusaciUser = false

@@ -31,6 +31,22 @@ import NotificationBuilder from '@/app/components/admin/NotificationBuilder'
 import NotificationSettings from '@/app/components/admin/NotificationSettings'
 import { FaEuroSign } from 'react-icons/fa'
 
+interface MyVehicleExpense {
+  id: string
+  item: string
+  cost: number
+  date: string
+  createdAt: string
+}
+
+interface MyVehicleMileage {
+  id: string
+  kilometers: number
+  date: string
+  note: string | null
+  createdAt: string
+}
+
 interface MyVehicle {
   id: string
   organization: string
@@ -46,6 +62,8 @@ interface MyVehicle {
   note: string | null
   createdAt: string
   updatedAt: string
+  expenses?: MyVehicleExpense[]
+  mileageRecords?: MyVehicleMileage[]
 }
 
 interface TierInfo {
@@ -62,12 +80,14 @@ interface Organization {
   id: string
   name: string
   tierId: string | null
+  mainContact?: string | null
   tierRelation?: TierInfo
   currentUsersCount: number
   currentVehiclesCount: number
   currentNotificationsCount: number
   currentTemplatesCount: number
   currentNotificationTypesCount: number
+  createdAt?: string
 }
 
 interface User {
@@ -108,12 +128,24 @@ interface VehicleNotification {
   createdAt: string
 }
 
-type TabType = 'vehicles' | 'users' | 'notifications' | 'templates' | 'types'
+type TabType = 'vehicles' | 'users' | 'notifications' | 'templates' | 'types' | 'organizations'
 
 const MyFleetPage = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
   const t = useTranslations('Client')
+
+  // Check for tab query parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab') as TabType
+    if (
+      tab &&
+      ['vehicles', 'users', 'notifications', 'templates', 'types', 'organizations'].includes(tab)
+    ) {
+      setActiveTab(tab)
+    }
+  }, [])
   const [vehicles, setVehicles] = useState<MyVehicle[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -123,6 +155,11 @@ const MyFleetPage = () => {
   const [activeTab, setActiveTab] = useState<TabType>('vehicles')
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [orgLoading, setOrgLoading] = useState(false)
+  const [isPictusaciUser, setIsPictusaciUser] = useState(false)
+
+  // Organizations state (for PICTUSACI users)
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [organizationsLoading, setOrganizationsLoading] = useState(false)
 
   // Users state
   const [users, setUsers] = useState<User[]>([])
@@ -134,18 +171,23 @@ const MyFleetPage = () => {
   const [showNotificationBuilder, setShowNotificationBuilder] = useState(false)
   const [notifications, setNotifications] = useState<VehicleNotification[]>([])
   const [notificationsLoading, setNotificationsLoading] = useState(false)
-  const [duplicateNotificationData, setDuplicateNotificationData] = useState<VehicleNotification | null>(null)
+  const [duplicateNotificationData, setDuplicateNotificationData] =
+    useState<VehicleNotification | null>(null)
 
   // Notification filters
   const [filterVehicle, setFilterVehicle] = useState('')
   const [filterPerson, setFilterPerson] = useState('')
   const [filterType, setFilterType] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
-  const [filterDatePreset, setFilterDatePreset] = useState<'all' | 'thisMonth' | 'thisYear' | 'custom'>('all')
+  const [filterDatePreset, setFilterDatePreset] = useState<
+    'all' | 'thisMonth' | 'thisYear' | 'custom'
+  >('all')
   const [filterDateFrom, setFilterDateFrom] = useState('')
   const [filterDateTo, setFilterDateTo] = useState('')
   const [sortByDutyDate, setSortByDutyDate] = useState<'asc' | 'desc' | 'none'>('none')
-  const [sortByNotificationDate, setSortByNotificationDate] = useState<'asc' | 'desc' | 'none'>('none')
+  const [sortByNotificationDate, setSortByNotificationDate] = useState<'asc' | 'desc' | 'none'>(
+    'none',
+  )
 
   const handleLogout = () => {
     signOut({ callbackUrl: '/' })
@@ -188,6 +230,12 @@ const MyFleetPage = () => {
         if (data.organizations && data.organizations.length > 0) {
           const org = data.organizations[0]
           setOrganization(org)
+
+          // Check if user is PICTUSACI
+          if (org.name === 'PICTUSACI') {
+            setIsPictusaciUser(true)
+          }
+
           // Fetch users for this organization
           fetchUsers(org.id)
         } else {
@@ -231,6 +279,22 @@ const MyFleetPage = () => {
     }
   }, [])
 
+  const fetchOrganizations = useCallback(async () => {
+    try {
+      setOrganizationsLoading(true)
+      const response = await fetch('/api/organizations')
+      if (response.ok) {
+        const data = await response.json()
+        setOrganizations(data.organizations || [])
+      }
+    } catch (err) {
+      console.error('Error fetching organizations:', err)
+      setOrganizations([])
+    } finally {
+      setOrganizationsLoading(false)
+    }
+  }, [])
+
   const fetchNotifications = useCallback(async () => {
     // Get organizationId from session
     const orgId = (session?.user as any)?.organizationId || session?.user?.organization
@@ -264,8 +328,12 @@ const MyFleetPage = () => {
       return
     }
 
-    if (!session.user.isFleetManager) {
+    // Check if user is fleet manager
+    const userIsFleetManager = (session.user as any).isFleetManager || session.user.isFleetManager
+
+    if (!userIsFleetManager) {
       // Not a fleet manager, redirect back to client page
+      console.log('Access denied: User is not a fleet manager')
       router.push('/client')
       return
     }
@@ -275,6 +343,13 @@ const MyFleetPage = () => {
     fetchOrganization()
     fetchNotifications()
   }, [session, status, router, fetchVehicles, fetchOrganization, fetchNotifications])
+
+  // Fetch organizations when tab is active and user is PICTUSACI
+  useEffect(() => {
+    if (isPictusaciUser && activeTab === 'organizations' && organizations.length === 0) {
+      fetchOrganizations()
+    }
+  }, [isPictusaciUser, activeTab, organizations.length, fetchOrganizations])
 
   const handleDelete = async (id: string) => {
     if (!confirm('Naozaj chcete odstrániť toto vozidlo?')) {
@@ -377,7 +452,11 @@ const MyFleetPage = () => {
   }
 
   // Show access denied if not fleet manager
-  if (session && !session.user.isFleetManager) {
+  const userIsFleetManager = session?.user
+    ? (session.user as any).isFleetManager || session.user.isFleetManager
+    : false
+
+  if (session && !userIsFleetManager) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white flex items-center justify-center">
         <div className="text-center max-w-md">
@@ -399,91 +478,104 @@ const MyFleetPage = () => {
   }
 
   // Filter and sort notifications
-  const filteredNotifications = notifications.filter(notification => {
-    // Organization filter - notifications are already filtered by organizationId in the API,
-    // so we don't need to filter again here. This was causing all notifications to be hidden.
-    // The API fetchNotifications already filters by organizationId
+  const filteredNotifications = notifications
+    .filter((notification) => {
+      // Organization filter - notifications are already filtered by organizationId in the API,
+      // so we don't need to filter again here. This was causing all notifications to be hidden.
+      // The API fetchNotifications already filters by organizationId
 
-    // Vehicle filter
-    if (filterVehicle && notification.vehicleRegistration !== filterVehicle) {
-      return false
-    }
+      // Vehicle filter
+      if (filterVehicle && notification.vehicleRegistration !== filterVehicle) {
+        return false
+      }
 
-    // Person filter
-    if (filterPerson && (!notification.personName || !notification.personName.toLowerCase().includes(filterPerson.toLowerCase()))) {
-      return false
-    }
+      // Person filter
+      if (
+        filterPerson &&
+        (!notification.personName ||
+          !notification.personName.toLowerCase().includes(filterPerson.toLowerCase()))
+      ) {
+        return false
+      }
 
-    // Type filter
-    if (filterType && notification.notificationType !== filterType) {
-      return false
-    }
+      // Type filter
+      if (filterType && notification.notificationType !== filterType) {
+        return false
+      }
 
-    // Status filter
-    if (filterStatus && notification.status !== filterStatus) {
-      return false
-    }
+      // Status filter
+      if (filterStatus && notification.status !== filterStatus) {
+        return false
+      }
 
-    // Date filter
-    if (filterDatePreset !== 'all' && notification.notificationDate) {
-      const notificationDate = new Date(notification.notificationDate)
-      const now = new Date()
+      // Date filter
+      if (filterDatePreset !== 'all' && notification.notificationDate) {
+        const notificationDate = new Date(notification.notificationDate)
+        const now = new Date()
 
-      if (filterDatePreset === 'thisMonth') {
-        if (notificationDate.getMonth() !== now.getMonth() || notificationDate.getFullYear() !== now.getFullYear()) {
-          return false
-        }
-      } else if (filterDatePreset === 'thisYear') {
-        if (notificationDate.getFullYear() !== now.getFullYear()) {
-          return false
-        }
-      } else if (filterDatePreset === 'custom') {
-        if (filterDateFrom) {
-          const fromDate = new Date(filterDateFrom)
-          if (notificationDate < fromDate) {
+        if (filterDatePreset === 'thisMonth') {
+          if (
+            notificationDate.getMonth() !== now.getMonth() ||
+            notificationDate.getFullYear() !== now.getFullYear()
+          ) {
             return false
           }
-        }
-        if (filterDateTo) {
-          const toDate = new Date(filterDateTo)
-          toDate.setHours(23, 59, 59, 999) // Include the entire end date
-          if (notificationDate > toDate) {
+        } else if (filterDatePreset === 'thisYear') {
+          if (notificationDate.getFullYear() !== now.getFullYear()) {
             return false
+          }
+        } else if (filterDatePreset === 'custom') {
+          if (filterDateFrom) {
+            const fromDate = new Date(filterDateFrom)
+            if (notificationDate < fromDate) {
+              return false
+            }
+          }
+          if (filterDateTo) {
+            const toDate = new Date(filterDateTo)
+            toDate.setHours(23, 59, 59, 999) // Include the entire end date
+            if (notificationDate > toDate) {
+              return false
+            }
           }
         }
       }
-    }
 
-    return true
-  }).sort((a, b) => {
-    // Sort by duty date if selected
-    if (sortByDutyDate !== 'none') {
-      const dateA = a.dutyDate ? new Date(a.dutyDate).getTime() : 0
-      const dateB = b.dutyDate ? new Date(b.dutyDate).getTime() : 0
+      return true
+    })
+    .sort((a, b) => {
+      // Sort by duty date if selected
+      if (sortByDutyDate !== 'none') {
+        const dateA = a.dutyDate ? new Date(a.dutyDate).getTime() : 0
+        const dateB = b.dutyDate ? new Date(b.dutyDate).getTime() : 0
 
-      if (dateA !== dateB) {
-        return sortByDutyDate === 'asc' ? dateA - dateB : dateB - dateA
+        if (dateA !== dateB) {
+          return sortByDutyDate === 'asc' ? dateA - dateB : dateB - dateA
+        }
       }
-    }
 
-    // Sort by notification date if selected
-    if (sortByNotificationDate !== 'none') {
-      const dateA = a.notificationDate ? new Date(a.notificationDate).getTime() : 0
-      const dateB = b.notificationDate ? new Date(b.notificationDate).getTime() : 0
+      // Sort by notification date if selected
+      if (sortByNotificationDate !== 'none') {
+        const dateA = a.notificationDate ? new Date(a.notificationDate).getTime() : 0
+        const dateB = b.notificationDate ? new Date(b.notificationDate).getTime() : 0
 
-      if (dateA !== dateB) {
-        return sortByNotificationDate === 'asc' ? dateA - dateB : dateB - dateA
+        if (dateA !== dateB) {
+          return sortByNotificationDate === 'asc' ? dateA - dateB : dateB - dateA
+        }
       }
-    }
 
-    // Default: sort by creation date descending
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  })
+      // Default: sort by creation date descending
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    })
 
   // Get unique values for filter dropdowns
-  const uniqueVehicles = Array.from(new Set(notifications.map(n => n.vehicleRegistration).filter(Boolean)))
-  const uniqueTypes = Array.from(new Set(notifications.map(n => n.notificationType).filter(Boolean)))
-  const uniqueStatuses = Array.from(new Set(notifications.map(n => n.status).filter(Boolean)))
+  const uniqueVehicles = Array.from(
+    new Set(notifications.map((n) => n.vehicleRegistration).filter(Boolean)),
+  )
+  const uniqueTypes = Array.from(
+    new Set(notifications.map((n) => n.notificationType).filter(Boolean)),
+  )
+  const uniqueStatuses = Array.from(new Set(notifications.map((n) => n.status).filter(Boolean)))
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
@@ -592,6 +684,19 @@ const MyFleetPage = () => {
               <Bell size={20} />
               Notifikácie
             </button>
+            {isPictusaciUser && (
+              <button
+                onClick={() => setActiveTab('organizations')}
+                className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                  activeTab === 'organizations'
+                    ? 'text-pictus-lime border-b-2 border-pictus-lime'
+                    : 'text-gray-400 hover:text-pictus-white'
+                }`}
+              >
+                <Building size={20} />
+                Onboarding
+              </button>
+            )}
             {organization?.tierRelation?.name === 'BUSINESS' && (
               <>
                 <button
@@ -637,8 +742,10 @@ const MyFleetPage = () => {
               <div>
                 {organization?.tierRelation && (
                   <p className="text-sm text-gray-400">
-                    Počet vozidiel: {organization.currentVehiclesCount} / {organization.tierRelation.vehiclesLimit}
-                    {organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit && (
+                    Počet vozidiel: {organization.currentVehiclesCount} /{' '}
+                    {organization.tierRelation.vehiclesLimit}
+                    {organization.currentVehiclesCount >=
+                      organization.tierRelation.vehiclesLimit && (
                       <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
                     )}
                   </p>
@@ -647,12 +754,16 @@ const MyFleetPage = () => {
               <Link
                 href="/client/my-fleet/new"
                 className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-light transition-all text-lg ${
-                  organization?.tierRelation && organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit
+                  organization?.tierRelation &&
+                  organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit
                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white hover:from-pictus-lime700 hover:to-pictus-black'
                 }`}
                 onClick={(e) => {
-                  if (organization?.tierRelation && organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit) {
+                  if (
+                    organization?.tierRelation &&
+                    organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit
+                  ) {
                     e.preventDefault()
                     alert('Dosiahli ste maximálny počet vozidiel pre vašu organizáciu')
                   }
@@ -665,116 +776,168 @@ const MyFleetPage = () => {
 
             {/* Vehicles Grid */}
             {vehicles.length === 0 ? (
-          // Empty State
-          <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-3xl p-12 border border-pictus-lime/30 text-center">
-            <div className="max-w-2xl mx-auto">
-              <div className="p-6 bg-pictus-lime/20 rounded-2xl inline-block mb-6">
-                <Car className="w-16 h-16 text-pictus-black" />
-              </div>
-              <h2 className="text-4xl font-light text-pictus-white mb-4">Žiadne vozidlá</h2>
-              <p className="text-xl text-pictus-lime mb-8">
-                Začnite pridaním prvého vozidla do vašej flotily.
-              </p>
-              <Link
-                href="/client/my-fleet/new"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-8 py-4 rounded-lg font-light hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/50"
-              >
-                <Plus size={24} />
-                Pridať prvé vozidlo
-              </Link>
-            </div>
-          </div>
-        ) : (
-          // Vehicle Cards Grid
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {vehicles.map((vehicle) => (
-              <div
-                key={vehicle.id}
-                className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl overflow-hidden border border-pictus-lime/30 hover:border-pictus-lime/50 transition-all"
-              >
-                {vehicle.image && (
-                  <div className="relative w-full h-48 bg-pictus-black/50 overflow-hidden">
-                    <Image
-                      src={vehicle.image}
-                      alt={vehicle.registration}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
+              // Empty State
+              <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-3xl p-12 border border-pictus-lime/30 text-center">
+                <div className="max-w-2xl mx-auto">
+                  <div className="p-6 bg-pictus-lime/20 rounded-2xl inline-block mb-6">
+                    <Car className="w-16 h-16 text-pictus-black" />
                   </div>
-                )}
-
-                <div className="p-6">
-                  <div className="mb-4">
-                    <h3 className="text-3xl font-light text-pictus-white mb-2">{vehicle.registration}</h3>
-                    <p className="text-xl text-pictus-lime">{vehicle.type}</p>
-                    {vehicle.year && (
-                      <p className="text-lg text-pictus-lime mt-1">Rok: {vehicle.year}</p>
-                    )}
-                  </div>
-
-                  {vehicle.note && (
-                    <p className="text-pictus-white/80 text-sm mb-4 line-clamp-2">{vehicle.note}</p>
-                  )}
-
-                  {/* Only show Expenses/Mileage buttons for vehicles from user's organization */}
-                  {vehicle.organizationId === organization?.id && (
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setSelectedVehicle(vehicle)
-                            setExpensesModalOpen(true)
-                          }}
-                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
-                        >
-                          <FaEuroSign size={16} />
-                          Výdavky
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedVehicle(vehicle)
-                            setMileageModalOpen(true)
-                          }}
-                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
-                        >
-                          <Gauge size={16} />
-                          Kilometre
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Only show Edit/Delete buttons for vehicles from user's organization */}
-                  {vehicle.organizationId === organization?.id ? (
-                    <div className="flex items-center gap-2 pt-4 border-t border-pictus-lime/20">
-                      <Link
-                        href={`/client/my-fleet/${vehicle.id}`}
-                        className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
-                      >
-                        <Edit size={16} />
-                        Upraviť
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(vehicle.id)}
-                        className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-red-600/50 transition text-sm"
-                      >
-                        <Trash2 size={16} />
-                        Odstrániť
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="pt-4 border-t border-pictus-lime/20">
-                      <p className="text-gray-400 text-xs text-center italic">
-                        Iba na prezeranie - Vozidlo patrí organizácii: {vehicle.organizationRelation?.name || vehicle.organization}
-                      </p>
-                    </div>
-                  )}
+                  <h2 className="text-4xl font-light text-pictus-white mb-4">Žiadne vozidlá</h2>
+                  <p className="text-xl text-pictus-lime mb-8">
+                    Začnite pridaním prvého vozidla do vašej flotily.
+                  </p>
+                  <Link
+                    href="/client/my-fleet/new"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-8 py-4 rounded-lg font-light hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/50"
+                  >
+                    <Plus size={24} />
+                    Pridať prvé vozidlo
+                  </Link>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            ) : (
+              // Vehicle Cards Grid
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {vehicles.map((vehicle) => (
+                  <div
+                    key={vehicle.id}
+                    className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl overflow-hidden border border-pictus-lime/30 hover:border-pictus-lime/50 transition-all"
+                  >
+                    {vehicle.image && (
+                      <div className="relative w-full h-48 bg-pictus-black/50 overflow-hidden">
+                        <Image
+                          src={vehicle.image}
+                          alt={vehicle.registration}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
+                    )}
+
+                    <div className="p-6">
+                      <div className="mb-4">
+                        <h3 className="text-3xl font-light text-pictus-white mb-2">
+                          {vehicle.registration}
+                        </h3>
+                        <p className="text-xl text-pictus-lime">{vehicle.type}</p>
+                        {vehicle.year && (
+                          <p className="text-lg text-pictus-lime mt-1">Rok: {vehicle.year}</p>
+                        )}
+                      </div>
+
+                      {vehicle.note && (
+                        <p className="text-pictus-white/80 text-sm mb-4 line-clamp-2">
+                          {vehicle.note}
+                        </p>
+                      )}
+
+                      {/* Stats Display */}
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        {/* Latest Mileage */}
+                        <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <Gauge size={14} className="text-blue-400" />
+                            <span className="text-xs text-pictus-white/70">Stav km</span>
+                          </div>
+                          {vehicle.mileageRecords && vehicle.mileageRecords.length > 0 ? (
+                            <>
+                              <p className="text-xl font-light text-pictus-white">
+                                {vehicle.mileageRecords[0].kilometers.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-pictus-white/50">km</p>
+                            </>
+                          ) : (
+                            <p className="text-sm text-pictus-white/50">Žiadne údaje</p>
+                          )}
+                        </div>
+
+                        {/* Total Expenses */}
+                        <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <FaEuroSign size={12} className="text-green-400" />
+                            <span className="text-xs text-pictus-white/70">Náklady</span>
+                          </div>
+                          {vehicle.expenses && vehicle.expenses.length > 0 ? (
+                            <>
+                              <p className="text-xl font-light text-pictus-white">
+                                {vehicle.expenses
+                                  .reduce((sum, exp) => sum + Number(exp.cost), 0)
+                                  .toLocaleString('sk-SK', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                              </p>
+                              <p className="text-xs text-pictus-white/50">
+                                {vehicle.expenses.length}{' '}
+                                {vehicle.expenses.length === 1 ? 'záznam' : 'záznamov'}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-sm text-pictus-white/50">Žiadne údaje</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Only show Expenses/Mileage buttons for vehicles from user's organization */}
+                      {vehicle.organizationId === organization?.id && (
+                        <div className="space-y-2 mb-4">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedVehicle(vehicle)
+                                setExpensesModalOpen(true)
+                              }}
+                              className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                            >
+                              <FaEuroSign size={16} />
+                              Výdavky
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedVehicle(vehicle)
+                                setMileageModalOpen(true)
+                              }}
+                              className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                            >
+                              <Gauge size={16} />
+                              Kilometre
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Only show Edit/Delete buttons for vehicles from user's organization */}
+                      {vehicle.organizationId === organization?.id ? (
+                        <div className="flex items-center gap-2 pt-4 border-t border-pictus-lime/20">
+                          <Link
+                            href={`/client/my-fleet/${vehicle.id}`}
+                            className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                          >
+                            <Edit size={16} />
+                            Upraviť
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(vehicle.id)}
+                            className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-red-600/50 transition text-sm"
+                          >
+                            <Trash2 size={16} />
+                            Odstrániť
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="pt-4 border-t border-pictus-lime/20">
+                          <p className="text-gray-400 text-xs text-center italic">
+                            Iba na prezeranie - Vozidlo patrí organizácii:{' '}
+                            {vehicle.organizationRelation?.name || vehicle.organization}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
 
@@ -784,10 +947,13 @@ const MyFleetPage = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-white">Správa používateľov</h2>
-                <p className="text-gray-400 mt-1">Organizácia: {organization?.name || 'Načítavam...'}</p>
+                <p className="text-gray-400 mt-1">
+                  Organizácia: {organization?.name || 'Načítavam...'}
+                </p>
                 {organization?.tierRelation && (
                   <p className="text-sm text-gray-500 mt-1">
-                    Počet používateľov: {organization.currentUsersCount} / {organization.tierRelation.usersLimit}
+                    Počet používateľov: {organization.currentUsersCount} /{' '}
+                    {organization.tierRelation.usersLimit}
                     {organization.currentUsersCount >= organization.tierRelation.usersLimit && (
                       <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
                     )}
@@ -796,9 +962,14 @@ const MyFleetPage = () => {
               </div>
               <button
                 onClick={handleCreateUser}
-                disabled={organization?.tierRelation ? organization.currentUsersCount >= organization.tierRelation.usersLimit : false}
+                disabled={
+                  organization?.tierRelation
+                    ? organization.currentUsersCount >= organization.tierRelation.usersLimit
+                    : false
+                }
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                  organization?.tierRelation && organization.currentUsersCount >= organization.tierRelation.usersLimit
+                  organization?.tierRelation &&
+                  organization.currentUsersCount >= organization.tierRelation.usersLimit
                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black'
                 }`}
@@ -829,12 +1000,24 @@ const MyFleetPage = () => {
                 <table className="w-full">
                   <thead className="bg-white/5 border-b border-white/10">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Meno</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Email</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Telefón</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Rola</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Stav</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Akcie</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Meno
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Email
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Telefón
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Rola
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Stav
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Akcie
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
@@ -913,7 +1096,8 @@ const MyFleetPage = () => {
                   <div>
                     <h2 className="text-2xl font-bold text-white">Notifikácie</h2>
                     <p className="text-gray-400 mt-1">
-                      Organizácia: {organization?.name || 'Načítavam...'} ({filteredNotifications.length} z {notifications.length} notifikácií)
+                      Organizácia: {organization?.name || 'Načítavam...'} (
+                      {filteredNotifications.length} z {notifications.length} notifikácií)
                     </p>
                   </div>
                   <button
@@ -986,9 +1170,7 @@ const MyFleetPage = () => {
 
                       {/* Status Filter */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Stav
-                        </label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Stav</label>
                         <select
                           value={filterStatus}
                           onChange={(e) => setFilterStatus(e.target.value)}
@@ -997,14 +1179,21 @@ const MyFleetPage = () => {
                           <option value="">Všetky stavy</option>
                           {uniqueStatuses.map((status) => (
                             <option key={status} value={status}>
-                              {status === 'sent' ? 'Odoslané' :
-                               status === 'confirmed' ? 'Potvrdené' :
-                               status === 'pending' ? 'Čaká' :
-                               status === 'failed' ? 'Zlyhalo' :
-                               status === 'imported' ? 'Importované' :
-                               status.startsWith('reminded') ? 'Pripomenuté' :
-                               status === 'no_response' ? 'Bez odpovede' :
-                               status}
+                              {status === 'sent'
+                                ? 'Odoslané'
+                                : status === 'confirmed'
+                                  ? 'Potvrdené'
+                                  : status === 'pending'
+                                    ? 'Čaká'
+                                    : status === 'failed'
+                                      ? 'Zlyhalo'
+                                      : status === 'imported'
+                                        ? 'Importované'
+                                        : status.startsWith('reminded')
+                                          ? 'Pripomenuté'
+                                          : status === 'no_response'
+                                            ? 'Bez odpovede'
+                                            : status}
                             </option>
                           ))}
                         </select>
@@ -1060,7 +1249,9 @@ const MyFleetPage = () => {
                         <select
                           value={filterDatePreset}
                           onChange={(e) => {
-                            setFilterDatePreset(e.target.value as 'all' | 'thisMonth' | 'thisYear' | 'custom')
+                            setFilterDatePreset(
+                              e.target.value as 'all' | 'thisMonth' | 'thisYear' | 'custom',
+                            )
                             if (e.target.value !== 'custom') {
                               setFilterDateFrom('')
                               setFilterDateTo('')
@@ -1105,7 +1296,13 @@ const MyFleetPage = () => {
                     </div>
 
                     {/* Clear Filters Button */}
-                    {(filterVehicle || filterPerson || filterType || filterStatus || sortByDutyDate !== 'none' || sortByNotificationDate !== 'none' || filterDatePreset !== 'all') && (
+                    {(filterVehicle ||
+                      filterPerson ||
+                      filterType ||
+                      filterStatus ||
+                      sortByDutyDate !== 'none' ||
+                      sortByNotificationDate !== 'none' ||
+                      filterDatePreset !== 'all') && (
                       <div className="mt-4">
                         <button
                           onClick={() => {
@@ -1155,70 +1352,110 @@ const MyFleetPage = () => {
                     <table className="w-full">
                       <thead className="bg-white/5 border-b border-white/10">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">ID</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Osoba</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Vozidlo</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Typ</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Kanál</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Stav</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Dátum</th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase">Akcie</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            ID
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            Osoba
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            Vozidlo
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            Typ
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            Kanál
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            Stav
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            Dátum
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase">
+                            Akcie
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/10">
                         {filteredNotifications.map((notification) => (
                           <tr key={notification.id} className="hover:bg-white/5 transition-colors">
                             <td className="px-4 py-3">
-                              <div className="text-sm font-medium text-white">#{notification.id}</div>
+                              <div className="text-sm font-medium text-white">
+                                #{notification.id}
+                              </div>
                             </td>
                             <td className="px-4 py-3">
-                              <div className="text-sm text-white">{notification.personName || '-'}</div>
+                              <div className="text-sm text-white">
+                                {notification.personName || '-'}
+                              </div>
                               <div className="text-xs text-gray-400">{notification.email}</div>
                             </td>
                             <td className="px-4 py-3">
-                              <div className="text-sm text-white">{notification.vehicleRegistration || '-'}</div>
-                              <div className="text-xs text-gray-400">{notification.vehicleType}</div>
+                              <div className="text-sm text-white">
+                                {notification.vehicleRegistration || '-'}
+                              </div>
+                              <div className="text-xs text-gray-400">
+                                {notification.vehicleType}
+                              </div>
                             </td>
                             <td className="px-4 py-3">
-                              <div className="text-sm text-gray-300">{notification.notificationType || '-'}</div>
+                              <div className="text-sm text-gray-300">
+                                {notification.notificationType || '-'}
+                              </div>
                             </td>
                             <td className="px-4 py-3">
-                              <div className="text-sm text-gray-300">{notification.notificationChannel || '-'}</div>
+                              <div className="text-sm text-gray-300">
+                                {notification.notificationChannel || '-'}
+                              </div>
                             </td>
                             <td className="px-4 py-3">
                               <span
                                 className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                                  notification.status === 'sent' || notification.status === 'confirmed'
+                                  notification.status === 'sent' ||
+                                  notification.status === 'confirmed'
                                     ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                                     : notification.status === 'pending'
-                                    ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                                    : notification.status === 'failed'
-                                    ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                    : notification.status === 'imported'
-                                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                                    : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                      : notification.status === 'failed'
+                                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                        : notification.status === 'imported'
+                                          ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                                          : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                                 }`}
                               >
-                                {notification.status === 'sent' ? 'Odoslané' :
-                                 notification.status === 'confirmed' ? 'Potvrdené' :
-                                 notification.status === 'pending' ? 'Čaká' :
-                                 notification.status === 'failed' ? 'Zlyhalo' :
-                                 notification.status === 'imported' ? 'Importované' :
-                                 notification.status.startsWith('reminded') ? 'Pripomenuté' :
-                                 notification.status === 'no_response' ? 'Bez odpovede' :
-                                 notification.status}
+                                {notification.status === 'sent'
+                                  ? 'Odoslané'
+                                  : notification.status === 'confirmed'
+                                    ? 'Potvrdené'
+                                    : notification.status === 'pending'
+                                      ? 'Čaká'
+                                      : notification.status === 'failed'
+                                        ? 'Zlyhalo'
+                                        : notification.status === 'imported'
+                                          ? 'Importované'
+                                          : notification.status.startsWith('reminded')
+                                            ? 'Pripomenuté'
+                                            : notification.status === 'no_response'
+                                              ? 'Bez odpovede'
+                                              : notification.status}
                               </span>
                             </td>
                             <td className="px-4 py-3">
                               <div className="space-y-1">
                                 {notification.notificationDate && (
                                   <div className="text-sm text-pictus-lime font-medium">
-                                    Notifikácia: {new Date(notification.notificationDate).toLocaleDateString('sk-SK')}
+                                    Notifikácia:{' '}
+                                    {new Date(notification.notificationDate).toLocaleDateString(
+                                      'sk-SK',
+                                    )}
                                   </div>
                                 )}
                                 {notification.dutyDate && (
                                   <div className="text-sm text-gray-300">
-                                    Termín: {new Date(notification.dutyDate).toLocaleDateString('sk-SK')}
+                                    Termín:{' '}
+                                    {new Date(notification.dutyDate).toLocaleDateString('sk-SK')}
                                   </div>
                                 )}
                                 {!notification.notificationDate && !notification.dutyDate && (
@@ -1314,9 +1551,7 @@ const MyFleetPage = () => {
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
               <h2 className="text-2xl font-bold text-white mb-2">Šablóny notifikácií</h2>
-              <p className="text-gray-400">
-                Spravujte šablóny notifikácií pre vašu organizáciu.
-              </p>
+              <p className="text-gray-400">Spravujte šablóny notifikácií pre vašu organizáciu.</p>
             </div>
             {organization && (
               <NotificationSettings
@@ -1335,9 +1570,7 @@ const MyFleetPage = () => {
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
               <h2 className="text-2xl font-bold text-white mb-2">Typy notifikácií</h2>
-              <p className="text-gray-400">
-                Spravujte typy notifikácií pre vašu organizáciu.
-              </p>
+              <p className="text-gray-400">Spravujte typy notifikácií pre vašu organizáciu.</p>
               {organization && organization.currentNotificationTypesCount === 0 && (
                 <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
                   <p className="text-blue-300 text-sm">
@@ -1348,7 +1581,8 @@ const MyFleetPage = () => {
               {organization?.tierRelation && (
                 <div className="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
                   <p className="text-orange-300 text-sm">
-                    ⚠️ Limit typov notifikácií: {organization.currentNotificationTypesCount} / {organization.tierRelation.notificationTypesLimit}
+                    ⚠️ Limit typov notifikácií: {organization.currentNotificationTypesCount} /{' '}
+                    {organization.tierRelation.notificationTypesLimit}
                   </p>
                 </div>
               )}
@@ -1361,6 +1595,135 @@ const MyFleetPage = () => {
                 hideTabs={true}
                 hideOrganizationSelector={true}
               />
+            )}
+          </div>
+        )}
+
+        {/* Organizations Tab (PICTUSACI only) */}
+        {activeTab === 'organizations' && isPictusaciUser && (
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Onboarding</h2>
+                <p className="text-gray-400 mt-1">Vytvor organizáciu a priraď klienta</p>
+              </div>
+              <Link
+                href="/client/my-fleet/onboard"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+              >
+                <Plus className="h-4 w-4" />
+                Onboard nového klienta
+              </Link>
+            </div>
+
+            {organizationsLoading ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400">Načítavam organizácie...</p>
+              </div>
+            ) : organizations.length === 0 ? (
+              <div className="text-center py-12">
+                <Building className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-medium text-white mb-2">Žiadne organizácie</h3>
+                <p className="text-gray-400 mb-6">Začnite onboardovaním prvého klienta</p>
+                <Link
+                  href="/client/my-fleet/onboard"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
+                >
+                  <Plus className="h-5 w-5" />
+                  Onboard prvého klienta
+                </Link>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-white/5 border-b border-white/10">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Názov
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Tier
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Používatelia
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Vozidlá
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Notifikácie
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                        Vytvorené
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {organizations.map((org) => (
+                      <tr key={org.id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="text-sm font-medium text-white">{org.name}</div>
+                          {org.mainContact && (
+                            <div className="text-xs text-gray-400">Kontakt: {org.mainContact}</div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {org.tierRelation ? (
+                            <span className="inline-flex px-2 py-1 text-xs rounded-full bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
+                              {org.tierRelation.name}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">-</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-300">
+                            {org.currentUsersCount !== undefined ? (
+                              <>
+                                {org.currentUsersCount}
+                                {org.tierRelation && ` / ${org.tierRelation.usersLimit}`}
+                              </>
+                            ) : (
+                              '-'
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-300">
+                            {org.currentVehiclesCount !== undefined ? (
+                              <>
+                                {org.currentVehiclesCount}
+                                {org.tierRelation && ` / ${org.tierRelation.vehiclesLimit}`}
+                              </>
+                            ) : (
+                              '-'
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-300">
+                            {org.currentNotificationsCount !== undefined ? (
+                              <>
+                                {org.currentNotificationsCount}
+                                {org.tierRelation && ` / ${org.tierRelation.notificationsLimit}`}
+                              </>
+                            ) : (
+                              '-'
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-300">
+                            {org.createdAt
+                              ? new Date(org.createdAt).toLocaleDateString('sk-SK')
+                              : '-'}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}
@@ -1377,6 +1740,7 @@ const MyFleetPage = () => {
             }}
             vehicleId={selectedVehicle.id}
             vehicleRegistration={selectedVehicle.registration}
+            onSuccess={fetchVehicles}
           />
           <MileageModal
             isOpen={mileageModalOpen}
@@ -1386,6 +1750,7 @@ const MyFleetPage = () => {
             }}
             vehicleId={selectedVehicle.id}
             vehicleRegistration={selectedVehicle.registration}
+            onSuccess={fetchVehicles}
           />
         </>
       )}

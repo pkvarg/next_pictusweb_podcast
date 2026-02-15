@@ -15,9 +15,10 @@ interface MileageModalProps {
   onClose: () => void
   vehicleId: string
   vehicleRegistration: string
+  onSuccess?: () => void
 }
 
-const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: MileageModalProps) => {
+const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSuccess }: MileageModalProps) => {
   const [mileageRecords, setMileageRecords] = useState<MileageRecord[]>([])
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -80,6 +81,11 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: Milea
 
       // Refresh list
       await fetchMileage()
+
+      // Call onSuccess callback to refresh parent data
+      if (onSuccess) {
+        onSuccess()
+      }
     } catch (err) {
       console.error('Error adding mileage:', err)
       setError('Nepodarilo sa pridať záznam')
@@ -104,6 +110,11 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: Milea
 
       // Refresh list
       await fetchMileage()
+
+      // Call onSuccess callback to refresh parent data
+      if (onSuccess) {
+        onSuccess()
+      }
     } catch (err) {
       console.error('Error deleting mileage:', err)
       alert('Nepodarilo sa odstrániť záznam')

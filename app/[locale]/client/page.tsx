@@ -240,8 +240,8 @@ const ClientZone = () => {
           </section>
         )} */}
 
-        {/* Fleet Overview Section - Only for Fleet Managers */}
-        {session?.user?.isFleetManager && organization?.name && (
+        {/* Fleet Overview Section - Show for ALL users */}
+        {organization?.name && (
           <section id="fleet-overview" className="mb-16">
             <FleetOverview
               organization={
@@ -252,10 +252,12 @@ const ClientZone = () => {
                   : organization.name
               }
               organizationName={organization.name}
+              isFleetManager={session?.user?.isFleetManager || false}
             />
           </section>
         )}
 
+        {/* Upcoming Duties Overview - Show for ALL users */}
         {organization?.name && (
           <section id="dashboard" className="mb-16">
             <div className="md:bg-gradient-to-br md:from-pictus-onyx900/30 md:to-pictus-black/50 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-pictus-lime/30">

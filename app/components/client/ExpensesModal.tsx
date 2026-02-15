@@ -16,9 +16,10 @@ interface ExpensesModalProps {
   onClose: () => void
   vehicleId: string
   vehicleRegistration: string
+  onSuccess?: () => void
 }
 
-const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: ExpensesModalProps) => {
+const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSuccess }: ExpensesModalProps) => {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -81,6 +82,11 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: Expe
 
       // Refresh list
       await fetchExpenses()
+
+      // Call onSuccess callback to refresh parent data
+      if (onSuccess) {
+        onSuccess()
+      }
     } catch (err) {
       console.error('Error adding expense:', err)
       setError('Nepodarilo sa pridať výdavok')
@@ -105,6 +111,11 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration }: Expe
 
       // Refresh list
       await fetchExpenses()
+
+      // Call onSuccess callback to refresh parent data
+      if (onSuccess) {
+        onSuccess()
+      }
     } catch (err) {
       console.error('Error deleting expense:', err)
       alert('Nepodarilo sa odstrániť výdavok')

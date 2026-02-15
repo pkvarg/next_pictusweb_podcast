@@ -84,9 +84,10 @@ interface FleetOverviewProps {
   userId?: string
   organization?: string
   organizationName?: string
+  isFleetManager?: boolean
 }
 
-const FleetOverview = ({ userId, organization, organizationName }: FleetOverviewProps) => {
+const FleetOverview = ({ userId, organization, organizationName, isFleetManager = false }: FleetOverviewProps) => {
   const isPictusaciUser = organizationName === 'PICTUSACI'
   const [vehicles, setVehicles] = useState<MyVehicle[]>([])
   const [notifications, setNotifications] = useState<VehicleNotification[]>([])
@@ -437,15 +438,20 @@ const FleetOverview = ({ userId, organization, organizationName }: FleetOverview
           </div>
           <h2 className="text-3xl font-light text-pictus-white mb-3">Vaša flotila je prázdna</h2>
           <p className="text-lg text-pictus-lime mb-6">
-            Začnite pridaním prvého vozidla do vašej flotily a sledujte všetky dôležité údaje na jednom mieste.
+            {isFleetManager
+              ? 'Začnite pridaním prvého vozidla do vašej flotily a sledujte všetky dôležité údaje na jednom mieste.'
+              : 'Momentálne nemáte žiadne vozidlá priradené k vašej organizácii.'
+            }
           </p>
-          <Link
-            href="/client/my-fleet"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-lg shadow-lg hover:shadow-pictus-lime/50"
-          >
-            <Plus size={20} />
-            Spravovať flotilu
-          </Link>
+          {isFleetManager && (
+            <Link
+              href="/client/my-fleet"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-lg shadow-lg hover:shadow-pictus-lime/50"
+            >
+              <Plus size={20} />
+              Spravovať flotilu
+            </Link>
+          )}
         </div>
       </div>
     )
@@ -466,14 +472,16 @@ const FleetOverview = ({ userId, organization, organizationName }: FleetOverview
             </p>
           </div>
         </div>
-        <Link
-          href="/client/my-fleet"
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white px-5 py-2.5 rounded-lg font-normal hover:from-pictus-lime700 hover:to-pictus-black transition-all text-base shadow-lg"
-        >
-          <Car size={18} />
-          Spravovať
-          <ArrowRight size={18} />
-        </Link>
+        {isFleetManager && (
+          <Link
+            href="/client/my-fleet"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white px-5 py-2.5 rounded-lg font-normal hover:from-pictus-lime700 hover:to-pictus-black transition-all text-base shadow-lg"
+          >
+            <Car size={18} />
+            Spravovať
+            <ArrowRight size={18} />
+          </Link>
+        )}
       </div>
 
       {/* Vehicle Cards Grid */}
