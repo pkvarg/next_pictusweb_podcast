@@ -79,7 +79,7 @@ model User {
   lastName             String?
   phoneNumber          String?                @map("phone_number") @db.VarChar(20)
   organizationId       String?                @map("organization_id")
-  organizationRelation Organization?          @relation(fields: [organizationId], references: [id])
+  organizationRelation Organization?          @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   isFleetManager       Boolean                @default(false)
   loginProvider        String?
   hybridPassword       String?
@@ -279,6 +279,13 @@ model Organization {
   currentNotificationsCount       Int            @default(0) @map("current_notifications_count")
   currentTemplatesCount           Int            @default(0) @map("current_templates_count")
   currentNotificationTypesCount   Int            @default(0) @map("current_notification_types_count")
+
+  // Notification usage tracking
+  notificationPeriodStart         DateTime?      @map("notification_period_start")
+  notificationsBlocked            Boolean        @default(false) @map("notifications_blocked")
+
+  // Onboarding
+  onboardedBy                     String?        @map("onboarded_by") @db.VarChar(255)
 
   createdAt                       DateTime       @default(now()) @map("created_at")
   updatedAt                       DateTime       @updatedAt @map("updated_at")

@@ -9,7 +9,6 @@ import {
   Check,
   Building,
   User,
-  Users,
   Mail,
   Phone,
   Lock,
@@ -18,6 +17,10 @@ import {
   CheckCircle,
   AlertCircle,
   Sparkles,
+  FileText,
+  Send,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react'
 
 interface Tier {
@@ -28,13 +31,6 @@ interface Tier {
   notificationsLimit: number
   templatesLimit: number
   notificationTypesLimit: number
-}
-
-interface PictusaciUser {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
 }
 
 type Step = 1 | 2 | 3
@@ -52,18 +48,12 @@ const OnboardClientPage = () => {
   const [tiers, setTiers] = useState<Tier[]>([])
   const [tiersLoading, setTiersLoading] = useState(true)
 
-  // PICTUSACI users (for existing user selection)
-  const [pictusaciUsers, setPictusaciUsers] = useState<PictusaciUser[]>([])
-  const [usersLoading, setUsersLoading] = useState(false)
-
   // Step 1: Organization data
   const [organizationName, setOrganizationName] = useState('')
   const [organizationMainContact, setOrganizationMainContact] = useState('')
   const [selectedTierId, setSelectedTierId] = useState('')
 
   // Step 2: User data
-  const [userType, setUserType] = useState<'new' | 'existing'>('new')
-  const [existingUserId, setExistingUserId] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -73,6 +63,101 @@ const OnboardClientPage = () => {
   const [isFleetManager, setIsFleetManager] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  // Fakturačné údaje
+  const [showInvoicingForm, setShowInvoicingForm] = useState(false)
+  const [invoicingSubmitting, setInvoicingSubmitting] = useState(false)
+  const [invoicingSuccess, setInvoicingSuccess] = useState(false)
+  const [invoicingError, setInvoicingError] = useState('')
+  const [invoicingData, setInvoicingData] = useState({
+    companyName: '',
+    ico: '',
+    dic: '',
+    street: '',
+    city: '',
+    postalCode: '',
+    country: '',
+    contactEmail: '',
+    contactPhone: '',
+    contactPerson: '',
+    note: '',
+  })
+
+  const handleInvoicingChange = (field: string, value: string) => {
+    setInvoicingData((prev) => ({ ...prev, [field]: value }))
+    if (field === 'companyName') {
+      setOrganizationName(value)
+    }
+    if (field === 'contactEmail') {
+      setOrganizationMainContact(value)
+      setEmail(value)
+    }
+    if (field === 'contactPerson') {
+      const parts = value.trim().split(/\s+/)
+      if (parts.length >= 2) {
+        setFirstName(parts[0])
+        setLastName(parts.slice(1).join(' '))
+      } else {
+        setFirstName(value)
+        setLastName('')
+      }
+    }
+    if (field === 'contactPhone') {
+      setPhoneNumber(value)
+    }
+  }
+
+  const handleInvoicingSubmit = async () => {
+    setInvoicingError('')
+
+    if (!invoicingData.contactPerson.trim()) {
+      setInvoicingError('Kontaktná osoba je povinná')
+      return
+    }
+    if (
+      !invoicingData.street.trim() ||
+      !invoicingData.city.trim() ||
+      !invoicingData.postalCode.trim()
+    ) {
+      setInvoicingError('Adresa (ulica, mesto, PSČ) je povinná')
+      return
+    }
+    if (!invoicingData.country.trim()) {
+      setInvoicingError('Krajina je povinná')
+      return
+    }
+    if (!invoicingData.contactEmail.trim() || !invoicingData.contactEmail.includes('@')) {
+      setInvoicingError('Zadajte platný kontaktný email')
+      return
+    }
+
+    setInvoicingSubmitting(true)
+
+    try {
+      const response = await fetch('/api/invoicing-details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...invoicingData,
+          organizationName: organizationName || '',
+          submittedBy: session?.user?.email || '',
+        }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Nepodarilo sa odoslať fakturačné údaje')
+      }
+
+      setInvoicingSuccess(true)
+    } catch (err) {
+      setInvoicingError(
+        err instanceof Error ? err.message : 'Nepodarilo sa odoslať fakturačné údaje',
+      )
+    } finally {
+      setInvoicingSubmitting(false)
+    }
+  }
 
   // Check if user is PICTUSACI
   useEffect(() => {
@@ -130,31 +215,6 @@ const OnboardClientPage = () => {
     fetchTiers()
   }, [])
 
-  // Fetch PICTUSACI users when user type is 'existing'
-  useEffect(() => {
-    if (userType === 'existing' && pictusaciUsers.length === 0) {
-      const fetchPictusaciUsers = async () => {
-        try {
-          setUsersLoading(true)
-          const orgId = (session?.user as any)?.organizationId || session?.user?.organization
-          if (!orgId) return
-
-          const response = await fetch(`/api/users?organizationId=${orgId}`)
-          if (response.ok) {
-            const data = await response.json()
-            setPictusaciUsers(data || [])
-          }
-        } catch (err) {
-          console.error('Error fetching users:', err)
-        } finally {
-          setUsersLoading(false)
-        }
-      }
-
-      fetchPictusaciUsers()
-    }
-  }, [userType, session, pictusaciUsers.length])
-
   const validateStep1 = () => {
     if (!organizationName.trim()) {
       setError('Názov organizácie je povinný')
@@ -168,28 +228,21 @@ const OnboardClientPage = () => {
   }
 
   const validateStep2 = () => {
-    if (userType === 'new') {
-      if (!firstName.trim() || !lastName.trim()) {
-        setError('Meno a priezvisko sú povinné')
-        return false
-      }
-      if (!email.trim() || !email.includes('@')) {
-        setError('Zadajte platný email')
-        return false
-      }
-      if (password.length < 8) {
-        setError('Heslo musí mať aspoň 8 znakov')
-        return false
-      }
-      if (password !== confirmPassword) {
-        setError('Heslá sa nezhodujú')
-        return false
-      }
-    } else {
-      if (!existingUserId) {
-        setError('Vyberte používateľa')
-        return false
-      }
+    if (!firstName.trim() || !lastName.trim()) {
+      setError('Meno a priezvisko sú povinné')
+      return false
+    }
+    if (!email.trim() || !email.includes('@')) {
+      setError('Zadajte platný email')
+      return false
+    }
+    if (password.length < 8) {
+      setError('Heslo musí mať aspoň 8 znakov')
+      return false
+    }
+    if (password !== confirmPassword) {
+      setError('Heslá sa nezhodujú')
+      return false
     }
     return true
   }
@@ -220,19 +273,12 @@ const OnboardClientPage = () => {
         organizationName,
         organizationMainContact,
         tierId: selectedTierId,
-        userType,
-        ...(userType === 'new'
-          ? {
-              firstName,
-              lastName,
-              email,
-              password,
-              phoneNumber,
-              isFleetManager,
-            }
-          : {
-              existingUserId,
-            }),
+        firstName,
+        lastName,
+        email,
+        password,
+        phoneNumber,
+        isFleetManager,
       }
 
       const response = await fetch('/api/onboard-client', {
@@ -264,7 +310,6 @@ const OnboardClientPage = () => {
   }
 
   const getSelectedTier = () => tiers.find((t) => t.id === selectedTierId)
-  const getSelectedUser = () => pictusaciUsers.find((u) => u.id === existingUserId)
 
   if (status === 'loading' || tiersLoading) {
     return (
@@ -321,6 +366,224 @@ const OnboardClientPage = () => {
                 https://docuseal.pictusweb.sk/
               </a>
             </p>
+          </div>
+
+          {/* Fakturačné údaje */}
+          <div className="mt-6 max-w-2xl mx-auto">
+            <button
+              onClick={() => setShowInvoicingForm(!showInvoicingForm)}
+              className="w-full flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <FileText className="w-6 h-6 text-pictus-lime" />
+                <span className="text-lg text-pictus-white">Fakturačné údaje</span>
+                {invoicingSuccess && (
+                  <span className="text-green-400 text-sm flex items-center gap-1">
+                    <CheckCircle size={16} /> Odoslané
+                  </span>
+                )}
+              </div>
+              {showInvoicingForm ? (
+                <ChevronUp className="w-5 h-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+
+            {showInvoicingForm && (
+              <div className="mt-2 p-6 bg-white/5 border border-white/10 rounded-lg space-y-4">
+                {invoicingSuccess ? (
+                  <div className="text-center py-6">
+                    <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-3" />
+                    <p className="text-green-300 text-lg">
+                      Fakturačné údaje boli úspešne odoslané!
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-gray-400 text-sm mb-2">
+                      Vyplň fakturačné údaje klienta. Údaje budú odoslané na spracovanie.
+                    </p>
+                    <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                      <p className="text-blue-300 text-sm font-medium">
+                        INFO: Pictusweb s.r.o. nie je platcom DPH
+                      </p>
+                    </div>
+
+                    {invoicingError && (
+                      <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3 flex items-center gap-2">
+                        <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+                        <p className="text-red-200 text-sm">{invoicingError}</p>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                        Kontaktná osoba *
+                      </label>
+                      <input
+                        type="text"
+                        value={invoicingData.contactPerson}
+                        onChange={(e) => handleInvoicingChange('contactPerson', e.target.value)}
+                        placeholder="napr. Ján Novák"
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                        Názov firmy
+                      </label>
+                      <input
+                        type="text"
+                        value={invoicingData.companyName}
+                        onChange={(e) => handleInvoicingChange('companyName', e.target.value)}
+                        placeholder="napr. ABC Company s.r.o."
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">IČO</label>
+                        <input
+                          type="text"
+                          value={invoicingData.ico}
+                          onChange={(e) => handleInvoicingChange('ico', e.target.value)}
+                          placeholder="12345678"
+                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">DIČ</label>
+                        <input
+                          type="text"
+                          value={invoicingData.dic}
+                          onChange={(e) => handleInvoicingChange('dic', e.target.value)}
+                          placeholder="2012345678"
+                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                        Ulica a číslo *
+                      </label>
+                      <input
+                        type="text"
+                        value={invoicingData.street}
+                        onChange={(e) => handleInvoicingChange('street', e.target.value)}
+                        placeholder="napr. Hlavná 123"
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Mesto *
+                        </label>
+                        <input
+                          type="text"
+                          value={invoicingData.city}
+                          onChange={(e) => handleInvoicingChange('city', e.target.value)}
+                          placeholder="Bratislava"
+                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          PSČ *
+                        </label>
+                        <input
+                          type="text"
+                          value={invoicingData.postalCode}
+                          onChange={(e) => handleInvoicingChange('postalCode', e.target.value)}
+                          placeholder="81101"
+                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Krajina *
+                        </label>
+                        <input
+                          type="text"
+                          value={invoicingData.country}
+                          onChange={(e) => handleInvoicingChange('country', e.target.value)}
+                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Kontaktný email *
+                        </label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <input
+                            type="email"
+                            value={invoicingData.contactEmail}
+                            onChange={(e) => handleInvoicingChange('contactEmail', e.target.value)}
+                            placeholder="fakturacia@firma.sk"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Kontaktný telefón
+                        </label>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <input
+                            type="tel"
+                            value={invoicingData.contactPhone}
+                            onChange={(e) => handleInvoicingChange('contactPhone', e.target.value)}
+                            placeholder="+421 9XX XXX XXX"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                        Poznámka
+                      </label>
+                      <textarea
+                        value={invoicingData.note}
+                        onChange={(e) => handleInvoicingChange('note', e.target.value)}
+                        rows={3}
+                        placeholder="Info k fakturácii, napr. Klient žiada iba FREE tier..."
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all resize-none"
+                      />
+                    </div>
+
+                    <button
+                      onClick={handleInvoicingSubmit}
+                      disabled={invoicingSubmitting}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {invoicingSubmitting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-pictus-black border-t-transparent" />
+                          Odosielam...
+                        </>
+                      ) : (
+                        <>
+                          <Send size={18} />
+                          Odoslať fakturačné údaje
+                        </>
+                      )}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -443,184 +706,115 @@ const OnboardClientPage = () => {
                 <h2 className="text-3xl font-light">Používateľ</h2>
               </div>
 
-              {/* User Type Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Typ používateľa *
-                </label>
+              <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <button
-                    onClick={() => setUserType('new')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      userType === 'new'
-                        ? 'border-pictus-lime bg-pictus-lime/10'
-                        : 'border-white/10 bg-white/5 hover:border-white/30'
-                    }`}
-                  >
-                    <User className="w-6 h-6 text-pictus-lime mb-2" />
-                    <h3 className="text-lg font-medium text-pictus-white">Nový používateľ</h3>
-                    <p className="text-sm text-gray-400">Vytvorte nového používateľa</p>
-                  </button>
-                  <button
-                    onClick={() => setUserType('existing')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      userType === 'existing'
-                        ? 'border-pictus-lime bg-pictus-lime/10'
-                        : 'border-white/10 bg-white/5 hover:border-white/30'
-                    }`}
-                  >
-                    <Users className="w-6 h-6 text-pictus-lime mb-2" />
-                    <h3 className="text-lg font-medium text-pictus-white">Existujúci používateľ</h3>
-                    <p className="text-sm text-gray-400">
-                      Priraďte existujúceho PICTUSACI používateľa
-                    </p>
-                  </button>
-                </div>
-              </div>
-
-              {/* New User Form */}
-              {userType === 'new' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Meno *</label>
-                      <input
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Priezvisko *
-                      </label>
-                      <input
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
-                      />
-                    </div>
-                  </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Email *</label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Telefónne číslo
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Heslo *</label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-                      >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Potvrďte heslo *
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-                      >
-                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Meno *</label>
                     <input
-                      type="checkbox"
-                      id="isFleetManager"
-                      checked={isFleetManager}
-                      onChange={(e) => setIsFleetManager(e.target.checked)}
-                      className="w-4 h-4 text-pictus-lime bg-white/5 border-white/10 rounded focus:ring-pictus-lime"
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
                     />
-                    <label htmlFor="isFleetManager" className="ml-2 text-sm text-gray-300">
-                      Správca flotily (môže spravovať vozidlá a používateľov)
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Priezvisko *
                     </label>
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                    />
                   </div>
                 </div>
-              )}
 
-              {/* Existing User Selection */}
-              {userType === 'existing' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Email *</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Vyberte používateľa *
+                    Telefónne číslo
                   </label>
-                  {usersLoading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pictus-lime mx-auto"></div>
-                      <p className="text-gray-400 mt-2">Načítavam používateľov...</p>
-                    </div>
-                  ) : pictusaciUsers.length === 0 ? (
-                    <div className="text-center py-8 bg-white/5 rounded-lg border border-white/10">
-                      <Users className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-400">Žiadni dostupní používatelia</p>
-                    </div>
-                  ) : (
-                    <select
-                      value={existingUserId}
-                      onChange={(e) => setExistingUserId(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
-                    >
-                      <option value="">-- Vyberte používateľa --</option>
-                      {pictusaciUsers.map((user) => (
-                        <option key={user.id} value={user.id}>
-                          {user.firstName} {user.lastName} ({user.email})
-                        </option>
-                      ))}
-                    </select>
-                  )}
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                    />
+                  </div>
                 </div>
-              )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Heslo * ... Nech si klient teraz zapíše
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Potvrďte heslo *
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    >
+                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isFleetManager"
+                    checked={isFleetManager}
+                    onChange={(e) => setIsFleetManager(e.target.checked)}
+                    className="w-4 h-4 text-pictus-lime bg-white/5 border-white/10 rounded focus:ring-pictus-lime"
+                  />
+                  <label htmlFor="isFleetManager" className="ml-2 text-sm text-gray-300">
+                    Správca flotily (môže spravovať vozidlá a používateľov)
+                  </label>
+                </div>
+              </div>
             </div>
           )}
 
@@ -665,41 +859,21 @@ const OnboardClientPage = () => {
                 <div className="bg-white/5 rounded-lg border border-white/10 p-6">
                   <h3 className="text-xl font-medium text-pictus-lime mb-4">Používateľ</h3>
                   <div className="space-y-2 text-gray-300">
-                    {userType === 'new' ? (
-                      <>
-                        <p>
-                          <span className="text-gray-400">Typ:</span> Nový používateľ
-                        </p>
-                        <p>
-                          <span className="text-gray-400">Meno:</span> {firstName} {lastName}
-                        </p>
-                        <p>
-                          <span className="text-gray-400">Email:</span> {email}
-                        </p>
-                        {phoneNumber && (
-                          <p>
-                            <span className="text-gray-400">Telefón:</span> {phoneNumber}
-                          </p>
-                        )}
-                        <p>
-                          <span className="text-gray-400">Rola:</span>{' '}
-                          {isFleetManager ? 'Správca flotily' : 'Používateľ'}
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p>
-                          <span className="text-gray-400">Typ:</span> Existujúci používateľ
-                        </p>
-                        <p>
-                          <span className="text-gray-400">Meno:</span>{' '}
-                          {getSelectedUser()?.firstName} {getSelectedUser()?.lastName}
-                        </p>
-                        <p>
-                          <span className="text-gray-400">Email:</span> {getSelectedUser()?.email}
-                        </p>
-                      </>
+                    <p>
+                      <span className="text-gray-400">Meno:</span> {firstName} {lastName}
+                    </p>
+                    <p>
+                      <span className="text-gray-400">Email:</span> {email}
+                    </p>
+                    {phoneNumber && (
+                      <p>
+                        <span className="text-gray-400">Telefón:</span> {phoneNumber}
+                      </p>
                     )}
+                    <p>
+                      <span className="text-gray-400">Rola:</span>{' '}
+                      {isFleetManager ? 'Správca flotily' : 'Používateľ'}
+                    </p>
                   </div>
                 </div>
               </div>

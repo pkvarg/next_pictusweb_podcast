@@ -19,6 +19,7 @@ declare module 'next-auth' {
       organization?: string // Contains organizationId (UUID) after migration
       organizationId?: string // Explicit organizationId field
       isFleetManager?: boolean
+      organizationDeleted?: boolean
     }
   }
 
@@ -96,12 +97,23 @@ export const authOptions = {
             token.organizationId = dbUser.organizationId
             token.organization = dbUser.organizationId || dbUser.organization // Use organizationId (UUID) first
             token.isFleetManager = dbUser.isFleetManager
-            
+
+            // Check if organization is soft-deleted
+            if (dbUser.organizationId) {
+              const org = await prisma.organization.findUnique({
+                where: { id: dbUser.organizationId },
+                select: { deletedAt: true }
+              })
+              token.organizationDeleted = org?.deletedAt ? true : false
+            } else {
+              token.organizationDeleted = false
+            }
+
             console.log('TESTING: Updating login tracking...')
             // Update login tracking
             await prisma.user.update({
               where: { id: dbUser.id },
-              data: { 
+              data: {
                 lastLoggedIn: new Date(),
                 loginCount: { increment: 1 }
               }
@@ -121,6 +133,16 @@ export const authOptions = {
             token.organizationId = dbUser.organizationId
             token.organization = dbUser.organizationId || dbUser.organization // Use organizationId (UUID) first
             token.isFleetManager = dbUser.isFleetManager
+
+            // Check if organization is soft-deleted
+            if (dbUser.organizationId) {
+              const org = await prisma.organization.findUnique({
+                where: { id: dbUser.organizationId },
+                select: { deletedAt: true }
+              })
+              token.organizationDeleted = org?.deletedAt ? true : false
+            }
+
             console.log('TESTING: Organization data refreshed')
           }
         }
@@ -144,6 +166,7 @@ export const authOptions = {
           session.user.organizationId = token.organizationId
           session.user.organization = token.organization
           session.user.isFleetManager = token.isFleetManager || false
+          session.user.organizationDeleted = token.organizationDeleted || false
           console.log('TESTING: Session data set successfully')
         } else {
           console.log('TESTING: No token provided to session callback')

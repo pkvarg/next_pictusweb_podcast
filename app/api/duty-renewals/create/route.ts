@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { PrismaClient } from '@prisma/client'
+import { checkNotificationLimit } from '@/lib/notificationLimits'
 
 const prisma = new PrismaClient()
 
@@ -59,6 +60,19 @@ export async function POST(request: NextRequest) {
         }
       }
       console.log('[RENEWAL] Calculated intervals from original:', intervals)
+    }
+
+    // Check notification limit before creating
+    const totalToCreate = intervals.length + (originalPdrReminder ? 1 : 0)
+    const orgId = originalNotifications[0].organizationId
+    if (orgId) {
+      const limitCheck = await checkNotificationLimit(orgId, totalToCreate, session?.user?.email || undefined)
+      if (!limitCheck.allowed) {
+        return NextResponse.json(
+          { error: limitCheck.reason, blocked: limitCheck.blocked, limitReached: limitCheck.limitReached },
+          { status: 403 }
+        )
+      }
     }
 
     // Generate new dutyBatchId

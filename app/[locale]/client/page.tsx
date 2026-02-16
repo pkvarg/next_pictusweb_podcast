@@ -20,6 +20,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
 import FleetOverview from '@/app/components/client/FleetOverview'
 import SimpleDutyOverview from '@/app/components/client/SimpleDutyOverview'
+import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
 
 interface TierInfo {
   id: string
@@ -36,6 +37,8 @@ interface Organization {
   name: string
   tierId: string | null
   tierRelation?: TierInfo
+  currentNotificationsCount: number
+  notificationsBlocked: boolean
 }
 
 const ClientZone = () => {
@@ -59,6 +62,9 @@ const ClientZone = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false)
   const [passwordChangeError, setPasswordChangeError] = useState('')
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('')
+
+  // Guard: organization deleted
+  const isOrgDeleted = (session?.user as any)?.organizationDeleted === true
 
   // Fetch organization details
   const fetchOrganization = useCallback(async () => {
@@ -177,6 +183,35 @@ const ClientZone = () => {
     }
   }
 
+  if (isOrgDeleted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk flex items-center justify-center">
+        <div className="text-center max-w-lg px-6">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
+            <X className="w-10 h-10 text-red-400" />
+          </div>
+          <h1 className="text-3xl font-light mb-4 text-red-400">Prístup zamietnutý</h1>
+          <p className="text-lg text-gray-300 mb-6">
+            Vaša organizácia bola deaktivovaná. Kontaktujte administrátora alebo vášho marketéra.
+          </p>
+          <p className="text-sm text-gray-500 mb-8">
+            Ak si myslíte, že ide o chybu, napíšte na{' '}
+            <a href="mailto:info@pictusweb.sk" className="text-pictus-lime hover:underline">
+              info@pictusweb.sk
+            </a>
+          </p>
+          <button
+            onClick={handleLogout}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+          >
+            <LogOut size={18} />
+            Odhlásiť sa
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
       {/* Header */}
@@ -211,6 +246,15 @@ const ClientZone = () => {
           </div>
         </div>
       </header>
+
+      {organization?.tierRelation && (
+        <NotificationLimitBanner
+          currentCount={organization.currentNotificationsCount}
+          limit={organization.tierRelation.notificationsLimit}
+          tierName={organization.tierRelation.name}
+          blocked={organization.notificationsBlocked}
+        />
+      )}
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

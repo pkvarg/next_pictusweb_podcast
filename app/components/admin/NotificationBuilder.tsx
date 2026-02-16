@@ -620,6 +620,15 @@ export default function NotificationBuilder({
         })
 
         const responses = await Promise.all(promises)
+
+        // Check for limit errors (403)
+        const limitError = responses.find((r) => r.status === 403)
+        if (limitError) {
+          const errorData = await limitError.json().catch(() => null)
+          alert(errorData?.error || 'Dosiahli ste limit notifikácií. Kontaktujte administrátora.')
+          return
+        }
+
         const allSuccessful = responses.every((r) => r.ok)
 
         if (allSuccessful) {
@@ -1251,7 +1260,8 @@ export default function NotificationBuilder({
             <div className="mt-4">
               <label className="block text-pictus-lime text-sm mb-2">
                 <Mail className="w-4 h-4 inline mr-1" />
-                Správa
+                Správa{' '}
+                <span>... už obsahuje ŠPZ, úlohu a dátum. Zadajte oslovenie alebo pozdrav.</span>
               </label>
               <textarea
                 value={formData.emailMessage}

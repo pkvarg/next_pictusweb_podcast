@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { checkNotificationLimit } from '@/lib/notificationLimits'
 
 const prisma = new PrismaClient()
 
@@ -30,6 +31,17 @@ export async function POST(request: NextRequest) {
         { error: 'Duty date is required' },
         { status: 400 }
       )
+    }
+
+    // Check notification limit before creating
+    if (organizationId) {
+      const limitCheck = await checkNotificationLimit(organizationId, 1, email || undefined)
+      if (!limitCheck.allowed) {
+        return NextResponse.json(
+          { error: limitCheck.reason, blocked: limitCheck.blocked, limitReached: limitCheck.limitReached },
+          { status: 403 }
+        )
+      }
     }
 
     let notificationData: any = {

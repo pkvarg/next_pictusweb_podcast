@@ -123,15 +123,19 @@ const RenewalModal = ({ dutyBatch, onClose, onSuccess }: RenewalModalProps) => {
       })
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        if (response.status === 403 && errorData?.error) {
+          throw new Error(errorData.error)
+        }
         throw new Error('Nepodarilo sa vytvoriť obnovu')
       }
 
       const data = await response.json()
       console.log('Renewal created:', data)
       onSuccess()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating renewal:', error)
-      setError('Nepodarilo sa vytvoriť obnovu')
+      setError(error?.message || 'Nepodarilo sa vytvoriť obnovu')
     } finally {
       setCreating(false)
     }

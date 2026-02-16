@@ -32,6 +32,7 @@ import NotificationBuilder from '@/app/components/admin/NotificationBuilder'
 import NotificationSettings from '@/app/components/admin/NotificationSettings'
 import RenewalsContent from '@/app/components/client/RenewalsContent'
 import { FaEuroSign } from 'react-icons/fa'
+import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
 
 interface MyVehicleExpense {
   id: string
@@ -89,6 +90,7 @@ interface Organization {
   currentNotificationsCount: number
   currentTemplatesCount: number
   currentNotificationTypesCount: number
+  notificationsBlocked: boolean
   createdAt?: string
 }
 
@@ -526,6 +528,35 @@ const MyFleetPage = () => {
     )
   }
 
+  // Show access denied if organization is deleted
+  const isOrgDeleted = (session?.user as any)?.organizationDeleted === true
+  if (session && isOrgDeleted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white flex items-center justify-center">
+        <div className="text-center max-w-lg px-6">
+          <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h1 className="text-3xl font-light mb-4 text-red-400">Prístup zamietnutý</h1>
+          <p className="text-lg text-gray-300 mb-6">
+            Vaša organizácia bola deaktivovaná. Kontaktujte administrátora alebo vášho marketéra.
+          </p>
+          <p className="text-sm text-gray-500 mb-8">
+            Ak si myslíte, že ide o chybu, napíšte na{' '}
+            <a href="mailto:info@pictusweb.sk" className="text-pictus-lime hover:underline">
+              info@pictusweb.sk
+            </a>
+          </p>
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+          >
+            <LogOut size={18} />
+            Odhlásiť sa
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   // Show access denied if not fleet manager
   const userIsFleetManager = session?.user
     ? (session.user as any).isFleetManager || session.user.isFleetManager
@@ -688,6 +719,15 @@ const MyFleetPage = () => {
           </div>
         </div>
       </header>
+
+      {organization?.tierRelation && (
+        <NotificationLimitBanner
+          currentCount={organization.currentNotificationsCount}
+          limit={organization.tierRelation.notificationsLimit}
+          tierName={organization.tierRelation.name}
+          blocked={organization.notificationsBlocked}
+        />
+      )}
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

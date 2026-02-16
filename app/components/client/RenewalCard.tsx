@@ -108,6 +108,10 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
       })
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        if (response.status === 403 && errorData?.error) {
+          throw new Error(errorData.error)
+        }
         throw new Error('Nepodarilo sa vytvoriť obnovu')
       }
 
@@ -115,9 +119,9 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
       setTimeout(() => {
         onRenewalSuccess()
       }, 1500)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating renewal:', error)
-      setError('Nepodarilo sa vytvoriť obnovu')
+      setError(error?.message || 'Nepodarilo sa vytvoriť obnovu')
     } finally {
       setCreating(false)
     }
@@ -145,6 +149,10 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
       })
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        if (response.status === 403 && errorData?.error) {
+          throw new Error(errorData.error)
+        }
         throw new Error('Nepodarilo sa vytvoriť obnovu')
       }
 
@@ -152,9 +160,9 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
       setTimeout(() => {
         onRenewalSuccess()
       }, 1500)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating renewal:', error)
-      setError('Nepodarilo sa vytvoriť obnovu')
+      setError(error?.message || 'Nepodarilo sa vytvoriť obnovu')
     } finally {
       setCreating(false)
     }

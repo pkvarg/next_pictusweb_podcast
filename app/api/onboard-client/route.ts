@@ -36,10 +36,7 @@ export async function POST(request: NextRequest) {
       organizationName,
       organizationMainContact,
       tierId,
-      // User data
-      userType, // 'new' or 'existing'
-      existingUserId, // If userType is 'existing'
-      // New user data (if userType is 'new')
+      // New user data
       firstName,
       lastName,
       email,
@@ -53,26 +50,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Organization name and tier are required' }, { status: 400 })
     }
 
-    if (userType === 'new') {
-      if (!firstName || !lastName || !email || !password) {
-        return NextResponse.json({ error: 'First name, last name, email, and password are required for new users' }, { status: 400 })
-      }
-
-      // Check if email already exists
-      const existingUser = await prisma.user.findUnique({
-        where: { email }
-      })
-
-      if (existingUser) {
-        return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
-      }
-    } else if (userType === 'existing') {
-      if (!existingUserId) {
-        return NextResponse.json({ error: 'Existing user ID is required' }, { status: 400 })
-      }
-    } else {
-      return NextResponse.json({ error: 'Invalid user type' }, { status: 400 })
+    if (!firstName || !lastName || !email || !password) {
+      return NextResponse.json({ error: 'First name, last name, email, and password are required' }, { status: 400 })
     }
+
+    // Check if email already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    })
+
+    if (existingUser) {
+      return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
+    }
+
+    // Fetch tier to determine if notificationPeriodStart should be set
+    const tier = await prisma.tier.findUnique({
+      where: { id: tierId },
+      select: { name: true }
+    })
+    const tierName = tier?.name?.toUpperCase() || ''
+    const isPaidTier = tierName === 'PREMIUM' || tierName === 'BUSINESS'
 
     // Start transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -82,7 +79,9 @@ export async function POST(request: NextRequest) {
           name: organizationName,
           mainContact: organizationMainContact || null,
           tierId: tierId,
-          parentOrganizationId: null, // New organizations have no parent
+          parentOrganizationId: currentUser?.organizationId || null,
+          onboardedBy: session.user.email,
+          notificationPeriodStart: isPaidTier ? new Date() : null,
         },
         include: {
           tierRelation: {
@@ -99,52 +98,31 @@ export async function POST(request: NextRequest) {
         }
       })
 
-      let user
+      // Step 2: Create new user in the new organization
+      const hashedPassword = await bcrypt.hash(password, 10)
 
-      if (userType === 'new') {
-        // Step 2a: Create new user directly in the new organization
-        const hashedPassword = await bcrypt.hash(password, 10)
-
-        user = await tx.user.create({
-          data: {
-            firstName,
-            lastName,
-            email,
-            password: hashedPassword,
-            phoneNumber: phoneNumber || null,
-            role: 'CLIENT',
-            active: true,
-            organizationId: organization.id,
-            isFleetManager: isFleetManager || false,
-          },
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            phoneNumber: true,
-            isFleetManager: true,
-            organizationId: true,
-          }
-        })
-      } else {
-        // Step 2b: Update existing user to new organization
-        user = await tx.user.update({
-          where: { id: existingUserId },
-          data: {
-            organizationId: organization.id,
-          },
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            phoneNumber: true,
-            isFleetManager: true,
-            organizationId: true,
-          }
-        })
-      }
+      const user = await tx.user.create({
+        data: {
+          firstName,
+          lastName,
+          email,
+          password: hashedPassword,
+          phoneNumber: phoneNumber || null,
+          role: 'CLIENT',
+          active: true,
+          organizationId: organization.id,
+          isFleetManager: isFleetManager || false,
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phoneNumber: true,
+          isFleetManager: true,
+          organizationId: true,
+        }
+      })
 
       return { organization, user }
     })
@@ -155,9 +133,7 @@ export async function POST(request: NextRequest) {
       success: true,
       organization: result.organization,
       user: result.user,
-      message: userType === 'new'
-        ? 'Organization and user created successfully'
-        : 'Organization created and user assigned successfully'
+      message: 'Organization and user created successfully'
     }, { status: 201 })
 
   } catch (error) {
