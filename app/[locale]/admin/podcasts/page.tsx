@@ -3,6 +3,8 @@ import AllPodcasts from '@/app/components/admin/AllPodcasts'
 import { Link } from '@/i18n/routing'
 import { Plus, Mic } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 const PodcastsAdmin = () => {
   return (
     <AdminLayout>
