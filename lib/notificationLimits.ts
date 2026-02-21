@@ -77,13 +77,13 @@ export async function checkNotificationLimit(
   }
 
   const tierName = org.tierRelation.name.toUpperCase()
-  const limit = org.tierRelation.notificationsLimit
+  const limit = org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? 0
 
   if (tierName === 'FREE') {
     return handleFreeTier(org, limit, countToAdd)
   }
 
-  // PREMIUM and BUSINESS - yearly tracking
+  // BASIC and BUSINESS - yearly tracking
   return handlePaidTier(org, limit, countToAdd, tierName, userEmail)
 }
 

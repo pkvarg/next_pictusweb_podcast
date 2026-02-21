@@ -225,6 +225,8 @@ model MyVehicleExpense {
   item                 String        @db.VarChar(200)
   cost         Decimal    @db.Decimal(10, 2)
   date         DateTime
+  note         String?    @db.VarChar(500)
+  link         String?    @db.VarChar(500)
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt @map("updated_at")
   deletedAt    DateTime?  @map("deleted_at")
@@ -271,6 +273,7 @@ model Tier {
   notificationsLimit      Int            @map("notifications_limit")
   templatesLimit          Int            @map("templates_limit")
   notificationTypesLimit  Int            @map("notification_types_limit")
+  pricePerVehicle         Decimal?       @map("price_per_vehicle") @db.Decimal(10, 2)
   createdAt               DateTime       @default(now()) @map("created_at")
   updatedAt               DateTime       @updatedAt @map("updated_at")
   deletedAt               DateTime?      @map("deleted_at")
@@ -301,6 +304,15 @@ model Organization {
   // Notification usage tracking
   notificationPeriodStart         DateTime?      @map("notification_period_start")
   notificationsBlocked            Boolean        @default(false) @map("notifications_blocked")
+
+  // Org-level limit overrides (fallback to tier if null)
+  usersLimit                      Int?           @map("users_limit")
+  vehiclesLimit                   Int?           @map("vehicles_limit")
+  notificationsLimit              Int?           @map("notifications_limit")
+  templatesLimit                  Int?           @map("templates_limit")
+  notificationTypesLimit          Int?           @map("notification_types_limit")
+  purchasedVehicles               Int?           @map("purchased_vehicles")
+  hiddenFromPictusaci             Boolean        @default(false) @map("hidden_from_pictusaci")
 
   // Onboarding
   onboardedBy                     String?        @map("onboarded_by") @db.VarChar(255)

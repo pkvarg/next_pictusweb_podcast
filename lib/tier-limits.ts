@@ -24,32 +24,32 @@ export async function checkTierLimit(
     throw new Error('Organization not found');
   }
 
-  // If organization has no tier assigned, skip limit check (no limits)
-  if (!org.tierRelation) {
-    console.log(`[checkTierLimit] Organization ${organizationId} has no tier, skipping limit check`);
+  // If organization has no tier and no org-level limits, skip limit check
+  if (!org.tierRelation && org.usersLimit === null && org.vehiclesLimit === null) {
+    console.log(`[checkTierLimit] Organization ${organizationId} has no tier or limits, skipping limit check`);
     return;
   }
 
   const limitMap = {
     users: {
       current: org.currentUsersCount,
-      limit: org.tierRelation.usersLimit
+      limit: org.usersLimit ?? org.tierRelation?.usersLimit ?? Infinity
     },
     vehicles: {
       current: org.currentVehiclesCount,
-      limit: org.tierRelation.vehiclesLimit
+      limit: org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? Infinity
     },
     notifications: {
       current: org.currentNotificationsCount,
-      limit: org.tierRelation.notificationsLimit
+      limit: org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? Infinity
     },
     templates: {
       current: org.currentTemplatesCount,
-      limit: org.tierRelation.templatesLimit
+      limit: org.templatesLimit ?? org.tierRelation?.templatesLimit ?? Infinity
     },
     notificationTypes: {
       current: org.currentNotificationTypesCount,
-      limit: org.tierRelation.notificationTypesLimit
+      limit: org.notificationTypesLimit ?? org.tierRelation?.notificationTypesLimit ?? Infinity
     }
   };
 
@@ -68,41 +68,47 @@ export async function getOrganizationLimits(organizationId: string) {
     include: { tierRelation: true }
   });
 
-  if (!org || !org.tierRelation) {
+  if (!org) {
     return null;
   }
 
+  const usersLimit = org.usersLimit ?? org.tierRelation?.usersLimit ?? 0;
+  const vehiclesLimit = org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? 0;
+  const notificationsLimit = org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? 0;
+  const templatesLimit = org.templatesLimit ?? org.tierRelation?.templatesLimit ?? 0;
+  const notificationTypesLimit = org.notificationTypesLimit ?? org.tierRelation?.notificationTypesLimit ?? 0;
+
   return {
-    tierName: org.tierRelation.name,
+    tierName: org.tierRelation?.name ?? 'N/A',
     users: {
       current: org.currentUsersCount,
-      limit: org.tierRelation.usersLimit,
-      remaining: org.tierRelation.usersLimit - org.currentUsersCount,
-      percentage: Math.round((org.currentUsersCount / org.tierRelation.usersLimit) * 100)
+      limit: usersLimit,
+      remaining: usersLimit - org.currentUsersCount,
+      percentage: usersLimit > 0 ? Math.round((org.currentUsersCount / usersLimit) * 100) : 0
     },
     vehicles: {
       current: org.currentVehiclesCount,
-      limit: org.tierRelation.vehiclesLimit,
-      remaining: org.tierRelation.vehiclesLimit - org.currentVehiclesCount,
-      percentage: Math.round((org.currentVehiclesCount / org.tierRelation.vehiclesLimit) * 100)
+      limit: vehiclesLimit,
+      remaining: vehiclesLimit - org.currentVehiclesCount,
+      percentage: vehiclesLimit > 0 ? Math.round((org.currentVehiclesCount / vehiclesLimit) * 100) : 0
     },
     notifications: {
       current: org.currentNotificationsCount,
-      limit: org.tierRelation.notificationsLimit,
-      remaining: org.tierRelation.notificationsLimit - org.currentNotificationsCount,
-      percentage: Math.round((org.currentNotificationsCount / org.tierRelation.notificationsLimit) * 100)
+      limit: notificationsLimit,
+      remaining: notificationsLimit - org.currentNotificationsCount,
+      percentage: notificationsLimit > 0 ? Math.round((org.currentNotificationsCount / notificationsLimit) * 100) : 0
     },
     templates: {
       current: org.currentTemplatesCount,
-      limit: org.tierRelation.templatesLimit,
-      remaining: org.tierRelation.templatesLimit - org.currentTemplatesCount,
-      percentage: Math.round((org.currentTemplatesCount / org.tierRelation.templatesLimit) * 100)
+      limit: templatesLimit,
+      remaining: templatesLimit - org.currentTemplatesCount,
+      percentage: templatesLimit > 0 ? Math.round((org.currentTemplatesCount / templatesLimit) * 100) : 0
     },
     notificationTypes: {
       current: org.currentNotificationTypesCount,
-      limit: org.tierRelation.notificationTypesLimit,
-      remaining: org.tierRelation.notificationTypesLimit - org.currentNotificationTypesCount,
-      percentage: Math.round((org.currentNotificationTypesCount / org.tierRelation.notificationTypesLimit) * 100)
+      limit: notificationTypesLimit,
+      remaining: notificationTypesLimit - org.currentNotificationTypesCount,
+      percentage: notificationTypesLimit > 0 ? Math.round((org.currentNotificationTypesCount / notificationTypesLimit) * 100) : 0
     }
   };
 }

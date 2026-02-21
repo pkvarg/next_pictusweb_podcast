@@ -31,6 +31,7 @@ interface Tier {
   notificationsLimit: number
   templatesLimit: number
   notificationTypesLimit: number
+  pricePerVehicle?: number | null
 }
 
 type Step = 1 | 2 | 3
@@ -52,6 +53,13 @@ const OnboardClientPage = () => {
   const [organizationName, setOrganizationName] = useState('')
   const [organizationMainContact, setOrganizationMainContact] = useState('')
   const [selectedTierId, setSelectedTierId] = useState('')
+  const [purchasedVehicles, setPurchasedVehicles] = useState('')
+  const [showCustomLimits, setShowCustomLimits] = useState(false)
+  const [customUsersLimit, setCustomUsersLimit] = useState('')
+  const [customVehiclesLimit, setCustomVehiclesLimit] = useState('')
+  const [customNotificationsLimit, setCustomNotificationsLimit] = useState('')
+  const [customTemplatesLimit, setCustomTemplatesLimit] = useState('')
+  const [customNotificationTypesLimit, setCustomNotificationTypesLimit] = useState('')
 
   // Step 2: User data
   const [firstName, setFirstName] = useState('')
@@ -81,6 +89,8 @@ const OnboardClientPage = () => {
     contactPhone: '',
     contactPerson: '',
     note: '',
+    numberOfVehicles: '',
+    tierName: '',
   })
 
   const handleInvoicingChange = (field: string, value: string) => {
@@ -100,6 +110,16 @@ const OnboardClientPage = () => {
       } else {
         setFirstName(value)
         setLastName('')
+      }
+    }
+    if (field === 'numberOfVehicles') {
+      setPurchasedVehicles(value)
+    }
+    if (field === 'tierName') {
+      // Find the tier by name and set selectedTierId
+      const matchedTier = tiers.find((t) => t.name === value)
+      if (matchedTier) {
+        setSelectedTierId(matchedTier.id)
       }
     }
     if (field === 'contactPhone') {
@@ -224,6 +244,12 @@ const OnboardClientPage = () => {
       setError('Vyberte tier')
       return false
     }
+    const selectedTier = getSelectedTier()
+    const isPaid = selectedTier && selectedTier.name !== 'FREE'
+    if (isPaid && (!purchasedVehicles || Number(purchasedVehicles) < 1)) {
+      setError('Zadajte počet zakúpených vozidiel (min. 1)')
+      return false
+    }
     return true
   }
 
@@ -273,6 +299,14 @@ const OnboardClientPage = () => {
         organizationName,
         organizationMainContact,
         tierId: selectedTierId,
+        purchasedVehicles: purchasedVehicles ? Number(purchasedVehicles) : null,
+        usersLimit: customUsersLimit ? Number(customUsersLimit) : null,
+        vehiclesLimit: customVehiclesLimit ? Number(customVehiclesLimit) : null,
+        notificationsLimit: customNotificationsLimit ? Number(customNotificationsLimit) : null,
+        templatesLimit: customTemplatesLimit ? Number(customTemplatesLimit) : null,
+        notificationTypesLimit: customNotificationTypesLimit
+          ? Number(customNotificationTypesLimit)
+          : null,
         firstName,
         lastName,
         email,
@@ -550,6 +584,39 @@ const OnboardClientPage = () => {
                       </div>
                     </div>
 
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Počet vozidiel
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={invoicingData.numberOfVehicles}
+                          onChange={(e) => handleInvoicingChange('numberOfVehicles', e.target.value)}
+                          placeholder="napr. 10"
+                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Tier
+                        </label>
+                        <select
+                          value={invoicingData.tierName}
+                          onChange={(e) => handleInvoicingChange('tierName', e.target.value)}
+                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                        >
+                          <option value="">Vyberte tier</option>
+                          {tiers.map((tier) => (
+                            <option key={tier.id} value={tier.name}>
+                              {tier.name} {tier.pricePerVehicle != null && Number(tier.pricePerVehicle) > 0 ? `(${tier.pricePerVehicle} €/voz/mes)` : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-1">
                         Poznámka
@@ -558,7 +625,7 @@ const OnboardClientPage = () => {
                         value={invoicingData.note}
                         onChange={(e) => handleInvoicingChange('note', e.target.value)}
                         rows={3}
-                        placeholder="Info k fakturácii, napr. Klient žiada iba FREE tier..."
+                        placeholder="Info k fakturácii..."
                         className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all resize-none"
                       />
                     </div>
@@ -686,6 +753,13 @@ const OnboardClientPage = () => {
                       }`}
                     >
                       <h3 className="text-xl font-medium text-pictus-white mb-2">{tier.name}</h3>
+                      {tier.pricePerVehicle != null && (
+                        <p className="text-pictus-lime text-lg font-medium mb-2">
+                          {Number(tier.pricePerVehicle) === 0
+                            ? 'Zadarmo'
+                            : `${tier.pricePerVehicle} € / vozidlo / mesiac`}
+                        </p>
+                      )}
                       <div className="space-y-1 text-sm text-gray-400">
                         <p>Používatelia: {tier.usersLimit}</p>
                         <p>Vozidlá: {tier.vehiclesLimit}</p>
@@ -694,6 +768,100 @@ const OnboardClientPage = () => {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Purchased Vehicles - show for paid tiers */}
+              {getSelectedTier() && getSelectedTier()?.name !== 'FREE' && (
+                <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Počet zakúpených vozidiel *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={purchasedVehicles}
+                    onChange={(e) => setPurchasedVehicles(e.target.value)}
+                    placeholder="napr. 10"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                  />
+                  {purchasedVehicles &&
+                    getSelectedTier()?.pricePerVehicle != null &&
+                    Number(getSelectedTier()?.pricePerVehicle) > 0 && (
+                      <p className="mt-3 text-pictus-lime text-lg">
+                        Mesačná cena:{' '}
+                        {(
+                          Number(purchasedVehicles) * Number(getSelectedTier()?.pricePerVehicle)
+                        ).toFixed(2)}{' '}
+                        € / mesiac
+                      </p>
+                    )}
+                </div>
+              )}
+
+              {/* Custom Limits Override */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowCustomLimits(!showCustomLimits)}
+                  className="flex items-center gap-2 text-sm text-gray-400 hover:text-pictus-lime transition-colors"
+                >
+                  {showCustomLimits ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  Vlastné limity (voliteľné)
+                </button>
+                {showCustomLimits && (
+                  <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-4 bg-white/5 rounded-lg border border-white/10 p-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Používatelia</label>
+                      <input
+                        type="number"
+                        value={customUsersLimit}
+                        onChange={(e) => setCustomUsersLimit(e.target.value)}
+                        placeholder={getSelectedTier()?.usersLimit?.toString() || '—'}
+                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Vozidlá</label>
+                      <input
+                        type="number"
+                        value={customVehiclesLimit}
+                        onChange={(e) => setCustomVehiclesLimit(e.target.value)}
+                        placeholder={getSelectedTier()?.vehiclesLimit?.toString() || '—'}
+                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Notifikácie</label>
+                      <input
+                        type="number"
+                        value={customNotificationsLimit}
+                        onChange={(e) => setCustomNotificationsLimit(e.target.value)}
+                        placeholder={getSelectedTier()?.notificationsLimit?.toString() || '—'}
+                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Šablóny</label>
+                      <input
+                        type="number"
+                        value={customTemplatesLimit}
+                        onChange={(e) => setCustomTemplatesLimit(e.target.value)}
+                        placeholder={getSelectedTier()?.templatesLimit?.toString() || '—'}
+                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Typy notifikácií</label>
+                      <input
+                        type="number"
+                        value={customNotificationTypesLimit}
+                        onChange={(e) => setCustomNotificationTypesLimit(e.target.value)}
+                        placeholder={getSelectedTier()?.notificationTypesLimit?.toString() || '—'}
+                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -843,13 +1011,47 @@ const OnboardClientPage = () => {
                     <p>
                       <span className="text-gray-400">Tier:</span> {getSelectedTier()?.name}
                     </p>
+                    {purchasedVehicles && (
+                      <p>
+                        <span className="text-gray-400">Zakúpené vozidlá:</span> {purchasedVehicles}
+                        {getSelectedTier()?.pricePerVehicle != null &&
+                          Number(getSelectedTier()?.pricePerVehicle) > 0 && (
+                            <span className="ml-2 text-pictus-lime">
+                              (
+                              {(
+                                Number(purchasedVehicles) *
+                                Number(getSelectedTier()?.pricePerVehicle)
+                              ).toFixed(2)}{' '}
+                              € / mesiac)
+                            </span>
+                          )}
+                      </p>
+                    )}
                     <div className="mt-4 pt-4 border-t border-white/10">
-                      <p className="text-sm text-gray-400 mb-2">Limity:</p>
+                      <p className="text-sm text-gray-400 mb-2">
+                        Limity
+                        {customUsersLimit ||
+                        customVehiclesLimit ||
+                        customNotificationsLimit ||
+                        customTemplatesLimit ||
+                        customNotificationTypesLimit
+                          ? ' (vlastné)'
+                          : ''}
+                        :
+                      </p>
                       <div className="grid grid-cols-2 gap-2 text-sm">
-                        <p>Používatelia: {getSelectedTier()?.usersLimit}</p>
-                        <p>Vozidlá: {getSelectedTier()?.vehiclesLimit}</p>
-                        <p>Notifikácie: {getSelectedTier()?.notificationsLimit}</p>
-                        <p>Šablóny: {getSelectedTier()?.templatesLimit}</p>
+                        <p>Používatelia: {customUsersLimit || getSelectedTier()?.usersLimit}</p>
+                        <p>
+                          Vozidlá:{' '}
+                          {customVehiclesLimit ||
+                            purchasedVehicles ||
+                            getSelectedTier()?.vehiclesLimit}
+                        </p>
+                        <p>
+                          Notifikácie:{' '}
+                          {customNotificationsLimit || getSelectedTier()?.notificationsLimit}
+                        </p>
+                        <p>Šablóny: {customTemplatesLimit || getSelectedTier()?.templatesLimit}</p>
                       </div>
                     </div>
                   </div>

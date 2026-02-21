@@ -36,6 +36,13 @@ export async function POST(request: NextRequest) {
       organizationName,
       organizationMainContact,
       tierId,
+      purchasedVehicles,
+      // Optional limit overrides
+      usersLimit: usersLimitOverride,
+      vehiclesLimit: vehiclesLimitOverride,
+      notificationsLimit: notificationsLimitOverride,
+      templatesLimit: templatesLimitOverride,
+      notificationTypesLimit: notificationTypesLimitOverride,
       // New user data
       firstName,
       lastName,
@@ -66,14 +73,17 @@ export async function POST(request: NextRequest) {
     // Fetch tier to determine if notificationPeriodStart should be set
     const tier = await prisma.tier.findUnique({
       where: { id: tierId },
-      select: { name: true }
+      select: { name: true, pricePerVehicle: true }
     })
     const tierName = tier?.name?.toUpperCase() || ''
-    const isPaidTier = tierName === 'PREMIUM' || tierName === 'BUSINESS'
+    const isPaidTier = tierName === 'BASIC' || tierName === 'BUSINESS'
 
     // Start transaction
     const result = await prisma.$transaction(async (tx) => {
       // Step 1: Create the organization
+      // Helper to convert override values
+      const toNullableInt = (val: any) => (val === '' || val === undefined || val === null) ? null : Number(val)
+
       const organization = await tx.organization.create({
         data: {
           name: organizationName,
@@ -82,6 +92,12 @@ export async function POST(request: NextRequest) {
           parentOrganizationId: currentUser?.organizationId || null,
           onboardedBy: session.user.email,
           notificationPeriodStart: isPaidTier ? new Date() : null,
+          purchasedVehicles: toNullableInt(purchasedVehicles),
+          vehiclesLimit: toNullableInt(purchasedVehicles) || toNullableInt(vehiclesLimitOverride),
+          usersLimit: toNullableInt(usersLimitOverride),
+          notificationsLimit: toNullableInt(notificationsLimitOverride),
+          templatesLimit: toNullableInt(templatesLimitOverride),
+          notificationTypesLimit: toNullableInt(notificationTypesLimitOverride),
         },
         include: {
           tierRelation: {

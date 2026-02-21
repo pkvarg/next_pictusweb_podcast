@@ -39,6 +39,8 @@ interface MyVehicleExpense {
   item: string
   cost: number
   date: string
+  note: string | null
+  link: string | null
   createdAt: string
 }
 
@@ -90,6 +92,13 @@ interface Organization {
   currentNotificationsCount: number
   currentTemplatesCount: number
   currentNotificationTypesCount: number
+  usersLimit: number | null
+  vehiclesLimit: number | null
+  notificationsLimit: number | null
+  templatesLimit: number | null
+  notificationTypesLimit: number | null
+  purchasedVehicles: number | null
+  hiddenFromPictusaci: boolean
   notificationsBlocked: boolean
   createdAt?: string
 }
@@ -720,11 +729,11 @@ const MyFleetPage = () => {
         </div>
       </header>
 
-      {organization?.tierRelation && (
+      {(organization?.tierRelation || organization?.notificationsLimit != null) && organization && (
         <NotificationLimitBanner
           currentCount={organization.currentNotificationsCount}
-          limit={organization.tierRelation.notificationsLimit}
-          tierName={organization.tierRelation.name}
+          limit={organization.notificationsLimit ?? organization.tierRelation?.notificationsLimit ?? 0}
+          tierName={organization.tierRelation?.name ?? 'N/A'}
           blocked={organization.notificationsBlocked}
         />
       )}
@@ -874,12 +883,12 @@ const MyFleetPage = () => {
             {/* Vehicle Header Actions */}
             <div className="mb-6 flex items-center justify-between">
               <div>
-                {organization?.tierRelation && (
+                {organization && (organization.tierRelation || organization.vehiclesLimit != null) && (
                   <p className="text-sm text-gray-400">
                     Počet vozidiel: {organization.currentVehiclesCount} /{' '}
-                    {organization.tierRelation.vehiclesLimit}
+                    {organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? '—'}
                     {organization.currentVehiclesCount >=
-                      organization.tierRelation.vehiclesLimit && (
+                      (organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? Infinity) && (
                       <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
                     )}
                   </p>
@@ -888,15 +897,15 @@ const MyFleetPage = () => {
               <Link
                 href="/client/my-fleet/new"
                 className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-light transition-all text-lg ${
-                  organization?.tierRelation &&
-                  organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit
+                  organization &&
+                  organization.currentVehiclesCount >= (organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? Infinity)
                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white hover:from-pictus-lime700 hover:to-pictus-black'
                 }`}
                 onClick={(e) => {
                   if (
-                    organization?.tierRelation &&
-                    organization.currentVehiclesCount >= organization.tierRelation.vehiclesLimit
+                    organization &&
+                    organization.currentVehiclesCount >= (organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? Infinity)
                   ) {
                     e.preventDefault()
                     alert('Dosiahli ste maximálny počet vozidiel pre vašu organizáciu')
@@ -1084,11 +1093,11 @@ const MyFleetPage = () => {
                 <p className="text-gray-400 mt-1">
                   Organizácia: {organization?.name || 'Načítavam...'}
                 </p>
-                {organization?.tierRelation && (
+                {organization && (organization.tierRelation || organization.usersLimit != null) && (
                   <p className="text-sm text-gray-500 mt-1">
                     Počet používateľov: {organization.currentUsersCount} /{' '}
-                    {organization.tierRelation.usersLimit}
-                    {organization.currentUsersCount >= organization.tierRelation.usersLimit && (
+                    {organization.usersLimit ?? organization.tierRelation?.usersLimit ?? '—'}
+                    {organization.currentUsersCount >= (organization.usersLimit ?? organization.tierRelation?.usersLimit ?? Infinity) && (
                       <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
                     )}
                   </p>
@@ -1097,13 +1106,13 @@ const MyFleetPage = () => {
               <button
                 onClick={handleCreateUser}
                 disabled={
-                  organization?.tierRelation
-                    ? organization.currentUsersCount >= organization.tierRelation.usersLimit
+                  organization
+                    ? organization.currentUsersCount >= (organization.usersLimit ?? organization.tierRelation?.usersLimit ?? Infinity)
                     : false
                 }
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                  organization?.tierRelation &&
-                  organization.currentUsersCount >= organization.tierRelation.usersLimit
+                  organization &&
+                  organization.currentUsersCount >= (organization.usersLimit ?? organization.tierRelation?.usersLimit ?? Infinity)
                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black'
                 }`}
@@ -1715,11 +1724,11 @@ const MyFleetPage = () => {
                   </p>
                 </div>
               )}
-              {organization?.tierRelation && (
+              {organization && (organization.tierRelation || organization.notificationTypesLimit != null) && (
                 <div className="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
                   <p className="text-orange-300 text-sm">
                     ⚠️ Limit typov notifikácií: {organization.currentNotificationTypesCount} /{' '}
-                    {organization.tierRelation.notificationTypesLimit}
+                    {organization.notificationTypesLimit ?? organization.tierRelation?.notificationTypesLimit ?? '—'}
                   </p>
                 </div>
               )}
@@ -1836,7 +1845,7 @@ const MyFleetPage = () => {
                             {org.currentUsersCount !== undefined ? (
                               <>
                                 {org.currentUsersCount}
-                                {org.tierRelation && ` / ${org.tierRelation.usersLimit}`}
+                                {` / ${org.usersLimit ?? org.tierRelation?.usersLimit ?? '—'}`}
                               </>
                             ) : (
                               '-'
@@ -1848,7 +1857,7 @@ const MyFleetPage = () => {
                             {org.currentVehiclesCount !== undefined ? (
                               <>
                                 {org.currentVehiclesCount}
-                                {org.tierRelation && ` / ${org.tierRelation.vehiclesLimit}`}
+                                {` / ${org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? '—'}`}
                               </>
                             ) : (
                               '-'
@@ -1860,7 +1869,7 @@ const MyFleetPage = () => {
                             {org.currentNotificationsCount !== undefined ? (
                               <>
                                 {org.currentNotificationsCount}
-                                {org.tierRelation && ` / ${org.tierRelation.notificationsLimit}`}
+                                {` / ${org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}`}
                               </>
                             ) : (
                               '-'

@@ -27,6 +27,8 @@ interface MyVehicleExpense {
   item: string
   cost: number
   date: string
+  note: string | null
+  link: string | null
   createdAt: string
 }
 
@@ -635,15 +637,34 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                       {recentExpenses.map((expense) => (
                         <div
                           key={expense.id}
-                          className="flex items-center justify-between bg-pictus-white/5 rounded-lg p-2"
+                          className="bg-pictus-white/5 rounded-lg p-2"
                         >
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs text-pictus-white truncate">{expense.item}</p>
-                            <p className="text-xs text-pictus-white/50">{formatDate(expense.date)}</p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs text-pictus-white truncate">{expense.item}</p>
+                              <p className="text-xs text-pictus-white/50">{formatDate(expense.date)}</p>
+                            </div>
+                            <p className="text-xs font-normal text-pictus-lime ml-2">
+                              {formatCurrency(Number(expense.cost))}
+                            </p>
                           </div>
-                          <p className="text-xs font-normal text-pictus-lime ml-2">
-                            {formatCurrency(Number(expense.cost))}
-                          </p>
+                          {(expense.note || expense.link) && (
+                            <div className="mt-1 flex gap-2">
+                              {expense.note && (
+                                <p className="text-xs text-pictus-white/40 italic truncate">{expense.note}</p>
+                              )}
+                              {expense.link && (
+                                <a
+                                  href={expense.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-pictus-lime/70 hover:underline truncate"
+                                >
+                                  link
+                                </a>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

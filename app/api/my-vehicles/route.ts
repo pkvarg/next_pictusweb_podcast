@@ -76,6 +76,10 @@ export async function GET(request: NextRequest) {
       whereClause.organizationId = organizationId
     }
     // If no param provided and IS PICTUSACI user, don't filter (show all vehicles)
+    // But exclude organizations hidden from PICTUSACI
+    if (isPictusaciUser && !organizationIdParam) {
+      whereClause.organizationRelation = { hiddenFromPictusaci: false }
+    }
 
     console.log('[MY-VEHICLES GET] WhereClause:', JSON.stringify(whereClause))
 

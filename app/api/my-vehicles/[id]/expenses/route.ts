@@ -81,7 +81,7 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { item, cost, date } = body
+    const { item, cost, date, note, link } = body
 
     if (!item || !cost || !date) {
       return NextResponse.json(
@@ -97,6 +97,8 @@ export async function POST(
         item,
         cost: parseFloat(cost),
         date: new Date(date),
+        note: note || null,
+        link: link || null,
         userId: session.user.id,
       },
     })

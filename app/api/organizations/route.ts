@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, mainContact, parentOrganizationId, tierId } = body
+    const { name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci } = body
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 })
@@ -74,6 +74,13 @@ export async function POST(request: NextRequest) {
         mainContact,
         parentOrganizationId: parentOrganizationId || null,
         tierId: tierId || null,
+        usersLimit: usersLimit != null ? Number(usersLimit) : null,
+        vehiclesLimit: vehiclesLimit != null ? Number(vehiclesLimit) : null,
+        notificationsLimit: notificationsLimit != null ? Number(notificationsLimit) : null,
+        templatesLimit: templatesLimit != null ? Number(templatesLimit) : null,
+        notificationTypesLimit: notificationTypesLimit != null ? Number(notificationTypesLimit) : null,
+        purchasedVehicles: purchasedVehicles != null ? Number(purchasedVehicles) : null,
+        hiddenFromPictusaci: hiddenFromPictusaci === true,
       },
       include: {
         tierRelation: {
@@ -106,11 +113,14 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, name, mainContact, parentOrganizationId, tierId } = body
+    const { id, name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Organization ID is required' }, { status: 400 })
     }
+
+    // Convert empty strings / undefined to null for limit fields
+    const toNullableInt = (val: any) => (val === '' || val === undefined || val === null) ? null : Number(val)
 
     const organization = await prisma.organization.update({
       where: { id },
@@ -119,6 +129,13 @@ export async function PUT(request: NextRequest) {
         mainContact,
         parentOrganizationId: parentOrganizationId || null,
         tierId: tierId || null,
+        usersLimit: toNullableInt(usersLimit),
+        vehiclesLimit: toNullableInt(vehiclesLimit),
+        notificationsLimit: toNullableInt(notificationsLimit),
+        templatesLimit: toNullableInt(templatesLimit),
+        notificationTypesLimit: toNullableInt(notificationTypesLimit),
+        purchasedVehicles: toNullableInt(purchasedVehicles),
+        ...(hiddenFromPictusaci !== undefined && { hiddenFromPictusaci: hiddenFromPictusaci === true }),
       },
       include: {
         parentOrganization: {

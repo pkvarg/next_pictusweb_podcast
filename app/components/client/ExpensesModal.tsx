@@ -8,6 +8,8 @@ interface Expense {
   item: string
   cost: number
   date: string
+  note: string | null
+  link: string | null
   createdAt: string
 }
 
@@ -19,15 +21,31 @@ interface ExpensesModalProps {
   onSuccess?: () => void
 }
 
-const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSuccess }: ExpensesModalProps) => {
+const ExpensesModal = ({
+  isOpen,
+  onClose,
+  vehicleId,
+  vehicleRegistration,
+  onSuccess,
+}: ExpensesModalProps) => {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     item: '',
     cost: '',
     date: new Date().toISOString().split('T')[0],
+    note: '',
+    link: '',
   })
   const [error, setError] = useState('')
+  const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null)
+  const [editFormData, setEditFormData] = useState({
+    item: '',
+    cost: '',
+    date: '',
+    note: '',
+    link: '',
+  })
 
   const fetchExpenses = useCallback(async () => {
     try {
@@ -78,6 +96,8 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucc
         item: '',
         cost: '',
         date: new Date().toISOString().split('T')[0],
+        note: '',
+        link: '',
       })
 
       // Refresh list
@@ -119,6 +139,41 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucc
     } catch (err) {
       console.error('Error deleting expense:', err)
       alert('Nepodarilo sa odstrániť výdavok')
+    }
+  }
+
+  const startEditExpense = (expense: Expense) => {
+    setEditingExpenseId(expense.id)
+    setEditFormData({
+      item: expense.item,
+      cost: String(expense.cost),
+      date: new Date(expense.date).toISOString().split('T')[0],
+      note: expense.note || '',
+      link: expense.link || '',
+    })
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingExpenseId) return
+
+    try {
+      setLoading(true)
+      const response = await fetch(`/api/my-vehicles/${vehicleId}/expenses/${editingExpenseId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editFormData),
+      })
+
+      if (!response.ok) throw new Error('Failed to update expense')
+
+      setEditingExpenseId(null)
+      await fetchExpenses()
+      if (onSuccess) onSuccess()
+    } catch (err) {
+      console.error('Error updating expense:', err)
+      alert('Nepodarilo sa upraviť výdavok')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -189,7 +244,9 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucc
                 />
               </div>
               <div>
-                <label className="block text-pictus-white text-lg font-light mb-2">Suma (€) *</label>
+                <label className="block text-pictus-white text-lg font-light mb-2">
+                  Suma (€) *
+                </label>
                 <input
                   type="number"
                   step="0.01"
@@ -208,6 +265,28 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucc
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-pictus-white text-lg font-light mb-2">Poznámka</label>
+                <input
+                  type="text"
+                  value={formData.note}
+                  onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                  placeholder="voliteľná poznámka"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-pictus-white text-lg font-light mb-2">
+                  Link napr. na obdchod
+                </label>
+                <input
+                  type="url"
+                  value={formData.link}
+                  onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                  placeholder="https://..."
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
               <div className="md:col-span-2">
@@ -231,7 +310,9 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucc
               {expenses.length > 1 && (
                 <div className="bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg px-6 py-3">
                   <p className="text-pictus-lime text-sm">Celkom</p>
-                  <p className="text-3xl font-light text-pictus-white">{formatCurrency(calculateTotal())}</p>
+                  <p className="text-3xl font-light text-pictus-white">
+                    {formatCurrency(calculateTotal())}
+                  </p>
                 </div>
               )}
             </div>
@@ -247,23 +328,118 @@ const ExpensesModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucc
                 {expenses.map((expense) => (
                   <div
                     key={expense.id}
-                    className="bg-gray-600/20 border border-pictus-lime/20 rounded-lg p-5 flex items-center justify-between hover:bg-pictus-lime/20 transition"
+                    className="bg-gray-600/20 border border-pictus-lime/20 rounded-lg p-5 hover:bg-pictus-lime/20 transition"
                   >
-                    <div className="flex-1">
-                      <h4 className="text-pictus-white font-light text-xl">{expense.item}</h4>
-                      <p className="text-pictus-lime text-base">{formatDate(expense.date)}</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-2xl font-light text-pictus-white">
-                        {formatCurrency(Number(expense.cost))}
-                      </span>
-                      <button
-                        onClick={() => handleDelete(expense.id)}
-                        className="p-3 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition text-red-400"
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
+                    {editingExpenseId === expense.id ? (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-3 gap-3">
+                          <input
+                            type="text"
+                            value={editFormData.item}
+                            onChange={(e) =>
+                              setEditFormData({ ...editFormData, item: e.target.value })
+                            }
+                            className="col-span-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                            placeholder="Položka"
+                          />
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editFormData.cost}
+                            onChange={(e) =>
+                              setEditFormData({ ...editFormData, cost: e.target.value })
+                            }
+                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                            placeholder="Suma"
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                          <input
+                            type="date"
+                            value={editFormData.date}
+                            onChange={(e) =>
+                              setEditFormData({ ...editFormData, date: e.target.value })
+                            }
+                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                          />
+                          <input
+                            type="text"
+                            value={editFormData.note}
+                            onChange={(e) =>
+                              setEditFormData({ ...editFormData, note: e.target.value })
+                            }
+                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                            placeholder="Poznámka"
+                          />
+                          <input
+                            type="url"
+                            value={editFormData.link}
+                            onChange={(e) =>
+                              setEditFormData({ ...editFormData, link: e.target.value })
+                            }
+                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleSaveEdit}
+                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition text-sm"
+                          >
+                            Uložiť
+                          </button>
+                          <button
+                            onClick={() => setEditingExpenseId(null)}
+                            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition text-sm"
+                          >
+                            Zrušiť
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h4 className="text-pictus-white font-light text-xl">{expense.item}</h4>
+                            <p className="text-pictus-lime text-base">{formatDate(expense.date)}</p>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="text-2xl font-light text-pictus-white">
+                              {formatCurrency(Number(expense.cost))}
+                            </span>
+                            <button
+                              onClick={() => startEditExpense(expense)}
+                              className="p-3 bg-blue-600/20 hover:bg-blue-600/40 rounded-lg transition text-blue-400"
+                            >
+                              <Plus size={20} className="rotate-45" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(expense.id)}
+                              className="p-3 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition text-red-400"
+                            >
+                              <Trash2 size={20} />
+                            </button>
+                          </div>
+                        </div>
+                        {(expense.note || expense.link) && (
+                          <div className="mt-2 flex gap-4 text-sm">
+                            {expense.note && (
+                              <span className="text-gray-400 italic">{expense.note}</span>
+                            )}
+                            {expense.link && (
+                              <a
+                                href={expense.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-pictus-lime hover:underline truncate max-w-xs"
+                              >
+                                {expense.link}
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 ))}
               </div>

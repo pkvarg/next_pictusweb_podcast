@@ -44,6 +44,9 @@ export async function GET(request: NextRequest) {
     // Filter by organization unless PICTUSACI user viewing all
     if (!isPictusaciUser || (organizationIdParam && organizationIdParam !== 'all')) {
       pdrWhereClause.organizationId = organizationId
+    } else if (isPictusaciUser && (!organizationIdParam || organizationIdParam === 'all')) {
+      // Exclude hidden organizations for PICTUSACI "all" queries
+      pdrWhereClause.organization = { hiddenFromPictusaci: false }
     }
 
     // Fetch all PDR reminder notifications
