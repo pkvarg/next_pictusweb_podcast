@@ -270,11 +270,13 @@ const Contact = () => {
     }
 
     try {
+      const timeSpent = Date.now() - formStartTime
       const sendData = {
         ...options,
         locale,
         origin,
         subject,
+        timeSpent,
       }
 
       // Use local API endpoint which has IP ban protection

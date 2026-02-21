@@ -18,6 +18,7 @@ import {
   Building,
   ChevronDown,
   Truck,
+  MessageSquare,
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -49,6 +50,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       name: 'File Upload',
       href: '/admin/file-upload',
       icon: Upload,
+    },
+    {
+      name: 'Contact Logs',
+      href: '/admin/contact-logs',
+      icon: MessageSquare,
     },
   ]
 

@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkIPBan } from '@/lib/checkIPBan'
+import db from '@/db/db'
 import axios from 'axios'
 
 /**
  * Contact form proxy with IP ban protection
  * Checks if IP is banned before forwarding to Hono API
+ * Logs all successful (non-bot) submissions to ContactLog for spam analysis
  */
 export async function POST(request: NextRequest) {
   try {
@@ -24,6 +26,15 @@ export async function POST(request: NextRequest) {
     // Get request body
     const body = await request.json()
 
+    // Capture request metadata for logging
+    const userAgent = request.headers.get('user-agent') || 'Unknown'
+    const ipAddress =
+      request.headers.get('x-forwarded-for')?.split(',')[0] ||
+      request.headers.get('x-real-ip') ||
+      'Unknown'
+    const referer = request.headers.get('referer') || null
+    const acceptLanguage = request.headers.get('accept-language') || null
+
     // Forward to Hono API
     const honoApiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/contact`
 
@@ -32,6 +43,27 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
     })
+
+    // Log successful submission to ContactLog (non-blocking)
+    db.contactLog
+      .create({
+        data: {
+          name: body.name || null,
+          email: body.email || null,
+          phone: body.phone || null,
+          message: body.mailMessage || null,
+          subject: body.subject || null,
+          locale: body.locale || null,
+          origin: body.origin || null,
+          ipAddress,
+          userAgent,
+          referer,
+          acceptLanguage,
+          timeSpent: body.timeSpent || null,
+          emailSent: true,
+        },
+      })
+      .catch((err) => console.error('Failed to log contact submission:', err))
 
     // Return Hono API response
     return NextResponse.json(response.data, { status: response.status })

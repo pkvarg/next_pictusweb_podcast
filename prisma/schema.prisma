@@ -149,6 +149,24 @@ model BotLog {
   createdAt        DateTime @default(now())
 }
 
+model ContactLog {
+  id             String   @id @default(uuid())
+  name           String?
+  email          String?
+  phone          String?
+  message        String?
+  subject        String?
+  locale         String?
+  origin         String?
+  ipAddress      String?
+  userAgent      String?
+  referer        String?
+  acceptLanguage String?
+  timeSpent      Int?
+  emailSent      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
 model IPReputation {
   id               String    @id @default(uuid())
   ipAddress        String    @unique
