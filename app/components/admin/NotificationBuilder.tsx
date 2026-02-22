@@ -106,7 +106,7 @@ export default function NotificationBuilder({
     templateId: '',
     vehicleId: '',
     notificationType: '',
-    notificationChannel: hideChannelDropdown ? 'Email/Sms' : '',
+    notificationChannel: hideChannelDropdown ? (organizationTier === 'FREE' ? 'Email' : 'Email/Sms') : '',
     dutyDate: '',
     notificationDate: '',
     personName: '',
@@ -229,6 +229,11 @@ export default function NotificationBuilder({
       console.error('Failed to fetch channel options:', error)
     }
   }, [organizationId, organizations])
+
+  // FREE tier can only use the Email channel
+  const filteredChannelOptions = organizationTier === 'FREE'
+    ? channelOptions.filter((ch) => ch.label.toLowerCase() === 'email')
+    : channelOptions
 
   const fetchVehicles = useCallback(async () => {
     if (!organizationId) return
@@ -367,7 +372,7 @@ export default function NotificationBuilder({
         vehicleId: duplicateData.myVehicleId || '',
         notificationType: duplicateData.notificationType || '',
         notificationChannel: hideChannelDropdown
-          ? 'Email/Sms'
+          ? (organizationTier === 'FREE' ? 'Email' : 'Email/Sms')
           : duplicateData.notificationChannel || '',
         dutyDate: formatDate(duplicateData.dutyDate),
         notificationDate: formatDate(duplicateData.notificationDate),
@@ -396,7 +401,7 @@ export default function NotificationBuilder({
         ...formData,
         templateId,
         notificationType: template.notificationType,
-        notificationChannel: hideChannelDropdown ? 'Email/Sms' : template.notificationChannel,
+        notificationChannel: hideChannelDropdown ? (organizationTier === 'FREE' ? 'Email' : 'Email/Sms') : template.notificationChannel,
         emailMessage: template.emailMessage || '',
       })
       // Set reminder intervals from template
@@ -954,7 +959,7 @@ export default function NotificationBuilder({
                 {hideChannelDropdown ? (
                   <input
                     type="text"
-                    value="Email/Sms"
+                    value={organizationTier === 'FREE' ? 'Email' : 'Email/Sms'}
                     disabled
                     className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 cursor-not-allowed"
                   />
@@ -972,7 +977,7 @@ export default function NotificationBuilder({
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     >
                       <option value="">Vybrať kanál...</option>
-                      {channelOptions.map((option) => (
+                      {filteredChannelOptions.map((option) => (
                         <option key={option.id} value={option.label}>
                           {option.label}
                         </option>

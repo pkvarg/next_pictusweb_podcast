@@ -410,6 +410,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             t('businessFeatures1'),
             t('businessFeatures2'),
             t('businessFeatures3'),
+            t('businessFeatures10'),
             t('businessFeatures4'),
             t('businessFeatures5'),
             t('businessFeatures6'),

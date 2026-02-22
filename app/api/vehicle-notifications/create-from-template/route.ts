@@ -42,6 +42,18 @@ export async function POST(request: NextRequest) {
           { status: 403 }
         )
       }
+
+      // FREE tier can only use the Email channel
+      const org = await prisma.organization.findUnique({
+        where: { id: organizationId },
+        include: { tierRelation: { select: { name: true } } },
+      })
+      if (org?.tierRelation?.name === 'FREE' && notificationChannel?.toLowerCase() !== 'email') {
+        return NextResponse.json(
+          { error: 'FREE tier only supports Email channel' },
+          { status: 403 }
+        )
+      }
     }
 
     let notificationData: any = {
