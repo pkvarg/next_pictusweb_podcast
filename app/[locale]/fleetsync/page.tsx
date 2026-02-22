@@ -1,5 +1,6 @@
 import Footer from '@/app/components/Footer'
 import PagesHeader from '@/app/components/PagesHeader'
+import FleetSyncPricing from '@/app/components/FleetSyncPricing'
 import { CheckCircle, Calculator, BarChart3, Users, Calendar, Bell } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
@@ -367,119 +368,59 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
       </section> */}
 
       {/* Pricing Section */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-light mb-6">
-              {t('pricingTitle')}{' '}
-              <span className="text-purple-400">{t('pricingTitleHighlight')}</span>
-            </h2>
-            <p className="text-2xl text-gray-300 font-thin">{t('pricingSubtitle')}</p>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Personal Plan */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30">
-              <h3 className="text-2xl font-semibold mb-2">{t('personalTitle')}</h3>
-              <div className="text-4xl font-bold mb-6">
-                {t('personalPrice')}
-                <span className="text-lg text-gray-400 font-thin">{t('personalPriceUnit')}</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('personalFeature1')}</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('personalFeature2')}</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('personalFeature3')}</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('personalFeature4')}</span>
-                </li>
-              </ul>
-              <Link
-                href={`/contact?subject=${encodeURIComponent(t('contactPersonal'))}`}
-                className="block w-full bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-full transition-colors text-center"
-              >
-                {t('personalButton')}
-              </Link>
-            </div>
-
-            {/* Business Plan */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30">
-              <h3 className="text-2xl font-semibold mb-2">{t('businessTitle')}</h3>
-              <div className="text-4xl font-bold mb-6">
-                {t('businessPrice')}
-                <span className="text-lg text-gray-400 font-thin">{t('businessPriceUnit')}</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('businessFeature1')}</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('businessFeature2')}</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('businessFeature3')}</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('businessFeature4')}</span>
-                </li>
-              </ul>
-              <Link
-                href={`/contact?subject=${encodeURIComponent(t('contactBusiness'))}`}
-                className="block w-full bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-full transition-colors text-center"
-              >
-                {t('businessButton')}
-              </Link>
-            </div>
-
-            {/* Enterprise Plan */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30">
-              <h3 className="text-2xl font-semibold mb-2">{t('enterpriseTitle')}</h3>
-              <div className="text-4xl font-bold mb-6">
-                {t('enterprisePrice')}
-                <span className="text-lg text-gray-400 font-thin">{t('enterprisePriceUnit')}</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('enterpriseFeature1')}</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('enterpriseFeature2')}</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('enterpriseFeature3')}</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>{t('enterpriseFeature4')}</span>
-                </li>
-              </ul>
-
-              <Link
-                href={`/contact?subject=${encodeURIComponent(t('contactEnterprise'))}`}
-                className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center"
-              >
-                {t('enterpriseButton')}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <FleetSyncPricing
+        translations={{
+          pricingTitle: t('pricingTitle'),
+          pricingTitleHighlight: t('pricingTitleHighlight'),
+          pricingSubtitle: t('pricingSubtitle'),
+          monthly: t('monthly'),
+          yearly: t('yearly'),
+          yearlySave: t('yearlySave'),
+          perVehicle: t('perVehicle'),
+          perMonth: t('perMonth'),
+          perYear: t('perYear'),
+          free: t('free'),
+          freeFeatures: [
+            t('freeFeatures1'),
+            t('freeFeatures2'),
+            t('freeFeatures3'),
+            t('freeFeatures4'),
+            t('freeFeatures5'),
+            t('freeFeatures6'),
+            t('freeFeatures7'),
+          ],
+          freeButton: t('freeButton'),
+          freeContact: t('freeContact'),
+          basic: t('basic'),
+          basicFeatures: [
+            t('basicFeatures1'),
+            t('basicFeatures2'),
+            t('basicFeatures3'),
+            t('basicFeatures4'),
+            t('basicFeatures5'),
+            t('basicFeatures6'),
+            t('basicFeatures7'),
+            t('basicFeatures8'),
+          ],
+          basicButton: t('basicButton'),
+          basicContact: t('basicContact'),
+          basicPopular: t('basicPopular'),
+          business: t('business'),
+          businessFeatures: [
+            t('businessFeatures1'),
+            t('businessFeatures2'),
+            t('businessFeatures3'),
+            t('businessFeatures4'),
+            t('businessFeatures5'),
+            t('businessFeatures6'),
+            t('businessFeatures7'),
+            t('businessFeatures8'),
+            t('businessFeatures9'),
+          ],
+          businessButton: t('businessButton'),
+          businessContact: t('businessContact'),
+        }}
+      />
 
       {/* CTA Section */}
       <section className=" py-20">

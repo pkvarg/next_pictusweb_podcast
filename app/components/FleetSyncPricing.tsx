@@ -78,13 +78,13 @@ const FleetSyncPricing = ({ translations: t }: FleetSyncPricingProps) => {
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* FREE */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30">
+          <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30 flex flex-col">
             <h3 className="text-2xl font-semibold mb-2">{t.free}</h3>
             <div className="text-4xl font-bold mb-1">
               €0
             </div>
             <p className="text-gray-400 mb-6 text-sm">{t.perVehicle}</p>
-            <ul className="space-y-3 mb-8">
+            <ul className="space-y-3 mb-8 flex-grow">
               {t.freeFeatures.filter(Boolean).map((feature, i) => (
                 <li key={i} className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
@@ -94,14 +94,14 @@ const FleetSyncPricing = ({ translations: t }: FleetSyncPricingProps) => {
             </ul>
             <Link
               href={`/contact?subject=${encodeURIComponent(t.freeContact)}`}
-              className="block w-full bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-full transition-colors text-center"
+              className="block w-full bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-full transition-colors text-center mt-auto"
             >
               {t.freeButton}
             </Link>
           </div>
 
           {/* BASIC - Popular */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border-2 border-purple-500/60 relative">
+          <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border-2 border-purple-500/60 relative flex flex-col">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-1 rounded-full text-sm font-medium">
               {t.basicPopular}
             </div>
@@ -113,7 +113,7 @@ const FleetSyncPricing = ({ translations: t }: FleetSyncPricingProps) => {
               </span>
             </div>
             <p className="text-gray-400 mb-6 text-sm">{t.perVehicle}</p>
-            <ul className="space-y-3 mb-8">
+            <ul className="space-y-3 mb-8 flex-grow">
               {t.basicFeatures.filter(Boolean).map((feature, i) => (
                 <li key={i} className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
@@ -123,14 +123,14 @@ const FleetSyncPricing = ({ translations: t }: FleetSyncPricingProps) => {
             </ul>
             <Link
               href={`/contact?subject=${encodeURIComponent(t.basicContact)}`}
-              className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center"
+              className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center mt-auto"
             >
               {t.basicButton}
             </Link>
           </div>
 
           {/* BUSINESS */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30">
+          <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-gray-500/30 flex flex-col">
             <h3 className="text-2xl font-semibold mb-2">{t.business}</h3>
             <div className="flex items-baseline gap-1 mb-1">
               <span className="text-4xl font-bold">€{businessPrice}</span>
@@ -139,8 +139,8 @@ const FleetSyncPricing = ({ translations: t }: FleetSyncPricingProps) => {
               </span>
             </div>
             <p className="text-gray-400 mb-6 text-sm">{t.perVehicle}</p>
-            <ul className="space-y-3 mb-8">
-              {t.businessFeatures.map((feature, i) => (
+            <ul className="space-y-3 mb-8 flex-grow">
+              {t.businessFeatures.filter(Boolean).map((feature, i) => (
                 <li key={i} className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
                   <span>{feature}</span>
@@ -149,7 +149,7 @@ const FleetSyncPricing = ({ translations: t }: FleetSyncPricingProps) => {
             </ul>
             <Link
               href={`/contact?subject=${encodeURIComponent(t.businessContact)}`}
-              className="block w-full bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-full transition-colors text-center"
+              className="block w-full bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-full transition-colors text-center mt-auto"
             >
               {t.businessButton}
             </Link>
