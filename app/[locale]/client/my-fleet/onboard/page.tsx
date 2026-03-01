@@ -60,6 +60,8 @@ const OnboardClientPage = () => {
   const [customNotificationsLimit, setCustomNotificationsLimit] = useState('')
   const [customTemplatesLimit, setCustomTemplatesLimit] = useState('')
   const [customNotificationTypesLimit, setCustomNotificationTypesLimit] = useState('')
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
+  const [skipPayment, setSkipPayment] = useState(false)
 
   // Step 2: User data
   const [firstName, setFirstName] = useState('')
@@ -294,10 +296,21 @@ const OnboardClientPage = () => {
     setError('')
     setLoading(true)
 
+    const selectedTier = getSelectedTier()
+    const tierName = selectedTier?.name?.toUpperCase() || ''
+    const isPaidTier = tierName === 'BASIC' || tierName === 'BUSINESS'
+    const requirePayment = isPaidTier && !(tierName === 'BASIC' && skipPayment)
+
     try {
       const payload = {
         organizationName,
         organizationMainContact,
+        ico: invoicingData.ico || null,
+        dic: invoicingData.dic || null,
+        street: invoicingData.street || null,
+        city: invoicingData.city || null,
+        postalCode: invoicingData.postalCode || null,
+        country: invoicingData.country || null,
         tierId: selectedTierId,
         purchasedVehicles: purchasedVehicles ? Number(purchasedVehicles) : null,
         usersLimit: customUsersLimit ? Number(customUsersLimit) : null,
@@ -313,6 +326,8 @@ const OnboardClientPage = () => {
         password,
         phoneNumber,
         isFleetManager,
+        billingInterval,
+        requirePayment,
       }
 
       const response = await fetch('/api/onboard-client', {
@@ -327,6 +342,12 @@ const OnboardClientPage = () => {
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to onboard client')
+      }
+
+      if (data.checkoutUrl) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.checkoutUrl
+        return
       }
 
       setSuccess(true)
@@ -798,6 +819,55 @@ const OnboardClientPage = () => {
                 </div>
               )}
 
+              {/* Billing Interval - show for paid tiers */}
+              {getSelectedTier() && getSelectedTier()?.name !== 'FREE' && (
+                <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Fakturačný interval
+                  </label>
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setBillingInterval('monthly')}
+                      className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all text-center ${
+                        billingInterval === 'monthly'
+                          ? 'border-pictus-lime bg-pictus-lime/10 text-pictus-white'
+                          : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
+                      }`}
+                    >
+                      Mesačne
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBillingInterval('yearly')}
+                      className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all text-center ${
+                        billingInterval === 'yearly'
+                          ? 'border-pictus-lime bg-pictus-lime/10 text-pictus-white'
+                          : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
+                      }`}
+                    >
+                      Ročne
+                    </button>
+                  </div>
+
+                  {/* Skip payment - only for BASIC */}
+                  {getSelectedTier()?.name === 'BASIC' && (
+                    <div className="mt-4 flex items-center">
+                      <input
+                        type="checkbox"
+                        id="skipPayment"
+                        checked={skipPayment}
+                        onChange={(e) => setSkipPayment(e.target.checked)}
+                        className="w-4 h-4 text-pictus-lime bg-white/5 border-white/10 rounded focus:ring-pictus-lime"
+                      />
+                      <label htmlFor="skipPayment" className="ml-2 text-sm text-gray-300">
+                        Preskočiť platbu (rodinný benefit)
+                      </label>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Custom Limits Override */}
               <div>
                 <button
@@ -1027,6 +1097,22 @@ const OnboardClientPage = () => {
                           )}
                       </p>
                     )}
+                    {getSelectedTier()?.name !== 'FREE' && (
+                      <>
+                        <p>
+                          <span className="text-gray-400">Fakturácia:</span>{' '}
+                          {billingInterval === 'monthly' ? 'Mesačne' : 'Ročne'}
+                        </p>
+                        <p>
+                          <span className="text-gray-400">Platba:</span>{' '}
+                          {getSelectedTier()?.name === 'BASIC' && skipPayment ? (
+                            <span className="text-yellow-400">Preskočená (rodinný benefit)</span>
+                          ) : (
+                            <span className="text-pictus-lime">Stripe Checkout</span>
+                          )}
+                        </p>
+                      </>
+                    )}
                     <div className="mt-4 pt-4 border-t border-white/10">
                       <p className="text-sm text-gray-400 mb-2">
                         Limity
@@ -1114,12 +1200,22 @@ const OnboardClientPage = () => {
                 {loading ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                    Vytváram...
+                    {(() => {
+                      const t = getSelectedTier()
+                      const isPaid = t?.name === 'BASIC' || t?.name === 'BUSINESS'
+                      const needsPayment = isPaid && !(t?.name === 'BASIC' && skipPayment)
+                      return needsPayment ? 'Presmerovanie na platbu...' : 'Vytváram...'
+                    })()}
                   </>
                 ) : (
                   <>
                     <Check size={20} />
-                    Vytvoriť klienta
+                    {(() => {
+                      const t = getSelectedTier()
+                      const isPaid = t?.name === 'BASIC' || t?.name === 'BUSINESS'
+                      const needsPayment = isPaid && !(t?.name === 'BASIC' && skipPayment)
+                      return needsPayment ? 'Pokračovať na platbu' : 'Vytvoriť klienta'
+                    })()}
                   </>
                 )}
               </button>

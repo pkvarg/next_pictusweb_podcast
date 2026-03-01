@@ -19,6 +19,7 @@ import {
   ChevronDown,
   Truck,
   MessageSquare,
+  DollarSign,
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -73,6 +74,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       name: 'Vehicle Notifications',
       href: '/admin/vehicle-notifications',
       icon: Car,
+    },
+    {
+      name: 'Tiers & Pricing',
+      href: '/admin/tiers',
+      icon: DollarSign,
     },
   ]
 

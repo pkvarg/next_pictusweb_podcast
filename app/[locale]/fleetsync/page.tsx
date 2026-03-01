@@ -5,6 +5,9 @@ import { CheckCircle, Calculator, BarChart3, Users, Calendar, Bell } from 'lucid
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import type { Metadata } from 'next'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
@@ -47,8 +50,20 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
 
   const t = await getTranslations('Automatizations')
 
+  // Fetch pricing from database (single source of truth)
+  const tiers = await prisma.tier.findMany({
+    where: { deletedAt: null },
+    select: { name: true, pricePerVehicle: true, pricePerVehicleYearly: true, yearlyDiscount: true },
+  })
+  const pricing = tiers.map((tier) => ({
+    name: tier.name,
+    pricePerVehicle: tier.pricePerVehicle ? Number(tier.pricePerVehicle) : 0,
+    pricePerVehicleYearly: tier.pricePerVehicleYearly ? Number(tier.pricePerVehicleYearly) : null,
+    yearlyDiscount: tier.yearlyDiscount ? Number(tier.yearlyDiscount) : 0.83,
+  }))
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
       <PagesHeader />
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-20">
@@ -61,40 +76,40 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
               <br />
               {t('heroTitle2')}
               <br />
-              <span className="text-purple-400">{t('heroTitle3')}</span>
+              <span className="text-pictus-lime">{t('heroTitle3')}</span>
             </h2>
-            <p className="text-2xl text-white mb-8 leading-relaxed font-light">
+            <p className="text-2xl text-pictus-white mb-8 leading-relaxed font-light">
               {t('heroSubtitle1')} <br /> {t('heroSubtitle2')}
             </p>
             <div className="flex flex-wrap gap-4 mb-8">
-              <div className="flex items-center gap-2 bg-purple-800/30 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-pictus-white/5 border border-pictus-lime/20 px-4 py-2 rounded-full">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span>{t('heroFeature1')}</span>
               </div>
-              <div className="flex items-center gap-2 bg-purple-800/30 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-pictus-white/5 border border-pictus-lime/20 px-4 py-2 rounded-full">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span>{t('heroFeature2')}</span>
               </div>
-              <div className="flex items-center gap-2 bg-purple-800/30 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-pictus-white/5 border border-pictus-lime/20 px-4 py-2 rounded-full">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span>{t('heroFeature3')}</span>
               </div>
-              <div className="flex items-center gap-2 bg-purple-800/30 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-pictus-white/5 border border-pictus-lime/20 px-4 py-2 rounded-full">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span>{t('heroFeature4')}</span>
               </div>
-              <div className="flex items-center gap-2 bg-purple-800/30 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-pictus-white/5 border border-pictus-lime/20 px-4 py-2 rounded-full">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span>{t('heroFeature5')}</span>
               </div>
-              <div className="flex items-center gap-2 bg-purple-800/30 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-pictus-white/5 border border-pictus-lime/20 px-4 py-2 rounded-full">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span>{t('heroFeature6')}</span>
               </div>
             </div>
             <Link
               href={`/contact?subject=${encodeURIComponent(t('contactHero'))}`}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-3 rounded-full text-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105"
+              className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-3 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
             >
               {t('heroButton')}
             </Link>
@@ -102,12 +117,12 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
 
           {/* Client Dashboard Mockup */}
           <div className="relative">
-            <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-6 backdrop-blur-sm border border-purple-500/30">
+            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-3xl p-6 backdrop-blur-sm border border-pictus-lime/30">
               {/* Dashboard Header */}
-              <div className="bg-white/10 rounded-2xl p-4 mb-4 backdrop-blur-sm">
+              <div className="bg-pictus-white/10 rounded-2xl p-4 mb-4 backdrop-blur-sm">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <BarChart3 className="w-6 h-6 text-purple-400" />
+                    <BarChart3 className="w-6 h-6 text-pictus-lime" />
                     <div>
                       <div className="font-normal text-2xl text-white">{t('dashboardTitle')}</div>
                       <div className="text-white text-lg">{t('dashboardSubtitle')}</div>
@@ -124,7 +139,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
 
               {/* Stats Cards */}
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+                <div className="bg-pictus-white/10 rounded-xl p-3 backdrop-blur-sm">
                   <div className="flex items-center gap-2">
                     <Users className="w-5 h-5 text-blue-400" />
                     <div>
@@ -133,7 +148,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
                     </div>
                   </div>
                 </div>
-                <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+                <div className="bg-pictus-white/10 rounded-xl p-3 backdrop-blur-sm">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-green-400" />
                     <div>
@@ -145,7 +160,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
               </div>
 
               {/* Upcoming Tasks */}
-              <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+              <div className="bg-pictus-white/10 rounded-2xl p-4 backdrop-blur-sm">
                 <div className="text-xl font-normal text-white mb-4 flex items-center gap-2">
                   <Bell className="w-6 h-6" />
                   {t('dashboardUpcomingTasks')}
@@ -171,7 +186,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
       </section>
 
       {/* Problem Section */}
-      <section className="bg-gradient-to-r from-red-900/20 to-orange-900/20 py-20">
+      <section className="bg-gradient-to-r from-red-900/10 to-orange-900/10 py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-light mb-6">
@@ -183,28 +198,28 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-red-500/30">
+            <div className="bg-pictus-white/5 backdrop-blur-sm rounded-2xl p-6 border border-red-500/30">
               <div className="text-3xl mb-4">💰</div>
               <h3 className="text-2xl font-semibold mb-2 text-red-400">{t('problem1Title')}</h3>
               <p className="text-gray-300 mb-2">{t('problem1Price')}</p>
               <p className="text-[22.5px] text-gray-400">{t('problem1Detail')}</p>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/30">
+            <div className="bg-pictus-white/5 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/30">
               <div className="text-3xl mb-4">⏰</div>
               <h3 className="text-2xl font-semibold mb-2 text-orange-400">{t('problem2Title')}</h3>
               <p className="text-gray-300 mb-2">{t('problem2Time')}</p>
               <p className="text-[22.5px] text-gray-400">{t('problem2Detail')}</p>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/30">
+            <div className="bg-pictus-white/5 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/30">
               <div className="text-3xl mb-4">🔧</div>
               <h3 className="text-2xl font-semibold mb-2 text-yellow-400">{t('problem3Title')}</h3>
               <p className="text-gray-300 mb-2">{t('problem3Cost')}</p>
               <p className="text-[22.5px] text-gray-400">{t('problem3Detail')}</p>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30">
+            <div className="bg-pictus-white/5 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30">
               <div className="text-3xl mb-4">😰</div>
               <h3 className="text-2xl font-semibold mb-2 text-purple-400">{t('problem4Title')}</h3>
               <p className="text-gray-300 mb-2">{t('problem4Issue')}</p>
@@ -220,7 +235,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
           <div className="text-center mb-16">
             <h2 className="text-4xl font-light mb-6">
               {t('solutionTitle')}{' '}
-              <span className="text-green-400">{t('solutionTitleHighlight')}</span>
+              <span className="text-pictus-lime">{t('solutionTitleHighlight')}</span>
             </h2>
             <p className="text-2xl text-gray-300 max-w-3xl mx-auto font-light">
               {t('solutionSubtitle')}
@@ -228,25 +243,25 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8 mb-16">
-            <div className="bg-gradient-to-br from-purple-800/30 to-blue-800/30 rounded-2xl p-8 backdrop-blur-sm border border-purple-500/30">
-              <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mb-6">
-                <span className="text-2xl font-bold">1</span>
+            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-2xl p-8 backdrop-blur-sm border border-pictus-lime/20">
+              <div className="w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl font-bold text-pictus-black">1</span>
               </div>
               <h3 className="text-2xl font-semibold mb-4">{t('step1Title')}</h3>
               <p className="text-gray-300 leading-relaxed font-light">{t('step1Description')}</p>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-800/30 to-green-800/30 rounded-2xl p-8 backdrop-blur-sm border border-blue-500/30">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6">
-                <span className="text-2xl font-bold">2</span>
+            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-2xl p-8 backdrop-blur-sm border border-pictus-lime/20">
+              <div className="w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl font-bold text-pictus-black">2</span>
               </div>
               <h3 className="text-2xl font-semibold mb-4">{t('step2Title')}</h3>
               <p className="text-gray-300 leading-relaxed font-light">{t('step2Description')}</p>
             </div>
 
-            <div className="bg-gradient-to-br from-green-800/30 to-purple-800/30 rounded-2xl p-8 backdrop-blur-sm border border-green-500/30">
-              <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-6">
-                <span className="text-2xl font-bold">3</span>
+            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-2xl p-8 backdrop-blur-sm border border-pictus-lime/20">
+              <div className="w-16 h-16 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl font-bold text-pictus-black">3</span>
               </div>
               <h3 className="text-2xl font-semibold mb-4">{t('step3Title')}</h3>
               <p className="text-gray-300 leading-relaxed font-light">{t('step3Description')}</p>
@@ -255,35 +270,35 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
 
           {/* Features Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
               <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
               <span>{t('feature1')}</span>
             </div>
-            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
               <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
               <span>{t('feature2')}</span>
             </div>
-            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
               <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
               <span>{t('feature3')}</span>
             </div>
-            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
               <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
               <span>{t('feature4')}</span>
             </div>
-            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
               <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
               <span>{t('feature5')}</span>
             </div>
-            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
               <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
               <span>{t('feature6')}</span>
             </div>
-            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
               <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
               <span>{t('heroFeature5')}</span>
             </div>
-            <div className="flex items-center gap-4 bg-white/5 rounded-xl p-4">
+            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
               <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
               <span>{t('heroFeature6')}</span>
             </div>
@@ -302,7 +317,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             </h2>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-green-500/30">
+          <div className="bg-pictus-white/10 backdrop-blur-sm rounded-3xl p-8 border border-green-500/30">
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <h3 className="text-2xl font-semibold mb-6 text-green-400">
@@ -369,6 +384,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
 
       {/* Pricing Section */}
       <FleetSyncPricing
+        pricing={pricing}
         translations={{
           pricingTitle: t('pricingTitle'),
           pricingTitleHighlight: t('pricingTitleHighlight'),
@@ -427,7 +443,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
       <section className=" py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl lg:text-5xl font-light mb-6">
-            {t('ctaTitle')} <span className="text-purple-400">{t('ctaTitleHighlight')}</span>
+            {t('ctaTitle')} <span className="text-pictus-lime">{t('ctaTitleHighlight')}</span>
           </h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto font-thin">
             {t('ctaSubtitle1')}
@@ -438,13 +454,13 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href={`/contact?subject=${encodeURIComponent(t('contactCta1'))}`}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 rounded-full text-lg font-thin hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105"
+              className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-4 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
             >
               {t('ctaButton1')}
             </Link>
             <Link
               href={`/contact?subject=${encodeURIComponent(t('contactCta2'))}`}
-              className="border border-purple-500 px-8 py-4 rounded-full text-lg font-thin hover:bg-purple-500/10 transition-colors"
+              className="border border-pictus-lime/30 px-8 py-4 rounded-full text-lg font-light text-pictus-white hover:bg-pictus-lime/10 transition-colors"
             >
               {t('ctaButton2')}
             </Link>
