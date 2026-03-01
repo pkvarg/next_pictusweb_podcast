@@ -9,7 +9,11 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
   const { locale } = await params
   setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'Automatizations' })
@@ -17,26 +21,32 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: 'FleetSync - ' + t('metaTitle'),
     description: t('metaDescription'),
-    keywords: 'fleet management, vehicle notifications, STK Slovakia, EK reminders, vehicle tracking, fleet automation',
+    keywords:
+      'fleet management, vehicle notifications, STK Slovakia, EK reminders, vehicle tracking, fleet automation',
     openGraph: {
       title: 'FleetSync - ' + t('metaTitle'),
       description: t('metaDescription'),
       type: 'website',
       siteName: 'pictusweb.sk',
       url: `https://www.pictusweb.sk/${locale}/fleetsync`,
-      images: [{
-        url: 'https://www.pictusweb.sk/pictusweb.webp',
-        width: 400,
-        height: 400,
-        alt: 'FleetSync by PICTUSWEB',
-      }],
+      images: [
+        {
+          url: 'https://www.pictusweb.sk/pictusweb.webp',
+          width: 400,
+          height: 400,
+          alt: 'FleetSync by PICTUSWEB',
+        },
+      ],
     },
     alternates: {
-      canonical: locale === 'sk' ? 'https://www.pictusweb.sk/fleetsync' : `https://www.pictusweb.sk/${locale}/fleetsync`,
+      canonical:
+        locale === 'sk'
+          ? 'https://www.pictusweb.sk/fleetsync'
+          : `https://www.pictusweb.sk/${locale}/fleetsync`,
       languages: {
-        'en': 'https://www.pictusweb.sk/en/fleetsync',
-        'sk': 'https://www.pictusweb.sk/sk/fleetsync',
-        'hu': 'https://www.pictusweb.sk/hu/fleetsync',
+        en: 'https://www.pictusweb.sk/en/fleetsync',
+        sk: 'https://www.pictusweb.sk/sk/fleetsync',
+        hu: 'https://www.pictusweb.sk/hu/fleetsync',
       },
     },
   }
@@ -53,7 +63,12 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
   // Fetch pricing from database (single source of truth)
   const tiers = await prisma.tier.findMany({
     where: { deletedAt: null },
-    select: { name: true, pricePerVehicle: true, pricePerVehicleYearly: true, yearlyDiscount: true },
+    select: {
+      name: true,
+      pricePerVehicle: true,
+      pricePerVehicleYearly: true,
+      yearlyDiscount: true,
+    },
   })
   const pricing = tiers.map((tier) => ({
     name: tier.name,
@@ -186,11 +201,12 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
       </section>
 
       {/* Problem Section */}
-      <section className="bg-gradient-to-r from-red-900/10 to-orange-900/10 py-20">
+
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-light mb-6">
-              {t('problemTitle')} <span className="text-red-400">{t('problemTitleHighlight')}</span>
+              {t('problemTitle')} <span className="text-pictus-lime">{t('problemTitleHighlight')}</span>
             </h2>
             <p className="text-2xl text-gray-300 max-w-3xl mx-auto font-light">
               {t('problemSubtitle')}
@@ -198,30 +214,30 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-pictus-white/5 backdrop-blur-sm rounded-2xl p-6 border border-red-500/30">
+            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 backdrop-blur-sm rounded-2xl p-6 border border-pictus-lime/20">
               <div className="text-3xl mb-4">💰</div>
-              <h3 className="text-2xl font-semibold mb-2 text-red-400">{t('problem1Title')}</h3>
+              <h3 className="text-2xl font-semibold mb-2 text-pictus-lime">{t('problem1Title')}</h3>
               <p className="text-gray-300 mb-2">{t('problem1Price')}</p>
               <p className="text-[22.5px] text-gray-400">{t('problem1Detail')}</p>
             </div>
 
-            <div className="bg-pictus-white/5 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/30">
+            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 backdrop-blur-sm rounded-2xl p-6 border border-pictus-lime/20">
               <div className="text-3xl mb-4">⏰</div>
-              <h3 className="text-2xl font-semibold mb-2 text-orange-400">{t('problem2Title')}</h3>
+              <h3 className="text-2xl font-semibold mb-2 text-pictus-lime">{t('problem2Title')}</h3>
               <p className="text-gray-300 mb-2">{t('problem2Time')}</p>
               <p className="text-[22.5px] text-gray-400">{t('problem2Detail')}</p>
             </div>
 
-            <div className="bg-pictus-white/5 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/30">
+            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 backdrop-blur-sm rounded-2xl p-6 border border-pictus-lime/20">
               <div className="text-3xl mb-4">🔧</div>
-              <h3 className="text-2xl font-semibold mb-2 text-yellow-400">{t('problem3Title')}</h3>
+              <h3 className="text-2xl font-semibold mb-2 text-pictus-lime">{t('problem3Title')}</h3>
               <p className="text-gray-300 mb-2">{t('problem3Cost')}</p>
               <p className="text-[22.5px] text-gray-400">{t('problem3Detail')}</p>
             </div>
 
-            <div className="bg-pictus-white/5 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30">
+            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 backdrop-blur-sm rounded-2xl p-6 border border-pictus-lime/20">
               <div className="text-3xl mb-4">😰</div>
-              <h3 className="text-2xl font-semibold mb-2 text-purple-400">{t('problem4Title')}</h3>
+              <h3 className="text-2xl font-semibold mb-2 text-pictus-lime">{t('problem4Title')}</h3>
               <p className="text-gray-300 mb-2">{t('problem4Issue')}</p>
               <p className="text-[22.5px] text-gray-400">{t('problem4Detail')}</p>
             </div>

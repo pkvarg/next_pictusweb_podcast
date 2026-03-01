@@ -32,6 +32,8 @@ interface Tier {
   templatesLimit: number
   notificationTypesLimit: number
   pricePerVehicle?: number | null
+  pricePerVehicleYearly?: number | null
+  yearlyDiscount?: number | null
 }
 
 type Step = 1 | 2 | 3
@@ -63,16 +65,26 @@ const OnboardClientPage = () => {
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [skipPayment, setSkipPayment] = useState(false)
 
+  // Step 1: Address / invoicing fields (shown directly in form, like self-service)
+  const [ico, setIco] = useState('')
+  const [dic, setDic] = useState('')
+  const [street, setStreet] = useState('')
+  const [city, setCity] = useState('')
+  const [postalCode, setPostalCode] = useState('')
+  const [country, setCountry] = useState('Slovensko')
+
   // Step 2: User data
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')  // stored WITHOUT +421 prefix
   const [isFleetManager, setIsFleetManager] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const fullPhoneNumber = phoneNumber.trim() ? `+421${phoneNumber.replace(/\s/g, '')}` : ''
 
   // Fakturačné údaje
   const [showInvoicingForm, setShowInvoicingForm] = useState(false)
@@ -113,20 +125,30 @@ const OnboardClientPage = () => {
         setFirstName(value)
         setLastName('')
       }
+      // If company name is empty, use contact person as org name
+      if (!invoicingData.companyName.trim()) {
+        setOrganizationName(value)
+      }
     }
     if (field === 'numberOfVehicles') {
       setPurchasedVehicles(value)
     }
     if (field === 'tierName') {
-      // Find the tier by name and set selectedTierId
       const matchedTier = tiers.find((t) => t.name === value)
       if (matchedTier) {
         setSelectedTierId(matchedTier.id)
       }
     }
     if (field === 'contactPhone') {
-      setPhoneNumber(value)
+      setPhoneNumber(value.replace(/[^\d\s]/g, ''))
     }
+    // Sync address fields
+    if (field === 'ico') setIco(value)
+    if (field === 'dic') setDic(value)
+    if (field === 'street') setStreet(value)
+    if (field === 'city') setCity(value)
+    if (field === 'postalCode') setPostalCode(value)
+    if (field === 'country') setCountry(value)
   }
 
   const handleInvoicingSubmit = async () => {
@@ -238,12 +260,17 @@ const OnboardClientPage = () => {
   }, [])
 
   const validateStep1 = () => {
-    if (!organizationName.trim()) {
-      setError('Názov organizácie je povinný')
-      return false
-    }
+    // organizationName is optional — auto-generated from firstName+lastName if empty
     if (!selectedTierId) {
       setError('Vyberte tier')
+      return false
+    }
+    if (!street.trim() || !city.trim() || !postalCode.trim()) {
+      setError('Adresa (ulica, mesto, PSČ) je povinná')
+      return false
+    }
+    if (!country.trim()) {
+      setError('Krajina je povinná')
       return false
     }
     const selectedTier = getSelectedTier()
@@ -281,6 +308,11 @@ const OnboardClientPage = () => {
     if (currentStep === 1 && validateStep1()) {
       setCurrentStep(2)
     } else if (currentStep === 2 && validateStep2()) {
+      // Auto-generate organizationName from firstName + lastName if left empty
+      if (!organizationName.trim()) {
+        const generated = `${firstName}${lastName}`.replace(/\s/g, '').toUpperCase()
+        setOrganizationName(generated)
+      }
       setCurrentStep(3)
     }
   }
@@ -305,12 +337,12 @@ const OnboardClientPage = () => {
       const payload = {
         organizationName,
         organizationMainContact,
-        ico: invoicingData.ico || null,
-        dic: invoicingData.dic || null,
-        street: invoicingData.street || null,
-        city: invoicingData.city || null,
-        postalCode: invoicingData.postalCode || null,
-        country: invoicingData.country || null,
+        ico: ico || null,
+        dic: dic || null,
+        street: street || null,
+        city: city || null,
+        postalCode: postalCode || null,
+        country: country || null,
         tierId: selectedTierId,
         purchasedVehicles: purchasedVehicles ? Number(purchasedVehicles) : null,
         usersLimit: customUsersLimit ? Number(customUsersLimit) : null,
@@ -324,7 +356,7 @@ const OnboardClientPage = () => {
         lastName,
         email,
         password,
-        phoneNumber,
+        phoneNumber: fullPhoneNumber || null,
         isFleetManager,
         billingInterval,
         requirePayment,
@@ -592,14 +624,14 @@ const OnboardClientPage = () => {
                         <label className="block text-sm font-medium text-gray-300 mb-1">
                           Kontaktný telefón
                         </label>
-                        <div className="relative">
-                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <div className="flex gap-2">
+                          <span className="flex items-center px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-400 font-light text-sm select-none">+421</span>
                           <input
                             type="tel"
                             value={invoicingData.contactPhone}
-                            onChange={(e) => handleInvoicingChange('contactPhone', e.target.value)}
-                            placeholder="+421 9XX XXX XXX"
-                            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                            onChange={(e) => handleInvoicingChange('contactPhone', e.target.value.replace(/[^\d\s]/g, ''))}
+                            placeholder="9XX XXX XXX"
+                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                           />
                         </div>
                       </div>
@@ -736,7 +768,7 @@ const OnboardClientPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Názov organizácie *
+                  Názov organizácie (voliteľné — automaticky z mena)
                 </label>
                 <input
                   type="text"
@@ -760,6 +792,74 @@ const OnboardClientPage = () => {
                 />
               </div>
 
+              {/* Address / Invoicing fields */}
+              <div className="bg-white/5 rounded-lg border border-white/10 p-6 space-y-4">
+                <h3 className="text-lg font-medium text-gray-200 mb-2">Fakturačná adresa</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">IČO</label>
+                    <input
+                      type="text"
+                      value={ico}
+                      onChange={(e) => { setIco(e.target.value); setInvoicingData((prev) => ({ ...prev, ico: e.target.value })) }}
+                      placeholder="12345678"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">DIČ</label>
+                    <input
+                      type="text"
+                      value={dic}
+                      onChange={(e) => { setDic(e.target.value); setInvoicingData((prev) => ({ ...prev, dic: e.target.value })) }}
+                      placeholder="2012345678"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Ulica *</label>
+                  <input
+                    type="text"
+                    value={street}
+                    onChange={(e) => { setStreet(e.target.value); setInvoicingData((prev) => ({ ...prev, street: e.target.value })) }}
+                    placeholder="Hlavná 1"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Mesto *</label>
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => { setCity(e.target.value); setInvoicingData((prev) => ({ ...prev, city: e.target.value })) }}
+                      placeholder="Bratislava"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">PSČ *</label>
+                    <input
+                      type="text"
+                      value={postalCode}
+                      onChange={(e) => { setPostalCode(e.target.value); setInvoicingData((prev) => ({ ...prev, postalCode: e.target.value })) }}
+                      placeholder="81101"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Krajina *</label>
+                    <input
+                      type="text"
+                      value={country}
+                      onChange={(e) => { setCountry(e.target.value); setInvoicingData((prev) => ({ ...prev, country: e.target.value })) }}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Tier *</label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -775,11 +875,18 @@ const OnboardClientPage = () => {
                     >
                       <h3 className="text-xl font-medium text-pictus-white mb-2">{tier.name}</h3>
                       {tier.pricePerVehicle != null && (
-                        <p className="text-pictus-lime text-lg font-medium mb-2">
-                          {Number(tier.pricePerVehicle) === 0
-                            ? 'Zadarmo'
-                            : `${tier.pricePerVehicle} € / vozidlo / mesiac`}
-                        </p>
+                        <div className="mb-2">
+                          <p className="text-pictus-lime text-lg font-medium">
+                            {Number(tier.pricePerVehicle) === 0
+                              ? 'Zadarmo'
+                              : `${tier.pricePerVehicle} € / vozidlo / mesiac`}
+                          </p>
+                          {Number(tier.pricePerVehicle) > 0 && tier.pricePerVehicleYearly != null && (
+                            <p className="text-pictus-lime/70 text-sm">
+                              {tier.pricePerVehicleYearly} € / vozidlo / rok
+                            </p>
+                          )}
+                        </div>
                       )}
                       <div className="space-y-1 text-sm text-gray-400">
                         <p>Používatelia: {tier.usersLimit}</p>
@@ -808,13 +915,29 @@ const OnboardClientPage = () => {
                   {purchasedVehicles &&
                     getSelectedTier()?.pricePerVehicle != null &&
                     Number(getSelectedTier()?.pricePerVehicle) > 0 && (
-                      <p className="mt-3 text-pictus-lime text-lg">
-                        Mesačná cena:{' '}
-                        {(
-                          Number(purchasedVehicles) * Number(getSelectedTier()?.pricePerVehicle)
-                        ).toFixed(2)}{' '}
-                        € / mesiac
-                      </p>
+                      <div className="mt-3 space-y-1">
+                        <p className="text-pictus-lime text-lg">
+                          {billingInterval === 'monthly'
+                            ? `Mesačná cena: ${(Number(purchasedVehicles) * Number(getSelectedTier()?.pricePerVehicle)).toFixed(2)} € / mesiac`
+                            : (() => {
+                                const t = getSelectedTier()
+                                const yearly = t?.pricePerVehicleYearly != null
+                                  ? (Number(purchasedVehicles) * Number(t.pricePerVehicleYearly)).toFixed(2)
+                                  : (Number(purchasedVehicles) * Number(t?.pricePerVehicle) * 12 * Number(t?.yearlyDiscount ?? 0.83)).toFixed(2)
+                                return `Ročná cena: ${yearly} € / rok`
+                              })()}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {billingInterval === 'monthly'
+                            ? `(${getSelectedTier()?.pricePerVehicle} € × ${purchasedVehicles} vozidiel)`
+                            : (() => {
+                                const t = getSelectedTier()
+                                return t?.pricePerVehicleYearly != null
+                                  ? `(${t.pricePerVehicleYearly} € × ${purchasedVehicles} vozidiel)`
+                                  : `(${t?.pricePerVehicle} € × 12 × ${t?.yearlyDiscount ?? 0.83} × ${purchasedVehicles} vozidiel)`
+                              })()}
+                        </p>
+                      </div>
                     )}
                 </div>
               )}
@@ -985,13 +1108,14 @@ const OnboardClientPage = () => {
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Telefónne číslo
                   </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <div className="flex gap-2">
+                    <span className="flex items-center px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-gray-400 font-light text-sm select-none">+421</span>
                     <input
                       type="tel"
                       value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                      onChange={(e) => setPhoneNumber(e.target.value.replace(/[^\d\s]/g, ''))}
+                      placeholder="9XX XXX XXX"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                 </div>
@@ -1078,6 +1202,18 @@ const OnboardClientPage = () => {
                         {organizationMainContact}
                       </p>
                     )}
+                    {(ico || dic) && (
+                      <p>
+                        <span className="text-gray-400">IČO / DIČ:</span>{' '}
+                        {[ico, dic].filter(Boolean).join(' / ')}
+                      </p>
+                    )}
+                    {street && (
+                      <p>
+                        <span className="text-gray-400">Adresa:</span>{' '}
+                        {[street, city, postalCode, country].filter(Boolean).join(', ')}
+                      </p>
+                    )}
                     <p>
                       <span className="text-gray-400">Tier:</span> {getSelectedTier()?.name}
                     </p>
@@ -1087,12 +1223,15 @@ const OnboardClientPage = () => {
                         {getSelectedTier()?.pricePerVehicle != null &&
                           Number(getSelectedTier()?.pricePerVehicle) > 0 && (
                             <span className="ml-2 text-pictus-lime">
-                              (
-                              {(
-                                Number(purchasedVehicles) *
-                                Number(getSelectedTier()?.pricePerVehicle)
-                              ).toFixed(2)}{' '}
-                              € / mesiac)
+                              {billingInterval === 'monthly'
+                                ? `(${(Number(purchasedVehicles) * Number(getSelectedTier()?.pricePerVehicle)).toFixed(2)} € / mesiac)`
+                                : (() => {
+                                    const t = getSelectedTier()
+                                    const yearly = t?.pricePerVehicleYearly != null
+                                      ? (Number(purchasedVehicles) * Number(t.pricePerVehicleYearly)).toFixed(2)
+                                      : (Number(purchasedVehicles) * Number(t?.pricePerVehicle) * 12 * Number(t?.yearlyDiscount ?? 0.83)).toFixed(2)
+                                    return `(${yearly} € / rok)`
+                                  })()}
                             </span>
                           )}
                       </p>
@@ -1155,7 +1294,7 @@ const OnboardClientPage = () => {
                     </p>
                     {phoneNumber && (
                       <p>
-                        <span className="text-gray-400">Telefón:</span> {phoneNumber}
+                        <span className="text-gray-400">Telefón:</span> {fullPhoneNumber}
                       </p>
                     )}
                     <p>
