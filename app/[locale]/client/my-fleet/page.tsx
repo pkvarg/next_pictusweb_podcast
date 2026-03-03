@@ -720,17 +720,17 @@ const MyFleetPage = () => {
               </Link>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-pictus-white">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="hidden sm:flex items-center space-x-2 text-pictus-white">
                 <User size={16} />
                 <span className="text-lg">{session?.user?.name}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-lg text-pictus-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
+                className="flex items-center text-sm sm:text-lg text-pictus-white hover:text-red-400 transition-colors px-2 sm:px-3 py-2 rounded-lg hover:bg-red-500/10"
               >
-                <LogOut className="mr-2 h-4 w-4" />
-                {t('logOut')}
+                <LogOut className="mr-1 sm:mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">{t('logOut')}</span>
               </button>
             </div>
           </div>
@@ -760,19 +760,19 @@ const MyFleetPage = () => {
         </div>
 
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="p-4 bg-gradient-to-r from-pictus-lime600/20 to-pictus-lime600/20 rounded-xl">
-              <Car className="w-10 h-10 text-pictus-lime" />
+        <div className="flex items-center mb-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-3 sm:p-4 bg-gradient-to-r from-pictus-lime600/20 to-pictus-lime600/20 rounded-xl">
+              <Car className="w-8 h-8 sm:w-10 sm:h-10 text-pictus-lime" />
             </div>
             <div>
-              <h1 className="text-5xl font-light text-pictus-white">FleetSync Manager</h1>
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-light text-pictus-white">FleetSync Manager</h1>
               {organization && (
-                <p className="text-2xl text-pictus-lime flex items-center gap-2">
-                  <Building size={20} />
+                <p className="text-lg sm:text-2xl text-pictus-lime flex items-center gap-2 flex-wrap">
+                  <Building size={18} className="hidden sm:block" />
                   {organization.name}
                   {organization.tierRelation && (
-                    <span className="text-sm bg-pictus-lime/20 px-2 py-1 rounded">
+                    <span className="text-xs sm:text-sm bg-pictus-lime/20 px-2 py-0.5 sm:py-1 rounded">
                       {organization.tierRelation.name}
                     </span>
                   )}
@@ -783,11 +783,11 @@ const MyFleetPage = () => {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="mb-8 border-b border-white/10">
-          <div className="flex gap-2">
+        <div className="mb-8 border-b border-white/10 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex gap-1 sm:gap-2 min-w-max">
             <button
               onClick={() => setActiveTab('vehicles')}
-              className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
                 activeTab === 'vehicles'
                   ? 'text-pictus-lime border-b-2 border-pictus-lime'
                   : 'text-gray-400 hover:text-pictus-white'
@@ -798,7 +798,7 @@ const MyFleetPage = () => {
             </button>
             <button
               onClick={() => setActiveTab('users')}
-              className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
                 activeTab === 'users'
                   ? 'text-pictus-lime border-b-2 border-pictus-lime'
                   : 'text-gray-400 hover:text-pictus-white'
@@ -809,7 +809,7 @@ const MyFleetPage = () => {
             </button>
             <button
               onClick={() => setActiveTab('notifications')}
-              className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
                 activeTab === 'notifications'
                   ? 'text-pictus-lime border-b-2 border-pictus-lime'
                   : 'text-gray-400 hover:text-pictus-white'
@@ -822,7 +822,7 @@ const MyFleetPage = () => {
             {isPictusaciUser && (
               <button
                 onClick={() => setActiveTab('organizations')}
-                className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
                   activeTab === 'organizations'
                     ? 'text-pictus-lime border-b-2 border-pictus-lime'
                     : 'text-gray-400 hover:text-pictus-white'
@@ -836,7 +836,7 @@ const MyFleetPage = () => {
               <>
                 <button
                   onClick={() => setActiveTab('types')}
-                  className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
                     activeTab === 'types'
                       ? 'text-pictus-lime border-b-2 border-pictus-lime'
                       : 'text-gray-400 hover:text-pictus-white'
@@ -847,7 +847,7 @@ const MyFleetPage = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab('templates')}
-                  className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
                     activeTab === 'templates'
                       ? 'text-pictus-lime border-b-2 border-pictus-lime'
                       : 'text-gray-400 hover:text-pictus-white'
@@ -860,7 +860,7 @@ const MyFleetPage = () => {
             )}
             <button
               onClick={() => setActiveTab('renewals')}
-              className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
                 activeTab === 'renewals'
                   ? 'text-pictus-lime border-b-2 border-pictus-lime'
                   : 'text-gray-400 hover:text-pictus-white'
@@ -889,7 +889,7 @@ const MyFleetPage = () => {
         {activeTab === 'vehicles' && (
           <>
             {/* Vehicle Header Actions */}
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 {organization && (organization.tierRelation || organization.vehiclesLimit != null) && (
                   <p className="text-sm text-gray-400">
@@ -1092,10 +1092,10 @@ const MyFleetPage = () => {
         {/* Users Tab */}
         {activeTab === 'users' && (
           <>
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white">{t('userManagement')}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-white">{t('userManagement')}</h2>
                 <p className="text-gray-400 mt-1">
                   {t('organization', { name: organization?.name || t('organizationLoading') })}
                 </p>
@@ -1144,7 +1144,35 @@ const MyFleetPage = () => {
                 </button>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              {/* Mobile: Card layout */}
+              <div className="sm:hidden space-y-3">
+                {users.map((user) => (
+                  <div key={user.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-sm font-medium text-white">{user.firstName} {user.lastName}</p>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                        {user.phoneNumber && <p className="text-xs text-gray-400">{user.phoneNumber}</p>}
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleEditUser(user)} className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all" title={t('editButton')}><Edit className="h-4 w-4" /></button>
+                        {session?.user?.id !== user.id ? (
+                          <button onClick={() => handleDeleteUser(user.id)} className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all" title={t('deleteButton')}><Trash2 className="h-4 w-4" /></button>
+                        ) : (
+                          <button disabled className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-lg cursor-not-allowed" title={t('cannotDeleteSelf')}><Trash2 className="h-4 w-4" /></button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400">{user.isFleetManager ? t('fleetManager') : t('userRole')}</span>
+                      <span className={`inline-flex px-2 py-0.5 text-xs rounded-full ${user.active ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'}`}>{user.active ? t('active') : t('inactive')}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Desktop: Table layout */}
+              <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-white/5 border-b border-white/10">
                     <tr>
@@ -1231,6 +1259,7 @@ const MyFleetPage = () => {
                   </tbody>
                 </table>
               </div>
+              </>
             )}
           </div>
 
@@ -1247,10 +1276,10 @@ const MyFleetPage = () => {
         {activeTab === 'notifications' && (
           <>
             {!showNotificationBuilder ? (
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
-                <div className="flex items-center justify-between mb-6">
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-white">{t('notificationsTitle')}</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white">{t('notificationsTitle')}</h2>
                     <p className="text-gray-400 mt-1">
                       {t('notificationsOrg', { name: organization?.name || t('organizationLoading'), filtered: filteredNotifications.length, total: notifications.length, used: organization?.currentNotificationsCount ?? 0, limit: organization?.notificationsLimit ?? organization?.tierRelation?.notificationsLimit ?? '—' })}
                     </p>
@@ -1270,8 +1299,8 @@ const MyFleetPage = () => {
 
                 {/* Filters */}
                 {notifications.length > 0 && (
-                  <div className="mb-6 bg-white/5 border border-white/10 rounded-lg p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="mb-6 bg-white/5 border border-white/10 rounded-lg p-3 sm:p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                       {/* Vehicle Filter */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1505,7 +1534,38 @@ const MyFleetPage = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <>
+                  {/* Mobile: Card layout for notifications */}
+                  <div className="sm:hidden space-y-3">
+                    {filteredNotifications.map((notification) => (
+                      <div key={notification.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <p className="text-sm font-medium text-white">#{notification.id} — {notification.vehicleRegistration || notification.myVehicle?.registration || '-'}</p>
+                            <p className="text-xs text-gray-400">{notification.personName || '-'} {notification.email ? `(${notification.email})` : ''}</p>
+                          </div>
+                          <button onClick={() => handleDeleteNotification(notification.id)} className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all" title={t('deleteButton')}><Trash2 className="h-4 w-4" /></button>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <span className="text-xs text-gray-400">{notification.notificationType || '-'}</span>
+                          {notification.isPdr && <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">PDR</span>}
+                          <span className="text-xs text-gray-500">{notification.notificationChannel || '-'}</span>
+                          <span className={`inline-flex px-2 py-0.5 text-xs rounded-full ${notification.status === 'sent' || notification.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : notification.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : notification.status === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'}`}>
+                            {notification.status === 'sent' ? t('statusSent') : notification.status === 'confirmed' ? t('statusConfirmed') : notification.status === 'pending' ? t('statusPending') : notification.status === 'failed' ? t('statusFailed') : notification.status === 'imported' ? t('statusImported') : notification.status.startsWith('reminded') ? t('statusReminded') : notification.status === 'no_response' ? t('statusNoResponse') : notification.status}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-3 text-xs">
+                          {notification.notificationDate && <span className="text-pictus-lime">{t('notificationDateLabel', { date: new Date(notification.notificationDate).toLocaleDateString(locale) })}</span>}
+                          {notification.dutyDate && <span className="text-gray-400">{t('dutyDateLabel', { date: new Date(notification.dutyDate).toLocaleDateString(locale) })}</span>}
+                        </div>
+                      </div>
+                    ))}
+                    {filteredNotifications.length === 0 && (
+                      <div className="text-center py-8 text-gray-400">{t('noFilteredNotifications')}</div>
+                    )}
+                  </div>
+                  {/* Desktop: Table layout for notifications */}
+                  <div className="hidden sm:block overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-white/5 border-b border-white/10">
                         <tr>
@@ -1643,6 +1703,7 @@ const MyFleetPage = () => {
                       </div>
                     )}
                   </div>
+                  </>
                 )}
               </div>
             ) : (
@@ -1758,10 +1819,10 @@ const MyFleetPage = () => {
 
         {/* Renewals Tab */}
         {activeTab === 'renewals' && (
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white">{t('renewalsTitle')}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-white">{t('renewalsTitle')}</h2>
                 <p className="text-gray-400 mt-1">{t('renewalsHint')}</p>
               </div>
             </div>
@@ -1772,10 +1833,10 @@ const MyFleetPage = () => {
 
         {/* Organizations Tab (PICTUSACI only) */}
         {activeTab === 'organizations' && isPictusaciUser && (
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white">{t('onboardingTitle')}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-white">{t('onboardingTitle')}</h2>
                 <p className="text-gray-400 mt-1">{t('onboardingHint')}</p>
               </div>
               <Link
@@ -1805,7 +1866,40 @@ const MyFleetPage = () => {
                 </Link>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              {/* Mobile: Card layout for organizations */}
+              <div className="sm:hidden space-y-3">
+                {organizations.map((org) => (
+                  <div key={org.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-sm font-medium text-white">{org.name}</p>
+                        {org.mainContact && <p className="text-xs text-gray-400">{t('contactLabel', { contact: org.mainContact })}</p>}
+                      </div>
+                      {org.tierRelation ? (
+                        <span className="inline-flex px-2 py-0.5 text-xs rounded-full bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">{org.tierRelation.name}</span>
+                      ) : null}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs text-gray-400">
+                      <div>
+                        <span className="text-gray-500">{t('usersColumn')}</span>
+                        <p className="text-gray-300">{org.currentUsersCount ?? '-'} / {org.usersLimit ?? org.tierRelation?.usersLimit ?? '—'}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">{t('vehiclesColumn')}</span>
+                        <p className="text-gray-300">{org.currentVehiclesCount ?? '-'} / {org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? '—'}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">{t('notificationsColumn')}</span>
+                        <p className="text-gray-300">{org.currentNotificationsCount ?? '-'} / {org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}</p>
+                      </div>
+                    </div>
+                    {org.createdAt && <p className="text-xs text-gray-500 mt-2">{new Date(org.createdAt).toLocaleDateString(locale)}</p>}
+                  </div>
+                ))}
+              </div>
+              {/* Desktop: Table layout for organizations */}
+              <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-white/5 border-b border-white/10">
                     <tr>
@@ -1895,6 +1989,7 @@ const MyFleetPage = () => {
                   </tbody>
                 </table>
               </div>
+              </>
             )}
           </div>
         )}

@@ -112,39 +112,39 @@ const RenewalsContent = ({ embedded = false }: RenewalsContentProps) => {
   return (
     <div className={embedded ? '' : 'max-w-6xl mx-auto'}>
       {/* Status Filter */}
-      <div className="mb-8 border-b border-white/10">
-        <div className="flex gap-2">
+      <div className="mb-6 sm:mb-8 border-b border-white/10 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex gap-1 sm:gap-2 min-w-max">
           <button
             onClick={() => setStatusFilter('pending')}
-            className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
               statusFilter === 'pending'
                 ? 'text-pictus-lime border-b-2 border-pictus-lime'
                 : 'text-gray-400 hover:text-pictus-white'
             }`}
           >
-            <AlertCircle size={20} />
+            <AlertCircle size={16} className="sm:w-5 sm:h-5" />
             Čakajúce ({dutyBatches.filter(b => b.status === 'pending').length})
           </button>
           <button
             onClick={() => setStatusFilter('completed')}
-            className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
               statusFilter === 'completed'
                 ? 'text-pictus-lime border-b-2 border-pictus-lime'
                 : 'text-gray-400 hover:text-pictus-white'
             }`}
           >
-            <Check size={20} />
+            <Check size={16} className="sm:w-5 sm:h-5" />
             Dokončené
           </button>
           <button
             onClick={() => setStatusFilter('all')}
-            className={`flex items-center gap-2 px-4 py-3 text-lg font-light transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-lg font-light transition-all whitespace-nowrap ${
               statusFilter === 'all'
                 ? 'text-pictus-lime border-b-2 border-pictus-lime'
                 : 'text-gray-400 hover:text-pictus-white'
             }`}
           >
-            <Calendar size={20} />
+            <Calendar size={16} className="sm:w-5 sm:h-5" />
             Všetky ({dutyBatches.length})
           </button>
         </div>
@@ -160,9 +160,9 @@ const RenewalsContent = ({ embedded = false }: RenewalsContentProps) => {
 
       {/* Renewals List */}
       {dutyBatches.length === 0 ? (
-        <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">
-          <RotateCcw className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-          <h3 className="text-xl font-light text-gray-400 mb-2">
+        <div className="bg-white/5 border border-white/10 rounded-xl p-6 sm:p-12 text-center">
+          <RotateCcw className="w-12 h-12 sm:w-16 sm:h-16 text-gray-500 mx-auto mb-4" />
+          <h3 className="text-lg sm:text-xl font-light text-gray-400 mb-2">
             {statusFilter === 'pending'
               ? 'Žiadne čakajúce obnovy'
               : statusFilter === 'completed'
