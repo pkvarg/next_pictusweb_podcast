@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Building, Plus, Edit2, Trash2, Save, X, Users } from 'lucide-react'
+import { Building, Plus, Edit2, Trash2, Save, X, Users, Gift } from 'lucide-react'
 
 interface TierInfo {
   id: string
@@ -32,6 +32,8 @@ interface Organization {
   notificationTypesLimit: number | null
   purchasedVehicles: number | null
   hiddenFromPictusaci: boolean
+  canCreateBenefit: boolean
+  isBenefitOrg: boolean
   createdAt: string
   updatedAt: string
   deletedAt: string | null
@@ -128,6 +130,7 @@ export default function OrganizationManager() {
       notificationTypesLimit: organization.notificationTypesLimit ?? '',
       purchasedVehicles: organization.purchasedVehicles ?? '',
       hiddenFromPictusaci: organization.hiddenFromPictusaci || false,
+      canCreateBenefit: organization.canCreateBenefit || false,
     })
   }
 
@@ -149,6 +152,7 @@ export default function OrganizationManager() {
           notificationTypesLimit: editingItem.notificationTypesLimit === '' ? null : editingItem.notificationTypesLimit,
           purchasedVehicles: editingItem.purchasedVehicles === '' ? null : editingItem.purchasedVehicles,
           hiddenFromPictusaci: editingItem.hiddenFromPictusaci,
+          canCreateBenefit: editingItem.canCreateBenefit,
         }),
       })
 
@@ -391,18 +395,33 @@ export default function OrganizationManager() {
                         />
                       </div>
                     </div>
-                    {/* Hidden toggle */}
-                    <div className="flex items-center gap-2 mt-3">
-                      <input
-                        type="checkbox"
-                        id={`hidden-${org.id}`}
-                        checked={editingItem.hiddenFromPictusaci}
-                        onChange={(e) => setEditingItem({ ...editingItem, hiddenFromPictusaci: e.target.checked })}
-                        className="w-4 h-4 rounded"
-                      />
-                      <label htmlFor={`hidden-${org.id}`} className="text-sm text-gray-300">
-                        Hidden from PICTUSACI
-                      </label>
+                    {/* Toggles row */}
+                    <div className="flex items-center gap-6 mt-3">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id={`hidden-${org.id}`}
+                          checked={editingItem.hiddenFromPictusaci}
+                          onChange={(e) => setEditingItem({ ...editingItem, hiddenFromPictusaci: e.target.checked })}
+                          className="w-4 h-4 rounded"
+                        />
+                        <label htmlFor={`hidden-${org.id}`} className="text-sm text-gray-300">
+                          Hidden from PICTUSACI
+                        </label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id={`benefit-${org.id}`}
+                          checked={editingItem.canCreateBenefit}
+                          onChange={(e) => setEditingItem({ ...editingItem, canCreateBenefit: e.target.checked })}
+                          className="w-4 h-4 rounded"
+                        />
+                        <label htmlFor={`benefit-${org.id}`} className="text-sm text-gray-300">
+                          <Gift className="w-3 h-3 inline mr-1" />
+                          Can Create Benefit
+                        </label>
+                      </div>
                     </div>
                     <div className="flex gap-2 mt-3">
                       <button
@@ -433,6 +452,18 @@ export default function OrganizationManager() {
                             'bg-purple-500/20 text-purple-300'
                           }`}>
                             {org.tierRelation.name}
+                          </span>
+                        )}
+                        {org.canCreateBenefit && (
+                          <span className="px-2 py-1 bg-amber-500/20 text-amber-300 text-xs rounded font-medium">
+                            <Gift className="w-3 h-3 inline mr-1" />
+                            Benefit
+                          </span>
+                        )}
+                        {org.isBenefitOrg && (
+                          <span className="px-2 py-1 bg-violet-500/20 text-violet-300 text-xs rounded font-medium">
+                            <Gift className="w-3 h-3 inline mr-1" />
+                            Sub-org
                           </span>
                         )}
                         {org.hiddenFromPictusaci && (

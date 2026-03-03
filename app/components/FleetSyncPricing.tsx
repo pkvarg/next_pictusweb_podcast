@@ -109,7 +109,7 @@ const FleetSyncPricing = ({ pricing, translations: t }: FleetSyncPricingProps) =
               ))}
             </ul>
             <Link
-              href={`/fleetsync/get-started?tier=FREE&billing=${isYearly ? 'yearly' : 'monthly'}`}
+              href={`/contact?subject=${encodeURIComponent(t.freeContact)}`}
               className="block w-full bg-pictus-white/10 hover:bg-pictus-white/20 px-6 py-3 rounded-full transition-colors text-center mt-auto"
             >
               {t.freeButton}
@@ -138,7 +138,7 @@ const FleetSyncPricing = ({ pricing, translations: t }: FleetSyncPricingProps) =
               ))}
             </ul>
             <Link
-              href={`/fleetsync/get-started?tier=BASIC&billing=${isYearly ? 'yearly' : 'monthly'}`}
+              href={`/contact?subject=${encodeURIComponent(t.basicContact)}`}
               className="block w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black font-normal px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center mt-auto shadow-lg hover:shadow-pictus-lime/50"
             >
               {t.basicButton}
@@ -164,7 +164,7 @@ const FleetSyncPricing = ({ pricing, translations: t }: FleetSyncPricingProps) =
               ))}
             </ul>
             <Link
-              href={`/fleetsync/get-started?tier=BUSINESS&billing=${isYearly ? 'yearly' : 'monthly'}`}
+              href={`/contact?subject=${encodeURIComponent(t.businessContact)}`}
               className="block w-full bg-pictus-white/10 hover:bg-pictus-white/20 px-6 py-3 rounded-full transition-colors text-center mt-auto"
             >
               {t.businessButton}

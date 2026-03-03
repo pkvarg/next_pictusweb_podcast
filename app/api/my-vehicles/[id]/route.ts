@@ -198,6 +198,14 @@ export async function DELETE(
       },
     })
 
+    // Decrement vehicle count on organization
+    if (existingVehicle.organizationId) {
+      await prisma.organization.update({
+        where: { id: existingVehicle.organizationId },
+        data: { currentVehiclesCount: { decrement: 1 } },
+      })
+    }
+
     return NextResponse.json({ message: 'Vehicle deleted successfully' })
   } catch (error) {
     console.error('Error deleting vehicle:', error)

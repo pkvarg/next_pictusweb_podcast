@@ -1,6 +1,7 @@
 'use client'
 import { useSession, signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
+import { useParams } from 'next/navigation'
 import { Link } from '@/i18n/routing'
 import {
   User,
@@ -44,6 +45,8 @@ interface Organization {
 const ClientZone = () => {
   const { data: session } = useSession()
   const t = useTranslations('Client')
+  const params = useParams()
+  const locale = (params?.locale as string) || 'sk'
   const iframe1Ref = useRef<HTMLIFrameElement>(null)
   const iframe2Ref = useRef<HTMLIFrameElement>(null)
   const iframe3Ref = useRef<HTMLIFrameElement>(null)
@@ -102,12 +105,12 @@ const ClientZone = () => {
 
     // Validation
     if (newPassword !== confirmPassword) {
-      setPasswordChangeError('Nové heslá sa nezhodujú')
+      setPasswordChangeError(t('passwordsMismatch'))
       return
     }
 
     if (newPassword.length < 8) {
-      setPasswordChangeError('Heslo musí mať aspoň 8 znakov')
+      setPasswordChangeError(t('passwordMinLength'))
       return
     }
 
@@ -127,7 +130,7 @@ const ClientZone = () => {
       })
 
       if (!verifyResponse.ok) {
-        setPasswordChangeError('Staré heslo nie je správne')
+        setPasswordChangeError(t('oldPasswordWrong'))
         setIsChangingPassword(false)
         return
       }
@@ -145,7 +148,7 @@ const ClientZone = () => {
       })
 
       if (!updateResponse.ok) {
-        setPasswordChangeError('Chyba pri zmene hesla. Skúste znova.')
+        setPasswordChangeError(t('passwordChangeError'))
         setIsChangingPassword(false)
         return
       }
@@ -161,13 +164,13 @@ const ClientZone = () => {
           body: JSON.stringify({
             name: session?.user?.name,
             email: session?.user?.email,
-            loginUrl: `${window.location.origin}/sk/auth/login`,
+            loginUrl: `${window.location.origin}/${locale}/auth/login`,
             origin: 'PICTUSWEB.SK',
           }),
         },
       )
 
-      setPasswordChangeSuccess('Heslo bolo úspešne zmenené!')
+      setPasswordChangeSuccess(t('passwordChangeSuccess'))
       setOldPassword('')
       setNewPassword('')
       setConfirmPassword('')
@@ -177,7 +180,7 @@ const ClientZone = () => {
       }, 3000)
     } catch (error) {
       console.error('Password change error:', error)
-      setPasswordChangeError('Chyba pri zmene hesla. Skúste znova.')
+      setPasswordChangeError(t('passwordChangeError'))
     } finally {
       setIsChangingPassword(false)
     }
@@ -190,12 +193,12 @@ const ClientZone = () => {
           <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
             <X className="w-10 h-10 text-red-400" />
           </div>
-          <h1 className="text-3xl font-light mb-4 text-red-400">Prístup zamietnutý</h1>
+          <h1 className="text-3xl font-light mb-4 text-red-400">{t('accessDenied')}</h1>
           <p className="text-lg text-gray-300 mb-6">
-            Vaša organizácia bola deaktivovaná. Kontaktujte administrátora alebo vášho marketéra.
+            {t('orgDeactivated')}
           </p>
           <p className="text-sm text-gray-500 mb-8">
-            Ak si myslíte, že ide o chybu, napíšte na{' '}
+            {t('orgDeactivatedHint')}{' '}
             <a href="mailto:info@pictusweb.sk" className="text-pictus-lime hover:underline">
               info@pictusweb.sk
             </a>
@@ -205,7 +208,7 @@ const ClientZone = () => {
             className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
           >
             <LogOut size={18} />
-            Odhlásiť sa
+            {t('logOutButton')}
           </button>
         </div>
       </div>
@@ -348,22 +351,22 @@ const ClientZone = () => {
           <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-xl p-6 backdrop-blur-sm border border-pictus-lime/30">
             <div className="flex items-center gap-3 mb-6">
               <User className="w-6 h-6 text-pictus-lime" />
-              <h2 className="text-3xl font-light text-pictus-white">Informácie o účte</h2>
+              <h2 className="text-3xl font-light text-pictus-white">{t('accountInfo')}</h2>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               {/* User Profile */}
               <div className="">
                 <div className="flex items-center gap-2 mb-3">
                   <User className="w-5 h-5 text-pictus-lime" />
-                  <h3 className="text-xl font-normal text-pictus-white">Profil používateľa</h3>
+                  <h3 className="text-xl font-normal text-pictus-white">{t('userProfile')}</h3>
                 </div>
                 <div className="space-y-2">
                   <div>
-                    <label className="text-pictus-white text-sm font-light">Meno</label>
+                    <label className="text-pictus-white text-sm font-light">{t('nameLabel')}</label>
                     <p className="text-pictus-white text-base">{session?.user?.name}</p>
                   </div>
                   <div>
-                    <label className="text-pictus-white text-sm font-light">Email</label>
+                    <label className="text-pictus-white text-sm font-light">{t('emailLabel')}</label>
                     <p className="text-pictus-white text-base">{session?.user?.email}</p>
                   </div>
                 </div>
@@ -373,7 +376,7 @@ const ClientZone = () => {
               <div className="">
                 <div className="flex items-center gap-2 mb-3">
                   <Lock className="w-5 h-5 text-pictus-lime" />
-                  <h3 className="text-xl font-normal text-pictus-white">Zmena hesla</h3>
+                  <h3 className="text-xl font-normal text-pictus-white">{t('changePassword')}</h3>
                 </div>
 
                 {!showPasswordChange ? (
@@ -381,14 +384,14 @@ const ClientZone = () => {
                     onClick={() => setShowPasswordChange(true)}
                     className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-4 py-2 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-sm"
                   >
-                    Zmeniť heslo
+                    {t('changePasswordButton')}
                   </button>
                 ) : (
                   <form onSubmit={handlePasswordChange} className="space-y-4 mt-4">
                     {/* Old Password */}
                     <div>
                       <label className="text-pictus-white text-lg font-light block mb-2">
-                        Staré heslo
+                        {t('oldPassword')}
                       </label>
                       <div className="relative">
                         <input
@@ -397,7 +400,7 @@ const ClientZone = () => {
                           onChange={(e) => setOldPassword(e.target.value)}
                           required
                           className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
-                          placeholder="Zadajte staré heslo"
+                          placeholder={t('oldPasswordPlaceholder')}
                         />
                         <button
                           type="button"
@@ -412,7 +415,7 @@ const ClientZone = () => {
                     {/* New Password */}
                     <div>
                       <label className="text-pictus-white text-lg font-light block mb-2">
-                        Nové heslo
+                        {t('newPassword')}
                       </label>
                       <div className="relative">
                         <input
@@ -422,7 +425,7 @@ const ClientZone = () => {
                           required
                           minLength={8}
                           className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
-                          placeholder="Zadajte nové heslo (min. 8 znakov)"
+                          placeholder={t('newPasswordPlaceholder')}
                         />
                         <button
                           type="button"
@@ -437,7 +440,7 @@ const ClientZone = () => {
                     {/* Confirm Password */}
                     <div>
                       <label className="text-pictus-white text-lg font-light block mb-2">
-                        Potvrďte nové heslo
+                        {t('confirmNewPassword')}
                       </label>
                       <div className="relative">
                         <input
@@ -447,7 +450,7 @@ const ClientZone = () => {
                           required
                           minLength={8}
                           className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
-                          placeholder="Zopakujte nové heslo"
+                          placeholder={t('confirmPasswordPlaceholder')}
                         />
                         <button
                           type="button"
@@ -485,7 +488,7 @@ const ClientZone = () => {
                         {isChangingPassword ? (
                           <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin mx-auto" />
                         ) : (
-                          'Uložiť heslo'
+                          t('savePassword')
                         )}
                       </button>
                       <button
@@ -500,7 +503,7 @@ const ClientZone = () => {
                         }}
                         className="px-6 py-3 bg-pictus-white/10 text-pictus-white rounded-lg font-light hover:bg-pictus-white/20 transition-all"
                       >
-                        Zrušiť
+                        {t('cancel')}
                       </button>
                     </div>
                   </form>

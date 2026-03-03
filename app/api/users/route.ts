@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../../../lib/isValidPassword'
 import { checkIPBan } from '@/lib/checkIPBan'
 import { checkTierLimit, TierLimitError } from '@/lib/tier-limits'
+import { randomUUID } from 'crypto'
+import axios from 'axios'
 
 const prisma = new PrismaClient()
 
@@ -22,6 +24,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const organizationId = searchParams.get('organizationId')
+    const excludeBenefit = searchParams.get('excludeBenefit')
 
     const whereClause: any = {
       deletedAt: null,
@@ -30,6 +33,11 @@ export async function GET(request: NextRequest) {
     // Filter by organization if provided
     if (organizationId) {
       whereClause.organizationId = organizationId
+    }
+
+    // Exclude benefit users from parent org's user list
+    if (excludeBenefit === 'true') {
+      whereClause.isBenefit = false
     }
 
     const users = await prisma.user.findMany({
@@ -50,6 +58,7 @@ export async function GET(request: NextRequest) {
         role: true,
         active: true,
         isFleetManager: true,
+        isBenefit: true,
         createdAt: true,
       },
       orderBy: {
@@ -78,7 +87,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { email, firstName, lastName, phoneNumber, organizationId, active, isFleetManager, password, loginProvider } = body
+    const { email, firstName, lastName, phoneNumber, organizationId, active, isFleetManager, password, loginProvider, isBenefit, locale } = body
 
     if (!email || !firstName || !lastName) {
       return NextResponse.json(
@@ -87,7 +96,122 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check tier limit if organizationId is provided
+    // Hash password if provided, otherwise use default
+    let hashedPassword = null
+    const defaultPassword = process.env.DEFAULT_USER_PASSWORD
+
+    if (password && password.trim() !== '') {
+      hashedPassword = await hashPassword(password)
+    } else if (!loginProvider || loginProvider === '' || loginProvider === 'hybrid') {
+      hashedPassword = await hashPassword(defaultPassword)
+      console.log(`Set default password for new user: ${email}`)
+    }
+
+    // ── Benefit user flow ──
+    if (isBenefit && organizationId) {
+      // Verify parent org has benefit creation enabled
+      const parentOrg = await prisma.organization.findUnique({
+        where: { id: organizationId },
+        include: { tierRelation: true },
+      })
+
+      if (!parentOrg || !parentOrg.canCreateBenefit) {
+        return NextResponse.json(
+          { error: 'This organization is not enabled for benefit user creation' },
+          { status: 403 }
+        )
+      }
+
+      // Prevent sub-orgs (benefit orgs) from creating nested benefit users
+      if (parentOrg.isBenefitOrg || parentOrg.parentOrganizationId) {
+        return NextResponse.json(
+          { error: 'Sub-organizations cannot create benefit users' },
+          { status: 403 }
+        )
+      }
+
+      const benefitActivationToken = randomUUID()
+      const subOrgName = firstName && lastName
+        ? `${parentOrg.name} — ${firstName} ${lastName}`
+        : `${parentOrg.name} — ${email}`
+
+      // Transaction: create sub-org (dormant) + user (inactive)
+      const result = await prisma.$transaction(async (tx) => {
+        const subOrg = await tx.organization.create({
+          data: {
+            name: subOrgName,
+            parentOrganizationId: parentOrg.id,
+            tierId: parentOrg.tierId,
+            isBenefitOrg: true,
+            deletedAt: new Date(), // dormant until user accepts GDPR
+            usersLimit: 1,
+            // vehicles/notifications/templates = null → uses parent's pool
+          },
+        })
+
+        const user = await tx.user.create({
+          data: {
+            email,
+            firstName,
+            lastName,
+            phoneNumber: phoneNumber || null,
+            organizationId: subOrg.id,
+            active: false, // pending GDPR acceptance
+            isFleetManager: isFleetManager || false,
+            password: hashedPassword,
+            loginProvider: loginProvider || null,
+            isBenefit: true,
+            benefitParentOrgId: parentOrg.id,
+            benefitActivationToken,
+          },
+          include: {
+            organizationRelation: {
+              select: { id: true, name: true }
+            }
+          }
+        })
+
+        return { user, subOrg }
+      })
+
+      // Send activation email to benefit user (non-blocking)
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || ''
+      const userLocale = locale || 'sk'
+      const activationUrl = `${appUrl}/${userLocale}/fleetsync/benefit-activate?token=${benefitActivationToken}`
+
+      try {
+        await axios.post(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/benefit-activation`, {
+          userEmail: email,
+          userName: `${firstName} ${lastName}`,
+          parentOrgName: parentOrg.name,
+          activationUrl,
+          locale: userLocale,
+        })
+      } catch (emailError) {
+        console.error('Failed to send benefit activation email:', emailError)
+      }
+
+      // Send info email to admin (non-blocking)
+      try {
+        await axios.post(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/benefit-notification`, {
+          parentOrgName: parentOrg.name,
+          parentOrgId: parentOrg.id,
+          userEmail: email,
+          userName: `${firstName} ${lastName}`,
+          subOrgName: result.subOrg.name,
+          subOrgId: result.subOrg.id,
+        })
+      } catch (emailError) {
+        console.error('Failed to send benefit admin notification:', emailError)
+      }
+
+      return NextResponse.json(
+        { ...result.user, benefitPending: true, subOrgId: result.subOrg.id },
+        { status: 201 }
+      )
+    }
+
+    // ── Standard user flow ──
     if (organizationId) {
       try {
         await checkTierLimit(organizationId, 'users')
@@ -98,20 +222,6 @@ export async function POST(request: NextRequest) {
         throw error
       }
     }
-
-    // Hash password if provided, otherwise use default
-    let hashedPassword = null
-    const defaultPassword = process.env.DEFAULT_USER_PASSWORD
-
-    if (password && password.trim() !== '') {
-      // Use provided password
-      hashedPassword = await hashPassword(password)
-    } else if (!loginProvider || loginProvider === '' || loginProvider === 'hybrid') {
-      // Set default password for users without OAuth provider or hybrid users
-      hashedPassword = await hashPassword(defaultPassword)
-      console.log(`Set default password for new user: ${email}`)
-    }
-    // For OAuth-only users (google, github), password remains null
 
     const user = await prisma.user.create({
       data: {

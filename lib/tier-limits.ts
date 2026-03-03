@@ -24,6 +24,20 @@ export async function checkTierLimit(
     throw new Error('Organization not found');
   }
 
+  // Benefit org: delegate vehicles/notifications to parent's pool
+  if (org.isBenefitOrg && org.parentOrganizationId) {
+    if (limitType === 'vehicles' || limitType === 'notifications') {
+      await checkBenefitParentLimit(org.parentOrganizationId, limitType);
+      return;
+    }
+    if (limitType === 'templates' || limitType === 'notificationTypes') {
+      // Inherited from parent — check against parent's limits
+      await checkTierLimit(org.parentOrganizationId, limitType);
+      return;
+    }
+    // 'users' — check against sub-org's own limit (usually 1)
+  }
+
   // If organization has no tier and no org-level limits, skip limit check
   if (!org.tierRelation && org.usersLimit === null && org.vehiclesLimit === null) {
     console.log(`[checkTierLimit] Organization ${organizationId} has no tier or limits, skipping limit check`);
@@ -58,6 +72,49 @@ export async function checkTierLimit(
   if (current >= limit) {
     throw new TierLimitError(
       `Organization has reached the limit for ${limitType}. Current: ${current}, Limit: ${limit}. Please upgrade your tier.`
+    );
+  }
+}
+
+/**
+ * For benefit orgs: check vehicles/notifications against the parent's total pool.
+ * Sums parent's own usage + all active benefit sub-orgs' usage.
+ */
+async function checkBenefitParentLimit(
+  parentOrgId: string,
+  limitType: 'vehicles' | 'notifications'
+): Promise<void> {
+  const parentOrg = await prisma.organization.findUnique({
+    where: { id: parentOrgId },
+    include: { tierRelation: true }
+  });
+
+  if (!parentOrg) {
+    throw new Error('Parent organization not found');
+  }
+
+  const countField = limitType === 'vehicles' ? 'currentVehiclesCount' : 'currentNotificationsCount';
+  const limitField = limitType === 'vehicles' ? 'vehiclesLimit' : 'notificationsLimit';
+
+  // Sum usage from all active benefit sub-orgs
+  const benefitSubOrgs = await prisma.organization.findMany({
+    where: {
+      parentOrganizationId: parentOrgId,
+      isBenefitOrg: true,
+      deletedAt: null,
+    },
+    select: { [countField]: true } as any,
+  });
+
+  const parentUsage = parentOrg[countField];
+  const benefitUsage = benefitSubOrgs.reduce((sum: number, sub: any) => sum + (sub[countField] || 0), 0);
+  const totalUsage = parentUsage + benefitUsage;
+
+  const limit = parentOrg[limitField] ?? (parentOrg.tierRelation as any)?.[`${limitType}Limit`] ?? Infinity;
+
+  if (totalUsage >= limit) {
+    throw new TierLimitError(
+      `Parent organization has reached the pooled limit for ${limitType}. Total usage: ${totalUsage}, Limit: ${limit}. Please upgrade your tier.`
     );
   }
 }

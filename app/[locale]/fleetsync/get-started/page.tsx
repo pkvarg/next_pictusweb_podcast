@@ -630,7 +630,8 @@ export default function GetStartedPage() {
               </div>
               <p className="text-sm text-gray-500 mt-1 font-light">
                 {t('phoneSkOnly')}{' '}
-                <a href="/contact" className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors">{t('phoneSkContact')}</a>
+{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                <Link href="/contact" className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors">{t('phoneSkContact')}</Link>
               </p>
             </div>
 

@@ -1,6 +1,7 @@
 'use client'
 import { useSession, signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
+import { useParams } from 'next/navigation'
 import { Link, useRouter } from '@/i18n/routing'
 import {
   User,
@@ -33,6 +34,7 @@ import NotificationSettings from '@/app/components/admin/NotificationSettings'
 import RenewalsContent from '@/app/components/client/RenewalsContent'
 import { FaEuroSign } from 'react-icons/fa'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
+import BenefitStats from '@/app/components/admin/BenefitStats'
 
 interface MyVehicleExpense {
   id: string
@@ -100,6 +102,8 @@ interface Organization {
   purchasedVehicles: number | null
   hiddenFromPictusaci: boolean
   notificationsBlocked: boolean
+  canCreateBenefit: boolean
+  isBenefitOrg: boolean
   createdAt?: string
 }
 
@@ -162,6 +166,8 @@ const MyFleetPage = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
   const t = useTranslations('Client')
+  const params = useParams()
+  const locale = (params?.locale as string) || 'sk'
 
   // Check for tab query parameter
   useEffect(() => {
@@ -215,6 +221,7 @@ const MyFleetPage = () => {
   const [usersLoading, setUsersLoading] = useState(false)
   const [userModalOpen, setUserModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [benefitRefreshKey, setBenefitRefreshKey] = useState(0)
 
   // Notifications state
   const [showNotificationBuilder, setShowNotificationBuilder] = useState(false)
@@ -252,7 +259,7 @@ const MyFleetPage = () => {
 
     try {
       setUsersLoading(true)
-      const response = await fetch(`/api/users?organizationId=${encodeURIComponent(orgId)}`)
+      const response = await fetch(`/api/users?organizationId=${encodeURIComponent(orgId)}&excludeBenefit=true`)
       if (response.ok) {
         const data = await response.json()
         setUsers(Array.isArray(data) ? data : [])
@@ -316,7 +323,7 @@ const MyFleetPage = () => {
       const response = await fetch('/api/my-vehicles')
 
       if (response.status === 403) {
-        setError('Prístup zamietnutý - vyžaduje sa oprávnenie správcu flotily')
+        setError(t('accessDeniedFleet'))
         return
       }
 
@@ -438,7 +445,7 @@ const MyFleetPage = () => {
   }, [isPictusaciUser, activeTab, organizations.length, fetchOrganizations])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Naozaj chcete odstrániť toto vozidlo?')) {
+    if (!confirm(t('confirmDeleteVehicle'))) {
       return
     }
 
@@ -455,12 +462,12 @@ const MyFleetPage = () => {
       fetchVehicles()
     } catch (err) {
       console.error('Error deleting vehicle:', err)
-      alert('Nepodarilo sa odstrániť vozidlo')
+      alert(t('deleteVehicleFailed'))
     }
   }
 
   const handleDeleteNotification = async (id: number) => {
-    if (!confirm('Naozaj chcete odstrániť túto notifikáciu?')) {
+    if (!confirm(t('confirmDeleteNotification'))) {
       return
     }
 
@@ -477,18 +484,18 @@ const MyFleetPage = () => {
       fetchNotifications()
     } catch (err) {
       console.error('Error deleting notification:', err)
-      alert('Nepodarilo sa odstrániť notifikáciu')
+      alert(t('deleteNotificationFailed'))
     }
   }
 
   const handleDeleteUser = async (userId: string) => {
     // Prevent deleting yourself
     if (session?.user?.id === userId) {
-      alert('Nemôžete odstrániť seba')
+      alert(t('cannotDeleteSelf'))
       return
     }
 
-    if (!confirm('Naozaj chcete odstrániť tohto používateľa?')) {
+    if (!confirm(t('confirmDeleteUser'))) {
       return
     }
 
@@ -506,7 +513,7 @@ const MyFleetPage = () => {
       }
     } catch (err) {
       console.error('Error deleting user:', err)
-      alert('Nepodarilo sa odstrániť používateľa')
+      alert(t('deleteUserFailed'))
     }
   }
 
@@ -524,6 +531,7 @@ const MyFleetPage = () => {
     if (organization?.id) {
       fetchUsers(organization.id)
     }
+    setBenefitRefreshKey((k) => k + 1)
     setUserModalOpen(false)
     setEditingUser(null)
   }
@@ -544,12 +552,12 @@ const MyFleetPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white flex items-center justify-center">
         <div className="text-center max-w-lg px-6">
           <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h1 className="text-3xl font-light mb-4 text-red-400">Prístup zamietnutý</h1>
+          <h1 className="text-3xl font-light mb-4 text-red-400">{t('accessDenied')}</h1>
           <p className="text-lg text-gray-300 mb-6">
-            Vaša organizácia bola deaktivovaná. Kontaktujte administrátora alebo vášho marketéra.
+            {t('orgDeactivated')}
           </p>
           <p className="text-sm text-gray-500 mb-8">
-            Ak si myslíte, že ide o chybu, napíšte na{' '}
+            {t('orgDeactivatedHint')}{' '}
             <a href="mailto:info@pictusweb.sk" className="text-pictus-lime hover:underline">
               info@pictusweb.sk
             </a>
@@ -559,7 +567,7 @@ const MyFleetPage = () => {
             className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
           >
             <LogOut size={18} />
-            Odhlásiť sa
+            {t('logOutButton')}
           </button>
         </div>
       </div>
@@ -576,16 +584,16 @@ const MyFleetPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white flex items-center justify-center">
         <div className="text-center max-w-md">
           <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-3xl font-light mb-4">Prístup zamietnutý</h2>
+          <h2 className="text-3xl font-light mb-4">{t('accessDenied')}</h2>
           <p className="text-pictus-lime mb-6">
-            Na prístup k správe flotily potrebujete oprávnenie správcu flotily.
+            {t('fleetManagerRequired')}
           </p>
           <Link
             href="/client"
             className="inline-flex items-center gap-2 bg-pictus-lime600 text-pictus-white px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
           >
             <ArrowLeft size={20} />
-            Späť na dashboard
+            {t('backToDashboard')}
           </Link>
         </div>
       </div>
@@ -747,7 +755,7 @@ const MyFleetPage = () => {
             className="inline-flex items-center gap-2 text-pictus-lime hover:text-pictus-lime-200 transition-colors text-lg"
           >
             <ArrowLeft size={20} />
-            Späť na dashboard
+            {t('backToDashboard')}
           </Link>
         </div>
 
@@ -786,7 +794,7 @@ const MyFleetPage = () => {
               }`}
             >
               <Car size={20} />
-              Vozidlá ({vehicles.length})
+              {t('vehiclesTab')} ({vehicles.length})
             </button>
             <button
               onClick={() => setActiveTab('users')}
@@ -797,7 +805,7 @@ const MyFleetPage = () => {
               }`}
             >
               <Users size={20} />
-              Používatelia
+              {t('usersTab')}
             </button>
             <button
               onClick={() => setActiveTab('notifications')}
@@ -808,7 +816,7 @@ const MyFleetPage = () => {
               }`}
             >
               <Bell size={20} />
-              Notifikácie
+              {t('notificationsTab')}
             </button>
 
             {isPictusaciUser && (
@@ -821,7 +829,7 @@ const MyFleetPage = () => {
                 }`}
               >
                 <Building size={20} />
-                Onboarding
+                {t('onboardingTab')}
               </button>
             )}
             {organization?.tierRelation?.name === 'BUSINESS' && (
@@ -835,7 +843,7 @@ const MyFleetPage = () => {
                   }`}
                 >
                   <Settings size={20} />
-                  Typy notifikácií
+                  {t('notificationTypesTab')}
                 </button>
                 <button
                   onClick={() => setActiveTab('templates')}
@@ -846,7 +854,7 @@ const MyFleetPage = () => {
                   }`}
                 >
                   <Sparkles size={20} />
-                  Šablóny
+                  {t('templatesTab')}
                 </button>
               </>
             )}
@@ -859,7 +867,7 @@ const MyFleetPage = () => {
               }`}
             >
               <RotateCcw size={20} />
-              Obnovy
+              {t('renewalsTab')}
               {pendingRenewalsCount > 0 && (
                 <span className="px-2 py-0.5 bg-blue-500 text-white text-xs rounded-full">
                   {pendingRenewalsCount}
@@ -885,11 +893,10 @@ const MyFleetPage = () => {
               <div>
                 {organization && (organization.tierRelation || organization.vehiclesLimit != null) && (
                   <p className="text-sm text-gray-400">
-                    Počet vozidiel: {organization.currentVehiclesCount} /{' '}
-                    {organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? '—'}
+                    {t('vehicleCount', { current: organization.currentVehiclesCount, limit: organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? '—' })}
                     {organization.currentVehiclesCount >=
                       (organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? Infinity) && (
-                      <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
+                      <span className="ml-2 text-orange-400">{t('limitReached')}</span>
                     )}
                   </p>
                 )}
@@ -908,12 +915,12 @@ const MyFleetPage = () => {
                     organization.currentVehiclesCount >= (organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? Infinity)
                   ) {
                     e.preventDefault()
-                    alert('Dosiahli ste maximálny počet vozidiel pre vašu organizáciu')
+                    alert(t('vehicleLimitAlert'))
                   }
                 }}
               >
                 <Plus size={20} />
-                Pridať vozidlo
+                {t('addVehicle')}
               </Link>
             </div>
 
@@ -925,16 +932,16 @@ const MyFleetPage = () => {
                   <div className="p-6 bg-pictus-lime/20 rounded-2xl inline-block mb-6">
                     <Car className="w-16 h-16 text-pictus-black" />
                   </div>
-                  <h2 className="text-4xl font-light text-pictus-white mb-4">Žiadne vozidlá</h2>
+                  <h2 className="text-4xl font-light text-pictus-white mb-4">{t('noVehicles')}</h2>
                   <p className="text-xl text-pictus-lime mb-8">
-                    Začnite pridaním prvého vozidla do vašej flotily.
+                    {t('noVehiclesHint')}
                   </p>
                   <Link
                     href="/client/my-fleet/new"
                     className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-8 py-4 rounded-lg font-light hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/50"
                   >
                     <Plus size={24} />
-                    Pridať prvé vozidlo
+                    {t('addFirstVehicle')}
                   </Link>
                 </div>
               </div>
@@ -965,7 +972,7 @@ const MyFleetPage = () => {
                         </h3>
                         <p className="text-xl text-pictus-lime">{vehicle.type}</p>
                         {vehicle.year && (
-                          <p className="text-lg text-pictus-lime mt-1">Rok: {vehicle.year}</p>
+                          <p className="text-lg text-pictus-lime mt-1">{t('year', { year: vehicle.year })}</p>
                         )}
                       </div>
 
@@ -981,17 +988,17 @@ const MyFleetPage = () => {
                         <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <Gauge size={14} className="text-blue-400" />
-                            <span className="text-xs text-pictus-white/70">Stav km</span>
+                            <span className="text-xs text-pictus-white/70">{t('mileageStatus')}</span>
                           </div>
                           {vehicle.mileageRecords && vehicle.mileageRecords.length > 0 ? (
                             <>
                               <p className="text-xl font-light text-pictus-white">
-                                {vehicle.mileageRecords[0].kilometers.toLocaleString()}
+                                {vehicle.mileageRecords[0].kilometers.toLocaleString(locale)}
                               </p>
                               <p className="text-xs text-pictus-white/50">km</p>
                             </>
                           ) : (
-                            <p className="text-sm text-pictus-white/50">Žiadne údaje</p>
+                            <p className="text-sm text-pictus-white/50">{t('noData')}</p>
                           )}
                         </div>
 
@@ -999,25 +1006,24 @@ const MyFleetPage = () => {
                         <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <FaEuroSign size={12} className="text-green-400" />
-                            <span className="text-xs text-pictus-white/70">Náklady</span>
+                            <span className="text-xs text-pictus-white/70">{t('expenses')}</span>
                           </div>
                           {vehicle.expenses && vehicle.expenses.length > 0 ? (
                             <>
                               <p className="text-xl font-light text-pictus-white">
                                 {vehicle.expenses
                                   .reduce((sum, exp) => sum + Number(exp.cost), 0)
-                                  .toLocaleString('sk-SK', {
+                                  .toLocaleString(locale, {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
                                   })}
                               </p>
                               <p className="text-xs text-pictus-white/50">
-                                {vehicle.expenses.length}{' '}
-                                {vehicle.expenses.length === 1 ? 'záznam' : 'záznamov'}
+                                {t('recordCount', { count: vehicle.expenses.length })}
                               </p>
                             </>
                           ) : (
-                            <p className="text-sm text-pictus-white/50">Žiadne údaje</p>
+                            <p className="text-sm text-pictus-white/50">{t('noData')}</p>
                           )}
                         </div>
                       </div>
@@ -1034,7 +1040,7 @@ const MyFleetPage = () => {
                               className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
                             >
                               <FaEuroSign size={16} />
-                              Výdavky
+                              {t('expensesButton')}
                             </button>
                             <button
                               onClick={() => {
@@ -1044,7 +1050,7 @@ const MyFleetPage = () => {
                               className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
                             >
                               <Gauge size={16} />
-                              Kilometre
+                              {t('mileageButton')}
                             </button>
                           </div>
                         </div>
@@ -1058,21 +1064,20 @@ const MyFleetPage = () => {
                             className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
                           >
                             <Edit size={16} />
-                            Upraviť
+                            {t('editButton')}
                           </Link>
                           <button
                             onClick={() => handleDelete(vehicle.id)}
                             className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-red-600/50 transition text-sm"
                           >
                             <Trash2 size={16} />
-                            Odstrániť
+                            {t('deleteButton')}
                           </button>
                         </div>
                       ) : (
                         <div className="pt-4 border-t border-pictus-lime/20">
                           <p className="text-gray-400 text-xs text-center italic">
-                            Iba na prezeranie - Vozidlo patrí organizácii:{' '}
-                            {vehicle.organizationRelation?.name || vehicle.organization}
+                            {t('viewOnlyVehicle', { orgName: vehicle.organizationRelation?.name || vehicle.organization || '' })}
                           </p>
                         </div>
                       )}
@@ -1086,19 +1091,19 @@ const MyFleetPage = () => {
 
         {/* Users Tab */}
         {activeTab === 'users' && (
+          <>
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white">Správa používateľov</h2>
+                <h2 className="text-2xl font-bold text-white">{t('userManagement')}</h2>
                 <p className="text-gray-400 mt-1">
-                  Organizácia: {organization?.name || 'Načítavam...'}
+                  {t('organization', { name: organization?.name || t('organizationLoading') })}
                 </p>
                 {organization && (organization.tierRelation || organization.usersLimit != null) && (
                   <p className="text-sm text-gray-500 mt-1">
-                    Počet používateľov: {organization.currentUsersCount} /{' '}
-                    {organization.usersLimit ?? organization.tierRelation?.usersLimit ?? '—'}
+                    {t('userCount', { current: organization.currentUsersCount, limit: organization.usersLimit ?? organization.tierRelation?.usersLimit ?? '—' })}
                     {organization.currentUsersCount >= (organization.usersLimit ?? organization.tierRelation?.usersLimit ?? Infinity) && (
-                      <span className="ml-2 text-orange-400">(Limit dosiahnutý)</span>
+                      <span className="ml-2 text-orange-400">{t('limitReached')}</span>
                     )}
                   </p>
                 )}
@@ -1118,24 +1123,24 @@ const MyFleetPage = () => {
                 }`}
               >
                 <Plus className="h-4 w-4" />
-                Pridať používateľa
+                {t('addUser')}
               </button>
             </div>
 
             {usersLoading ? (
               <div className="text-center py-12">
-                <p className="text-gray-400">Načítavam používateľov...</p>
+                <p className="text-gray-400">{t('loadingUsers')}</p>
               </div>
             ) : users.length === 0 ? (
               <div className="text-center py-12">
                 <Users className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400">Žiadni používatelia</p>
+                <p className="text-gray-400">{t('noUsers')}</p>
                 <button
                   onClick={handleCreateUser}
                   className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
                 >
                   <Plus className="h-4 w-4" />
-                  Pridať prvého používateľa
+                  {t('addFirstUser')}
                 </button>
               </div>
             ) : (
@@ -1144,22 +1149,22 @@ const MyFleetPage = () => {
                   <thead className="bg-white/5 border-b border-white/10">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Meno
+                        {t('nameColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Email
+                        {t('emailColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Telefón
+                        {t('phoneColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Rola
+                        {t('roleColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Stav
+                        {t('statusColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Akcie
+                        {t('actionsColumn')}
                       </th>
                     </tr>
                   </thead>
@@ -1179,7 +1184,7 @@ const MyFleetPage = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="text-sm text-gray-300">
-                            {user.isFleetManager ? 'Správca flotily' : 'Používateľ'}
+                            {user.isFleetManager ? t('fleetManager') : t('userRole')}
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -1190,7 +1195,7 @@ const MyFleetPage = () => {
                                 : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                             }`}
                           >
-                            {user.active ? 'Aktívny' : 'Neaktívny'}
+                            {user.active ? t('active') : t('inactive')}
                           </span>
                         </td>
                         <td className="px-4 py-3">
@@ -1198,7 +1203,7 @@ const MyFleetPage = () => {
                             <button
                               onClick={() => handleEditUser(user)}
                               className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
-                              title="Upraviť"
+                              title={t('editButton')}
                             >
                               <Edit className="h-4 w-4" />
                             </button>
@@ -1206,7 +1211,7 @@ const MyFleetPage = () => {
                               <button
                                 onClick={() => handleDeleteUser(user.id)}
                                 className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
-                                title="Odstrániť"
+                                title={t('deleteButton')}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -1214,7 +1219,7 @@ const MyFleetPage = () => {
                               <button
                                 disabled
                                 className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-lg cursor-not-allowed"
-                                title="Nemôžete odstrániť seba"
+                                title={t('cannotDeleteSelf')}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -1228,6 +1233,14 @@ const MyFleetPage = () => {
               </div>
             )}
           </div>
+
+          {/* Benefit Stats - shown below user table for orgs that can create benefits */}
+          {organization && organization.canCreateBenefit && !organization.isBenefitOrg && (
+            <div className="mt-6">
+              <BenefitStats key={benefitRefreshKey} organizationId={organization.id} />
+            </div>
+          )}
+          </>
         )}
 
         {/* Notifications Tab */}
@@ -1237,10 +1250,9 @@ const MyFleetPage = () => {
               <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-white">Notifikácie</h2>
+                    <h2 className="text-2xl font-bold text-white">{t('notificationsTitle')}</h2>
                     <p className="text-gray-400 mt-1">
-                      Organizácia: {organization?.name || 'Načítavam...'} (
-                      {filteredNotifications.length} z {notifications.length} notifikácií)
+                      {t('notificationsOrg', { name: organization?.name || t('organizationLoading'), filtered: filteredNotifications.length, total: notifications.length, used: organization?.currentNotificationsCount ?? 0, limit: organization?.notificationsLimit ?? organization?.tierRelation?.notificationsLimit ?? '—' })}
                     </p>
                   </div>
                   <button
@@ -1252,7 +1264,7 @@ const MyFleetPage = () => {
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
                   >
                     <Plus className="h-4 w-4" />
-                    Vytvoriť notifikáciu
+                    {t('createNotification')}
                   </button>
                 </div>
 
@@ -1263,14 +1275,14 @@ const MyFleetPage = () => {
                       {/* Vehicle Filter */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Vozidlo
+                          {t('filterVehicle')}
                         </label>
                         <select
                           value={filterVehicle}
                           onChange={(e) => setFilterVehicle(e.target.value)}
                           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                         >
-                          <option value="">Všetky vozidlá</option>
+                          <option value="">{t('allVehicles')}</option>
                           {uniqueVehicles.map((vehicle) => (
                             <option key={vehicle} value={vehicle}>
                               {vehicle}
@@ -1282,13 +1294,13 @@ const MyFleetPage = () => {
                       {/* Person Filter */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Osoba
+                          {t('filterPerson')}
                         </label>
                         <input
                           type="text"
                           value={filterPerson}
                           onChange={(e) => setFilterPerson(e.target.value)}
-                          placeholder="Hľadať meno..."
+                          placeholder={t('searchName')}
                           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
                         />
                       </div>
@@ -1296,14 +1308,14 @@ const MyFleetPage = () => {
                       {/* Type Filter */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Typ notifikácie
+                          {t('filterNotificationType')}
                         </label>
                         <select
                           value={filterType}
                           onChange={(e) => setFilterType(e.target.value)}
                           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                         >
-                          <option value="">Všetky typy</option>
+                          <option value="">{t('allTypes')}</option>
                           {uniqueTypes.map((type) => (
                             <option key={type} value={type}>
                               {type}
@@ -1314,29 +1326,29 @@ const MyFleetPage = () => {
 
                       {/* Status Filter */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Stav</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">{t('filterStatus')}</label>
                         <select
                           value={filterStatus}
                           onChange={(e) => setFilterStatus(e.target.value)}
                           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                         >
-                          <option value="">Všetky stavy</option>
+                          <option value="">{t('allStatuses')}</option>
                           {uniqueStatuses.map((status) => (
                             <option key={status} value={status}>
                               {status === 'sent'
-                                ? 'Odoslané'
+                                ? t('statusSent')
                                 : status === 'confirmed'
-                                  ? 'Potvrdené'
+                                  ? t('statusConfirmed')
                                   : status === 'pending'
-                                    ? 'Čaká'
+                                    ? t('statusPending')
                                     : status === 'failed'
-                                      ? 'Zlyhalo'
+                                      ? t('statusFailed')
                                       : status === 'imported'
-                                        ? 'Importované'
+                                        ? t('statusImported')
                                         : status.startsWith('reminded')
-                                          ? 'Pripomenuté'
+                                          ? t('statusReminded')
                                           : status === 'no_response'
-                                            ? 'Bez odpovede'
+                                            ? t('statusNoResponse')
                                             : status}
                             </option>
                           ))}
@@ -1346,7 +1358,7 @@ const MyFleetPage = () => {
                       {/* Sort by Duty Date */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Zoradiť podľa termínu
+                          {t('sortByDutyDate')}
                         </label>
                         <select
                           value={sortByDutyDate}
@@ -1358,16 +1370,16 @@ const MyFleetPage = () => {
                           }}
                           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                         >
-                          <option value="none">Nezoraďovať</option>
-                          <option value="asc">Vzostupne (najskôr najstarší)</option>
-                          <option value="desc">Zostupne (najskôr najnovší)</option>
+                          <option value="none">{t('noSort')}</option>
+                          <option value="asc">{t('sortAsc')}</option>
+                          <option value="desc">{t('sortDesc')}</option>
                         </select>
                       </div>
 
                       {/* Sort by Notification Date */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Zoradiť podľa dátumu notifikácie
+                          {t('sortByNotificationDate')}
                         </label>
                         <select
                           value={sortByNotificationDate}
@@ -1379,16 +1391,16 @@ const MyFleetPage = () => {
                           }}
                           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                         >
-                          <option value="none">Nezoraďovať</option>
-                          <option value="asc">Vzostupne (najskôr najstarší)</option>
-                          <option value="desc">Zostupne (najskôr najnovší)</option>
+                          <option value="none">{t('noSort')}</option>
+                          <option value="asc">{t('sortAsc')}</option>
+                          <option value="desc">{t('sortDesc')}</option>
                         </select>
                       </div>
 
                       {/* Date Preset Filter */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Obdobie
+                          {t('filterPeriod')}
                         </label>
                         <select
                           value={filterDatePreset}
@@ -1403,10 +1415,10 @@ const MyFleetPage = () => {
                           }}
                           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                         >
-                          <option value="all">Všetky dátumy</option>
-                          <option value="thisMonth">Tento mesiac</option>
-                          <option value="thisYear">Tento rok</option>
-                          <option value="custom">Vlastné obdobie</option>
+                          <option value="all">{t('allDates')}</option>
+                          <option value="thisMonth">{t('thisMonth')}</option>
+                          <option value="thisYear">{t('thisYear')}</option>
+                          <option value="custom">{t('customPeriod')}</option>
                         </select>
                       </div>
 
@@ -1415,7 +1427,7 @@ const MyFleetPage = () => {
                         <>
                           <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                              Od dátumu
+                              {t('dateFrom')}
                             </label>
                             <input
                               type="date"
@@ -1426,7 +1438,7 @@ const MyFleetPage = () => {
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                              Do dátumu
+                              {t('dateTo')}
                             </label>
                             <input
                               type="date"
@@ -1462,7 +1474,7 @@ const MyFleetPage = () => {
                           }}
                           className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all text-sm"
                         >
-                          Vymazať filtre
+                          {t('clearFilters')}
                         </button>
                       </div>
                     )}
@@ -1471,14 +1483,14 @@ const MyFleetPage = () => {
 
                 {notificationsLoading ? (
                   <div className="text-center py-12">
-                    <p className="text-gray-400">Načítavam notifikácie...</p>
+                    <p className="text-gray-400">{t('loadingNotifications')}</p>
                   </div>
                 ) : notifications.length === 0 ? (
                   <div className="text-center py-12">
                     <Bell className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium text-white mb-2">Žiadne notifikácie</h3>
+                    <h3 className="text-xl font-medium text-white mb-2">{t('noNotifications')}</h3>
                     <p className="text-gray-400 mb-6">
-                      Notifikácie pomôžu vašim používateľom nezabudnúť na dôležité udalosti
+                      {t('noNotificationsHint')}
                     </p>
                     <button
                       onClick={() => {
@@ -1489,7 +1501,7 @@ const MyFleetPage = () => {
                       className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
                     >
                       <Plus className="h-5 w-5" />
-                      Vytvoriť prvú notifikáciu
+                      {t('createFirstNotification')}
                     </button>
                   </div>
                 ) : (
@@ -1498,28 +1510,28 @@ const MyFleetPage = () => {
                       <thead className="bg-white/5 border-b border-white/10">
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            ID
+                            {t('idColumn')}
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            Osoba
+                            {t('personColumn')}
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            Vozidlo
+                            {t('vehicleColumn')}
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            Typ
+                            {t('typeColumn')}
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            Kanál
+                            {t('channelColumn')}
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            Stav
+                            {t('statusColumn')}
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            Dátum
+                            {t('dateColumn')}
                           </th>
                           <th className="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase">
-                            Akcie
+                            {t('actionsColumn')}
                           </th>
                         </tr>
                       </thead>
@@ -1575,19 +1587,19 @@ const MyFleetPage = () => {
                                 }`}
                               >
                                 {notification.status === 'sent'
-                                  ? 'Odoslané'
+                                  ? t('statusSent')
                                   : notification.status === 'confirmed'
-                                    ? 'Potvrdené'
+                                    ? t('statusConfirmed')
                                     : notification.status === 'pending'
-                                      ? 'Čaká'
+                                      ? t('statusPending')
                                       : notification.status === 'failed'
-                                        ? 'Zlyhalo'
+                                        ? t('statusFailed')
                                         : notification.status === 'imported'
-                                          ? 'Importované'
+                                          ? t('statusImported')
                                           : notification.status.startsWith('reminded')
-                                            ? 'Pripomenuté'
+                                            ? t('statusReminded')
                                             : notification.status === 'no_response'
-                                              ? 'Bez odpovede'
+                                              ? t('statusNoResponse')
                                               : notification.status}
                               </span>
                             </td>
@@ -1595,16 +1607,12 @@ const MyFleetPage = () => {
                               <div className="space-y-1">
                                 {notification.notificationDate && (
                                   <div className="text-sm text-pictus-lime font-medium">
-                                    Notifikácia:{' '}
-                                    {new Date(notification.notificationDate).toLocaleDateString(
-                                      'sk-SK',
-                                    )}
+                                    {t('notificationDateLabel', { date: new Date(notification.notificationDate).toLocaleDateString(locale) })}
                                   </div>
                                 )}
                                 {notification.dutyDate && (
                                   <div className="text-sm text-gray-300">
-                                    Termín:{' '}
-                                    {new Date(notification.dutyDate).toLocaleDateString('sk-SK')}
+                                    {t('dutyDateLabel', { date: new Date(notification.dutyDate).toLocaleDateString(locale) })}
                                   </div>
                                 )}
                                 {!notification.notificationDate && !notification.dutyDate && (
@@ -1617,7 +1625,7 @@ const MyFleetPage = () => {
                                 <button
                                   onClick={() => handleDeleteNotification(notification.id)}
                                   className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
-                                  title="Odstrániť"
+                                  title={t('deleteButton')}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </button>
@@ -1631,7 +1639,7 @@ const MyFleetPage = () => {
                     {/* No results message */}
                     {filteredNotifications.length === 0 && (
                       <div className="text-center py-8 text-gray-400">
-                        Žiadne notifikácie podľa vybraných filtrov
+                        {t('noFilteredNotifications')}
                       </div>
                     )}
                   </div>
@@ -1647,7 +1655,7 @@ const MyFleetPage = () => {
                   }}
                   className="mb-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
                 >
-                  ← Späť na zoznam
+                  ← {t('backToList')}
                 </button>
                 {organization ? (
                   <NotificationBuilder
@@ -1680,7 +1688,7 @@ const MyFleetPage = () => {
                 ) : (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime mx-auto mb-4"></div>
-                    <p className="text-gray-400">Načítavam organizáciu...</p>
+                    <p className="text-gray-400">{t('loadingOrganization')}</p>
                   </div>
                 )}
               </div>
@@ -1692,8 +1700,8 @@ const MyFleetPage = () => {
         {activeTab === 'templates' && organization?.tierRelation?.name === 'BUSINESS' && (
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Šablóny notifikácií</h2>
-              <p className="text-gray-400">Spravujte šablóny notifikácií pre vašu organizáciu.</p>
+              <h2 className="text-2xl font-bold text-white mb-2">{t('notificationTemplates')}</h2>
+              <p className="text-gray-400">{t('manageTemplates')}</p>
             </div>
             {organization?.id && organization.id.trim() !== '' ? (
               <NotificationSettings
@@ -1705,7 +1713,7 @@ const MyFleetPage = () => {
               />
             ) : (
               <div className="mt-6 p-8 bg-white/5 rounded-xl border border-white/10 text-center">
-                <p className="text-gray-400">Načítavam organizáciu...</p>
+                <p className="text-gray-400">{t('loadingOrganization')}</p>
               </div>
             )}
           </div>
@@ -1715,20 +1723,19 @@ const MyFleetPage = () => {
         {activeTab === 'types' && organization?.tierRelation?.name === 'BUSINESS' && (
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Typy notifikácií</h2>
-              <p className="text-gray-400">Spravujte typy notifikácií pre vašu organizáciu.</p>
+              <h2 className="text-2xl font-bold text-white mb-2">{t('notificationTypesTitle')}</h2>
+              <p className="text-gray-400">{t('manageNotificationTypes')}</p>
               {organization && organization.currentNotificationTypesCount === 0 && (
                 <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
                   <p className="text-blue-300 text-sm">
-                    ℹ️ Ak nie sú definované vlastné typy, použijú sa predvolené možnosti.
+                    {t('noCustomTypesHint')}
                   </p>
                 </div>
               )}
               {organization && (organization.tierRelation || organization.notificationTypesLimit != null) && (
                 <div className="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
                   <p className="text-orange-300 text-sm">
-                    ⚠️ Limit typov notifikácií: {organization.currentNotificationTypesCount} /{' '}
-                    {organization.notificationTypesLimit ?? organization.tierRelation?.notificationTypesLimit ?? '—'}
+                    {t('notificationTypesLimit', { current: organization.currentNotificationTypesCount, limit: organization.notificationTypesLimit ?? organization.tierRelation?.notificationTypesLimit ?? '—' })}
                   </p>
                 </div>
               )}
@@ -1743,7 +1750,7 @@ const MyFleetPage = () => {
               />
             ) : (
               <div className="mt-6 p-8 bg-white/5 rounded-xl border border-white/10 text-center">
-                <p className="text-gray-400">Načítavam organizáciu...</p>
+                <p className="text-gray-400">{t('loadingOrganization')}</p>
               </div>
             )}
           </div>
@@ -1754,8 +1761,8 @@ const MyFleetPage = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white">Obnova úloh</h2>
-                <p className="text-gray-400 mt-1">Rýchle obnovenie pravidelných povinností</p>
+                <h2 className="text-2xl font-bold text-white">{t('renewalsTitle')}</h2>
+                <p className="text-gray-400 mt-1">{t('renewalsHint')}</p>
               </div>
             </div>
 
@@ -1768,33 +1775,33 @@ const MyFleetPage = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white">Onboarding</h2>
-                <p className="text-gray-400 mt-1">Vytvor organizáciu a priraď klienta</p>
+                <h2 className="text-2xl font-bold text-white">{t('onboardingTitle')}</h2>
+                <p className="text-gray-400 mt-1">{t('onboardingHint')}</p>
               </div>
               <Link
                 href="/client/my-fleet/onboard"
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
               >
                 <Plus className="h-4 w-4" />
-                Onboard nového klienta
+                {t('onboardNewClient')}
               </Link>
             </div>
 
             {organizationsLoading ? (
               <div className="text-center py-12">
-                <p className="text-gray-400">Načítavam organizácie...</p>
+                <p className="text-gray-400">{t('loadingOrganizations')}</p>
               </div>
             ) : organizations.length === 0 ? (
               <div className="text-center py-12">
                 <Building className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-                <h3 className="text-xl font-medium text-white mb-2">Žiadne organizácie</h3>
-                <p className="text-gray-400 mb-6">Začnite onboardovaním prvého klienta</p>
+                <h3 className="text-xl font-medium text-white mb-2">{t('noOrganizations')}</h3>
+                <p className="text-gray-400 mb-6">{t('noOrganizationsHint')}</p>
                 <Link
                   href="/client/my-fleet/onboard"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
                 >
                   <Plus className="h-5 w-5" />
-                  Onboard prvého klienta
+                  {t('onboardFirstClient')}
                 </Link>
               </div>
             ) : (
@@ -1803,22 +1810,22 @@ const MyFleetPage = () => {
                   <thead className="bg-white/5 border-b border-white/10">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Názov
+                        {t('orgNameColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Tier
+                        {t('tierColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Používatelia
+                        {t('usersColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Vozidlá
+                        {t('vehiclesColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Notifikácie
+                        {t('notificationsColumn')}
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        Vytvorené
+                        {t('createdColumn')}
                       </th>
                     </tr>
                   </thead>
@@ -1828,7 +1835,7 @@ const MyFleetPage = () => {
                         <td className="px-4 py-3">
                           <div className="text-sm font-medium text-white">{org.name}</div>
                           {org.mainContact && (
-                            <div className="text-xs text-gray-400">Kontakt: {org.mainContact}</div>
+                            <div className="text-xs text-gray-400">{t('contactLabel', { contact: org.mainContact })}</div>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -1879,7 +1886,7 @@ const MyFleetPage = () => {
                         <td className="px-4 py-3">
                           <div className="text-sm text-gray-300">
                             {org.createdAt
-                              ? new Date(org.createdAt).toLocaleDateString('sk-SK')
+                              ? new Date(org.createdAt).toLocaleDateString(locale)
                               : '-'}
                           </div>
                         </td>
@@ -1931,6 +1938,7 @@ const MyFleetPage = () => {
           user={editingUser}
           organization={organization.name}
           organizationId={organization.id}
+          canCreateBenefit={organization.canCreateBenefit && !organization.isBenefitOrg}
         />
       )}
     </div>

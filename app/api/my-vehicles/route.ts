@@ -204,6 +204,12 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    // Increment vehicle count on organization
+    await prisma.organization.update({
+      where: { id: vehicleOrganizationId },
+      data: { currentVehiclesCount: { increment: 1 } },
+    })
+
     return NextResponse.json(vehicle, { status: 201 })
   } catch (error) {
     console.error('Error creating vehicle:', error)

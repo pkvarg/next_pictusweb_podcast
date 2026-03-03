@@ -12,7 +12,8 @@ import {
   UserX,
   Search,
   Shield,
-  Phone
+  Phone,
+  Gift,
 } from 'lucide-react'
 import CreateUserModal from './CreateUserModal'
 import EditUserModal from './EditUserModal'
@@ -32,6 +33,7 @@ interface User {
   }
   active: boolean
   isFleetManager: boolean
+  isBenefit?: boolean
   role: string
   password: string | null
   loginProvider: string | null
@@ -223,6 +225,12 @@ export default function AllUsers() {
                         <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
                           <Shield className="h-3 w-3 mr-1" />
                           Manager
+                        </span>
+                      )}
+                      {user.isBenefit && (
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                          <Gift className="h-3 w-3 mr-1" />
+                          Benefit
                         </span>
                       )}
                     </div>

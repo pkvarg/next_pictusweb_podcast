@@ -1,0 +1,36 @@
+import { NextRequest, NextResponse } from 'next/server'
+import axios from 'axios'
+
+/**
+ * Proxy to send benefit notification (informational) to PICTUSACI admin via Hono API.
+ * Called server-side after creating a benefit user + sub-org.
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+
+    const honoApiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/benefit-notification`
+
+    const response = await axios.post(honoApiUrl, body, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return NextResponse.json(response.data, { status: response.status })
+  } catch (error) {
+    console.error('Benefit notification email proxy error:', error)
+
+    if (axios.isAxiosError(error) && error.response) {
+      return NextResponse.json(
+        { error: error.response.data?.error || 'Failed to send benefit notification' },
+        { status: error.response.status },
+      )
+    }
+
+    return NextResponse.json(
+      { error: 'Failed to send benefit notification' },
+      { status: 500 },
+    )
+  }
+}

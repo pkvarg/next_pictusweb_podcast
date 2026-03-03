@@ -1,10 +1,11 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { X, User, Mail, Building, ToggleLeft, Lock, Shield, Phone } from 'lucide-react'
+import { X, User, Mail, Building, ToggleLeft, Lock, Shield, Phone, Gift, Info } from 'lucide-react'
 
 interface Organization {
   id: string
   name: string
+  canCreateBenefit?: boolean
 }
 
 interface CreateUserModalProps {
@@ -24,10 +25,13 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
     isFleetManager: false,
     password: '',
     loginProvider: '',
+    isBenefit: false,
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [organizations, setOrganizations] = useState<Organization[]>([])
+
+  const selectedOrgCanBenefit = organizations.find((o) => o.id === formData.organizationId)?.canCreateBenefit || false
 
   useEffect(() => {
     if (isOpen) {
@@ -40,7 +44,12 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
       const response = await fetch('/api/organizations')
       if (response.ok) {
         const data = await response.json()
-        setOrganizations(data.organizations || [])
+        const orgs = (data.organizations || []).map((org: any) => ({
+          id: org.id,
+          name: org.name,
+          canCreateBenefit: org.canCreateBenefit || false,
+        }))
+        setOrganizations(orgs)
       }
     } catch (error) {
       console.error('Failed to fetch organizations:', error)
@@ -73,6 +82,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
           isFleetManager: false,
           password: '',
           loginProvider: '',
+          isBenefit: false,
         })
       } else {
         const errorData = await response.json()
@@ -257,6 +267,33 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
               className="w-4 h-4 text-pictus-lime bg-gray-100 border-gray-300 rounded focus:ring-pictus-lime"
             />
           </div>
+
+          {/* Benefit checkbox - only for orgs with canCreateBenefit enabled */}
+          {selectedOrgCanBenefit && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center text-sm font-medium text-gray-300">
+                  <Gift className="h-4 w-4 mr-2" />
+                  Benefit
+                </label>
+                <input
+                  type="checkbox"
+                  name="isBenefit"
+                  checked={formData.isBenefit}
+                  onChange={handleChange}
+                  className="w-4 h-4 text-pictus-lime bg-gray-100 border-gray-300 rounded focus:ring-pictus-lime"
+                />
+              </div>
+              {formData.isBenefit && (
+                <div className="flex items-start gap-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <Info className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-blue-300">
+                    This user will receive an activation email to accept GDPR &amp; Trade Rules. A sub-organization will be created automatically.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center justify-end space-x-3 pt-4">
             <button

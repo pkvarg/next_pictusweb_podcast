@@ -84,6 +84,15 @@ model User {
   loginProvider        String?
   hybridPassword       String?
   phoneVerified        DateTime?              @map("phone_verified")
+  // Benefit fields
+  isBenefit              Boolean    @default(false)   @map("is_benefit")
+  benefitParentOrgId     String?    @db.Uuid          @map("benefit_parent_org_id")
+  benefitGdprAccepted    Boolean    @default(false)   @map("benefit_gdpr_accepted")
+  benefitGdprAcceptedAt  DateTime?                    @map("benefit_gdpr_accepted_at")
+  benefitTermsAccepted   Boolean    @default(false)   @map("benefit_terms_accepted")
+  benefitTermsAcceptedAt DateTime?                    @map("benefit_terms_accepted_at")
+  benefitActivationToken String?    @unique           @map("benefit_activation_token")
+
   vehicles             MyVehicle[]
   vehicleExpenses      MyVehicleExpense[]
   vehicleMileage       MyVehicleMileage[]
@@ -345,6 +354,10 @@ model Organization {
   parentOrganizationId            String?                    @map("parent_organization_id")
   parentOrganization              Organization?              @relation("OrganizationHierarchy", fields: [parentOrganizationId], references: [id])
   childOrganizations              Organization[]             @relation("OrganizationHierarchy")
+
+  // Benefit
+  isBenefitOrg                    Boolean        @default(false) @map("is_benefit_org")
+  canCreateBenefit                Boolean        @default(false) @map("can_create_benefit")
 
   // Relations
   users                           User[]

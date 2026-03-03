@@ -44,6 +44,19 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             name: true,
+            isBenefitOrg: true,
+            _count: {
+              select: {
+                users: { where: { active: true } },
+                vehicles: { where: { deletedAt: null } },
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            vehicles: { where: { deletedAt: null } },
+            users: { where: { active: true } },
           },
         },
       },
@@ -52,7 +65,41 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ organizations })
+    // Sync counts with actual values
+    const orgsWithSyncedCounts = organizations.map((org) => {
+      const actualOwnVehicleCount = org._count.vehicles
+      const actualOwnUserCount = org._count.users
+
+      // For parent orgs, aggregate counts from benefit sub-orgs
+      const benefitChildren = org.childOrganizations.filter((child) => (child as any).isBenefitOrg)
+      const benefitUsersCount = benefitChildren.reduce((sum, child) => sum + (child as any)._count.users, 0)
+      const benefitVehiclesCount = benefitChildren.reduce((sum, child) => sum + (child as any)._count.vehicles, 0)
+      const totalUserCount = actualOwnUserCount + benefitUsersCount
+      const totalVehicleCount = actualOwnVehicleCount + benefitVehiclesCount
+
+      // Fire-and-forget sync stored counters
+      if (org.currentVehiclesCount !== totalVehicleCount || org.currentUsersCount !== totalUserCount) {
+        prisma.organization.update({
+          where: { id: org.id },
+          data: {
+            currentVehiclesCount: totalVehicleCount,
+            currentUsersCount: totalUserCount,
+          },
+        }).catch(() => {})
+      }
+
+      const { _count, ...orgData } = org
+      // Strip internal fields from childOrganizations before returning
+      const cleanChildren = org.childOrganizations.map(({ _count: _, isBenefitOrg: __, ...child }) => child)
+      return {
+        ...orgData,
+        currentVehiclesCount: totalVehicleCount,
+        currentUsersCount: totalUserCount,
+        childOrganizations: cleanChildren,
+      }
+    })
+
+    return NextResponse.json({ organizations: orgsWithSyncedCounts })
   } catch (error) {
     console.error('Failed to fetch organizations:', error)
     return NextResponse.json({ error: 'Failed to fetch organizations' }, { status: 500 })
@@ -62,7 +109,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci } = body
+    const { name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci, canCreateBenefit } = body
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 })
@@ -81,6 +128,7 @@ export async function POST(request: NextRequest) {
         notificationTypesLimit: notificationTypesLimit != null ? Number(notificationTypesLimit) : null,
         purchasedVehicles: purchasedVehicles != null ? Number(purchasedVehicles) : null,
         hiddenFromPictusaci: hiddenFromPictusaci === true,
+        canCreateBenefit: canCreateBenefit === true,
       },
       include: {
         tierRelation: {
@@ -113,7 +161,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci } = body
+    const { id, name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci, canCreateBenefit } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Organization ID is required' }, { status: 400 })
@@ -136,6 +184,7 @@ export async function PUT(request: NextRequest) {
         notificationTypesLimit: toNullableInt(notificationTypesLimit),
         purchasedVehicles: toNullableInt(purchasedVehicles),
         ...(hiddenFromPictusaci !== undefined && { hiddenFromPictusaci: hiddenFromPictusaci === true }),
+        ...(canCreateBenefit !== undefined && { canCreateBenefit: canCreateBenefit === true }),
       },
       include: {
         parentOrganization: {
