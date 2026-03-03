@@ -102,10 +102,7 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href={`/fleetsync`}
-                    className="hover:text-purple-300 transition-colors"
-                  >
+                  <Link href={`/fleetsync`} className="hover:text-purple-300 transition-colors">
                     {t('footerService6')}
                   </Link>
                 </li>
@@ -148,17 +145,14 @@ const Footer = () => {
                   </a>
                 </li>
 
-                <li>💬 WhatsApp: +421 904 798 505</li>
+                <li>+421 948 024 638</li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-white">{t('footerForClients')}</h3>
               <ul className="space-y-2 text-xl font-thin text-gray-400">
                 <li>
-                  <Link
-                    href="/client"
-                    className="hover:text-purple-300 transition-colors"
-                  >
+                  <Link href="/client" className="hover:text-purple-300 transition-colors">
                     {t('footerForClients')}
                   </Link>
                 </li>
