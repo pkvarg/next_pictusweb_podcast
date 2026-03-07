@@ -64,6 +64,7 @@ const OnboardClientPage = () => {
   const [customNotificationTypesLimit, setCustomNotificationTypesLimit] = useState('')
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [skipPayment, setSkipPayment] = useState(false)
+  const [agentAttested, setAgentAttested] = useState(false)
 
   // Step 1: Address / invoicing fields (shown directly in form, like self-service)
   const [ico, setIco] = useState('')
@@ -77,10 +78,12 @@ const OnboardClientPage = () => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null)
+  const [emailCheckLoading, setEmailCheckLoading] = useState(false)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')  // stored WITHOUT +421 prefix
-  const [isFleetManager, setIsFleetManager] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState('') // stored WITHOUT +421 prefix
+  const [isFleetManager, setIsFleetManager] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -185,6 +188,7 @@ const OnboardClientPage = () => {
           ...invoicingData,
           organizationName: organizationName || '',
           submittedBy: session?.user?.email || '',
+          billingInterval,
         }),
       })
 
@@ -279,16 +283,48 @@ const OnboardClientPage = () => {
       setError('Zadajte počet zakúpených vozidiel (min. 1)')
       return false
     }
+    if (isPaid && selectedTier.vehiclesLimit && Number(purchasedVehicles) > selectedTier.vehiclesLimit) {
+      setError(`Maximálny počet vozidiel pre tento tier je ${selectedTier.vehiclesLimit}`)
+      return false
+    }
     return true
   }
 
-  const validateStep2 = () => {
+  const checkEmail = async (val: string): Promise<boolean | null> => {
+    if (!val || !val.includes('@')) {
+      setEmailAvailable(null)
+      return null
+    }
+    setEmailCheckLoading(true)
+    try {
+      const res = await fetch('/api/fleetsync/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: val }),
+      })
+      const data = await res.json()
+      setEmailAvailable(data.available)
+      return data.available as boolean
+    } catch {
+      setEmailAvailable(null)
+      return null
+    } finally {
+      setEmailCheckLoading(false)
+    }
+  }
+
+  const validateStep2 = (emailAvailableOverride?: boolean) => {
     if (!firstName.trim() || !lastName.trim()) {
       setError('Meno a priezvisko sú povinné')
       return false
     }
     if (!email.trim() || !email.includes('@')) {
       setError('Zadajte platný email')
+      return false
+    }
+    const emailOk = emailAvailableOverride !== undefined ? emailAvailableOverride : emailAvailable
+    if (emailOk !== true) {
+      setError('Tento email je už registrovaný')
       return false
     }
     if (password.length < 8) {
@@ -302,12 +338,21 @@ const OnboardClientPage = () => {
     return true
   }
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     setError('')
 
     if (currentStep === 1 && validateStep1()) {
       setCurrentStep(2)
-    } else if (currentStep === 2 && validateStep2()) {
+    } else if (currentStep === 2) {
+      let available: boolean | null = emailAvailable
+      if (email.includes('@')) {
+        available = await checkEmail(email)
+        if (available !== true) {
+          setError('Tento email je už registrovaný')
+          return
+        }
+      }
+      if (!validateStep2(available === true ? true : undefined)) return
       // Auto-generate organizationName from firstName + lastName if left empty
       if (!organizationName.trim()) {
         const generated = `${firstName}${lastName}`.replace(/\s/g, '').toUpperCase()
@@ -326,12 +371,24 @@ const OnboardClientPage = () => {
 
   const handleSubmit = async () => {
     setError('')
+
+    if (!agentAttested) {
+      setError('Potvrdenie súhlasu klienta s podmienkami je povinné.')
+      return
+    }
+
+    if (skipPayment && !invoicingSuccess) {
+      setError('Pri fakturácii ručne je vyplnenie a odoslanie Fakturačných údajov povinné.')
+      setShowInvoicingForm(true)
+      return
+    }
+
     setLoading(true)
 
     const selectedTier = getSelectedTier()
     const tierName = selectedTier?.name?.toUpperCase() || ''
     const isPaidTier = tierName === 'BASIC' || tierName === 'BUSINESS'
-    const requirePayment = isPaidTier && !(tierName === 'BASIC' && skipPayment)
+    const requirePayment = isPaidTier && !skipPayment
 
     try {
       const payload = {
@@ -360,6 +417,7 @@ const OnboardClientPage = () => {
         isFleetManager,
         billingInterval,
         requirePayment,
+        agentAttested,
       }
 
       const response = await fetch('/api/onboard-client', {
@@ -455,15 +513,48 @@ const OnboardClientPage = () => {
             </p>
           </div>
 
+
+          {/* Invoice payment warning + skip option */}
+          <div className="mt-6 max-w-2xl mx-auto p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg space-y-3">
+            <p className="text-yellow-300 text-sm font-medium">⚠️ Platba kartou vs. faktúra</p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              Štandardne prebieha platba kartou cez Stripe. Ak klient preferuje platbu na základe
+              faktúry, vyplňte <strong className="text-pictus-white">Fakturačné údaje</strong>{' '}
+              nižšie a zaškrtnite možnosť{' '}
+              <strong className="text-pictus-white">&bdquo;Preskočiť platbu &ndash; fakturácia ručne&ldquo;</strong>
+              . Klientovi bude vytvorený účet bez online platby a faktúru vystavíme manuálne.
+            </p>
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="skipPaymentInvoice"
+                checked={skipPayment}
+                onChange={(e) => {
+                  setSkipPayment(e.target.checked)
+                  if (e.target.checked) setShowInvoicingForm(true)
+                }}
+                className="w-4 h-4 accent-pictus-lime bg-white/5 border-white/10 rounded"
+              />
+              <label htmlFor="skipPaymentInvoice" className="text-sm text-yellow-200 cursor-pointer">
+                Preskočiť platbu – fakturácia ručne
+              </label>
+            </div>
+          </div>
+
           {/* Fakturačné údaje */}
           <div className="mt-6 max-w-2xl mx-auto">
             <button
               onClick={() => setShowInvoicingForm(!showInvoicingForm)}
-              className="w-full flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all"
+              className={`w-full flex items-center justify-between p-4 bg-white/5 border rounded-lg hover:bg-white/10 transition-all ${
+                skipPayment && !invoicingSuccess ? 'border-yellow-500/50' : 'border-white/10'
+              }`}
             >
               <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6 text-pictus-lime" />
+                <FileText className={`w-6 h-6 ${skipPayment && !invoicingSuccess ? 'text-yellow-400' : 'text-pictus-lime'}`} />
                 <span className="text-lg text-pictus-white">Fakturačné údaje</span>
+                {skipPayment && !invoicingSuccess && (
+                  <span className="text-yellow-400 text-sm font-medium">* povinné</span>
+                )}
                 {invoicingSuccess && (
                   <span className="text-green-400 text-sm flex items-center gap-1">
                     <CheckCircle size={16} /> Odoslané
@@ -625,11 +716,18 @@ const OnboardClientPage = () => {
                           Kontaktný telefón
                         </label>
                         <div className="flex gap-2">
-                          <span className="flex items-center px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-400 font-light text-sm select-none">+421</span>
+                          <span className="flex items-center px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-400 font-light text-sm select-none">
+                            +421
+                          </span>
                           <input
                             type="tel"
                             value={invoicingData.contactPhone}
-                            onChange={(e) => handleInvoicingChange('contactPhone', e.target.value.replace(/[^\d\s]/g, ''))}
+                            onChange={(e) =>
+                              handleInvoicingChange(
+                                'contactPhone',
+                                e.target.value.replace(/[^\d\s]/g, ''),
+                              )
+                            }
                             placeholder="9XX XXX XXX"
                             className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                           />
@@ -637,7 +735,7 @@ const OnboardClientPage = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-1">
                           Počet vozidiel
@@ -645,16 +743,22 @@ const OnboardClientPage = () => {
                         <input
                           type="number"
                           min="1"
+                          max={getSelectedTier()?.vehiclesLimit ?? undefined}
                           value={invoicingData.numberOfVehicles}
-                          onChange={(e) => handleInvoicingChange('numberOfVehicles', e.target.value)}
+                          onChange={(e) => {
+                            const max = getSelectedTier()?.vehiclesLimit
+                            const val = parseInt(e.target.value) || 1
+                            handleInvoicingChange('numberOfVehicles', String(max ? Math.min(max, Math.max(1, val)) : Math.max(1, val)))
+                          }}
                           placeholder="napr. 10"
                           className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                         />
+                        {getSelectedTier()?.vehiclesLimit && (
+                          <p className="mt-1 text-xs text-gray-400">Max. {getSelectedTier()?.vehiclesLimit}</p>
+                        )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                          Tier
-                        </label>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Tier</label>
                         <select
                           value={invoicingData.tierName}
                           onChange={(e) => handleInvoicingChange('tierName', e.target.value)}
@@ -663,10 +767,42 @@ const OnboardClientPage = () => {
                           <option value="">Vyberte tier</option>
                           {tiers.map((tier) => (
                             <option key={tier.id} value={tier.name}>
-                              {tier.name} {tier.pricePerVehicle != null && Number(tier.pricePerVehicle) > 0 ? `(${tier.pricePerVehicle} €/voz/mes)` : ''}
+                              {tier.name}{' '}
+                              {tier.pricePerVehicle != null && Number(tier.pricePerVehicle) > 0
+                                ? `(${tier.pricePerVehicle} €/voz/mes)`
+                                : ''}
                             </option>
                           ))}
                         </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Fakturácia
+                        </label>
+                        <div className="flex rounded-lg overflow-hidden border border-white/10 h-[42px]">
+                          <button
+                            type="button"
+                            onClick={() => setBillingInterval('monthly')}
+                            className={`flex-1 text-sm font-light transition-all ${
+                              billingInterval === 'monthly'
+                                ? 'bg-pictus-lime text-pictus-black font-normal'
+                                : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                            }`}
+                          >
+                            Mesačne
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setBillingInterval('yearly')}
+                            className={`flex-1 text-sm font-light transition-all border-l border-white/10 ${
+                              billingInterval === 'yearly'
+                                ? 'bg-pictus-lime text-pictus-black font-normal'
+                                : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                            }`}
+                          >
+                            Ročne
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -801,7 +937,10 @@ const OnboardClientPage = () => {
                     <input
                       type="text"
                       value={ico}
-                      onChange={(e) => { setIco(e.target.value); setInvoicingData((prev) => ({ ...prev, ico: e.target.value })) }}
+                      onChange={(e) => {
+                        setIco(e.target.value)
+                        setInvoicingData((prev) => ({ ...prev, ico: e.target.value }))
+                      }}
                       placeholder="12345678"
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
@@ -811,7 +950,10 @@ const OnboardClientPage = () => {
                     <input
                       type="text"
                       value={dic}
-                      onChange={(e) => { setDic(e.target.value); setInvoicingData((prev) => ({ ...prev, dic: e.target.value })) }}
+                      onChange={(e) => {
+                        setDic(e.target.value)
+                        setInvoicingData((prev) => ({ ...prev, dic: e.target.value }))
+                      }}
                       placeholder="2012345678"
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
@@ -822,7 +964,10 @@ const OnboardClientPage = () => {
                   <input
                     type="text"
                     value={street}
-                    onChange={(e) => { setStreet(e.target.value); setInvoicingData((prev) => ({ ...prev, street: e.target.value })) }}
+                    onChange={(e) => {
+                      setStreet(e.target.value)
+                      setInvoicingData((prev) => ({ ...prev, street: e.target.value }))
+                    }}
                     placeholder="Hlavná 1"
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                   />
@@ -833,7 +978,10 @@ const OnboardClientPage = () => {
                     <input
                       type="text"
                       value={city}
-                      onChange={(e) => { setCity(e.target.value); setInvoicingData((prev) => ({ ...prev, city: e.target.value })) }}
+                      onChange={(e) => {
+                        setCity(e.target.value)
+                        setInvoicingData((prev) => ({ ...prev, city: e.target.value }))
+                      }}
                       placeholder="Bratislava"
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
@@ -843,17 +991,25 @@ const OnboardClientPage = () => {
                     <input
                       type="text"
                       value={postalCode}
-                      onChange={(e) => { setPostalCode(e.target.value); setInvoicingData((prev) => ({ ...prev, postalCode: e.target.value })) }}
+                      onChange={(e) => {
+                        setPostalCode(e.target.value)
+                        setInvoicingData((prev) => ({ ...prev, postalCode: e.target.value }))
+                      }}
                       placeholder="81101"
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Krajina *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                      Krajina *
+                    </label>
                     <input
                       type="text"
                       value={country}
-                      onChange={(e) => { setCountry(e.target.value); setInvoicingData((prev) => ({ ...prev, country: e.target.value })) }}
+                      onChange={(e) => {
+                        setCountry(e.target.value)
+                        setInvoicingData((prev) => ({ ...prev, country: e.target.value }))
+                      }}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
@@ -881,11 +1037,12 @@ const OnboardClientPage = () => {
                               ? 'Zadarmo'
                               : `${tier.pricePerVehicle} € / vozidlo / mesiac`}
                           </p>
-                          {Number(tier.pricePerVehicle) > 0 && tier.pricePerVehicleYearly != null && (
-                            <p className="text-pictus-lime/70 text-sm">
-                              {tier.pricePerVehicleYearly} € / vozidlo / rok
-                            </p>
-                          )}
+                          {Number(tier.pricePerVehicle) > 0 &&
+                            tier.pricePerVehicleYearly != null && (
+                              <p className="text-pictus-lime/70 text-sm">
+                                {tier.pricePerVehicleYearly} € / vozidlo / rok
+                              </p>
+                            )}
                         </div>
                       )}
                       <div className="space-y-1 text-sm text-gray-400">
@@ -907,11 +1064,19 @@ const OnboardClientPage = () => {
                   <input
                     type="number"
                     min="1"
+                    max={getSelectedTier()?.vehiclesLimit ?? undefined}
                     value={purchasedVehicles}
-                    onChange={(e) => setPurchasedVehicles(e.target.value)}
+                    onChange={(e) => {
+                      const max = getSelectedTier()?.vehiclesLimit
+                      const val = parseInt(e.target.value) || 1
+                      setPurchasedVehicles(String(max ? Math.min(max, Math.max(1, val)) : Math.max(1, val)))
+                    }}
                     placeholder="napr. 10"
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                   />
+                  {getSelectedTier()?.vehiclesLimit && (
+                    <p className="mt-1 text-sm text-gray-400">Max. {getSelectedTier()?.vehiclesLimit} vozidiel pre tento tier</p>
+                  )}
                   {purchasedVehicles &&
                     getSelectedTier()?.pricePerVehicle != null &&
                     Number(getSelectedTier()?.pricePerVehicle) > 0 && (
@@ -921,9 +1086,17 @@ const OnboardClientPage = () => {
                             ? `Mesačná cena: ${(Number(purchasedVehicles) * Number(getSelectedTier()?.pricePerVehicle)).toFixed(2)} € / mesiac`
                             : (() => {
                                 const t = getSelectedTier()
-                                const yearly = t?.pricePerVehicleYearly != null
-                                  ? (Number(purchasedVehicles) * Number(t.pricePerVehicleYearly)).toFixed(2)
-                                  : (Number(purchasedVehicles) * Number(t?.pricePerVehicle) * 12 * Number(t?.yearlyDiscount ?? 0.83)).toFixed(2)
+                                const yearly =
+                                  t?.pricePerVehicleYearly != null
+                                    ? (
+                                        Number(purchasedVehicles) * Number(t.pricePerVehicleYearly)
+                                      ).toFixed(2)
+                                    : (
+                                        Number(purchasedVehicles) *
+                                        Number(t?.pricePerVehicle) *
+                                        12 *
+                                        Number(t?.yearlyDiscount ?? 0.83)
+                                      ).toFixed(2)
                                 return `Ročná cena: ${yearly} € / rok`
                               })()}
                         </p>
@@ -972,22 +1145,6 @@ const OnboardClientPage = () => {
                       Ročne
                     </button>
                   </div>
-
-                  {/* Skip payment - only for BASIC */}
-                  {getSelectedTier()?.name === 'BASIC' && (
-                    <div className="mt-4 flex items-center">
-                      <input
-                        type="checkbox"
-                        id="skipPayment"
-                        checked={skipPayment}
-                        onChange={(e) => setSkipPayment(e.target.checked)}
-                        className="w-4 h-4 text-pictus-lime bg-white/5 border-white/10 rounded focus:ring-pictus-lime"
-                      />
-                      <label htmlFor="skipPayment" className="ml-2 text-sm text-gray-300">
-                        Preskočiť platbu (rodinný benefit)
-                      </label>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -1098,10 +1255,34 @@ const OnboardClientPage = () => {
                     <input
                       type="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                      onChange={(e) => {
+                        setEmail(e.target.value)
+                        setEmailAvailable(null)
+                      }}
+                      onBlur={(e) => checkEmail(e.target.value)}
+                      className={`w-full pl-12 pr-4 py-3 bg-white/5 border rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all ${
+                        emailAvailable === false
+                          ? 'border-red-500/60'
+                          : emailAvailable === true
+                            ? 'border-green-500/60'
+                            : 'border-white/10'
+                      }`}
                     />
+                    {emailCheckLoading && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-pictus-lime/30 border-t-pictus-lime rounded-full animate-spin" />
+                    )}
+                    {!emailCheckLoading && emailAvailable === true && (
+                      <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-400" />
+                    )}
+                    {!emailCheckLoading && emailAvailable === false && (
+                      <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-400" />
+                    )}
                   </div>
+                  {emailAvailable === false && (
+                    <span className="text-red-400 text-sm mt-1 block">
+                      Tento email je už registrovaný
+                    </span>
+                  )}
                 </div>
 
                 <div>
@@ -1109,7 +1290,9 @@ const OnboardClientPage = () => {
                     Telefónne číslo
                   </label>
                   <div className="flex gap-2">
-                    <span className="flex items-center px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-gray-400 font-light text-sm select-none">+421</span>
+                    <span className="flex items-center px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-gray-400 font-light text-sm select-none">
+                      +421
+                    </span>
                     <input
                       type="tel"
                       value={phoneNumber}
@@ -1227,9 +1410,18 @@ const OnboardClientPage = () => {
                                 ? `(${(Number(purchasedVehicles) * Number(getSelectedTier()?.pricePerVehicle)).toFixed(2)} € / mesiac)`
                                 : (() => {
                                     const t = getSelectedTier()
-                                    const yearly = t?.pricePerVehicleYearly != null
-                                      ? (Number(purchasedVehicles) * Number(t.pricePerVehicleYearly)).toFixed(2)
-                                      : (Number(purchasedVehicles) * Number(t?.pricePerVehicle) * 12 * Number(t?.yearlyDiscount ?? 0.83)).toFixed(2)
+                                    const yearly =
+                                      t?.pricePerVehicleYearly != null
+                                        ? (
+                                            Number(purchasedVehicles) *
+                                            Number(t.pricePerVehicleYearly)
+                                          ).toFixed(2)
+                                        : (
+                                            Number(purchasedVehicles) *
+                                            Number(t?.pricePerVehicle) *
+                                            12 *
+                                            Number(t?.yearlyDiscount ?? 0.83)
+                                          ).toFixed(2)
                                     return `(${yearly} € / rok)`
                                   })()}
                             </span>
@@ -1244,8 +1436,8 @@ const OnboardClientPage = () => {
                         </p>
                         <p>
                           <span className="text-gray-400">Platba:</span>{' '}
-                          {getSelectedTier()?.name === 'BASIC' && skipPayment ? (
-                            <span className="text-yellow-400">Preskočená (rodinný benefit)</span>
+                          {skipPayment ? (
+                            <span className="text-yellow-400">Preskočená – fakturácia ručne</span>
                           ) : (
                             <span className="text-pictus-lime">Stripe Checkout</span>
                           )}
@@ -1307,6 +1499,31 @@ const OnboardClientPage = () => {
             </div>
           )}
 
+          {/* Agent attestation — visible only on final step */}
+          {currentStep === 3 && (
+            <div className="mt-6 max-w-2xl mx-auto p-4 bg-pictus-lime/5 border border-pictus-lime/20 rounded-lg">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agentAttested}
+                  onChange={(e) => setAgentAttested(e.target.checked)}
+                  className="w-4 h-4 mt-0.5 accent-pictus-lime shrink-0"
+                />
+                <span className="text-sm text-gray-300 leading-relaxed">
+                  Potvrdzujem, že som klienta oboznámil s{' '}
+                  <a href="https://www.pictusweb.sk/obchodne-podmienky" target="_blank" rel="noreferrer" className="text-pictus-lime underline">
+                    obchodnými podmienkami
+                  </a>{' '}
+                  a{' '}
+                  <a href="https://www.pictusweb.sk/gdpr" target="_blank" rel="noreferrer" className="text-pictus-lime underline">
+                    zásadami ochrany osobných údajov (GDPR)
+                  </a>{' '}
+                  a že klient pred registráciou udelil svoj súhlas. Klientovi bude zaslaný informačný email s prihlasovacím odkazom a odkazmi na tieto dokumenty.
+                </span>
+              </label>
+            </div>
+          )}
+
           {/* Navigation Buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
             <button
@@ -1342,7 +1559,7 @@ const OnboardClientPage = () => {
                     {(() => {
                       const t = getSelectedTier()
                       const isPaid = t?.name === 'BASIC' || t?.name === 'BUSINESS'
-                      const needsPayment = isPaid && !(t?.name === 'BASIC' && skipPayment)
+                      const needsPayment = isPaid && !skipPayment
                       return needsPayment ? 'Presmerovanie na platbu...' : 'Vytváram...'
                     })()}
                   </>
@@ -1352,7 +1569,7 @@ const OnboardClientPage = () => {
                     {(() => {
                       const t = getSelectedTier()
                       const isPaid = t?.name === 'BASIC' || t?.name === 'BUSINESS'
-                      const needsPayment = isPaid && !(t?.name === 'BASIC' && skipPayment)
+                      const needsPayment = isPaid && !skipPayment
                       return needsPayment ? 'Pokračovať na platbu' : 'Vytvoriť klienta'
                     })()}
                   </>

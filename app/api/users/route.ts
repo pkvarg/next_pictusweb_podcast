@@ -60,6 +60,7 @@ export async function GET(request: NextRequest) {
         isFleetManager: true,
         isBenefit: true,
         createdAt: true,
+        lastLoggedIn: true,
       },
       orderBy: {
         createdAt: 'desc',

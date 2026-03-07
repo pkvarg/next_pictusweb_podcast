@@ -392,7 +392,7 @@ export default function NotificationBuilder({
 
       setStep(dupOrgId ? 1 : 0) // Skip to Step 1 (template selection)
     }
-  }, [duplicateData, initialOrganization, organizations, typeOptions, hideChannelDropdown])
+  }, [duplicateData, initialOrganization, organizations, typeOptions, hideChannelDropdown, organizationTier])
 
   const handleTemplateSelect = (templateId: string) => {
     const template = templates.find((t) => t.id === templateId)

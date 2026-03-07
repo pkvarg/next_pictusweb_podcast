@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
@@ -25,15 +25,7 @@ export default function BenefitActivatePage() {
   const [activated, setActivated] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (!token) {
-      setLoading(false)
-      return
-    }
-    validateToken()
-  }, [token])
-
-  const validateToken = async () => {
+  const validateToken = useCallback(async () => {
     try {
       const res = await fetch(`/api/fleetsync/benefit-activate?token=${token}`)
       const data = await res.json()
@@ -45,7 +37,15 @@ export default function BenefitActivatePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [token])
+
+  useEffect(() => {
+    if (!token) {
+      setLoading(false)
+      return
+    }
+    validateToken()
+  }, [token, validateToken])
 
   const handleActivate = async () => {
     if (!gdprAccepted || !termsAccepted) return

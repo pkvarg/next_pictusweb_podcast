@@ -14,6 +14,7 @@ import {
   Shield,
   Phone,
   Gift,
+  Clock,
 } from 'lucide-react'
 import CreateUserModal from './CreateUserModal'
 import EditUserModal from './EditUserModal'
@@ -39,6 +40,7 @@ interface User {
   loginProvider: string | null
   createdAt: string
   updatedAt: string
+  lastLoggedIn: string | null
 }
 
 export default function AllUsers() {
@@ -186,6 +188,9 @@ export default function AllUsers() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Created
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                  Last Seen
+                </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Actions
                 </th>
@@ -267,6 +272,21 @@ export default function AllUsers() {
                       <Calendar className="h-4 w-4 mr-2" />
                       {new Date(user.createdAt).toLocaleDateString()}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                    {user.lastLoggedIn ? (
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="h-4 w-4 text-pictus-lime/60 flex-shrink-0" />
+                        <div>
+                          <div>{new Date(user.lastLoggedIn).toLocaleDateString('sk-SK')}</div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(user.lastLoggedIn).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-gray-600">—</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">

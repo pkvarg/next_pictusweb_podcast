@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Users,
   Car,
@@ -37,7 +37,7 @@ export default function BenefitStats({ organizationId }: BenefitStatsProps) {
   const [revoking, setRevoking] = useState<string | null>(null)
   const [confirmRevoke, setConfirmRevoke] = useState<string | null>(null)
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const res = await fetch(`/api/fleetsync/benefit-stats?organizationId=${organizationId}`)
       if (res.ok) {
@@ -51,11 +51,11 @@ export default function BenefitStats({ organizationId }: BenefitStatsProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [organizationId])
 
   useEffect(() => {
     fetchStats()
-  }, [organizationId])
+  }, [fetchStats])
 
   const handleRevoke = async (userId: string) => {
     setRevoking(userId)

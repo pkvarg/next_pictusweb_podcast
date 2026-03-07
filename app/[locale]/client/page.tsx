@@ -22,6 +22,7 @@ import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotifi
 import FleetOverview from '@/app/components/client/FleetOverview'
 import SimpleDutyOverview from '@/app/components/client/SimpleDutyOverview'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
+import VerifyContactInfo from '@/app/components/client/VerifyContactInfo'
 
 interface TierInfo {
   id: string
@@ -509,6 +510,11 @@ const ClientZone = () => {
                   </form>
                 )}
               </div>
+            </div>
+
+            {/* Contact Verification */}
+            <div className="md:col-span-2 border-t border-pictus-lime/10 pt-6">
+              <VerifyContactInfo />
             </div>
           </div>
         </section>

@@ -114,6 +114,25 @@ export async function POST(request: NextRequest) {
         // Delete pending record
         await prisma.pendingOnboarding.delete({ where: { id: pendingId } })
         console.log('Successfully onboarded paid user:', pending.email)
+
+        // Send welcome email (fire-and-forget)
+        const honoApi = process.env.NEXT_PUBLIC_HONO_API_URL
+        const appUrl = process.env.NEXTAUTH_URL || 'https://www.pictusweb.sk'
+        const agentEmail = onboardedBy
+        fetch(`${honoApi}/api/pictusweb/client/send-welcome-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: pending.email,
+            firstName: pending.firstName,
+            agentName: agentEmail,
+            agentEmail,
+            loginUrl: `${appUrl}/sk/auth/login`,
+            gdprUrl: `${appUrl}/gdpr`,
+            termsUrl: `${appUrl}/obchodne-podmienky`,
+          }),
+        }).catch((err) => console.error('Welcome email (webhook) failed:', err))
+
         break
       }
 

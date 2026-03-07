@@ -18,11 +18,13 @@ export async function POST(request: NextRequest) {
     // Check if user is from PICTUSACI organization
     const currentUser = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: {
+      select: {
+        firstName: true,
+        lastName: true,
+        email: true,
+        organizationId: true,
         organizationRelation: {
-          select: {
-            name: true
-          }
+          select: { name: true }
         }
       }
     })
@@ -55,12 +57,18 @@ export async function POST(request: NextRequest) {
       lastName,
       email,
       password,
-      phoneNumber,
+      phoneNumber: rawPhone,
       isFleetManager,
       // Payment
       billingInterval,
-      requirePayment
+      requirePayment,
+      agentAttested,
     } = body
+    const phoneNumber = rawPhone ? rawPhone.replace(/\s+/g, '') : null
+
+    if (!agentAttested) {
+      return NextResponse.json({ error: 'Agent attestation of client consent is required' }, { status: 400 })
+    }
 
     // Validate required fields
     if (!organizationName || !tierId) {
@@ -185,6 +193,8 @@ export async function POST(request: NextRequest) {
           tierId: tierId,
           parentOrganizationId: currentUser?.organizationId || null,
           onboardedBy: session.user.email,
+          agentConsentBy: session.user.email,
+          agentConsentAt: new Date(),
           notificationPeriodStart: isPaidTier ? new Date() : null,
           purchasedVehicles: pvCount,
           vehiclesLimit: toNullableInt(vehiclesLimitOverride) ?? pvCount ?? tier?.vehiclesLimit ?? null,
@@ -237,6 +247,23 @@ export async function POST(request: NextRequest) {
 
       return { organization, user }
     })
+
+    // Send welcome email to the new client (fire-and-forget)
+    const origin = request.headers.get('origin') || 'https://www.pictusweb.sk'
+    const agentFullName = `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() || session.user.email || 'Pictusweb'
+    fetch(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/send-welcome-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: result.user.email,
+        firstName: result.user.firstName,
+        agentName: agentFullName,
+        agentEmail: session.user.email,
+        loginUrl: `${origin}/sk/auth/login`,
+        gdprUrl: `${origin}/gdpr`,
+        termsUrl: `${origin}/obchodne-podmienky`,
+      }),
+    }).catch((err) => console.error('Welcome email failed:', err))
 
     return NextResponse.json({
       success: true,

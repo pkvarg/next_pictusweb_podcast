@@ -342,7 +342,7 @@ const MyFleetPage = () => {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   const fetchOrganizations = useCallback(async () => {
     try {
@@ -544,6 +544,8 @@ const MyFleetPage = () => {
       </div>
     )
   }
+
+  const isPictusaci = organization?.name === 'PICTUSACI'
 
   // Show access denied if organization is deleted
   const isOrgDeleted = (session?.user as any)?.organizationDeleted === true
@@ -1155,14 +1157,16 @@ const MyFleetPage = () => {
                         <p className="text-xs text-gray-400">{user.email}</p>
                         {user.phoneNumber && <p className="text-xs text-gray-400">{user.phoneNumber}</p>}
                       </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => handleEditUser(user)} className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all" title={t('editButton')}><Edit className="h-4 w-4" /></button>
-                        {session?.user?.id !== user.id ? (
-                          <button onClick={() => handleDeleteUser(user.id)} className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all" title={t('deleteButton')}><Trash2 className="h-4 w-4" /></button>
-                        ) : (
-                          <button disabled className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-lg cursor-not-allowed" title={t('cannotDeleteSelf')}><Trash2 className="h-4 w-4" /></button>
-                        )}
-                      </div>
+                      {!isPictusaci && (
+                        <div className="flex gap-2">
+                          <button onClick={() => handleEditUser(user)} className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all" title={t('editButton')}><Edit className="h-4 w-4" /></button>
+                          {session?.user?.id !== user.id ? (
+                            <button onClick={() => handleDeleteUser(user.id)} className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all" title={t('deleteButton')}><Trash2 className="h-4 w-4" /></button>
+                          ) : (
+                            <button disabled className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-lg cursor-not-allowed" title={t('cannotDeleteSelf')}><Trash2 className="h-4 w-4" /></button>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-gray-400">{user.isFleetManager ? t('fleetManager') : t('userRole')}</span>
@@ -1227,32 +1231,34 @@ const MyFleetPage = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEditUser(user)}
-                              className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
-                              title={t('editButton')}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </button>
-                            {session?.user?.id !== user.id ? (
+                          {!isPictusaci && (
+                            <div className="flex gap-2">
                               <button
-                                onClick={() => handleDeleteUser(user.id)}
-                                className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
-                                title={t('deleteButton')}
+                                onClick={() => handleEditUser(user)}
+                                className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
+                                title={t('editButton')}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Edit className="h-4 w-4" />
                               </button>
-                            ) : (
-                              <button
-                                disabled
-                                className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-lg cursor-not-allowed"
-                                title={t('cannotDeleteSelf')}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            )}
-                          </div>
+                              {session?.user?.id !== user.id ? (
+                                <button
+                                  onClick={() => handleDeleteUser(user.id)}
+                                  className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
+                                  title={t('deleteButton')}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              ) : (
+                                <button
+                                  disabled
+                                  className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-lg cursor-not-allowed"
+                                  title={t('cannotDeleteSelf')}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))}

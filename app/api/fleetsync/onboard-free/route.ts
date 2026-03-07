@@ -20,8 +20,9 @@ export async function POST(request: NextRequest) {
       lastName,
       email,
       password,
-      phoneNumber,
+      phoneNumber: rawPhone,
     } = body
+    const phoneNumber = rawPhone ? rawPhone.replace(/\s+/g, '') : null
 
     // Validate required fields
     if (!organizationName || !firstName || !lastName || !email || !password) {

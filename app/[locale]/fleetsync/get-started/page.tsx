@@ -58,6 +58,8 @@ export default function GetStartedPage() {
   const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null)
   const [verificationSent, setVerificationSent] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
+  const [emailToken, setEmailToken] = useState('')
+  const [phoneToken, setPhoneToken] = useState('')
   const [pricingData, setPricingData] = useState<{ name: string; pricePerVehicle: number; pricePerVehicleYearly: number | null; yearlyDiscount: number; vehiclesLimit: number }[]>([])
 
   const [form, setForm] = useState<FormData>({
@@ -137,10 +139,10 @@ export default function GetStartedPage() {
   const fullPhoneNumber = `+421${form.phoneNumber.replace(/\s/g, '')}`
 
   // Email availability check
-  const checkEmail = async (email: string) => {
+  const checkEmail = async (email: string): Promise<boolean | null> => {
     if (!email || !email.includes('@')) {
       setEmailAvailable(null)
-      return
+      return null
     }
     setEmailCheckLoading(true)
     try {
@@ -151,8 +153,10 @@ export default function GetStartedPage() {
       })
       const data = await res.json()
       setEmailAvailable(data.available)
+      return data.available as boolean
     } catch {
       setEmailAvailable(null)
+      return null
     } finally {
       setEmailCheckLoading(false)
     }
@@ -165,9 +169,16 @@ export default function GetStartedPage() {
       const res = await fetch('/api/fleetsync/send-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, phoneNumber: fullPhoneNumber }),
+        body: JSON.stringify({
+          email: form.email,
+          phoneNumber: fullPhoneNumber,
+          firstName: form.firstName,
+        }),
       })
       if (res.ok) {
+        const data = await res.json()
+        if (data.emailToken) setEmailToken(data.emailToken)
+        if (data.phoneToken) setPhoneToken(data.phoneToken)
         setVerificationSent(true)
         setResendCooldown(60)
       }
@@ -188,8 +199,11 @@ export default function GetStartedPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: form.email,
+          phoneNumber: fullPhoneNumber,
           emailCode: form.emailCode,
           phoneCode: form.phoneCode,
+          emailToken,
+          phoneToken,
         }),
       })
       const data = await res.json()
@@ -209,6 +223,13 @@ export default function GetStartedPage() {
     }
   }
 
+  // Dev-only skip
+  const skipVerification = () => {
+    updateForm('emailVerified', true)
+    updateForm('phoneVerified', true)
+    setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1))
+  }
+
   // Validation per step
   const validateStep = (): string | null => {
     switch (STEPS[currentStep]) {
@@ -221,7 +242,7 @@ export default function GetStartedPage() {
         return null
       case 'account':
         if (!form.email.includes('@')) return t('errorEmail')
-        if (emailAvailable === false) return t('errorEmailTaken')
+        if (emailAvailable !== true) return t('errorEmailTaken')
         if (!form.phoneNumber.trim()) return t('errorPhone')
         if (form.password.length < 8) return t('errorPasswordLength')
         if (form.password !== form.confirmPassword) return t('errorPasswordMatch')
@@ -239,6 +260,15 @@ export default function GetStartedPage() {
   }
 
   const handleNext = async () => {
+    // Force email availability re-check on account step before validating
+    if (STEPS[currentStep] === 'account' && form.email.includes('@')) {
+      const available = await checkEmail(form.email)
+      if (available !== true) {
+        setError(t('errorEmailTaken'))
+        return
+      }
+    }
+
     // Skip standard validation for verification step — verifyCodes handles it
     if (STEPS[currentStep] !== 'verification') {
       const validationError = validateStep()
@@ -733,6 +763,16 @@ export default function GetStartedPage() {
             >
               {resendCooldown > 0 ? `${t('resendIn')} ${resendCooldown}s` : t('resendCodes')}
             </button>
+
+            {process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true' && (
+              <button
+                type="button"
+                onClick={skipVerification}
+                className="w-full border border-yellow-500/50 text-yellow-400 py-2 rounded-lg text-sm font-light hover:bg-yellow-500/10 transition-colors mt-2"
+              >
+                [DEV] Preskočiť overenie
+              </button>
+            )}
           </div>
         )
 

@@ -62,6 +62,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Tier not found' }, { status: 400 })
     }
 
+    // Normalize phone number — strip all whitespace
+    const normalizedPhone = phoneNumber ? phoneNumber.replace(/\s+/g, '') : null
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
         lastName,
         email,
         password: hashedPassword,
-        phoneNumber: phoneNumber || null,
+        phoneNumber: normalizedPhone || null,
         emailVerified: true,
         phoneVerified: true,
         gdprAccepted: true,

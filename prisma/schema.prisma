@@ -347,6 +347,8 @@ model Organization {
 
   // Onboarding
   onboardedBy                     String?        @map("onboarded_by") @db.VarChar(255)
+  agentConsentBy                  String?        @map("agent_consent_by") @db.VarChar(255)
+  agentConsentAt                  DateTime?      @map("agent_consent_at")
 
   createdAt                       DateTime       @default(now()) @map("created_at")
   updatedAt                       DateTime       @updatedAt @map("updated_at")
@@ -441,6 +443,36 @@ model DutyRenewalPreset {
   @@index([organizationId])
   @@index([notificationTypeId])
   @@map("duty_renewal_presets")
+}
+
+model VerificationCode {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  purpose   String    @db.VarChar(30)
+  codeHash  String    @map("code_hash") @db.VarChar(64)
+  tokenHash String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at")
+  attempts  Int       @default(0)
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([purpose])
+  @@map("verification_codes")
+}
+
+model TrustedDevice {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  deviceHash String   @map("device_hash") @db.VarChar(64)
+  userAgent  String?  @map("user_agent") @db.VarChar(500)
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([deviceHash])
+  @@map("trusted_devices")
 }
 
 model PendingOnboarding {
