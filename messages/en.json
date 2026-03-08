@@ -455,9 +455,7 @@
     "ctaTitle": "Ready to eliminate",
     "ctaTitleHighlight": "fines?",
     "ctaSubtitle1": "Get a 15-minute personalized demo of the system for your company.",
-    "ctaSubtitle2": "First month is completely free.",
-    "ctaButton1": "Order free demo",
-    "ctaButton2": "Send info by email"
+    "ctaButton1": "Order free demo"
   },
   "FleetSyncOnboarding": {
     "pageTitle": "Get Started with FleetSync",

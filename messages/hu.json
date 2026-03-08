@@ -459,9 +459,7 @@
     "ctaTitle": "Készen áll a bírságok",
     "ctaTitleHighlight": "megszüntetésére?",
     "ctaSubtitle1": "Kapjon 15 perces személyre szabott bemutatót a rendszerről cége számára.",
-    "ctaSubtitle2": "Az első hónap teljesen ingyenes.",
-    "ctaButton1": "Ingyenes bemutató rendelése",
-    "ctaButton2": "Információ küldése emailben"
+    "ctaButton1": "Ingyenes bemutató rendelése"
   },
   "FleetSyncOnboarding": {
     "pageTitle": "Kezdje el a FleetSync-et",

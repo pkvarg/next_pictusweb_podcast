@@ -215,7 +215,8 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-light mb-6">
-              {t('problemTitle')} <span className="text-pictus-lime">{t('problemTitleHighlight')}</span>
+              {t('problemTitle')}{' '}
+              <span className="text-pictus-lime">{t('problemTitleHighlight')}</span>
             </h2>
             <p className="text-2xl text-gray-300 max-w-3xl mx-auto font-light">
               {t('problemSubtitle')}
@@ -472,8 +473,6 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
           </h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto font-thin">
             {t('ctaSubtitle1')}
-            <br />
-            {t('ctaSubtitle2')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -482,12 +481,6 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
               className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-4 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
             >
               {t('ctaButton1')}
-            </Link>
-            <Link
-              href={`/contact?subject=${encodeURIComponent(t('contactCta2'))}`}
-              className="border border-pictus-lime/30 px-8 py-4 rounded-full text-lg font-light text-pictus-white hover:bg-pictus-lime/10 transition-colors"
-            >
-              {t('ctaButton2')}
             </Link>
           </div>
         </div>
