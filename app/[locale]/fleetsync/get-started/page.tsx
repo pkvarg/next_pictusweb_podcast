@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
@@ -39,7 +39,7 @@ interface FormData {
   termsAccepted: boolean
 }
 
-export default function GetStartedPage() {
+function GetStartedContent() {
   const searchParams = useSearchParams()
   const t = useTranslations('FleetSyncOnboarding')
 
@@ -1003,5 +1003,13 @@ export default function GetStartedPage() {
       </div>
       <Footer />
     </div>
+  )
+}
+
+export default function GetStartedPage() {
+  return (
+    <Suspense>
+      <GetStartedContent />
+    </Suspense>
   )
 }
