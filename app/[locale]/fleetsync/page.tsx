@@ -433,6 +433,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
           ],
           freeButton: t('freeButton'),
           freeContact: t('freeContact'),
+          freePlanLimit: t('freePlanLimit'),
           basic: t('basic'),
           basicFeatures: [
             t('basicFeatures1'),
@@ -454,7 +455,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             t('businessFeatures3'),
             t('businessFeatures10'),
             t('businessFeatures4'),
-            t('businessFeatures5'),
+            // t('businessFeatures5'),
             t('businessFeatures6'),
             t('businessFeatures7'),
             t('businessFeatures8'),
@@ -477,8 +478,14 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
-              href={`/contact?subject=${encodeURIComponent(t('contactCta1'))}`}
+              href="/fleetsync/get-started?tier=FREE&billing=monthly"
               className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-4 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
+            >
+              {t('ctaButton2')}
+            </Link>
+            <Link
+              href={`/contact?subject=${encodeURIComponent(t('contactCta1'))}`}
+              className="px-8 py-4 rounded-full text-lg font-normal border border-pictus-white/20 hover:bg-pictus-white/10 transition-colors"
             >
               {t('ctaButton1')}
             </Link>

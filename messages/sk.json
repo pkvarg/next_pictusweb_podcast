@@ -430,6 +430,7 @@
     "freeFeatures7": "10 bezplatných notifikácií, potom sa účet uzavrie",
     "freeButton": "Začať",
     "freeContact": "Chcem začať so ZDARMA plánom pre notifikácie vozidiel",
+    "freePlanLimit": "Plán FREE je obmedzený na 10 e-mailových notifikácií.",
     "basic": "BASIC",
     "basicFeatures1": "1-3 vozidlá",
     "basicFeatures2": "2 používatelia",
@@ -459,11 +460,13 @@
     "ctaTitle": "Ste Pripravení eliminovať",
     "ctaTitleHighlight": "pokuty?",
     "ctaSubtitle1": "Získajte 15-minútovú personalizovanú ukážku systému pre vašu firmu.",
-    "ctaButton1": "Objednať ukážku zdarma"
+    "ctaButton1": "Objednať ukážku zdarma",
+    "ctaButton2": "Začať zadarmo"
   },
   "FleetSyncOnboarding": {
     "pageTitle": "Začnite s FleetSync",
     "pageSubtitle": "Nastavte si účet v niekoľkých jednoduchých krokoch",
+    "freePlanLimit": "Plán FREE je obmedzený na 10 e-mailových notifikácií.",
     "backToPricing": "Späť na cenník",
 
     "step1Title": "Údaje organizácie",
@@ -479,7 +482,7 @@
 
     "selectedTier": "Vybraný plán",
     "billing": "Fakturácia",
-    "freeForever": "Zadarmo navždy",
+    "freeForever": "Zadarmo",
     "monthly": "Mesačne",
     "yearly": "Ročne",
     "year": "rok",
@@ -487,7 +490,7 @@
 
     "orgName": "Názov organizácie",
     "orgNamePlaceholder": "Názov vašej firmy",
-    "orgNameAutoHint": "Pre jednotlivcov nechajte prázdne — vytvorí sa automaticky z vášho mena",
+    "orgNameAutoHint": "Pre jednotlivcov nechajte prázdne",
     "orgContact": "Kontaktný email (pre faktúry)",
     "orgContactPlaceholder": "fakturacia@firma.sk",
     "ico": "IČO",

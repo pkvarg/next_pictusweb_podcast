@@ -430,6 +430,7 @@
     "freeFeatures7": "10 ingyenes értesítés, utána a fiók bezárul",
     "freeButton": "Kezdés",
     "freeContact": "Szeretném elkezdeni az Ingyenes csomaggal a járműértesítéseket",
+    "freePlanLimit": "Az ingyenes csomag legfeljebb 10 e-mail értesítést tartalmaz.",
     "basic": "BASIC",
     "basicFeatures1": "1-3 jármű",
     "basicFeatures2": "2 felhasználó",
@@ -459,11 +460,13 @@
     "ctaTitle": "Készen áll a bírságok",
     "ctaTitleHighlight": "megszüntetésére?",
     "ctaSubtitle1": "Kapjon 15 perces személyre szabott bemutatót a rendszerről cége számára.",
-    "ctaButton1": "Ingyenes bemutató rendelése"
+    "ctaButton1": "Ingyenes bemutató rendelése",
+    "ctaButton2": "Kezdje el ingyen"
   },
   "FleetSyncOnboarding": {
     "pageTitle": "Kezdje el a FleetSync-et",
     "pageSubtitle": "Állítsa be fiókját néhány egyszerű lépésben",
+    "freePlanLimit": "Az ingyenes csomag legfeljebb 10 e-mail értesítést tartalmaz.",
     "backToPricing": "Vissza az árakhoz",
 
     "step1Title": "Szervezet adatai",
@@ -479,7 +482,7 @@
 
     "selectedTier": "Kiválasztott csomag",
     "billing": "Számlázás",
-    "freeForever": "Örökre ingyenes",
+    "freeForever": "Ingyenes",
     "monthly": "Havi",
     "yearly": "Éves",
     "year": "év",
@@ -487,7 +490,7 @@
 
     "orgName": "Szervezet neve",
     "orgNamePlaceholder": "Cég neve",
-    "orgNameAutoHint": "Magánszemélyeknek hagyja üresen — automatikusan generálódik a nevéből",
+    "orgNameAutoHint": "Magánszemélyeknek hagyja üresen",
     "orgContact": "Kapcsolattartó email (számlákhoz)",
     "orgContactPlaceholder": "szamlazas@ceg.hu",
     "ico": "IČO (Cégazonosító)",

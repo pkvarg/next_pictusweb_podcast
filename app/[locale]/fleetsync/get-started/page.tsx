@@ -223,11 +223,11 @@ export default function GetStartedPage() {
     }
   }
 
-  // Dev-only skip
+  // Dev-only skip — jumps from account step directly to agreements (skips verification)
   const skipVerification = () => {
     updateForm('emailVerified', true)
     updateForm('phoneVerified', true)
-    setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1))
+    setCurrentStep((prev) => Math.min(prev + 2, STEPS.length - 1))
   }
 
   // Validation per step
@@ -433,16 +433,17 @@ export default function GetStartedPage() {
             <p className="text-gray-400 font-light">{t('step1Subtitle')}</p>
 
             {/* Tier info card */}
-            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 border border-pictus-lime/30 rounded-xl p-4 flex items-center justify-between backdrop-blur-sm">
-              <div>
-                <span className="text-sm text-gray-400">{t('selectedTier')}</span>
-                <p className="text-xl font-normal text-pictus-lime">{tier}</p>
-              </div>
-              <div className="text-right">
-                <span className="text-sm text-gray-400">{t('billing')}</span>
-                {isFree ? (
-                  <p className="text-lg font-normal text-pictus-white">{t('freeForever')}</p>
-                ) : (
+            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 border border-pictus-lime/30 rounded-xl p-4 backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-sm text-gray-400">{t('selectedTier')}</span>
+                  <p className="text-xl font-normal text-pictus-lime">{tier}</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm text-gray-400">{t('billing')}</span>
+                  {isFree ? (
+                    <p className="text-lg font-normal text-pictus-white">{t('freeForever')}</p>
+                  ) : (
                   <div className="flex gap-2 mt-1">
                     <button
                       type="button"
@@ -469,6 +470,13 @@ export default function GetStartedPage() {
                   </div>
                 )}
               </div>
+              </div>
+              {isFree && (
+                <p className="mt-3 text-xs text-yellow-400/80 flex items-start gap-1.5">
+                  <span className="flex-shrink-0">⚠</span>
+                  {t('freePlanLimit')}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -704,6 +712,16 @@ export default function GetStartedPage() {
                 </button>
               </div>
             </div>
+
+            {process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true' && (
+              <button
+                type="button"
+                onClick={skipVerification}
+                className="w-full border border-yellow-500/50 text-yellow-400 py-2 rounded-lg text-sm font-light hover:bg-yellow-500/10 transition-colors mt-2"
+              >
+                [DEV] Preskočiť overenie
+              </button>
+            )}
           </div>
         )
 
@@ -764,15 +782,6 @@ export default function GetStartedPage() {
               {resendCooldown > 0 ? `${t('resendIn')} ${resendCooldown}s` : t('resendCodes')}
             </button>
 
-            {process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true' && (
-              <button
-                type="button"
-                onClick={skipVerification}
-                className="w-full border border-yellow-500/50 text-yellow-400 py-2 rounded-lg text-sm font-light hover:bg-yellow-500/10 transition-colors mt-2"
-              >
-                [DEV] Preskočiť overenie
-              </button>
-            )}
           </div>
         )
 

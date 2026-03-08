@@ -426,6 +426,7 @@
     "freeFeatures7": "10 free notifications, then account closes",
     "freeButton": "Get started",
     "freeContact": "I want to start with the Free plan for vehicle notifications",
+    "freePlanLimit": "The FREE plan is limited to 10 email notifications.",
     "basic": "BASIC",
     "basicFeatures1": "1-3 vehicles",
     "basicFeatures2": "2 users",
@@ -455,11 +456,13 @@
     "ctaTitle": "Ready to eliminate",
     "ctaTitleHighlight": "fines?",
     "ctaSubtitle1": "Get a 15-minute personalized demo of the system for your company.",
-    "ctaButton1": "Order free demo"
+    "ctaButton1": "Order free demo",
+    "ctaButton2": "Start for free"
   },
   "FleetSyncOnboarding": {
     "pageTitle": "Get Started with FleetSync",
     "pageSubtitle": "Set up your account in a few simple steps",
+    "freePlanLimit": "The FREE plan is limited to 10 email notifications.",
     "backToPricing": "Back to pricing",
 
     "step1Title": "Organization Details",
@@ -475,7 +478,7 @@
 
     "selectedTier": "Selected Tier",
     "billing": "Billing",
-    "freeForever": "Free forever",
+    "freeForever": "Free",
     "monthly": "Monthly",
     "yearly": "Yearly",
     "year": "year",
@@ -483,7 +486,7 @@
 
     "orgName": "Organization Name",
     "orgNamePlaceholder": "Your company name",
-    "orgNameAutoHint": "Leave empty for individuals — will be auto-generated from your name",
+    "orgNameAutoHint": "Leave empty for individuals",
     "orgContact": "Contact Email (for invoices)",
     "orgContactPlaceholder": "billing@company.com",
     "ico": "IČO (Company ID)",
