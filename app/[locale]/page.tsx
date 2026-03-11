@@ -15,15 +15,11 @@ const Home = () => {
   try {
     const result = (
       <>
-        <div className="text-white text-[25px] hero-gradient">
-          <Header />
-
+        <div className="text-white text-[25px] bg-[#161616]">
           <Hero />
           <NewServicesSlider />
           <Offer />
           <Projects />
-        </div>
-        <div className="second-gradient">
           <Feedbacks />
           <GetInTouch />
           <Footer />
