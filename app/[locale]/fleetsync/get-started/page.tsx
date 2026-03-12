@@ -60,7 +60,11 @@ function GetStartedContent() {
   const [resendCooldown, setResendCooldown] = useState(0)
   const [emailToken, setEmailToken] = useState('')
   const [phoneToken, setPhoneToken] = useState('')
-  const [pricingData, setPricingData] = useState<{ name: string; pricePerVehicle: number; pricePerVehicleYearly: number | null; yearlyDiscount: number; vehiclesLimit: number }[]>([])
+  const PRICING: Record<string, { monthly: number; yearly: number }> = {
+    FREE: { monthly: 0, yearly: 0 },
+    BASIC: { monthly: 2, yearly: 20 },
+    BUSINESS: { monthly: 3, yearly: 30 },
+  }
 
   const [form, setForm] = useState<FormData>({
     organizationName: '',
@@ -101,26 +105,15 @@ function GetStartedContent() {
     }
   }, [])
 
-  // Fetch pricing from database
-  useEffect(() => {
-    fetch('/api/tiers/pricing')
-      .then((res) => res.json())
-      .then((data) => { if (data.pricing) setPricingData(data.pricing) })
-      .catch(() => {})
-  }, [])
-
-  // Price calculation from DB
-  const tierPricing = pricingData.find((p) => p.name === tier)
-  const pricePerVehicle = tierPricing?.pricePerVehicle ?? (tier === 'BASIC' ? 2 : tier === 'BUSINESS' ? 3 : 0)
-  const yearlyDiscount = tierPricing?.yearlyDiscount ?? 0.83
-  const maxVehicles = tierPricing?.vehiclesLimit ?? 999
-  const pricePerVehicleYearly = tierPricing?.pricePerVehicleYearly ?? null
+  // Hardcoded pricing
+  const tierPricing = PRICING[tier] ?? PRICING.FREE
+  const pricePerVehicle = tierPricing.monthly
+  const pricePerVehicleYearly = tierPricing.yearly
+  const maxVehicles = 999
   const totalPrice = isFree
     ? 0
     : billing === 'yearly'
-      ? pricePerVehicleYearly != null
-        ? +(pricePerVehicleYearly * form.numberOfVehicles).toFixed(2)
-        : +(pricePerVehicle * 12 * yearlyDiscount * form.numberOfVehicles).toFixed(2)
+      ? pricePerVehicleYearly * form.numberOfVehicles
       : pricePerVehicle * form.numberOfVehicles
 
   // Resend cooldown timer
@@ -610,8 +603,7 @@ function GetStartedContent() {
                   onChange={(e) => updateForm('numberOfVehicles', Math.min(maxVehicles, Math.max(1, parseInt(e.target.value) || 1)))}
                 />
                 <p className="text-sm text-gray-400 mt-2 font-light">
-                  {t('priceCalculation')}: {form.numberOfVehicles} x €{billing === 'yearly' && pricePerVehicleYearly != null ? pricePerVehicleYearly : pricePerVehicle}/{billing === 'yearly' ? t('year') : t('month')}
-                  {billing === 'yearly' && pricePerVehicleYearly == null && <> x 12 x {yearlyDiscount} ({Math.round((1 - yearlyDiscount) * 100)}% {t('discount')})</>}
+                  {t('priceCalculation')}: {form.numberOfVehicles} x €{billing === 'yearly' ? pricePerVehicleYearly : pricePerVehicle}/{billing === 'yearly' ? t('year') : t('month')}
                   {' '}= <span className="text-pictus-lime font-normal">€{totalPrice}/{billing === 'yearly' ? t('year') : t('month')}</span>
                 </p>
               </div>
