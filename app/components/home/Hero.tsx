@@ -5,6 +5,7 @@ import { fadeIn } from '@/lib/motion'
 import Image from 'next/image'
 import { Figma, Atom, FileCode2, Triangle } from 'lucide-react'
 import { useRouter, usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 
 const languages = [
@@ -16,6 +17,7 @@ const languages = [
 const Hero = () => {
   const router = useRouter()
   const pathname = usePathname()
+  const t = useTranslations('Home')
   const currentLang = pathname.slice(1, 3)
   const path = pathname.slice(4)
 
@@ -86,6 +88,17 @@ const Hero = () => {
           </div>
         </div>
       </header>
+
+      {/* Testing banner */}
+      <div className='relative z-30 mt-4 mx-auto w-fit px-6 py-2.5 rounded-full border border-red-500/50 bg-red-600/20 backdrop-blur-sm'>
+        <span className='text-red-400 text-[17px] tracking-wide'>
+          !! {t('testingBanner')}{' '}
+          <a href='https://www.pictusweb.sk' target='_blank' rel='noopener noreferrer' className='underline text-red-300 hover:text-white transition-colors font-medium'>
+            pictusweb.sk
+          </a>
+          {' '}!!
+        </span>
+      </div>
 
       {/* Giant background text */}
       <div
