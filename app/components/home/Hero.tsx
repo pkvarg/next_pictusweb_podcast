@@ -5,6 +5,7 @@ import { fadeIn } from '@/lib/motion'
 import Image from 'next/image'
 import { Figma, Atom, FileCode2, Triangle } from 'lucide-react'
 import { useRouter, usePathname } from 'next/navigation'
+import { Link } from '@/i18n/routing'
 
 const languages = [
   { code: 'en', label: 'EN', flag: '🇬🇧' },
@@ -48,25 +49,25 @@ const Hero = () => {
       {/* Top Navigation */}
       <header className='flex w-full z-30 items-center justify-between' style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
         <div className='flex items-center gap-16 md:gap-24'>
-          <a href='#' className='text-[#F8F8F8] text-[30px] tracking-tight font-normal'>
+          <Link href='/' className='text-[#F8F8F8] text-[30px] tracking-tight font-normal'>
             Logo
-          </a>
+          </Link>
           <nav className='hidden md:flex items-center gap-10'>
-            <a href='#' className='text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors'>
-              Services
-            </a>
-            <a href='#' className='text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors'>
+            <Link href='/fleetsync' className='text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors'>
+              FleetSync
+            </Link>
+            <Link href='/#projects' className='text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors'>
               Our Work
-            </a>
-            <a href='#' className='text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors'>
-              Process
-            </a>
+            </Link>
+            <Link href='/podcasts' className='text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors'>
+              Podcasts
+            </Link>
+            <Link href='/contact' className='text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors'>
+              Contact
+            </Link>
           </nav>
         </div>
         <div className='flex items-center gap-6'>
-          <a href='#' className='inline-flex items-center justify-center border border-white/20 rounded-full px-8 py-3 text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light hover:bg-white/5 transition-colors duration-300'>
-            Contact
-          </a>
           <div className='hidden md:flex items-center gap-1 border border-white/20 rounded-full px-2 py-1'>
             {languages.map((lang) => (
               <button
