@@ -27,26 +27,7 @@ const Hero = () => {
 
   return (
     <section className='relative isolate min-h-screen overflow-hidden flex flex-col p-6 md:p-12 justify-between'>
-      {/* Background base */}
-      <div className='absolute inset-0 z-0 bg-[#161616]' />
 
-      {/* Subtle center glow */}
-      <div
-        className='absolute inset-0 z-[1] pointer-events-none'
-        style={{
-          background:
-            'radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, transparent 60%)',
-        }}
-      />
-
-      {/* Faint vertical grid */}
-      <div className='absolute inset-0 z-[1] flex justify-evenly pointer-events-none opacity-[0.03]'>
-        <div className='w-px h-full bg-white' />
-        <div className='w-px h-full bg-white' />
-        <div className='w-px h-full bg-white' />
-        <div className='w-px h-full bg-white' />
-        <div className='w-px h-full bg-white' />
-      </div>
 
       {/* Top Navigation */}
       <header className='flex w-full z-30 items-center justify-between' style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
@@ -102,11 +83,11 @@ const Hero = () => {
 
       {/* Giant background text */}
       <div
-        className='absolute inset-0 flex items-center justify-center z-0 pointer-events-none select-none overflow-hidden w-full'
+        className='absolute inset-0 flex items-center justify-center z-0 pointer-events-none select-none overflow-hidden w-full -translate-y-[16vh]'
         aria-hidden='true'
       >
-        <h1 className='text-[26vw] leading-none font-medium text-[#F8F8F8] tracking-tighter whitespace-nowrap mt-8'>
-          PICTUS WORLD
+        <h1 className='font-brutal-milk text-[11vw] leading-[0.85] font-bold text-[#F8F8F8]/90 tracking-[0.04em] whitespace-nowrap mt-8 scale-y-[1.7] origin-center'>
+          PICTUS<span className='ml-[10vw]'>WORLD</span>
         </h1>
       </div>
 

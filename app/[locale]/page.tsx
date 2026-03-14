@@ -1,32 +1,37 @@
 import React from 'react'
-import Header from '../components/Header'
-import Projects from '../components/home/Projects'
 import Hero from '../components/home/Hero'
-import Feedbacks from '../components/home/Feedbacks'
-import Footer from '../components/Footer'
-import Offer from '../components/home/Offer'
-import GetInTouch from '../components/GetInTouch'
-import NewServicesSlider from '../components/home/NewServicesSlider'
+import Services from '../components/home/Services'
+import ValueProp from '../components/home/ValueProp'
+import OurProjects from '../components/home/OurProjects'
+import Process from '../components/home/Process'
+import Testimonials from '../components/home/Testimonials'
+import CallToAction from '../components/home/CallToAction'
+import HomeFooter from '../components/home/HomeFooter'
 import { prodLogger } from '@/lib/prodLogger'
 
 const Home = () => {
   prodLogger.serverComponentStart('HomePage')
-  
+
   try {
     const result = (
       <>
-        <div className="text-white text-[25px] bg-[#161616]">
+        <div className="relative text-white text-[25px] bg-[#161616]">
+          {/* Starfield background for entire page */}
+          <div className="fixed inset-0 z-0 pointer-events-none stars-small" />
+          <div className="fixed inset-0 z-0 pointer-events-none stars-medium" />
+          <div className="fixed inset-0 z-0 pointer-events-none stars-large" />
           <Hero />
-          <NewServicesSlider />
-          <Offer />
-          <Projects />
-          <Feedbacks />
-          <GetInTouch />
-          <Footer />
+          <Services />
+          <ValueProp />
+          <OurProjects />
+          <Process />
+          <Testimonials />
+          <CallToAction />
+          <HomeFooter />
         </div>
       </>
     )
-    
+
     prodLogger.serverComponentEnd('HomePage')
     return result
   } catch (error) {
