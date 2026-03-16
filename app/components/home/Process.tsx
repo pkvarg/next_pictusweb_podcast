@@ -185,14 +185,14 @@ const Process = () => {
               <path
                 d={svgData.path}
                 stroke="rgba(255,255,255,0.25)"
-                strokeWidth="1"
+                strokeWidth="2"
                 fill="none"
               />
               <path
                 ref={greenRef}
                 d={svgData.path}
                 stroke="#B6E036"
-                strokeWidth="1"
+                strokeWidth="2"
                 fill="none"
               />
             </svg>
