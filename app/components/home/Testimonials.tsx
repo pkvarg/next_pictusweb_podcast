@@ -66,21 +66,23 @@ const Testimonials = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.3 }}
-          className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 lg:gap-12 mb-16 md:mb-20"
+          className="flex flex-col gap-6 mb-16 md:mb-20"
         >
           <motion.h2
             variants={fadeIn('up', 'tween', 0.1, 0.5)}
-            className="font-brutal-milk text-white text-3xl md:text-5xl lg:text-6xl lg:max-w-[50%] shrink-0"
+            className="font-brutal-milk text-white text-3xl md:text-5xl lg:text-6xl"
           >
             Čo hovoria naši klienti
           </motion.h2>
 
           <motion.p
             variants={fadeIn('up', 'tween', 0.2, 0.5)}
-            className="text-white/60 text-sm md:text-base font-light leading-relaxed lg:max-w-md lg:pt-2"
+            className="text-[#F8F8F8] text-lg md:text-[26px] font-light leading-relaxed max-w-[445px] md:self-end"
+            style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
           >
             Každý projekt je spolupráca. Spätná väzba od klientov nám pomáha
-            rásť a robiť to, čo robíme, ešte lepšie.
+            rásť a zlepšovať to, čo robíme. Niekoľko slov od ľudí, s ktorými
+            sme pracovali.
           </motion.p>
         </motion.div>
 

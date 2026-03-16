@@ -75,120 +75,144 @@ const HomeFooter = () => {
         whileInView="show"
         viewport={{ once: true, amount: 0.1 }}
         className="max-w-7xl mx-auto"
+        style={{ backgroundColor: '#171816' }}
       >
         {/* Top border */}
         <div className="h-px w-full bg-white/10 mb-12" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8 mb-16">
-          {/* Logo & description */}
+          {/* Logo & contact */}
           <div className="lg:col-span-1">
             <Link
               href="/"
-              className="text-[#F8F8F8] text-2xl tracking-tight font-normal inline-block mb-4"
+              className="text-[#F8F8F8] text-2xl tracking-tight font-normal inline-block mb-6"
             >
               Logo
             </Link>
-            <p className="text-[#F8F8F8]/40 text-sm font-light leading-relaxed">
-              {t('companyDescription1')}
-            </p>
-          </div>
-
-          {/* Services */}
-          <div>
-            <h4 className="text-[#F8F8F8] text-sm font-semibold tracking-widest uppercase mb-5">
-              {t('footerCategory1')}
-            </h4>
-            <ul className="space-y-3">
-              {[
-                'footerService1',
-                'footerService2',
-                'footerService3',
-                'footerService4',
-                'footerService5',
-                'footerService6',
-              ].map((key) => (
-                <li key={key}>
-                  <Link
-                    href="/#projects"
-                    className="text-[#F8F8F8]/50 text-sm font-light hover:text-pictus-lime transition-colors duration-200"
-                  >
-                    {t(key)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="text-[#F8F8F8] text-sm font-semibold tracking-widest uppercase mb-5">
-              {t('footerCategory2')}
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href="/contact#about"
-                  className="text-[#F8F8F8]/50 text-sm font-light hover:text-pictus-lime transition-colors duration-200"
-                >
-                  {t('navbarAbout')}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact#gdpr"
-                  className="text-[#F8F8F8]/50 text-sm font-light hover:text-pictus-lime transition-colors duration-200"
-                >
-                  GDPR
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact#trade-rules"
-                  className="text-[#F8F8F8]/50 text-sm font-light hover:text-pictus-lime transition-colors duration-200"
-                >
-                  {t('footerTradeRules')}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="text-[#F8F8F8] text-sm font-semibold tracking-widest uppercase mb-5">
-              {t('footerCategory3')}
-            </h4>
             <ul className="space-y-3">
               <li>
                 <a
                   href="mailto:info@pictusweb.sk"
-                  className="text-[#F8F8F8]/50 text-sm font-light hover:text-pictus-lime transition-colors duration-200"
+                  className="text-[#F8F8F8]/50 text-[16px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
                   info@pictusweb.sk
                 </a>
               </li>
-              <li className="text-[#F8F8F8]/50 text-sm font-light">
+              <li className="text-[#F8F8F8]/50 text-[16px] font-light">
                 +421 948 024 638
               </li>
+              <li className="pt-3">
+                <Link
+                  href="/client"
+                  className="text-pictus-lime text-[16px] font-medium hover:text-pictus-lime/80 transition-colors duration-200"
+                >
+                  {t('footerForClients')}
+                </Link>
+              </li>
             </ul>
-            <div className="mt-6">
-              <Link
-                href="/client"
-                className="text-pictus-lime text-sm font-medium hover:text-pictus-lime/80 transition-colors duration-200"
-              >
-                {t('footerForClients')}
-              </Link>
-            </div>
+          </div>
+
+          {/* Navigation */}
+          <div>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  Domov
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#services"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  Služby
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact#about"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  O nás
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#projects"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  Projekty
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#process"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  Proces
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Services */}
+          <div>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/#services"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  Weby
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#services"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  Redizajn webov
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#services"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  AI riešenia
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#services"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  AI média
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#services"
+                  className="text-[#F8F8F8] text-[16px] font-normal hover:text-pictus-lime transition-colors duration-200"
+                >
+                  FleetSync
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 
         {/* Bottom bar */}
         <div className="h-px w-full bg-white/10 mb-6" />
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[#F8F8F8]/30 text-xs font-light">
-            Copyright &copy; {new Date().getFullYear()} Pictusweb s.r.o.
+          <p className="text-[#F8F8F8] text-[14px] font-normal">
+            &copy;PictusWorld {new Date().getFullYear()}
           </p>
-          <p className="text-[#F8F8F8]/30 text-xs font-light">
-            {t('companyDescription2')}
+          <p className="text-[#F8F8F8] text-[13px] font-normal">
+            Privacy Policy &nbsp;|&nbsp; Terms &amp; Conditions
           </p>
         </div>
       </motion.div>
