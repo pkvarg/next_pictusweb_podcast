@@ -8,39 +8,28 @@ const services = [
   {
     label: 'Tvorba webov',
     icon: '/icons/service-web.svg',
-    description:
-      'Moderné webové stránky navrhnuté pre rýchlosť, prehľadnosť a rast vášho biznisu.',
+    description: 'Moderné webové stránky navrhnuté pre rýchlosť, prehľadnosť a rast vášho biznisu.',
   },
   {
     label: 'Redizajn webov',
     icon: '/icons/service-redesign.svg',
-    description:
-      'Premena zastaraného webu na moderný, výkonný a vizuálne silný nástroj.',
+    description: 'Premena zastaraného webu na moderný, výkonný a vizuálne silný nástroj.',
   },
   {
     label: 'AI média',
     icon: '/icons/service-media.svg',
-    description:
-      'AI podcasty a digitálny obsah pre modernú komunikáciu značiek.',
+    description: 'AI podcasty a digitálny obsah pre modernú komunikáciu značiek.',
   },
   {
     label: 'AI riešenia',
     icon: '/icons/service-ai.svg',
-    description:
-      'Inteligentné AI nástroje a automatizácie pre efektívnejšie procesy.',
+    description: 'Inteligentné AI nástroje a automatizácie pre efektívnejšie procesy.',
   },
 ]
 
 const Services = () => {
   return (
     <section className="relative py-12 md:py-20 px-6 md:px-12">
-      {/* Section label — right-aligned */}
-      <div className="max-w-7xl mx-auto mb-5 flex justify-end">
-        <span className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-white/50 font-light">
-          Core Tools
-        </span>
-      </div>
-
       {/* Cards grid with glow */}
       <div className="relative max-w-7xl mx-auto">
         {/* Green glow — matches Figma: ellipse, lime gradient, 150px blur, 64% opacity */}
