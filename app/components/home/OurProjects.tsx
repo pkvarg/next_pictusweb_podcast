@@ -80,8 +80,8 @@ const ProjectCard = ({
       href={project.href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group relative overflow-hidden block border-2 border-white/20 h-full ${className || ''}`}
-      style={{ borderRadius: '24px' }}
+      className={`group relative overflow-hidden block h-full ${className || ''}`}
+      style={{ borderRadius: '24px', border: '12px solid rgba(255,255,255,0.4)' }}
     >
       <div className={`relative ${aspectClass} overflow-hidden h-full`}>
         <Image

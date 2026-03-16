@@ -3,7 +3,17 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { fadeIn } from '@/lib/motion'
 import Image from 'next/image'
-import { Figma, Atom, FileCode2, Triangle } from 'lucide-react'
+import { Figma } from 'lucide-react'
+
+const ReactIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className={className}>
+    <ellipse cx="12" cy="12" rx="10" ry="4" />
+    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" />
+    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" />
+    <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+  </svg>
+)
+
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import LanguageBar from '../LanguageBar'
@@ -126,18 +136,9 @@ const Hero = () => {
               className="w-6 h-6 hover:text-white transition-colors cursor-pointer"
               strokeWidth={1.5}
             />
-            <Atom
-              className="w-6 h-6 hover:text-white transition-colors cursor-pointer"
-              strokeWidth={1.5}
-            />
-            <FileCode2
-              className="w-6 h-6 hover:text-white transition-colors cursor-pointer"
-              strokeWidth={1.5}
-            />
-            <Triangle
-              className="w-6 h-6 hover:text-white transition-colors cursor-pointer"
-              strokeWidth={1.5}
-            />
+            <ReactIcon className="w-6 h-6 hover:text-white transition-colors cursor-pointer" />
+            <Image src="/icons/hero-js.png" alt="JavaScript" width={24} height={24} className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer" />
+            <Image src="/icons/hero-threejs.png" alt="Three.js" width={24} height={24} className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer" />
           </div>
           <span className="text-[#F8F8F8]/50 text-sm tracking-widest uppercase font-light">
             Core Tools

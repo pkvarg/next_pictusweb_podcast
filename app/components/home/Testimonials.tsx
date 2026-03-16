@@ -2,31 +2,50 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { fadeIn, staggerContainer } from '@/lib/motion'
+import Image from 'next/image'
 
 const testimonials = [
   {
-    name: 'Martin Kovač',
-    role: 'Founder at Roadstage',
+    name: 'Ioana Mindrila',
+    role: 'Designer - IoanaM',
+    image: '/ionuca1.webp',
     quote:
-      'Majster sme overiť. Za to najdôs overiť prechádzat naši biznis. Vrelo odporúčam všetkým, čo majú náš zakúpenám.',
+      'Peter mi dokázal vytvoriť web profesionálne, promptne, kvalitne a za rozumnú cenu. S výsledkom som veľmi spokojná. Ďakujem Peter ❤️.',
   },
   {
-    name: 'Lucia Benková',
-    role: 'Marketing Manager at Studio Elena',
+    name: 'Tomáš Dovala',
+    role: 'CEO - Dovala Construction',
+    image: '/tomas1.webp',
     quote:
-      'Celý proces bol prekrásno jednoduchosť. Všetko bolo jasne vysvetlene a naradili sme, čo sa deje.',
+      'Spolupráca s Petrom je výborná, skvelá komunikácia a výsledok. Práca ho baví, robí ju poctivo a dôkladne. Určite s ním počítam pri svojich ďalších projektoch.',
   },
   {
-    name: 'Tomáš Richter',
-    role: 'Co-Founder at Vektra',
+    name: 'Leo Grman',
+    role: 'Manager - prud.sk',
+    image: '/leo1.webp',
     quote:
-      'Jasný štýl a dizajn. Pomáhli nám lepšie odpravúné odborť a nemáme všetko strastite povedaľ.',
+      'S Petrom spolupracujem už dlhé roky v rôznych oblastiach a vždy ma poteší jeho priateľský prístup a ochota pomôcť. Ďakujem.',
   },
   {
-    name: 'Peter Malík',
-    role: 'Product Lead at Orbit Labs',
+    name: 'Michal Dovala',
+    role: 'Realitný maklér - michaldovala.sk',
+    image: '/michal.webp',
     quote:
-      'Web pôsobí profesionálne a máme dobre pocity! mať by vás pustili dokument procesy.',
+      'Pokiaľ hľadáte niekoho spoľahlivého a šikovného, Peter je Váš človek. Som veľmi spokojný s jeho prácou a odporúčam spoluprácu s ním.',
+  },
+  {
+    name: 'Samuel Koriťák',
+    role: 'Autor - cestazivota.sk',
+    image: '/sam1.webp',
+    quote:
+      'Výborná spolupráca, ľahké pochopenie mojich požiadaviek a pripomienok, flexibilita pri možnostiach, ktoré boli predmetom môjho rozhodnutia.',
+  },
+  {
+    name: 'Vladimír Chovanec',
+    role: 'Fyzioterapeut - fyziology.sk',
+    image: '/vlado.webp',
+    quote:
+      'Pictusweb som vyhľadal kvôli naštýlovaniu grafického dizajnu pre môj web. Spoluprácu hodnotím veľmi pozitívne, pán bol veľmi príjemný, ochotný a rýchly. Určite doporučujem.',
   },
 ]
 
@@ -60,19 +79,18 @@ const Testimonials = () => {
             variants={fadeIn('up', 'tween', 0.2, 0.5)}
             className="text-white/60 text-sm md:text-base font-light leading-relaxed lg:max-w-md lg:pt-2"
           >
-            Každý projekt je spolupráca. Spätnú väzbu od klientov nám pomáha
-            rásť a doplniť to, čo robíme, robiť ešte efektívnejšie, aby čo cieľ
-            mali, a tvorimy sme pracovek.
+            Každý projekt je spolupráca. Spätná väzba od klientov nám pomáha
+            rásť a robiť to, čo robíme, ešte lepšie.
           </motion.p>
         </motion.div>
 
-        {/* Testimonial cards */}
+        {/* Testimonial cards — first row of 3, second row of 3 */}
         <motion.div
           variants={staggerContainer(0.12, 0.2)}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
+          viewport={{ once: true, amount: 0.15 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
         >
           {testimonials.map((item, index) => (
             <motion.div
@@ -85,12 +103,21 @@ const Testimonials = () => {
                 &ldquo;{item.quote}&rdquo;
               </p>
 
-              <div>
-                <div className="text-pictus-lime text-sm font-semibold">
-                  {item.name}
-                </div>
-                <div className="text-white/50 text-xs mt-0.5">
-                  {item.role}
+              <div className="flex items-center gap-3">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={44}
+                  height={44}
+                  className="w-11 h-11 rounded-full object-cover"
+                />
+                <div>
+                  <div className="text-pictus-lime text-sm font-semibold">
+                    {item.name}
+                  </div>
+                  <div className="text-white/50 text-xs mt-0.5">
+                    {item.role}
+                  </div>
                 </div>
               </div>
             </motion.div>
