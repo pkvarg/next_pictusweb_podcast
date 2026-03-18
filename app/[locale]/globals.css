@@ -164,3 +164,9 @@ body {
     transform: translateY(0px);
   }
 }
+
+/* Make native date input calendar icon visible on dark backgrounds */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}

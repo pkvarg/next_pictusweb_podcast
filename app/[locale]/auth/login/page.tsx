@@ -86,6 +86,12 @@ export default function LoginPage() {
         const userId = sessionData?.user?.id || ''
         const role = sessionData?.user?.role || 'client'
 
+        // Dev mode: skip 2FA entirely when NEXT_PUBLIC_SKIP_VERIFICATION=true
+        if (process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true') {
+          window.location.href = `/${locale}/${role === 'admin' ? 'admin' : 'client'}`
+          return
+        }
+
         // Check if this device is trusted → skip 2FA
         const trusted = await checkDeviceTrust(userId)
         if (trusted) {
