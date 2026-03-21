@@ -101,12 +101,13 @@ function GetStartedContent() {
     }
   }, [])
 
-  // Fetch pricing from database
+  // Static pricing (Stripe temporarily disabled)
   useEffect(() => {
-    fetch('/api/tiers/pricing')
-      .then((res) => res.json())
-      .then((data) => { if (data.pricing) setPricingData(data.pricing) })
-      .catch(() => {})
+    setPricingData([
+      { name: 'FREE', pricePerVehicle: 0, pricePerVehicleYearly: 0, yearlyDiscount: 0, vehiclesLimit: 999 },
+      { name: 'BASIC', pricePerVehicle: 2, pricePerVehicleYearly: 20, yearlyDiscount: 0.83, vehiclesLimit: 999 },
+      { name: 'BUSINESS', pricePerVehicle: 3, pricePerVehicleYearly: 30, yearlyDiscount: 0.83, vehiclesLimit: 999 },
+    ])
   }, [])
 
   // Price calculation from DB
@@ -313,6 +314,65 @@ function GetStartedContent() {
     setCurrentStep((prev) => Math.max(prev - 1, 0))
   }
 
+  const skipVerificationAllowed = process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true'
+
+  const handleSkipPayment = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/fleetsync/dev-skip-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          organizationName: form.organizationName,
+          organizationContact: form.organizationContact,
+          ico: form.ico,
+          dic: form.dic,
+          street: form.street,
+          city: form.city,
+          postalCode: form.postalCode,
+          country: form.country,
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          password: form.password,
+          phoneNumber: fullPhoneNumber,
+          tier,
+          billing,
+          numberOfVehicles: form.numberOfVehicles,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Dev skip payment failed')
+        return
+      }
+      sessionStorage.setItem('fleetsync-invoice-data', JSON.stringify({
+        organizationName: form.organizationName,
+        street: form.street,
+        city: form.city,
+        postalCode: form.postalCode,
+        country: form.country,
+        ico: form.ico,
+        dic: form.dic,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        tier,
+        billing,
+        numberOfVehicles: form.numberOfVehicles,
+        pricePerVehicle: billing === 'yearly' ? (pricePerVehicleYearly ?? pricePerVehicle) : pricePerVehicle,
+        totalPrice,
+      }))
+      const locale = window.location.pathname.split('/')[1]
+      window.location.href = `/${locale}/fleetsync/get-started/success?tier=${tier}&session_id=dev-skip`
+    } catch {
+      setError('Dev skip payment failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Submit (final step)
   const handleSubmit = async () => {
     setLoading(true)
@@ -377,8 +437,25 @@ function GetStartedContent() {
             verificationSent,
             billing,
           }))
+          sessionStorage.setItem('fleetsync-invoice-data', JSON.stringify({
+            organizationName: form.organizationName,
+            street: form.street,
+            city: form.city,
+            postalCode: form.postalCode,
+            country: form.country,
+            ico: form.ico,
+            dic: form.dic,
+            firstName: form.firstName,
+            lastName: form.lastName,
+            email: form.email,
+            tier,
+            billing,
+            numberOfVehicles: form.numberOfVehicles,
+            pricePerVehicle: billing === 'yearly' ? (pricePerVehicleYearly ?? pricePerVehicle) : pricePerVehicle,
+            totalPrice,
+          }))
           window.location.href = data.checkoutUrl
-        } else {
+        } else if (data.error) {
           setError(data.error || t('submitError'))
         }
       }
@@ -666,7 +743,7 @@ function GetStartedContent() {
                   placeholder="9XX XXX XXX"
                 />
               </div>
-              <p className="text-sm text-gray-500 mt-1 font-light">
+              <p className="text-sm text-yellow-400/80 mt-2 font-light bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-3 py-2">
                 {t('phoneSkOnly')}{' '}
 {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                 <Link href="/contact" className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors">{t('phoneSkContact')}</Link>
@@ -997,6 +1074,14 @@ function GetStartedContent() {
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               {isFree ? t('createAccount') : t('proceedToPayment')}
+            </button>
+          )}
+          {skipVerificationAllowed && !isFree && currentStep === STEPS.length - 1 && (
+            <button
+              onClick={handleSkipPayment}
+              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-red-600 text-white font-normal hover:bg-red-700 transition-all text-sm"
+            >
+              DEV: Skip Payment
             </button>
           )}
         </div>

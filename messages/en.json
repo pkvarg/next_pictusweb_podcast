@@ -568,6 +568,9 @@
     "successStep2": "Add your vehicles to the dashboard",
     "successStep3": "Set up your notification preferences",
     "goToLogin": "Go to Login",
+    "downloadInvoice": "Download Invoice",
+    "invoiceError": "Failed to generate invoice. Please try again later.",
+    "invoiceSentToEmail": "The invoice has been sent to your email.",
 
     "cancelTitle": "Payment Canceled",
     "cancelDescription": "Your payment was not completed. No charges were made. You can try again or contact us for help.",

@@ -572,6 +572,9 @@
     "successStep2": "Pridajte vaše vozidlá na dashboard",
     "successStep3": "Nastavte si preferencie notifikácií",
     "goToLogin": "Prejsť na prihlásenie",
+    "downloadInvoice": "Stiahnuť faktúru",
+    "invoiceError": "Nepodarilo sa vygenerovať faktúru. Skúste to neskôr.",
+    "invoiceSentToEmail": "Faktúra bola odoslaná na Váš e-mail.",
 
     "cancelTitle": "Platba zrušená",
     "cancelDescription": "Vaša platba nebola dokončená. Žiadne poplatky neboli účtované. Môžete to skúsiť znova alebo nás kontaktovať.",

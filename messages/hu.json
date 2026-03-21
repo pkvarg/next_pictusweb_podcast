@@ -572,6 +572,9 @@
     "successStep2": "Adja hozzá járműveit az irányítópulthoz",
     "successStep3": "Állítsa be értesítési preferenciáit",
     "goToLogin": "Bejelentkezés",
+    "downloadInvoice": "Számla letöltése",
+    "invoiceError": "Nem sikerült a számlát létrehozni. Próbálja újra később.",
+    "invoiceSentToEmail": "A számla elküldésre került az e-mail címére.",
 
     "cancelTitle": "Fizetés megszakítva",
     "cancelDescription": "A fizetés nem fejeződött be. Nem történt terhelés. Próbálja újra vagy lépjen kapcsolatba velünk.",

@@ -5,9 +5,6 @@ import { CheckCircle, Calculator, BarChart3, Users, Calendar, Bell } from 'lucid
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import type { Metadata } from 'next'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
 
 export async function generateMetadata({
   params,
@@ -60,22 +57,11 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
 
   const t = await getTranslations('Automatizations')
 
-  // Fetch pricing from database (single source of truth)
-  const tiers = await prisma.tier.findMany({
-    where: { deletedAt: null },
-    select: {
-      name: true,
-      pricePerVehicle: true,
-      pricePerVehicleYearly: true,
-      yearlyDiscount: true,
-    },
-  })
-  const pricing = tiers.map((tier) => ({
-    name: tier.name,
-    pricePerVehicle: tier.pricePerVehicle ? Number(tier.pricePerVehicle) : 0,
-    pricePerVehicleYearly: tier.pricePerVehicleYearly ? Number(tier.pricePerVehicleYearly) : null,
-    yearlyDiscount: tier.yearlyDiscount ? Number(tier.yearlyDiscount) : 0.83,
-  }))
+  const pricing = [
+    { name: 'FREE', pricePerVehicle: 0, pricePerVehicleYearly: 0, yearlyDiscount: 0 },
+    { name: 'BASIC', pricePerVehicle: 2, pricePerVehicleYearly: 20, yearlyDiscount: 0.83 },
+    { name: 'BUSINESS', pricePerVehicle: 3, pricePerVehicleYearly: 30, yearlyDiscount: 0.83 },
+  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
