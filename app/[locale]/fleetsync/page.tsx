@@ -28,9 +28,9 @@ export async function generateMetadata({
       url: `https://www.pictusweb.sk/${locale}/fleetsync`,
       images: [
         {
-          url: 'https://www.pictusweb.sk/pictusweb.webp',
-          width: 400,
-          height: 400,
+          url: 'https://new.pictusweb.sk/pictusweb.webp',
+          width: 1200,
+          height: 630,
           alt: 'FleetSync by PICTUSWEB',
         },
       ],
