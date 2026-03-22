@@ -4,6 +4,7 @@ import { Link } from '@/i18n/routing'
 import LanguageBar from './LanguageBar'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
+import Image from 'next/image'
 
 const Header = () => {
   const [navbar, setNavbar] = useState(false)
@@ -35,8 +36,8 @@ const Header = () => {
       <div className="justify-between px-4 mx-auto md:items-center md:flex md:px-8">
         <div className="mb-0 lg:mb-2">
           <div className="flex items-center justify-between py-3 md:py-5 md:block">
-            <Link className="text-[22.5px] lg:text-[22.5px] font-light" href="/">
-              &#60;&#47;&#62; PICTUSWEB development
+            <Link href="/">
+              <Image src="/PictusLIME.webp" alt="Pictusweb" width={64} height={64} />
             </Link>
             <div className="md:hidden">
               <button
@@ -82,12 +83,12 @@ const Header = () => {
               navbar ? 'block' : 'hidden'
             }`}
           >
-            <ul className="text-[22.5px] lg:text-[22.5px] font-light justify-center space-y-4 md:flex md:space-x-6 md:space-y-0">
+            <ul className="text-[14px] tracking-widest uppercase font-light justify-center space-y-4 md:flex md:space-x-6 md:space-y-0 items-center">
               <li>
                 <Link
                   href={`/fleetsync`}
-                  className={`hover:text-[#0388f4] transition-colors ${
-                    isActive('/fleetsync') ? 'text-[#0388f4] font-normal' : ''
+                  className={`hover:text-[#F8F8F8] transition-colors ${
+                    isActive('/fleetsync') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
                   }`}
                 >
                   {t('navbarAutomatizations')}
@@ -96,8 +97,8 @@ const Header = () => {
               <li>
                 <Link
                   href={`/#projects`}
-                  className={`hover:text-[#0388f4] transition-colors ${
-                    isActive('/#projects') ? 'text-[#0388f4] font-normal' : ''
+                  className={`hover:text-[#F8F8F8] transition-colors ${
+                    isActive('/#projects') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
                   }`}
                 >
                   {t('navbarProjects')}
@@ -107,8 +108,8 @@ const Header = () => {
               <li>
                 <Link
                   href={`/podcasts`}
-                  className={`hover:text-[#0388f4] transition-colors ${
-                    isActive('/podcasts') ? 'text-[#0388f4] font-normal' : ''
+                  className={`hover:text-[#F8F8F8] transition-colors ${
+                    isActive('/podcasts') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
                   }`}
                 >
                   {t('podcastsTitle')}
@@ -118,8 +119,8 @@ const Header = () => {
               <li>
                 <Link
                   href={`/contact`}
-                  className={`hover:text-[#0388f4] transition-colors ${
-                    isActive('/contact') ? 'text-[#0388f4] font-normal' : ''
+                  className={`hover:text-[#F8F8F8] transition-colors ${
+                    isActive('/contact') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
                   }`}
                 >
                   {t('navbarContact')}

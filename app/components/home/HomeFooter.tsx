@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing'
 import { useTranslations } from 'next-intl'
 import CookieConsent from 'react-cookie-consent'
 import { updateVisitors } from '@/lib/visitorsCounter'
+import Image from 'next/image'
 
 const HomeFooter = () => {
   const t = useTranslations('Home')
@@ -85,9 +86,10 @@ const HomeFooter = () => {
           <div className="lg:col-span-1">
             <Link
               href="/"
-              className="text-[#F8F8F8] text-2xl tracking-tight font-normal inline-block mb-6"
+              className="flex items-center gap-2 text-[#F8F8F8] text-2xl tracking-tight font-normal mb-6"
             >
-              Logo
+              <Image src="/PictusLIME.webp" alt="Pictusweb" width={36} height={36} />
+              PICTUSWEB
             </Link>
             <ul className="space-y-3">
               <li>
@@ -209,7 +211,7 @@ const HomeFooter = () => {
         <div className="h-px w-full bg-white/10 mb-6" />
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[#F8F8F8] text-[14px] font-normal">
-            &copy;PictusWorld {new Date().getFullYear()}
+            &copy;Pictusweb {new Date().getFullYear()}
           </p>
           <p className="text-[#F8F8F8] text-[13px] font-normal">
             Privacy Policy &nbsp;|&nbsp; Terms &amp; Conditions

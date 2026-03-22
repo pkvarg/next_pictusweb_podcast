@@ -32,14 +32,14 @@ const LanguageBar = () => {
         {languages.map((lang) => (
           <button
             key={lang.code}
-            className={`px-3 py-0 rounded-full text-[20px] font-medium transition-all duration-200 flex items-center gap-2 ${
+            className={`px-3 py-0 rounded-full text-[14px] font-medium transition-all duration-200 flex items-center gap-1.5 ${
               currentLang === lang.code
                 ? 'border border-pictus-lime text-white'
                 : 'text-gray-300 hover:text-white hover:bg-white/10'
             }`}
             onClick={() => handleLanguage(lang.code)}
           >
-            <span className="text-base">{lang.flag}</span>
+            <span className="text-sm">{lang.flag}</span>
             <span>{lang.label}</span>
           </button>
         ))}

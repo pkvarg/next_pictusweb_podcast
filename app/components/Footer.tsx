@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing'
 import { usePathname } from 'next/navigation'
 import { updateVisitors } from '@/lib/visitorsCounter'
 import CookieConsent from 'react-cookie-consent'
+import Image from 'next/image'
 
 const Footer = () => {
   const t = useTranslations('Home')
@@ -70,8 +71,9 @@ const Footer = () => {
           <div className="mb-[10px] h-[2px] bg-white opacity-10" />
           <div className="flex flex-col lg:flex-row justify-center gap:8 lg:gap-16 mb-8">
             <div>
-              <div className="text-xl font-light mb-4 text-white">
-                &lt;/&gt; PICTUSWEB development
+              <div className="flex items-center gap-2 text-xl font-light mb-4 text-white">
+                <Image src="/PictusLIME.webp" alt="Pictusweb" width={32} height={32} />
+                PICTUSWEB development
               </div>
 
               <p className="text-gray-400 text-xl font-thin">{t('companyDescription1')}</p>

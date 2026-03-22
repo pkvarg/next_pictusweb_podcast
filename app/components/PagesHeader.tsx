@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing'
 import LanguageBar from './LanguageBar'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
+import Image from 'next/image'
 
 const PagesHeader = () => {
   const [navbar, setNavbar] = useState(false)
@@ -26,109 +27,88 @@ const PagesHeader = () => {
   }
 
   return (
-    <nav id="navbar" className="w-full text-white bg-transparent">
-      <div className="justify-between px-4 mx-auto md:items-center md:flex md:px-8">
-        <div className="mb-0 lg:mb-2">
-          <div className="flex items-center justify-between py-3 md:py-5 md:block">
-            <Link className="text-[22.5px] lg:text-[22.5px] font-light" href="/">
-              &#60;&#47;&#62; PICTUSWEB development
+    <nav id="navbar" className="w-full text-white bg-transparent px-6 md:px-12 pt-1">
+      <div className="flex w-full items-center justify-between"
+        style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
+      >
+        <div className="flex items-center gap-6 md:gap-10">
+          <Link href="/">
+            <Image src="/PictusLIME.webp" alt="Pictusweb" width={50} height={50} className="hidden md:block" />
+            <span className="md:hidden text-[#F8F8F8] text-xl font-bold tracking-tight">PICTUSWEB</span>
+          </Link>
+          <div className="hidden md:flex items-center gap-10">
+            <Link
+              href={`/fleetsync`}
+              className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
+                isActive('/fleetsync') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+              }`}
+            >
+              {t('navbarAutomatizations')}
             </Link>
-            <div className="md:hidden">
-              <button
-                className="p-2 text-white rounded-md outline-none focus:border-gray-400 focus:border"
-                onClick={() => setNavbar(!navbar)}
-              >
-                {navbar ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-7 h-7"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-7 h-7"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
-                )}
-              </button>
-            </div>
+            <Link
+              href={`/#projects`}
+              className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
+                isActive('/#projects') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+              }`}
+            >
+              {t('navbarProjects')}
+            </Link>
+            <Link
+              href={`/podcasts`}
+              className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
+                isActive('/podcasts') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+              }`}
+            >
+              {t('navbarPodcasts')}
+            </Link>
+            <Link
+              href={`/contact`}
+              className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
+                isActive('/contact') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+              }`}
+            >
+              {t('navbarContact')}
+            </Link>
           </div>
         </div>
-        <div>
-          <div
-            className={`flex-1 justify-self-center h-[80vh] lg:h-auto pb-3 mt-8 md:block md:pb-0 md:mt-0 ${
-              navbar ? 'block' : 'hidden'
-            }`}
+        <div className="hidden md:block">
+          <LanguageBar />
+        </div>
+        <div className="md:hidden">
+          <button
+            className="p-2 text-white rounded-md outline-none"
+            onClick={() => setNavbar(!navbar)}
           >
-            <ul className="text-[22.5px] lg:text-[22.5px] font-light justify-center space-y-4 md:flex md:space-x-6 md:space-y-0">
-              <li>
-                <Link
-                  href={`/fleetsync`}
-                  className={`hover:text-[#0388f4] transition-colors ${
-                    isActive('/fleetsync') ? 'text-[#0388f4] font-normal' : ''
-                  }`}
-                >
-                  {t('navbarAutomatizations')}
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href={`/#projects`}
-                  className={`hover:text-[#0388f4] transition-colors ${
-                    isActive('/#projects') ? 'text-[#0388f4] font-normal' : ''
-                  }`}
-                >
-                  {t('navbarProjects')}
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href={`/podcasts`}
-                  className={`hover:text-[#0388f4] transition-colors ${
-                    isActive('/podcasts') ? 'text-[#0388f4] font-normal' : ''
-                  }`}
-                >
-                  {t('navbarPodcasts')}
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href={`/contact`}
-                  className={`hover:text-[#0388f4] transition-colors ${
-                    isActive('/contact') ? 'text-[#0388f4] font-normal' : ''
-                  }`}
-                >
-                  {t('navbarContact')}
-                </Link>
-              </li>
-
-              <li>
-                <LanguageBar />
-              </li>
-            </ul>
-          </div>
+            {navbar ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
+      {/* Mobile menu */}
+      {navbar && (
+        <div className="md:hidden py-4 flex flex-col items-center gap-4">
+          <Link href="/fleetsync" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
+            {t('navbarAutomatizations')}
+          </Link>
+          <Link href="/#projects" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
+            {t('navbarProjects')}
+          </Link>
+          <Link href="/podcasts" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
+            {t('navbarPodcasts')}
+          </Link>
+          <Link href="/contact" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
+            {t('navbarContact')}
+          </Link>
+          <LanguageBar />
+        </div>
+      )}
     </nav>
   )
 }
