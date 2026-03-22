@@ -28,14 +28,14 @@ const LanguageBar = () => {
   return (
     <div className="">
       {/* Desktop version - horizontal */}
-      <div className="hidden md:flex flex-row gap-1 items-center rounded-full px-2 py-0 border border-pictus-white/10">
+      <div className="hidden md:flex flex-row gap-1 items-center rounded-full px-2 py-0 border border-pictus-lime/20">
         {languages.map((lang) => (
           <button
             key={lang.code}
             className={`px-3 py-0 rounded-full text-[20px] font-medium transition-all duration-200 flex items-center gap-2 ${
               currentLang === lang.code
-                ? 'border-2 border-pictus-lime text-pictus-white'
-                : 'text-gray-300 hover:text-white hover:bg-white/10 border-2 border-transparent'
+                ? 'border border-pictus-lime text-white'
+                : 'text-gray-300 hover:text-white hover:bg-white/10'
             }`}
             onClick={() => handleLanguage(lang.code)}
           >
@@ -48,7 +48,7 @@ const LanguageBar = () => {
       {/* Mobile version - dropdown */}
       <div className="md:hidden relative">
         <button
-          className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-3 py-2 border border-pictus-white/10 hover:bg-white/10 transition-all duration-200"
+          className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-3 py-2 border border-pictus-lime/20 hover:bg-white/10 transition-all duration-200"
           onClick={() => setIsOpen(!isOpen)}
         >
           <Globe className="w-4 h-4 text-pictus-lime" />
@@ -60,13 +60,13 @@ const LanguageBar = () => {
         </button>
 
         {isOpen && (
-          <div className="absolute top-full right-0 mt-2 bg-gray-900/95 backdrop-blur-md rounded-2xl border border-pictus-white/10 shadow-2xl overflow-hidden z-50 min-w-[160px]">
+          <div className="absolute top-full right-0 mt-2 bg-gray-900/95 backdrop-blur-md rounded-2xl border border-pictus-lime/30 shadow-2xl overflow-hidden z-50 min-w-[160px]">
             {languages.map((lang) => (
               <button
                 key={lang.code}
                 className={`w-full px-4 py-3 text-left flex items-center gap-3 transition-all duration-200 ${
                   currentLang === lang.code
-                    ? 'text-white border-l-2 border-pictus-lime bg-pictus-lime/10'
+                    ? 'bg-pictus-lime/10 text-white border-l-2 border-pictus-lime'
                     : 'text-gray-300 hover:text-white hover:bg-white/10'
                 }`}
                 onClick={() => handleLanguage(lang.code)}

@@ -27,7 +27,7 @@ const NewServicesSlider = () => {
       icon: Car,
       link: '/fleetsync',
       gradient: 'from-blue-600 to-purple-600',
-      bgGradient: 'from-blue-900/20 to-purple-900/20',
+      bgGradient: 'from-white/[0.03] to-white/[0.06]',
       href: '/vozidla-notifikacie',
       badge: t('service1Badge'),
     },
@@ -45,7 +45,7 @@ const NewServicesSlider = () => {
       price: t('service2Price'),
       icon: Mic,
       gradient: 'from-pink-600 to-orange-600',
-      bgGradient: 'from-pink-900/20 to-orange-900/20',
+      bgGradient: 'from-white/[0.03] to-white/[0.06]',
       link: '/podcast',
       badge: t('service2Badge'),
     },
@@ -83,14 +83,14 @@ const NewServicesSlider = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="w-6 h-6 text-purple-400" />
-            <span className="text-purple-400 font-medium uppercase tracking-wider text-sm">
+            <Sparkles className="w-6 h-6 text-white/60" />
+            <span className="text-white/60 font-medium uppercase tracking-wider text-sm">
               {t('newServicesLabel')}
             </span>
           </div>
           <h2 className="text-4xl lg:text-5xl font-light mb-6 text-white">
             {t('latestTitle')}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+            <span className="text-transparent bg-clip-text bg-white">
               {t('latestTitleHighlight')}
             </span>
           </h2>
@@ -252,7 +252,7 @@ const NewServicesSlider = () => {
               onClick={() => goToSlide(index)}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
                 currentSlide === index
-                  ? 'bg-gradient-to-r from-purple-400 to-pink-400'
+                  ? 'bg-white'
                   : 'bg-white/30 hover:bg-white/50'
               }`}
             />

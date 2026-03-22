@@ -3,15 +3,7 @@ import { useState } from 'react'
 import { CheckCircle } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 
-interface TierPricing {
-  name: string
-  pricePerVehicle: number
-  pricePerVehicleYearly: number | null
-  yearlyDiscount: number
-}
-
 interface FleetSyncPricingProps {
-  pricing: TierPricing[]
   translations: {
     pricingTitle: string
     pricingTitleHighlight: string
@@ -39,27 +31,17 @@ interface FleetSyncPricingProps {
   }
 }
 
-const FleetSyncPricing = ({ pricing, translations: t }: FleetSyncPricingProps) => {
+const PRICING = {
+  FREE: { monthly: 0, yearly: 0 },
+  BASIC: { monthly: 2, yearly: 20 },
+  BUSINESS: { monthly: 3, yearly: 30 },
+} as const
+
+const FleetSyncPricing = ({ translations: t }: FleetSyncPricingProps) => {
   const [isYearly, setIsYearly] = useState(false)
 
-  const getPricing = (tierName: string) => pricing.find((p) => p.name === tierName)
-  const basicTier = getPricing('BASIC')
-  const businessTier = getPricing('BUSINESS')
-
-  const basicMonthly = basicTier?.pricePerVehicle ?? 2
-  const businessMonthly = businessTier?.pricePerVehicle ?? 3
-  const yearlyDiscount = basicTier?.yearlyDiscount ?? 0.83
-
-  const basicPrice = isYearly
-    ? basicTier?.pricePerVehicleYearly != null
-      ? basicTier.pricePerVehicleYearly
-      : +(basicMonthly * 12 * yearlyDiscount).toFixed(0)
-    : basicMonthly
-  const businessPrice = isYearly
-    ? businessTier?.pricePerVehicleYearly != null
-      ? businessTier.pricePerVehicleYearly
-      : +(businessMonthly * 12 * yearlyDiscount).toFixed(0)
-    : businessMonthly
+  const basicPrice = isYearly ? PRICING.BASIC.yearly : PRICING.BASIC.monthly
+  const businessPrice = isYearly ? PRICING.BUSINESS.yearly : PRICING.BUSINESS.monthly
 
   return (
     <section className="py-20">

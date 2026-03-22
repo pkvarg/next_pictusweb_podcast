@@ -21,19 +21,24 @@ const Footer = () => {
       <CookieConsent
         location="bottom"
         style={{
-          background: '#834daf',
-          color: '#ffffff',
-          fontSize: '19px',
+          background: 'rgba(24, 24, 27, 0.85)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          color: '#e4e4e7',
+          fontSize: '15px',
           textAlign: 'start',
+          borderTop: '1px solid rgba(182, 224, 54, 0.15)',
+          padding: '14px 24px',
+          alignItems: 'center',
         }}
         buttonStyle={{
-          background: '#1d9f2f',
-          color: '#fff',
-          fontSize: '18px',
-          paddingTop: '9px',
-          paddingLeft: '40px',
-          paddingRight: '40px',
-          borderRadius: '20px',
+          background: 'linear-gradient(to right, #B6E036, #8ab52a)',
+          color: '#18181b',
+          fontSize: '14px',
+          fontWeight: 500,
+          padding: '8px 32px',
+          borderRadius: '9999px',
+          border: 'none',
         }}
         buttonText="OK"
         expires={365}
@@ -43,11 +48,13 @@ const Footer = () => {
           increaseVisitors()
         }}
         declineButtonStyle={{
-          background: 'red',
-          color: '#fff',
-          fontSize: '18px',
-          paddingTop: '7.5px',
-          borderRadius: '20px',
+          background: 'transparent',
+          color: '#a1a1aa',
+          fontSize: '14px',
+          fontWeight: 400,
+          padding: '8px 24px',
+          borderRadius: '9999px',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
         }}
         declineButtonText={t('cookiesDisagree')}
         onAccept={() => {

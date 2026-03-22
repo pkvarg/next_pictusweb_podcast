@@ -60,7 +60,11 @@ function GetStartedContent() {
   const [resendCooldown, setResendCooldown] = useState(0)
   const [emailToken, setEmailToken] = useState('')
   const [phoneToken, setPhoneToken] = useState('')
-  const [pricingData, setPricingData] = useState<{ name: string; pricePerVehicle: number; pricePerVehicleYearly: number | null; yearlyDiscount: number; vehiclesLimit: number }[]>([])
+  const PRICING: Record<string, { monthly: number; yearly: number }> = {
+    FREE: { monthly: 0, yearly: 0 },
+    BASIC: { monthly: 2, yearly: 20 },
+    BUSINESS: { monthly: 3, yearly: 30 },
+  }
 
   const [form, setForm] = useState<FormData>({
     organizationName: '',
@@ -101,27 +105,15 @@ function GetStartedContent() {
     }
   }, [])
 
-  // Static pricing (Stripe temporarily disabled)
-  useEffect(() => {
-    setPricingData([
-      { name: 'FREE', pricePerVehicle: 0, pricePerVehicleYearly: 0, yearlyDiscount: 0, vehiclesLimit: 999 },
-      { name: 'BASIC', pricePerVehicle: 2, pricePerVehicleYearly: 20, yearlyDiscount: 0.83, vehiclesLimit: 999 },
-      { name: 'BUSINESS', pricePerVehicle: 3, pricePerVehicleYearly: 30, yearlyDiscount: 0.83, vehiclesLimit: 999 },
-    ])
-  }, [])
-
-  // Price calculation from DB
-  const tierPricing = pricingData.find((p) => p.name === tier)
-  const pricePerVehicle = tierPricing?.pricePerVehicle ?? (tier === 'BASIC' ? 2 : tier === 'BUSINESS' ? 3 : 0)
-  const yearlyDiscount = tierPricing?.yearlyDiscount ?? 0.83
-  const maxVehicles = tierPricing?.vehiclesLimit ?? 999
-  const pricePerVehicleYearly = tierPricing?.pricePerVehicleYearly ?? null
+  // Hardcoded pricing
+  const tierPricing = PRICING[tier] ?? PRICING.FREE
+  const pricePerVehicle = tierPricing.monthly
+  const pricePerVehicleYearly = tierPricing.yearly
+  const maxVehicles = 999
   const totalPrice = isFree
     ? 0
     : billing === 'yearly'
-      ? pricePerVehicleYearly != null
-        ? +(pricePerVehicleYearly * form.numberOfVehicles).toFixed(2)
-        : +(pricePerVehicle * 12 * yearlyDiscount * form.numberOfVehicles).toFixed(2)
+      ? pricePerVehicleYearly * form.numberOfVehicles
       : pricePerVehicle * form.numberOfVehicles
 
   // Resend cooldown timer

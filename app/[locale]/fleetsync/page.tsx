@@ -62,10 +62,23 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
     { name: 'BASIC', pricePerVehicle: 2, pricePerVehicleYearly: 20, yearlyDiscount: 0.83 },
     { name: 'BUSINESS', pricePerVehicle: 3, pricePerVehicleYearly: 30, yearlyDiscount: 0.83 },
   ]
+  const tHome = await getTranslations('Home')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
       <PagesHeader />
+      {/* Testing banner */}
+      <div className="flex justify-center pt-4">
+        <div className="px-6 py-2.5 rounded-full border border-red-500/50 bg-red-600/20 backdrop-blur-sm">
+          <span className="text-red-400 text-[17px] tracking-wide">
+            !! {tHome('testingBanner')}{' '}
+            <a href="https://www.pictusweb.sk" target="_blank" rel="noopener noreferrer" className="underline text-red-300 hover:text-white transition-colors font-medium">
+              pictusweb.sk
+            </a>
+            {' '}!!
+          </span>
+        </div>
+      </div>
       {/* Already a client banner */}
       <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-end">
         <Link
