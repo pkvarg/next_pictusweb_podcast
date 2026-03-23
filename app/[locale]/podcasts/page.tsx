@@ -2,8 +2,11 @@ import PodcastPage from './../../components/podcast/PodcastPage'
 import db from '@/db/db'
 import React from 'react'
 import { getTranslations } from 'next-intl/server'
+import { setRequestLocale } from 'next-intl/server'
 
-const Podcast = async () => {
+const Podcast = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params
+  setRequestLocale(locale)
   const t = await getTranslations('Home')
   const podcasts = await db.podcast.findMany({
     select: {
