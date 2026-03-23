@@ -16,11 +16,6 @@ const Header = () => {
     // Remove locale prefix from pathname for comparison
     const cleanPath = pathname.replace(/^\/(en|sk|hu)/, '')
 
-    if (path === '/#projects') {
-      // For anchor links, check if we're on home page
-      return cleanPath === '' || cleanPath === '/'
-    }
-
     return cleanPath.startsWith(path)
   }
 
@@ -96,9 +91,9 @@ const Header = () => {
               </li>
               <li>
                 <Link
-                  href={`/#projects`}
+                  href={`/projects`}
                   className={`hover:text-[#F8F8F8] transition-colors ${
-                    isActive('/#projects') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+                    isActive('/projects') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
                   }`}
                 >
                   {t('navbarProjects')}

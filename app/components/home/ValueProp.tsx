@@ -4,8 +4,10 @@ import { motion } from 'framer-motion'
 import { fadeIn } from '@/lib/motion'
 import { Link } from '@/i18n/routing'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 const ValueProp = () => {
+  const t = useTranslations('Home')
   return (
     <section className="relative py-20 md:py-32 px-6 md:px-12 overflow-hidden">
       {/* Subtle background gradient */}
@@ -26,19 +28,29 @@ const ValueProp = () => {
           viewport={{ once: true, amount: 0.3 }}
           className="flex-1"
         >
-          <h2 className="font-brutal-milk text-[#F8F8F8] text-4xl md:text-5xl lg:text-6xl leading-tight mb-6">
-            Premyslené weby bez zbytočného chaosu
+          <h2 className="font-brutal-milk text-[#F8F8F8] text-4xl md:text-5xl lg:text-6xl leading-tight mb-2">
+            {t('valuePropTitle1')}
           </h2>
+          <h2 className="font-brutal-milk text-pictus-lime text-4xl md:text-5xl lg:text-6xl leading-tight mb-6">
+            {t('valuePropTitle2')}
+          </h2>
+          <p className="text-[#F8F8F8]/80 text-base md:text-lg font-light leading-relaxed max-w-xl mb-4">
+            {t('valuePropText1')}
+          </p>
+          <p className="text-[#F8F8F8]/80 text-base md:text-lg font-light leading-relaxed max-w-xl mb-4">
+            {t('valuePropText2')}
+          </p>
+          <p className="text-[#F8F8F8]/80 text-base md:text-lg font-light leading-relaxed max-w-xl mb-4">
+            {t('valuePropText3')}
+          </p>
           <p className="text-[#F8F8F8]/80 text-base md:text-lg font-light leading-relaxed max-w-xl mb-10">
-            Pomáhame firmám premeniť nápady na jasné a funkčné webové stránky.
-            Spájame dizajn a štruktúru tak, aby web nielen dobre vyzeral, ale aj
-            skutočne fungoval.
+            {t('valuePropText4')}
           </p>
           <Link
             href="/contact"
             className="inline-block bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-3 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
           >
-            Mám záujem
+            {t('valuePropButton')}
           </Link>
         </motion.div>
 

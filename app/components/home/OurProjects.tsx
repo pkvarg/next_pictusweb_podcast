@@ -171,7 +171,7 @@ const OurProjects = () => {
                 <div className="lg:col-span-3 lg:row-span-2">
                   <ProjectCard
                     project={slide[0]}
-                    aspectClass="aspect-[4/3] lg:aspect-auto"
+                    aspectClass="aspect-[16/10] lg:aspect-auto"
                     className="lg:h-full"
                     sizes="(max-width: 1024px) 100vw, 60vw"
                   />

@@ -29,7 +29,7 @@ const services = [
 
 const Services = () => {
   return (
-    <section className="relative py-12 md:py-20 px-6 md:px-12">
+    <section id="services" className="relative py-12 md:py-20 px-6 md:px-12">
       {/* Cards grid with glow */}
       <div className="relative max-w-7xl mx-auto">
         {/* Green glow — matches Figma: ellipse, lime gradient, 150px blur, 64% opacity */}

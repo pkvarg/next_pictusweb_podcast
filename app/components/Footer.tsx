@@ -3,22 +3,23 @@ import { motion } from 'framer-motion'
 import { footerVariants } from '@/lib/motion'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
-import { usePathname } from 'next/navigation'
 import { updateVisitors } from '@/lib/visitorsCounter'
 import CookieConsent from 'react-cookie-consent'
 import Image from 'next/image'
 
+const fontSystem = {
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+}
+
 const Footer = () => {
   const t = useTranslations('Home')
-  const path = usePathname()
-  const page = path.slice(4)
 
   const increaseVisitors = async () => {
     await updateVisitors()
   }
 
   return (
-    <div className="mx-8 mt-16">
+    <footer className="relative pt-16 md:pt-24 pb-8 px-6 md:px-12" style={fontSystem}>
       <CookieConsent
         location="bottom"
         style={{
@@ -65,113 +66,116 @@ const Footer = () => {
       >
         {t('cookies')}
       </CookieConsent>
-      <motion.footer variants={footerVariants} initial="hidden" whileInView="show">
-        <div className={`flex flex-col gap-8`}>
-          {/* Extended Footer Section with Services */}
-          <div className="mb-[10px] h-[2px] bg-white opacity-10" />
-          <div className="flex flex-col lg:flex-row justify-center gap:8 lg:gap-16 mb-8">
-            <div>
-              <div className="flex items-center gap-2 text-xl font-light mb-4 text-white">
-                <Image src="/PictusLIME.webp" alt="Pictusweb" width={32} height={32} />
-                PICTUSWEB development
-              </div>
 
-              <p className="text-gray-400 text-xl font-thin">{t('companyDescription1')}</p>
-              <p className="text-gray-400 text-xl font-thin">{t('companyDescription2')}</p>
-              <h4 className="flex-nowrap text-gray-400 font-thin !text-[20px] mt-2">
-                Copyright &copy; {new Date().getFullYear()} Pictusweb s.r.o.
-              </h4>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4 text-white">{t('footerCategory1')}</h3>
-              <ul className="space-y-2  text-gray-400 text-xl font-thin">
-                <li>
-                  <Link href="/#offer" className="hover:text-purple-300 transition-colors">
-                    {t('footerService1')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#offer" className="hover:text-purple-300 transition-colors">
-                    {t('footerService2')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#offer" className="hover:text-purple-300 transition-colors">
-                    {t('footerService3')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#offer" className="hover:text-purple-300 transition-colors">
-                    {t('footerService4')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#offer" className="hover:text-purple-300 transition-colors">
-                    {t('footerService5')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href={`/fleetsync`} className="hover:text-purple-300 transition-colors">
-                    {t('footerService6')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4 text-white">{t('footerCategory2')}</h3>
-              <div className="flex flex-col gap-2">
+      <motion.div
+        variants={footerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.1 }}
+        className="max-w-7xl mx-auto"
+      >
+        {/* Top border */}
+        <div className="h-px w-full bg-white/[0.06] mb-12" />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 mb-16">
+          {/* Logo & description */}
+          <div>
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-[#F8F8F8] text-lg tracking-tight font-normal mb-6"
+            >
+              <Image src="/PictusLIME.webp" alt="Pictusweb" width={36} height={36} />
+              PICTUSWEB
+            </Link>
+            <p className="text-[#F8F8F8]/40 text-[14px] font-light mb-4">{t('companyDescription1')}</p>
+            <Link
+              href="/client"
+              className="text-pictus-lime text-[14px] font-medium hover:text-pictus-lime/80 transition-colors duration-200"
+            >
+              {t('footerForClients')}
+            </Link>
+          </div>
+
+          {/* Pages */}
+          <div>
+            <h3 className="text-[#F8F8F8]/80 text-xs font-medium tracking-widest uppercase mb-5">
+              {t('footerCategory2')}
+            </h3>
+            <ul className="space-y-2.5">
+              <li>
                 <Link
-                  className=" text-gray-400 hover:text-[#0388f4] transition-colors font-thin text-xl"
-                  href={page !== 'contact' ? `/contact/#about` : `#about`}
+                  href="/podcasts"
+                  className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  {t('navbarAbout')}
+                  {t('navbarPodcasts')}
                 </Link>
-                <a
-                  className="text-gray-400 hover:text-[#0388f4] transition-colors font-thin text-xl"
-                  href={page !== 'contact' ? `/contact/#gdpr` : `#gdpr`}
+              </li>
+              <li>
+                <Link
+                  href="/projects"
+                  className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  GDPR
-                </a>
-
-                <a
-                  className="text-gray-400 hover:text-[#0388f4] transition-colors font-thin text-xl"
-                  href={page !== 'contact' ? `/contact/#trade-rules` : `#trade-rules`}
+                  {t('navbarProjects')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/fleetsync"
+                  className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  {t('footerTradeRules')}
-                </a>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4 text-white">{t('footerCategory3')}</h3>
-              <ul className="space-y-2 text-xl font-thin text-gray-400">
-                <li>
-                  📧{' '}
-                  <a
-                    href="mailto:info@pictusweb.sk"
-                    className="hover:text-purple-300 transition-colors"
-                  >
-                    info@pictusweb.sk
-                  </a>
-                </li>
+                  {t('footerService6')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
+                >
+                  {t('navbarContact')}
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-                <li>+421 948 024 638</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4 text-white">{t('footerForClients')}</h3>
-              <ul className="space-y-2 text-xl font-thin text-gray-400">
-                <li>
-                  <Link href="/client" className="hover:text-purple-300 transition-colors">
-                    {t('footerForClients')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          {/* Contact */}
+          <div>
+            <h3 className="text-[#F8F8F8]/80 text-xs font-medium tracking-widest uppercase mb-5">
+              {t('footerCategory3')}
+            </h3>
+            <ul className="space-y-2.5">
+              <li>
+                <a
+                  href="mailto:info@pictusweb.sk"
+                  className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
+                >
+                  info@pictusweb.sk
+                </a>
+              </li>
+              <li className="text-[#F8F8F8]/50 text-[14px] font-light">
+                +421 948 024 638
+              </li>
+            </ul>
           </div>
         </div>
-      </motion.footer>
-      <div className="bg:hero-gradient h-10"></div>
-    </div>
+
+        {/* Bottom bar */}
+        <div className="h-px w-full bg-white/[0.06] mb-6" />
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-[#F8F8F8]/40 text-[13px] font-light">
+            &copy; Pictusweb {new Date().getFullYear()}
+          </p>
+          <div className="flex items-center gap-2 text-[#F8F8F8]/30 text-[12px] font-light">
+            <Link href="/gdpr" className="hover:text-pictus-lime transition-colors duration-200">
+              GDPR
+            </Link>
+            <span>|</span>
+            <Link href="/trade-rules" className="hover:text-pictus-lime transition-colors duration-200">
+              {t('footerTradeRules')}
+            </Link>
+          </div>
+        </div>
+      </motion.div>
+    </footer>
   )
 }
 

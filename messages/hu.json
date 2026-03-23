@@ -74,7 +74,18 @@
     "reviewsDesignationSam": "Szerző",
     "reviewsDesignationVlado": "Fizioterápeuta",
 
+    "heroSubtitle": "Modern weboldalak és intelligens megoldások komolyan gondolkodó vállalkozásoknak.",
+
+    "valuePropTitle1": "Nem vagyunk nagy csapat.",
+    "valuePropTitle2": "De tudjuk, mit csinálunk.",
+    "valuePropText1": "Kis csapat vagyunk, amely ötvözi a dizájn iránti érzéket, a logikát és a technikai gondolkodást.",
+    "valuePropText2": "És ott van Pictus. A mi kis barátunk, aki arcot ad ennek a világnak és egy kis lazaságot hoz.",
+    "valuePropText3": "Természetesen a te barátod is lehet.",
+    "valuePropText4": "Együtt nem csak szépet alkotunk. Azt akarjuk, hogy működjön, értelme legyen, és hosszú távon is jól érezd magad vele.",
+    "valuePropButton": "Ismerjük meg egymást",
+
     "getInTouch": "További információra van szüksége?",
+    "callToActionTitle": "alkossunk valamit!",
     "getInTouchButton": "Írjon nekünk!",
 
     "podcastsTitle": "Podcastok",
@@ -254,7 +265,17 @@
     "tradeRulesFleetSyncSection15Title": "15. ZÁRÓ RENDELKEZÉSEK",
     "tradeRulesFleetSyncSection15Text": "15.1. Bármely rendelkezés érvénytelensége nem érinti a többi rendelkezés érvényességét.\n15.2. Jelen ÁÜF a Szolgáltatás weboldalán történő közzététel napján lép hatályba.\n15.3. Az ÁÜF aktuális változata mindig elérhető a FleetSync weboldalán.\n15.4. A szlovák és az idegen nyelvű változat közötti ellentmondás esetén a szlovák változat az irányadó.",
     "tradeRulesFleetSyncContactTitle": "A SZOLGÁLTATÓ ELÉRHETŐSÉGEI",
-    "tradeRulesFleetSyncContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Szlovák Köztársaság\nCégjegyzékszám: 54 631 068 | Adószám: 2121741424\nE-mail: info@pictusweb.sk\nTelefon: +421 948 024 638\nWeb: pictusweb.sk"
+    "tradeRulesFleetSyncContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Szlovák Köztársaság\nCégjegyzékszám: 54 631 068 | Adószám: 2121741424\nE-mail: info@pictusweb.sk\nTelefon: +421 948 024 638\nWeb: pictusweb.sk",
+
+    "projectsSubtitle": "Válogatás projektjeinkből. Mindegyik egyedi — a tervezéstől a fejlesztésen át az üzembe helyezésig.",
+    "projectBow4bassDesc": "Weboldal egy kézműves nagybőgő-vonó készítőnek. Kézzel készített vonók, javítások és restaurálás bemutatása, a történelmi hitelesség hangsúlyozásával. Egyedi admin felület a tartalom kezeléséhez.",
+    "projectIoanaDesc": "Portfólió weboldal egy illusztrátor és designer számára. Munkák galériája animációkkal és finom vizuális stílussal, amely tükrözi a művész kézjegyét.",
+    "projectMiestnacirkevDesc": "Weboldal egy pozsonyi keresztény gyülekezet számára. Blog, konferenciák, audio- és videóanyagok, énekeskönyv és kapcsolatfelvételi űrlap. Többnyelvű támogatás.",
+    "projectKvalitnamontazDesc": "Bemutató weboldal egy szerelésre és felújításra szakosodott építőipari cég számára. Áttekinthető szolgáltatási kínálat és megvalósított projektek galériája.",
+    "projectKatolickavieraDesc": "Információs portál a katolikus hitről, cikkekkel és lelki forrásokkal. Olvasásra és tartalommegosztásra optimalizálva.",
+    "projectPrudDesc": "Keresztény irodalom forgalmazója Szlovákiában. E-shop, podcastok, videók, digitális olvasóterem és letölthető anyagok.",
+    "projectMichaldovalaDesc": "Weboldal egy ingatlan- és pénzügyi szakértő számára. Ingatlan-, pénzügyi és felújítási szolgáltatások bemutatása szakértői hálózattal.",
+    "projectLibrosophiaDesc": "Egyedi közösségi hálózat könyvek kölcsönzésére. Regisztráció, profilok, értesítések és könyvmegosztás a felhasználók között."
   },
   "NewsSlider": {
     "newServicesLabel": "Új szolgáltatások",

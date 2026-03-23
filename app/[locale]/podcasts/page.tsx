@@ -25,10 +25,12 @@ const Podcast = async () => {
 
   if (podcasts.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-light mb-4">No Podcasts Found</h1>
-          <p className="text-gray-400">Check back soon for new AI-generated podcasts!</p>
+      <div className="min-h-screen bg-[#161616] text-white flex items-center justify-center relative">
+        <div className="fixed inset-0 z-0 pointer-events-none stars-small" />
+        <div className="fixed inset-0 z-0 pointer-events-none stars-medium" />
+        <div className="text-center relative z-10">
+          <h1 className="font-brutal-milk text-4xl mb-4">No Podcasts Found</h1>
+          <p className="text-[#F8F8F8]/50 font-light">Check back soon for new AI-generated podcasts!</p>
         </div>
       </div>
     )

@@ -3,22 +3,7 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { fadeIn } from '@/lib/motion'
 import Image from 'next/image'
-import { Figma, Menu, X } from 'lucide-react'
-
-const ReactIcon = ({ className }: { className?: string }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.5}
-    className={className}
-  >
-    <ellipse cx="12" cy="12" rx="10" ry="4" />
-    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" />
-    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" />
-    <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
-  </svg>
-)
+import { Menu, X } from 'lucide-react'
 
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
@@ -71,7 +56,7 @@ const Hero = () => {
                 FleetSync
               </Link>
               <Link
-                href="/#projects"
+                href="/projects"
                 className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -143,7 +128,7 @@ const Hero = () => {
                 FleetSync
               </Link>
               <Link
-                href="/#projects"
+                href="/projects"
                 className="text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors"
               >
                 Our Work
@@ -230,38 +215,10 @@ const Hero = () => {
               </span>
             </div>
             <p className="text-[#F8F8F8] text-lg md:text-xl font-light leading-relaxed opacity-90">
-              Crafting intuitive digital ecosystems and brand experiences for the next generation of
-              creative growth.
+              {t('heroSubtitle')}
             </p>
           </div>
 
-          {/* Right: stack icons */}
-          <div className="flex flex-col items-end gap-6 w-full md:w-auto">
-            <div className="flex text-[#F8F8F8]/80 gap-x-6 gap-y-6 items-center">
-              <Figma
-                className="w-6 h-6 hover:text-white transition-colors cursor-pointer"
-                strokeWidth={1.5}
-              />
-              <ReactIcon className="w-6 h-6 hover:text-white transition-colors cursor-pointer" />
-              <Image
-                src="/icons/hero-js.png"
-                alt="JavaScript"
-                width={24}
-                height={24}
-                className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-              />
-              <Image
-                src="/icons/hero-threejs.png"
-                alt="Three.js"
-                width={24}
-                height={24}
-                className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-              />
-            </div>
-            <span className="text-[#F8F8F8]/50 text-sm tracking-widest uppercase font-light">
-              Core Tools
-            </span>
-          </div>
         </motion.div>
       </section>
     </>

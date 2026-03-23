@@ -60,7 +60,18 @@
     "reviewsDesignationSam": "Author",
     "reviewsDesignationVlado": "Physiotherapist",
 
+    "heroSubtitle": "Modern websites and intelligent solutions for businesses that mean it.",
+
+    "valuePropTitle1": "We're not a big team.",
+    "valuePropTitle2": "But we know what we're doing.",
+    "valuePropText1": "We're a small team that combines a sense for design, logic, and technical thinking.",
+    "valuePropText2": "And then there's Pictus. Our little buddy who gives this world a face and a bit of extra chill.",
+    "valuePropText3": "He can be your buddy too, of course.",
+    "valuePropText4": "Together, we won't just make things look nice. We want them to work, make sense, and feel good in the long run.",
+    "valuePropButton": "Let's get to know each other",
+
     "getInTouch": "Do you want to find out more?",
+    "callToActionTitle": "let's create something!",
     "getInTouchButton": "Get in touch!",
 
     "podcastsTitle": "Podcasts",
@@ -250,7 +261,17 @@
     "tradeRulesFleetSyncSection15Title": "15. FINAL PROVISIONS",
     "tradeRulesFleetSyncSection15Text": "15.1. Invalidity of any provision does not affect the validity of others.\n15.2. These GTC take effect upon publication on the Service's website.\n15.3. The current version of the GTC is always available on the FleetSync website.\n15.4. In case of conflict between the Slovak and foreign language version, the Slovak version prevails.",
     "tradeRulesFleetSyncContactTitle": "PROVIDER CONTACT DETAILS",
-    "tradeRulesFleetSyncContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Slovak Republic\nCompany ID: 54 631 068 | Tax ID: 2121741424\nEmail: info@pictusweb.sk\nPhone: +421 948 024 638\nWeb: pictusweb.sk"
+    "tradeRulesFleetSyncContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Slovak Republic\nCompany ID: 54 631 068 | Tax ID: 2121741424\nEmail: info@pictusweb.sk\nPhone: +421 948 024 638\nWeb: pictusweb.sk",
+
+    "projectsSubtitle": "A selection of our projects. Each one is unique — from design through development to deployment.",
+    "projectBow4bassDesc": "Website for an artisan double bass bow maker. Showcasing handcrafted bows, repairs and restoration with a focus on historical authenticity. Custom admin panel for content management.",
+    "projectIoanaDesc": "Portfolio website for an illustrator and designer. Gallery of works with animations and a delicate visual style reflecting the artist's creative signature.",
+    "projectMiestnacirkevDesc": "Website for a Christian church in Bratislava. Blog, conferences, audio and video materials, hymnal and contact form. Multilingual support.",
+    "projectKvalitnamontazDesc": "Presentation website for a construction company focused on installations and renovations. Clear service offering and gallery of completed projects.",
+    "projectKatolickavieraDesc": "Information portal about the Catholic faith with articles and spiritual resources. Optimized for reading and content sharing.",
+    "projectPrudDesc": "Distributor of Christian literature in Slovakia. E-shop, podcasts, videos, digital reading room and downloadable materials.",
+    "projectMichaldovalaDesc": "Website for a real estate and finance specialist. Presentation of services in property, finance and renovations with a network of experts.",
+    "projectLibrosophiaDesc": "Custom social network for lending books. Registration, profiles, notifications and book sharing between users."
   },
   "NewsSlider": {
     "newServicesLabel": "New services",

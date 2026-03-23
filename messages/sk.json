@@ -74,7 +74,18 @@
     "reviewsDesignationSam": "Autor",
     "reviewsDesignationVlado": "Fyzioterapeut",
 
+    "heroSubtitle": "Moderné weby a inteligentné riešenia pre firmy, ktoré to myslia vážne.",
+
+    "valuePropTitle1": "Nie sme veľký tím.",
+    "valuePropTitle2": "Ale vieme, čo robíme.",
+    "valuePropText1": "Sme malý tím, ktoré spája cit pre dizajn, logiku a technické myslenie.",
+    "valuePropText2": "A potom je tu Pictus. Náš malý kamoš, ktorý tomuto svetu dáva tvár a trochu chillu navyše.",
+    "valuePropText3": "Samozrejme môže byť aj tvoj kamoš.",
+    "valuePropText4": "Spolu nebudeme robiť veci len pekne. Chceme, aby fungovali, dávali zmysel a dobre sa s nimi žilo aj dlhodobo.",
+    "valuePropButton": "Spoznajme sa",
+
     "getInTouch": "Potrebujete viac informácií?",
+    "callToActionTitle": "poďme niečo vymyslieť!",
     "getInTouchButton": "Napíšte nám!",
 
     "podcastsTitle": "Podcasty",
@@ -254,7 +265,17 @@
     "tradeRulesFleetSyncSection15Title": "15. ZÁVEREČNÉ USTANOVENIA",
     "tradeRulesFleetSyncSection15Text": "15.1. Neplatnosť jednotlivého ustanovenia nemá vplyv na platnosť ostatných.\n15.2. VOP nadobúdajú platnosť dňom zverejnenia na webovej stránke Služby.\n15.3. Aktuálne znenie VOP je vždy dostupné na webovej stránke FleetSync.\n15.4. V prípade rozporu medzi slovenskou a cudzojazyčnou verziou VOP má prednosť slovenská verzia.",
     "tradeRulesFleetSyncContactTitle": "KONTAKTNÉ ÚDAJE POSKYTOVATEĽA",
-    "tradeRulesFleetSyncContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Slovenská republika\nIČO: 54 631 068 | DIČ: 2121741424\nE-mail: info@pictusweb.sk\nTelefón: +421 948 024 638\nWeb: pictusweb.sk"
+    "tradeRulesFleetSyncContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Slovenská republika\nIČO: 54 631 068 | DIČ: 2121741424\nE-mail: info@pictusweb.sk\nTelefón: +421 948 024 638\nWeb: pictusweb.sk",
+
+    "projectsSubtitle": "Výber z našich realizácií. Každý projekt je jedinečný — od dizajnu cez vývoj až po nasadenie.",
+    "projectBow4bassDesc": "Web pre remeselného výrobcu sláčikov na kontrabas. Prezentácia ručne vyrábaných sláčikov, opráv a reštaurovania s dôrazom na historickú autentickosť. Vlastné admin rozhranie na správu obsahu.",
+    "projectIoanaDesc": "Portfólio web pre ilustrátorku a dizajnérku. Galéria prác s animáciami a jemným vizuálnym štýlom, ktorý odráža autorkin umelecký rukopis.",
+    "projectMiestnacirkevDesc": "Web pre kresťanský zbor v Bratislave. Blog, konferencie, audio a video materiály, spevník a kontaktný formulár. Viacjazyčná podpora.",
+    "projectKvalitnamontazDesc": "Prezentačný web pre stavebnú firmu zameranú na montáže a rekonštrukcie. Prehľadná ponuka služieb a galéria realizácií.",
+    "projectKatolickavieraDesc": "Informačný portál o katolíckej viere s článkami a duchovnými zdrojmi. Optimalizovaný pre čítanie a zdieľanie obsahu.",
+    "projectPrudDesc": "Distribútor kresťanskej literatúry na Slovensku. E-shop, podcasty, videá, digitálna čitáreň a sťahovateľné materiály.",
+    "projectMichaldovalaDesc": "Web pre realitného a finančného špecialistu. Prezentácia služieb v oblasti nehnuteľností, financií a rekonštrukcií so sieťou odborníkov.",
+    "projectLibrosophiaDesc": "Vlastná sociálna sieť na požičiavanie kníh. Registrácia, profily, notifikácie a zdieľanie kníh medzi používateľmi."
   },
   "NewsSlider": {
     "newServicesLabel": "Nové služby",

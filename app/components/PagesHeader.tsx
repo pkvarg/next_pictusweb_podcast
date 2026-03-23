@@ -18,11 +18,6 @@ const PagesHeader = () => {
     // Remove locale prefix from pathname for comparison
     const cleanPath = pathname.replace(/^\/(en|sk|hu)/, '')
 
-    if (path === '/#projects') {
-      // For anchor links, check if we're on home page
-      return cleanPath === '' || cleanPath === '/'
-    }
-
     return cleanPath.startsWith(path)
   }
 
@@ -46,9 +41,9 @@ const PagesHeader = () => {
               {t('navbarAutomatizations')}
             </Link>
             <Link
-              href={`/#projects`}
+              href={`/projects`}
               className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
-                isActive('/#projects') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+                isActive('/projects') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
               }`}
             >
               {t('navbarProjects')}
@@ -97,7 +92,7 @@ const PagesHeader = () => {
           <Link href="/fleetsync" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
             {t('navbarAutomatizations')}
           </Link>
-          <Link href="/#projects" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
+          <Link href="/projects" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
             {t('navbarProjects')}
           </Link>
           <Link href="/podcasts" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
