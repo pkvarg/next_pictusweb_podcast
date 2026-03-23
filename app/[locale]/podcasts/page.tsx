@@ -1,8 +1,10 @@
 import PodcastPage from './../../components/podcast/PodcastPage'
 import db from '@/db/db'
 import React from 'react'
+import { getTranslations } from 'next-intl/server'
 
 const Podcast = async () => {
+  const t = await getTranslations('Home')
   const podcasts = await db.podcast.findMany({
     select: {
       id: true,
@@ -29,8 +31,8 @@ const Podcast = async () => {
         <div className="fixed inset-0 z-0 pointer-events-none stars-small" />
         <div className="fixed inset-0 z-0 pointer-events-none stars-medium" />
         <div className="text-center relative z-10">
-          <h1 className="font-brutal-milk text-4xl mb-4">No Podcasts Found</h1>
-          <p className="text-[#F8F8F8]/50 font-light">Check back soon for new AI-generated podcasts!</p>
+          <h1 className="font-brutal-milk text-4xl mb-4">{t('noPodcastsTitle')}</h1>
+          <p className="text-[#F8F8F8]/50 font-light">{t('noPodcastsDesc')}</p>
         </div>
       </div>
     )

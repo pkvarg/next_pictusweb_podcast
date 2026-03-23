@@ -11,46 +11,46 @@ import { useTranslations } from 'next-intl'
 const projects = [
   {
     title: 'bow4bass.com',
-    image: '/projects/bow4bass.png',
+    image: '/projects/bow4bass.webp',
     href: 'https://bow4bass.com',
     objectPosition: 'left center',
     descriptionKey: 'projectBow4bassDesc',
   },
   {
     title: 'ioana-illustrations.eu',
-    image: '/projects/ioana-illustrations.png',
+    image: '/projects/ioana-illustrations.webp',
     href: 'https://ioana-illustrations.eu',
     objectPosition: '20% center',
     descriptionKey: 'projectIoanaDesc',
   },
   {
     title: 'miestnacirkev.sk',
-    image: '/projects/miestnacirkev.png',
+    image: '/projects/miestnacirkev.webp',
     href: 'https://miestnacirkev.sk',
     objectPosition: '27% center',
     descriptionKey: 'projectMiestnacirkevDesc',
   },
   {
     title: 'kvalitnamontaz.sk',
-    image: '/projects/kvalitnamontaz.png',
+    image: '/projects/kvalitnamontaz.webp',
     href: 'https://kvalitnamontaz.sk',
     descriptionKey: 'projectKvalitnamontazDesc',
   },
   {
     title: 'katolickaviera.sk',
-    image: '/projects/katolickaviera.png',
+    image: '/projects/katolickaviera.webp',
     href: 'https://katolickaviera.sk',
     descriptionKey: 'projectKatolickavieraDesc',
   },
   {
     title: 'prud.sk',
-    image: '/projects/prud.png',
+    image: '/projects/prud.webp',
     href: 'https://prud.sk',
     descriptionKey: 'projectPrudDesc',
   },
   {
     title: 'michaldovala.sk',
-    image: '/projects/michaldovala.png',
+    image: '/projects/michaldovala.webp',
     href: 'https://michaldovala.vercel.app',
     descriptionKey: 'projectMichaldovalaDesc',
   },
@@ -59,6 +59,12 @@ const projects = [
     image: '/projects/librosophia.webp',
     href: 'https://librosophia.sk',
     descriptionKey: 'projectLibrosophiaDesc',
+  },
+  {
+    title: 'fyziology.sk',
+    image: '/projects/fyziology.webp',
+    href: 'https://fyziology.sk',
+    descriptionKey: 'projectFyziologyDesc',
   },
 ]
 

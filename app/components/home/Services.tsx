@@ -3,48 +3,29 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { fadeIn, staggerContainer } from '@/lib/motion'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 const services = [
-  {
-    label: 'Tvorba webov',
-    icon: '/icons/service-web.svg',
-    description: 'Moderné webové stránky navrhnuté pre rýchlosť, prehľadnosť a rast vášho biznisu.',
-  },
-  {
-    label: 'Redizajn webov',
-    icon: '/icons/service-redesign.svg',
-    description: 'Premena zastaraného webu na moderný, výkonný a vizuálne silný nástroj.',
-  },
-  {
-    label: 'AI média',
-    icon: '/icons/service-media.svg',
-    description: 'AI podcasty a digitálny obsah pre modernú komunikáciu značiek.',
-  },
-  {
-    label: 'AI riešenia',
-    icon: '/icons/service-ai.svg',
-    description: 'Inteligentné AI nástroje a automatizácie pre efektívnejšie procesy.',
-  },
+  { labelKey: 'serviceWebLabel', descKey: 'serviceWebDesc', icon: '/icons/service-web.svg' },
+  { labelKey: 'serviceRedesignLabel', descKey: 'serviceRedesignDesc', icon: '/icons/service-redesign.svg' },
+  { labelKey: 'serviceMediaLabel', descKey: 'serviceMediaDesc', icon: '/icons/service-media.svg' },
+  { labelKey: 'serviceAILabel', descKey: 'serviceAIDesc', icon: '/icons/service-ai.svg' },
 ]
 
 const Services = () => {
+  const t = useTranslations('Home')
   return (
     <section id="services" className="relative py-12 md:py-20 px-6 md:px-12">
       {/* Cards grid with glow */}
       <div className="relative max-w-7xl mx-auto">
-        {/* Green glow — matches Figma: ellipse, lime gradient, 150px blur, 64% opacity */}
-        <div
+        {/* Green glow from Figma */}
+        <Image
+          src="/light-1.webp"
+          alt=""
+          width={610}
+          height={503}
           aria-hidden
-          className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-[10%]"
-          style={{
-            width: '320px',
-            height: '210px',
-            borderRadius: '50%',
-            filter: 'blur(150px)',
-            opacity: 0.64,
-            background:
-              'linear-gradient(135deg, rgba(182,224,54,0.75) 0%, rgba(99,121,29,0.87) 100%)',
-          }}
+          className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-[10%] opacity-64"
         />
 
         <motion.div
@@ -56,7 +37,7 @@ const Services = () => {
         >
           {services.map((service, index) => (
             <motion.div
-              key={service.label}
+              key={service.labelKey}
               variants={fadeIn('up', 'tween', index * 0.08, 0.55)}
               className="group relative flex flex-col items-center text-center gap-5 py-10 md:py-12 px-5 md:px-6 overflow-hidden transition-all duration-300"
               style={{
@@ -69,7 +50,7 @@ const Services = () => {
               {/* Icon */}
               <Image
                 src={service.icon}
-                alt={service.label}
+                alt={t(service.labelKey)}
                 width={54}
                 height={54}
                 className="w-[46px] h-[46px] md:w-[54px] md:h-[54px] shrink-0"
@@ -84,12 +65,12 @@ const Services = () => {
                   letterSpacing: '1.2px',
                 }}
               >
-                {service.label}
+                {t(service.labelKey)}
               </h3>
 
               {/* Description — Satoshi 300, 18px, white 80% */}
               <p className="text-white/80 text-[14px] md:text-[16px] font-light leading-snug max-w-[265px]">
-                {service.description}
+                {t(service.descKey)}
               </p>
             </motion.div>
           ))}

@@ -84,6 +84,52 @@
     "valuePropText4": "Spolu nebudeme robiť veci len pekne. Chceme, aby fungovali, dávali zmysel a dobre sa s nimi žilo aj dlhodobo.",
     "valuePropButton": "Spoznajme sa",
 
+    "processTitle": "Proces, v ktorom sa nestratíš",
+    "processSubtitle": "Spoluprácu stavíme tak, aby nepôsobila ako dlhá zátaž. Každý krok má svoje miesto a pomáha tomu, aby výsledok nebol len pekný, ale aj funkčný a dobre uchopený.",
+    "processStep1Title": "Pochopenie projektu",
+    "processStep1Desc": "Najprv sa pozrieme na tvoju značku, ciele a to, čo momentálne funguje alebo chýba. Potrebujeme pochopiť kontext skôr, než sa pustíme do riešenia.",
+    "processStep2Title": "Smer a štruktúra",
+    "processStep2Desc": "Ujasníme si, čo má vzniknúť, ako to má fungovať a čo tomu má dať správny smer. Práve tu sa veci začnú skladať do poriadku.",
+    "processStep3Title": "Návrh riešenia",
+    "processStep3Desc": "Navrhneme podobu, systém alebo výstup tak, aby sedel tvojej značke aj reálnym potrebám. Dbáme na zmysel, použiteľnosť aj detaily, ktoré robia rozdiel.",
+    "processStep4Title": "Realizácia",
+    "processStep4Desc": "Návrh meníme na reálny výstup. Či ide o web, vizuál, AI obsah alebo praktické riešenie, všetko skladáme tak, aby to fungovalo a držalo pokope.",
+    "processStep5Title": "Odovzdanie a ďalší posun",
+    "processStep5Desc": "Výstup dodáme, pripravíme na použitie a odovzdáme ti ho s pokojom. Nekončíme tam, kde má. A keď treba, môžeme ho spolu ďalej zlepšovať.",
+    "processButton": "Začať spoluprácu",
+
+    "testimonialsTitle": "Čo hovoria naši klienti",
+    "testimonialsSubtitle": "Každý projekt je spolupráca. Spätná väzba od klientov nám pomáha rásť a zlepšovať to, čo robíme. Niekoľko slov od ľudí, s ktorými sme pracovali.",
+    "testimonial1": "Peter mi dokázal vytvoriť web profesionálne, promptne, kvalitne a za rozumnú cenu. S výsledkom som veľmi spokojná. Ďakujem Peter.",
+    "testimonial2": "Spolupráca s Petrom je výborná, skvelá komunikácia a výsledok. Práca ho baví, robí ju poctivo a dôkladne. Určite s ním počítam pri svojich ďalších projektoch.",
+    "testimonial3": "S Petrom spolupracujem už dlhé roky v rôznych oblastiach a vždy ma poteší jeho priateľský prístup a ochota pomôcť. Ďakujem.",
+    "testimonial4": "Pokiaľ hľadáte niekoho spoľahlivého a šikovného, Peter je Váš človek. Som veľmi spokojný s jeho prácou a odporúčam spoluprácu s ním.",
+    "testimonial4Role": "Realitný maklér - michaldovala.sk",
+    "testimonial5": "Výborná spolupráca, ľahké pochopenie mojich požiadaviek a pripomienok, flexibilita pri možnostiach, ktoré boli predmetom môjho rozhodnutia.",
+    "testimonial5Role": "Autor - cestazivota.sk",
+    "testimonial6": "Pictusweb som vyhľadal kvôli naštýlovaniu grafického dizajnu pre môj web. Spoluprácu hodnotím veľmi pozitívne, pán bol veľmi príjemný, ochotný a rýchly. Určite doporučujem.",
+    "testimonial6Role": "Fyzioterapeut - fyziology.sk",
+
+    "ourProjectsTitle": "naše projekty",
+
+    "homeFooterProcess": "Proces",
+    "homeFooterWebs": "Weby",
+    "homeFooterRedesign": "Redizajn webov",
+    "homeFooterAI": "AI riešenia",
+    "homeFooterAIMedia": "AI média",
+
+    "serviceWebLabel": "Tvorba webov",
+    "serviceWebDesc": "Sme tu preto, aby sme tvorili weby, od stratégie po finálny build.",
+    "serviceRedesignLabel": "Redizajn webov",
+    "serviceRedesignDesc": "Prerobíme tvoj web tak, aby pôsobil modernejšie a fungoval lepšie.",
+    "serviceMediaLabel": "AI média",
+    "serviceMediaDesc": "Pomôžeme ti tvoriť obsah pomocou AI rýchlo a bez chaosu.",
+    "serviceAILabel": "AI riešenia",
+    "serviceAIDesc": "Nastavíme AI nástroje, ktoré ti ušetria čas a zjednodušia procesy.",
+
+    "noPodcastsTitle": "Žiadne podcasty",
+    "noPodcastsDesc": "Čoskoro pribudnú nové AI podcasty!",
+
     "getInTouch": "Potrebujete viac informácií?",
     "callToActionTitle": "poďme niečo vymyslieť!",
     "getInTouchButton": "Napíšte nám!",
@@ -275,7 +321,8 @@
     "projectKatolickavieraDesc": "Informačný portál o katolíckej viere s článkami a duchovnými zdrojmi. Optimalizovaný pre čítanie a zdieľanie obsahu.",
     "projectPrudDesc": "Distribútor kresťanskej literatúry na Slovensku. E-shop, podcasty, videá, digitálna čitáreň a sťahovateľné materiály.",
     "projectMichaldovalaDesc": "Web pre realitného a finančného špecialistu. Prezentácia služieb v oblasti nehnuteľností, financií a rekonštrukcií so sieťou odborníkov.",
-    "projectLibrosophiaDesc": "Vlastná sociálna sieť na požičiavanie kníh. Registrácia, profily, notifikácie a zdieľanie kníh medzi používateľmi."
+    "projectLibrosophiaDesc": "Vlastná sociálna sieť na požičiavanie kníh. Registrácia, profily, notifikácie a zdieľanie kníh medzi používateľmi.",
+    "projectFyziologyDesc": "Kompletný redizajn existujúceho webu pre mobilnú fyzioterapiu v Bratislave. Moderný vzhľad, prehľadná ponuka služieb a optimalizácia pre SEO."
   },
   "NewsSlider": {
     "newServicesLabel": "Nové služby",

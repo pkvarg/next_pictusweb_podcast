@@ -60,21 +60,21 @@ const Hero = () => {
                 className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Our Work
+                {t('navbarProjects')}
               </Link>
               <Link
                 href="/podcasts"
                 className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Podcasts
+                {t('navbarPodcasts')}
               </Link>
               <Link
                 href="/contact"
                 className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Contact
+                {t('navbarContact')}
               </Link>
             </nav>
             <div className="flex items-center gap-4 mt-4">
@@ -131,19 +131,19 @@ const Hero = () => {
                 href="/projects"
                 className="text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors"
               >
-                Our Work
+                {t('navbarProjects')}
               </Link>
               <Link
                 href="/podcasts"
                 className="text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors"
               >
-                Podcasts
+                {t('navbarPodcasts')}
               </Link>
               <Link
                 href="/contact"
                 className="text-[#F8F8F8]/70 hover:text-[#F8F8F8] text-[14px] tracking-widest uppercase font-light transition-colors"
               >
-                Contact
+                {t('navbarContact')}
               </Link>
             </nav>
           </div>

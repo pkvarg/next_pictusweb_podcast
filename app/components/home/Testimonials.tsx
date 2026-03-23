@@ -3,50 +3,15 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { fadeIn, staggerContainer } from '@/lib/motion'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 const testimonials = [
-  {
-    name: 'Ioana Mindrila',
-    role: 'Designer - IoanaM',
-    image: '/ionuca1.webp',
-    quote:
-      'Peter mi dokázal vytvoriť web profesionálne, promptne, kvalitne a za rozumnú cenu. S výsledkom som veľmi spokojná. Ďakujem Peter ❤️.',
-  },
-  {
-    name: 'Tomáš Dovala',
-    role: 'CEO - Dovala Construction',
-    image: '/tomas1.webp',
-    quote:
-      'Spolupráca s Petrom je výborná, skvelá komunikácia a výsledok. Práca ho baví, robí ju poctivo a dôkladne. Určite s ním počítam pri svojich ďalších projektoch.',
-  },
-  {
-    name: 'Leo Grman',
-    role: 'Manager - prud.sk',
-    image: '/leo1.webp',
-    quote:
-      'S Petrom spolupracujem už dlhé roky v rôznych oblastiach a vždy ma poteší jeho priateľský prístup a ochota pomôcť. Ďakujem.',
-  },
-  {
-    name: 'Michal Dovala',
-    role: 'Realitný maklér - michaldovala.sk',
-    image: '/michal.webp',
-    quote:
-      'Pokiaľ hľadáte niekoho spoľahlivého a šikovného, Peter je Váš človek. Som veľmi spokojný s jeho prácou a odporúčam spoluprácu s ním.',
-  },
-  {
-    name: 'Samuel Koriťák',
-    role: 'Autor - cestazivota.sk',
-    image: '/sam1.webp',
-    quote:
-      'Výborná spolupráca, ľahké pochopenie mojich požiadaviek a pripomienok, flexibilita pri možnostiach, ktoré boli predmetom môjho rozhodnutia.',
-  },
-  {
-    name: 'Vladimír Chovanec',
-    role: 'Fyzioterapeut - fyziology.sk',
-    image: '/vlado.webp',
-    quote:
-      'Pictusweb som vyhľadal kvôli naštýlovaniu grafického dizajnu pre môj web. Spoluprácu hodnotím veľmi pozitívne, pán bol veľmi príjemný, ochotný a rýchly. Určite doporučujem.',
-  },
+  { name: 'Ioana Mindrila', role: 'Designer - IoanaM', image: '/ionuca1.webp', quoteKey: 'testimonial1' },
+  { name: 'Tomáš Dovala', role: 'CEO - Dovala Construction', image: '/tomas1.webp', quoteKey: 'testimonial2' },
+  { name: 'Leo Grman', role: 'Manager - prud.sk', image: '/leo1.webp', quoteKey: 'testimonial3' },
+  { name: 'Michal Dovala', roleKey: 'testimonial4Role', image: '/michal.webp', quoteKey: 'testimonial4' },
+  { name: 'Samuel Koriťák', roleKey: 'testimonial5Role', image: '/sam1.webp', quoteKey: 'testimonial5' },
+  { name: 'Vladimír Chovanec', roleKey: 'testimonial6Role', image: '/vlado.webp', quoteKey: 'testimonial6' },
 ]
 
 const cardStyle = {
@@ -57,6 +22,7 @@ const cardStyle = {
 }
 
 const Testimonials = () => {
+  const t = useTranslations('Home')
   return (
     <section className="relative py-20 md:py-32 px-6 md:px-12 overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -72,7 +38,7 @@ const Testimonials = () => {
             variants={fadeIn('up', 'tween', 0.1, 0.5)}
             className="font-brutal-milk text-white text-3xl md:text-5xl lg:text-6xl"
           >
-            Čo hovoria naši klienti
+            {t('testimonialsTitle')}
           </motion.h2>
 
           <motion.p
@@ -80,9 +46,7 @@ const Testimonials = () => {
             className="text-[#F8F8F8] text-lg md:text-[26px] font-light leading-relaxed max-w-[445px] md:self-end"
             style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
           >
-            Každý projekt je spolupráca. Spätná väzba od klientov nám pomáha
-            rásť a zlepšovať to, čo robíme. Niekoľko slov od ľudí, s ktorými
-            sme pracovali.
+            {t('testimonialsSubtitle')}
           </motion.p>
         </motion.div>
 
@@ -102,7 +66,7 @@ const Testimonials = () => {
               className="flex flex-col justify-between p-6 md:p-8"
             >
               <p className="text-white/80 text-sm md:text-[15px] font-light leading-relaxed mb-8">
-                &ldquo;{item.quote}&rdquo;
+                &ldquo;{t(item.quoteKey)}&rdquo;
               </p>
 
               <div className="flex items-center gap-3">
@@ -118,7 +82,7 @@ const Testimonials = () => {
                     {item.name}
                   </div>
                   <div className="text-white/50 text-xs mt-0.5">
-                    {item.role}
+                    {item.roleKey ? t(item.roleKey) : item.role}
                   </div>
                 </div>
               </div>

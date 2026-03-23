@@ -84,6 +84,52 @@
     "valuePropText4": "Együtt nem csak szépet alkotunk. Azt akarjuk, hogy működjön, értelme legyen, és hosszú távon is jól érezd magad vele.",
     "valuePropButton": "Ismerjük meg egymást",
 
+    "processTitle": "Egy folyamat, amiben nem veszel el",
+    "processSubtitle": "Az együttműködést úgy építjük fel, hogy ne legyen teher. Minden lépésnek megvan a helye, és segít abban, hogy az eredmény ne csak szép legyen, hanem funkcionális és jól átgondolt is.",
+    "processStep1Title": "A projekt megértése",
+    "processStep1Desc": "Először megnézzük a márkádat, a céljaidat, és azt, ami jelenleg működik vagy hiányzik. Meg kell értenünk a kontextust, mielőtt megoldásba kezdenénk.",
+    "processStep2Title": "Irány és struktúra",
+    "processStep2Desc": "Tisztázzuk, minek kell létrejönnie, hogyan kell működnie, és mi adja meg a helyes irányt. Itt kezdenek a dolgok a helyükre kerülni.",
+    "processStep3Title": "A megoldás tervezése",
+    "processStep3Desc": "Megtervezzük a megjelenést, rendszert vagy kimenetet úgy, hogy illeszkedjen a márkádhoz és a valós igényeidhez. Odafigyelünk az értelemre, a használhatóságra és a részletekre, amelyek számítanak.",
+    "processStep4Title": "Megvalósítás",
+    "processStep4Desc": "A tervet valós kimenetté alakítjuk. Legyen szó weboldalról, vizuálról, AI tartalomról vagy gyakorlati megoldásról, mindent úgy építünk, hogy működjön és összetartson.",
+    "processStep5Title": "Átadás és továbblépés",
+    "processStep5Desc": "Leszállítjuk a kimenetet, előkészítjük a használatra, és nyugodtan átadjuk. Nem ér itt véget. Ha szükséges, együtt tovább fejleszthetjük.",
+    "processButton": "Együttműködés indítása",
+
+    "testimonialsTitle": "Mit mondanak ügyfeleink",
+    "testimonialsSubtitle": "Minden projekt együttműködés. Az ügyfelek visszajelzései segítenek nekünk fejlődni és javítani munkánkat. Néhány szó azoktól, akikkel dolgoztunk.",
+    "testimonial1": "Peter professzionálisan, gyorsan, minőségben és ésszerű áron készítette el a weboldalamat. Nagyon elégedett vagyok az eredménnyel. Köszönöm Peter.",
+    "testimonial2": "Peterrel kiváló az együttműködés, remek kommunikáció és eredmény. Élvezi a munkáját, becsületesen és alaposan végzi. Biztosan számítok rá a jövőbeli projektjeimnél.",
+    "testimonial3": "Peterrel már hosszú évek óta dolgozom együtt különböző területeken, és mindig örömet okoz barátságos hozzáállása és segítőkészsége. Köszönöm.",
+    "testimonial4": "Ha megbízható és ügyes embert keresel, Peter a te embered. Nagyon elégedett vagyok a munkájával, és ajánlom az együttműködést vele.",
+    "testimonial4Role": "Ingatlanügynök - michaldovala.sk",
+    "testimonial5": "Kiváló együttműködés, követelményeim és észrevételeim könnyű megértése, rugalmasság a lehetőségek terén, amelyek a döntésem tárgyát képezték.",
+    "testimonial5Role": "Szerző - cestazivota.sk",
+    "testimonial6": "A Pictuswebet a weboldalem grafikai dizájnjának átalakítása miatt kerestem fel. Az együttműködést nagyon pozitívan értékelem, nagyon kedves, segítőkész és gyors volt. Határozottan ajánlom.",
+    "testimonial6Role": "Fizioterápeuta - fyziology.sk",
+
+    "ourProjectsTitle": "projektjeink",
+
+    "homeFooterProcess": "Folyamat",
+    "homeFooterWebs": "Weboldalak",
+    "homeFooterRedesign": "Weboldal újratervezés",
+    "homeFooterAI": "AI megoldások",
+    "homeFooterAIMedia": "AI média",
+
+    "serviceWebLabel": "Webfejlesztés",
+    "serviceWebDesc": "Azért vagyunk itt, hogy weboldalakat készítsünk, a stratégiától a végleges buildig.",
+    "serviceRedesignLabel": "Weboldal újratervezés",
+    "serviceRedesignDesc": "Átalakítjuk a weboldaladat, hogy modernebben nézzen ki és jobban működjön.",
+    "serviceMediaLabel": "AI média",
+    "serviceMediaDesc": "Segítünk tartalmat létrehozni AI segítségével gyorsan és káosz nélkül.",
+    "serviceAILabel": "AI megoldások",
+    "serviceAIDesc": "Beállítjuk az AI eszközöket, amelyek időt takarítanak meg és egyszerűsítik a folyamataidat.",
+
+    "noPodcastsTitle": "Nincsenek podcastok",
+    "noPodcastsDesc": "Hamarosan érkeznek új AI podcastok!",
+
     "getInTouch": "További információra van szüksége?",
     "callToActionTitle": "alkossunk valamit!",
     "getInTouchButton": "Írjon nekünk!",
@@ -275,7 +321,8 @@
     "projectKatolickavieraDesc": "Információs portál a katolikus hitről, cikkekkel és lelki forrásokkal. Olvasásra és tartalommegosztásra optimalizálva.",
     "projectPrudDesc": "Keresztény irodalom forgalmazója Szlovákiában. E-shop, podcastok, videók, digitális olvasóterem és letölthető anyagok.",
     "projectMichaldovalaDesc": "Weboldal egy ingatlan- és pénzügyi szakértő számára. Ingatlan-, pénzügyi és felújítási szolgáltatások bemutatása szakértői hálózattal.",
-    "projectLibrosophiaDesc": "Egyedi közösségi hálózat könyvek kölcsönzésére. Regisztráció, profilok, értesítések és könyvmegosztás a felhasználók között."
+    "projectLibrosophiaDesc": "Egyedi közösségi hálózat könyvek kölcsönzésére. Regisztráció, profilok, értesítések és könyvmegosztás a felhasználók között.",
+    "projectFyziologyDesc": "Egy meglévő weboldal teljes újratervezése egy pozsonyi mobil fizioterápiás szolgáltatás számára. Modern megjelenés, áttekinthető szolgáltatási kínálat és SEO optimalizálás."
   },
   "NewsSlider": {
     "newServicesLabel": "Új szolgáltatások",

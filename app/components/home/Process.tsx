@@ -3,38 +3,14 @@ import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { fadeIn } from '@/lib/motion'
 import { Link } from '@/i18n/routing'
+import { useTranslations } from 'next-intl'
 
-const steps = [
-  {
-    number: '01',
-    title: 'Pochopenie a analýza',
-    description:
-      'Najskôr spoznáme váš biznis, ciele a publikum. Vďaka tomu vieme navrhnúť správny smer celej stratégie, nie začínáme naslepo s dizajnom.',
-  },
-  {
-    number: '02',
-    title: 'Štruktúra a obsah',
-    description:
-      'Navrhneme logickú štruktúru webu a wireframy informácií. Drilujeme architektúru stránok, to všetko rôzne postupy, čo máme.',
-  },
-  {
-    number: '03',
-    title: 'Dizajn',
-    description:
-      'Vytvoríme vizuálny štýl, ktorý je čistý, estetický a pripojil formálneho creative. Dizajn sa raz je dokonalý, ale médium pre jasnosti a účinok.',
-  },
-  {
-    number: '04',
-    title: 'Vývoj',
-    description:
-      'Dizajn premeníme na rýchly, responsívny a technicky čistý web. Riešime výkon, mobilitu a individuálnu digitálnu použiteľnosť.',
-  },
-  {
-    number: '05',
-    title: 'Spustenie',
-    description:
-      'Po nasadení web spustíme a prepojíme na analytics a podklady. Výsledkom je digitálna prezentácia, ktorá reálne a funkčne posilní založenie.',
-  },
+const stepKeys = [
+  { number: '01', titleKey: 'processStep1Title', descKey: 'processStep1Desc' },
+  { number: '02', titleKey: 'processStep2Title', descKey: 'processStep2Desc' },
+  { number: '03', titleKey: 'processStep3Title', descKey: 'processStep3Desc' },
+  { number: '04', titleKey: 'processStep4Title', descKey: 'processStep4Desc' },
+  { number: '05', titleKey: 'processStep5Title', descKey: 'processStep5Desc' },
 ]
 
 const PAD = 4 // padding so strokes don't clip at edges
@@ -85,6 +61,7 @@ function buildPath(W: number, totalH: number, stepCount: number) {
 }
 
 const Process = () => {
+  const t = useTranslations('Home')
   const sectionRef = useRef<HTMLDivElement>(null)
   const stepsRef = useRef<HTMLDivElement>(null)
   const greenRef = useRef<SVGPathElement>(null)
@@ -97,7 +74,7 @@ const Process = () => {
     const w = el.offsetWidth
     const h = el.offsetHeight
     const svgH = h + PAD * 2 // extra space for stroke at top and bottom
-    setSvgData({ path: buildPath(w, h, steps.length), w, h: svgH })
+    setSvgData({ path: buildPath(w, h, stepKeys.length), w, h: svgH })
   }, [])
 
   useEffect(() => {
@@ -136,7 +113,7 @@ const Process = () => {
     return () => window.removeEventListener('scroll', onScroll)
   }, [svgData.path])
 
-  const stepH = svgData.h ? svgData.h / steps.length : 180
+  const stepH = svgData.h ? svgData.h / stepKeys.length : 180
 
   return (
     <section ref={sectionRef} className="relative py-20 md:py-32 px-6 md:px-12 overflow-hidden">
@@ -149,7 +126,7 @@ const Process = () => {
           className="mb-6 text-center"
         >
           <h2 className="font-brutal-milk text-[#F8F8F8] text-3xl md:text-5xl leading-tight">
-            Tvoj web bude vznikať takto
+            {t('processTitle')}
           </h2>
         </motion.div>
 
@@ -160,8 +137,7 @@ const Process = () => {
           viewport={{ once: true, amount: 0.3 }}
           className="text-[#F8F8F8]/60 text-base md:text-lg font-light leading-relaxed max-w-2xl mx-auto text-center mb-16 md:mb-24"
         >
-          Overený proces, ktorý premení tvoju víziu na funkčný a estetický web.
-          Každý krok má jasný cieľ a transparentný výstup.
+          {t('processSubtitle')}
         </motion.p>
 
         <div className="relative">
@@ -199,7 +175,7 @@ const Process = () => {
           )}
 
           <div ref={stepsRef} data-steps className="relative flex flex-col">
-            {steps.map((step, index) => {
+            {stepKeys.map((step, index) => {
               const isRight = index % 2 === 0
               return (
                 <motion.div
@@ -217,10 +193,10 @@ const Process = () => {
                 >
                   <div className="max-w-[380px] py-6">
                     <h3 className="text-[#F8F8F8] text-lg md:text-xl font-semibold mb-2">
-                      {step.title}
+                      {t(step.titleKey)}
                     </h3>
-                    <p className="text-[#F8F8F8]/50 text-sm md:text-[15px] font-light leading-relaxed">
-                      {step.description}
+                    <p className="text-[#F8F8F8]/50 text-base md:text-lg font-light leading-relaxed">
+                      {t(step.descKey)}
                     </p>
                   </div>
                 </motion.div>
@@ -240,7 +216,7 @@ const Process = () => {
             href="/contact"
             className="inline-block bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-3 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
           >
-            Mám záujem
+            {t('processButton')}
           </Link>
         </motion.div>
       </div>

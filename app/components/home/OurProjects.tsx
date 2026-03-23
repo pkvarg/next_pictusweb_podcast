@@ -5,51 +5,57 @@ import { fadeIn } from '@/lib/motion'
 import Image from 'next/image'
 import { Link } from '@/i18n/routing'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 const projects = [
   {
     title: 'bow4bass.com',
-    image: '/projects/bow4bass.png',
+    image: '/projects/bow4bass.webp',
     href: 'https://bow4bass.com',
     objectPosition: 'left center',
   },
   {
     title: 'ioana-illustrations.eu',
-    image: '/projects/ioana-illustrations.png',
+    image: '/projects/ioana-illustrations.webp',
     href: 'https://ioana-illustrations.eu',
     objectPosition: '20% center',
   },
   {
     title: 'miestnacirkev.sk',
-    image: '/projects/miestnacirkev.png',
+    image: '/projects/miestnacirkev.webp',
     href: 'https://miestnacirkev.sk',
     objectPosition: '27% center',
   },
   {
     title: 'kvalitnamontaz.sk',
-    image: '/projects/kvalitnamontaz.png',
+    image: '/projects/kvalitnamontaz.webp',
     href: 'https://kvalitnamontaz.sk',
   },
   {
     title: 'katolickaviera.sk',
-    image: '/projects/katolickaviera.png',
+    image: '/projects/katolickaviera.webp',
     href: 'https://katolickaviera.sk',
   },
   {
     title: 'prud.sk',
-    image: '/projects/prud.png',
+    image: '/projects/prud.webp',
     href: 'https://prud.sk',
   },
 
   {
     title: 'michaldovala.sk',
-    image: '/projects/michaldovala.png',
+    image: '/projects/michaldovala.webp',
     href: 'https://michaldovala.vercel.app',
   },
   {
     title: 'librosophia.sk',
     image: '/projects/librosophia.webp',
     href: 'https://librosophia.sk',
+  },
+  {
+    title: 'fyziology.sk',
+    image: '/projects/fyziology.webp',
+    href: 'https://fyziology.sk',
   },
 ]
 
@@ -105,6 +111,7 @@ const ProjectCard = ({
 }
 
 const OurProjects = () => {
+  const t = useTranslations('Home')
   const [current, setCurrent] = useState(0)
   const [isDesktop, setIsDesktop] = useState(true)
 
@@ -136,7 +143,7 @@ const OurProjects = () => {
           className="mb-12 md:mb-16"
         >
           <h2 className="font-brutal-milk text-pictus-white text-5xl md:text-7xl lg:text-8xl italic lowercase text-center">
-            naše projekty
+            {t('ourProjectsTitle')}
           </h2>
         </motion.div>
 
@@ -228,7 +235,7 @@ const OurProjects = () => {
             href="/contact"
             className="inline-block bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-3 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
           >
-            Mám záujem
+            {t('getInTouchButton')}
           </Link>
         </motion.div>
       </div>

@@ -150,7 +150,7 @@ const HomeFooter = () => {
                   href="/"
                   className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  Domov
+                  {t('navbarHome')}
                 </Link>
               </li>
               <li>
@@ -158,7 +158,7 @@ const HomeFooter = () => {
                   href="/#services"
                   className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  Služby
+                  {t('navbarOffer')}
                 </Link>
               </li>
               <li>
@@ -166,7 +166,7 @@ const HomeFooter = () => {
                   href="/contact#about"
                   className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  O nás
+                  {t('navbarAbout')}
                 </Link>
               </li>
               <li>
@@ -174,7 +174,7 @@ const HomeFooter = () => {
                   href="/projects"
                   className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  Projekty
+                  {t('navbarProjects')}
                 </Link>
               </li>
               <li>
@@ -182,7 +182,7 @@ const HomeFooter = () => {
                   href="/#process"
                   className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  Proces
+                  {t('homeFooterProcess')}
                 </Link>
               </li>
             </ul>
@@ -196,7 +196,7 @@ const HomeFooter = () => {
                   href="/#services"
                   className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  Weby
+                  {t('homeFooterWebs')}
                 </Link>
               </li>
               <li>
@@ -204,7 +204,7 @@ const HomeFooter = () => {
                   href="/#services"
                   className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  Redizajn webov
+                  {t('homeFooterRedesign')}
                 </Link>
               </li>
               <li>
@@ -212,7 +212,7 @@ const HomeFooter = () => {
                   href="/#services"
                   className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  AI riešenia
+                  {t('homeFooterAI')}
                 </Link>
               </li>
               <li>
@@ -220,7 +220,7 @@ const HomeFooter = () => {
                   href="/#services"
                   className="text-[#F8F8F8]/50 text-[14px] font-light hover:text-pictus-lime transition-colors duration-200"
                 >
-                  AI média
+                  {t('homeFooterAIMedia')}
                 </Link>
               </li>
               <li>
@@ -257,9 +257,15 @@ const HomeFooter = () => {
             </div>
           </div>
 
-          <p className="text-[#F8F8F8]/30 text-[12px] font-light">
-            Privacy Policy &nbsp;|&nbsp; Terms &amp; Conditions
-          </p>
+          <div className="flex items-center gap-2 text-[#F8F8F8]/30 text-[12px] font-light">
+            <Link href="/gdpr" className="hover:text-pictus-lime transition-colors duration-200">
+              GDPR
+            </Link>
+            <span>|</span>
+            <Link href="/trade-rules" className="hover:text-pictus-lime transition-colors duration-200">
+              {t('footerTradeRules')}
+            </Link>
+          </div>
         </div>
       </motion.div>
     </footer>

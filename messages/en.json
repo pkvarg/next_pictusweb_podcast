@@ -70,6 +70,52 @@
     "valuePropText4": "Together, we won't just make things look nice. We want them to work, make sense, and feel good in the long run.",
     "valuePropButton": "Let's get to know each other",
 
+    "processTitle": "A process you won't get lost in",
+    "processSubtitle": "We build collaboration so it doesn't feel like a burden. Every step has its place and helps ensure the result is not just beautiful, but also functional and well thought out.",
+    "processStep1Title": "Understanding the project",
+    "processStep1Desc": "First, we look at your brand, goals, and what currently works or is missing. We need to understand the context before jumping into solutions.",
+    "processStep2Title": "Direction and structure",
+    "processStep2Desc": "We clarify what needs to be built, how it should work, and what will give it the right direction. This is where things start falling into place.",
+    "processStep3Title": "Designing the solution",
+    "processStep3Desc": "We design the look, system, or output to fit your brand and real needs. We care about meaning, usability, and the details that make a difference.",
+    "processStep4Title": "Implementation",
+    "processStep4Desc": "We turn the design into a real output. Whether it's a website, visual, AI content, or practical solution, we build it to work and hold together.",
+    "processStep5Title": "Delivery and next steps",
+    "processStep5Desc": "We deliver the output, prepare it for use, and hand it over with confidence. It doesn't end there. When needed, we can keep improving it together.",
+    "processButton": "Start collaboration",
+
+    "testimonialsTitle": "What our clients say",
+    "testimonialsSubtitle": "Every project is a collaboration. Feedback from clients helps us grow and improve what we do. A few words from people we've worked with.",
+    "testimonial1": "Peter managed to create my website professionally, promptly, with quality and at a reasonable price. I'm very happy with the result. Thank you Peter.",
+    "testimonial2": "Working with Peter is excellent, great communication and results. He enjoys his work, does it honestly and thoroughly. I'll definitely count on him for my future projects.",
+    "testimonial3": "I've been working with Peter for many years in various areas and I'm always pleased by his friendly approach and willingness to help. Thank you.",
+    "testimonial4": "If you're looking for someone reliable and skilled, Peter is your person. I'm very satisfied with his work and recommend working with him.",
+    "testimonial4Role": "Real estate agent - michaldovala.sk",
+    "testimonial5": "Excellent collaboration, easy understanding of my requirements and feedback, flexibility in the options that were subject to my decision.",
+    "testimonial5Role": "Author - cestazivota.sk",
+    "testimonial6": "I sought out Pictusweb for restyling the graphic design of my website. I rate the collaboration very positively, he was very pleasant, helpful and fast. Definitely recommend.",
+    "testimonial6Role": "Physiotherapist - fyziology.sk",
+
+    "ourProjectsTitle": "our projects",
+
+    "homeFooterProcess": "Process",
+    "homeFooterWebs": "Websites",
+    "homeFooterRedesign": "Website redesign",
+    "homeFooterAI": "AI solutions",
+    "homeFooterAIMedia": "AI media",
+
+    "serviceWebLabel": "Web development",
+    "serviceWebDesc": "We're here to build websites, from strategy to final build.",
+    "serviceRedesignLabel": "Website redesign",
+    "serviceRedesignDesc": "We'll remake your website to look more modern and work better.",
+    "serviceMediaLabel": "AI media",
+    "serviceMediaDesc": "We'll help you create content with AI quickly and without chaos.",
+    "serviceAILabel": "AI solutions",
+    "serviceAIDesc": "We'll set up AI tools that save you time and simplify your processes.",
+
+    "noPodcastsTitle": "No Podcasts Found",
+    "noPodcastsDesc": "Check back soon for new AI-generated podcasts!",
+
     "getInTouch": "Do you want to find out more?",
     "callToActionTitle": "let's create something!",
     "getInTouchButton": "Get in touch!",
@@ -271,7 +317,8 @@
     "projectKatolickavieraDesc": "Information portal about the Catholic faith with articles and spiritual resources. Optimized for reading and content sharing.",
     "projectPrudDesc": "Distributor of Christian literature in Slovakia. E-shop, podcasts, videos, digital reading room and downloadable materials.",
     "projectMichaldovalaDesc": "Website for a real estate and finance specialist. Presentation of services in property, finance and renovations with a network of experts.",
-    "projectLibrosophiaDesc": "Custom social network for lending books. Registration, profiles, notifications and book sharing between users."
+    "projectLibrosophiaDesc": "Custom social network for lending books. Registration, profiles, notifications and book sharing between users.",
+    "projectFyziologyDesc": "Complete redesign of an existing website for a mobile physiotherapy service in Bratislava. Modern look, clear service offering and SEO optimization."
   },
   "NewsSlider": {
     "newServicesLabel": "New services",
