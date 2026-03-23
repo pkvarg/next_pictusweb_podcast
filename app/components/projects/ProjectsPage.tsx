@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { fadeIn, staggerContainer } from '@/lib/motion'
 import Image from 'next/image'
 import { ExternalLink } from 'lucide-react'
+import { Link } from '@/i18n/routing'
 import PagesHeader from '@/app/components/PagesHeader'
 import Footer from '@/app/components/Footer'
 import { useTranslations } from 'next-intl'
@@ -203,13 +204,13 @@ const ProjectsPage = () => {
             <h2 className="font-brutal-milk text-3xl md:text-5xl text-white mb-10 leading-tight lowercase">
               {t('callToActionTitle') || 'poďme niečo vymyslieť!'}
             </h2>
-            <a
+            <Link
               href="/contact"
               className="inline-block bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-10 py-3.5 rounded-full text-base font-medium text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/30"
               style={fontSystem}
             >
               {t('getInTouchButton')}
-            </a>
+            </Link>
           </motion.div>
         </section>
 
