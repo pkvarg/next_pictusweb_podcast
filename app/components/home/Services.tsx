@@ -33,7 +33,7 @@ const Services = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
-          className="relative grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5"
+          className="relative grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5"
         >
           {services.map((service, index) => (
             <motion.div

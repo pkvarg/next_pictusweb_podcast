@@ -211,7 +211,7 @@ const Hero = () => {
             <div className="flex items-center gap-6 mb-8">
               <div className="h-px w-10 bg-white/40" />
               <span className="text-[#F8F8F8]/80 text-sm tracking-widest uppercase font-light">
-                Creative Studio
+                {t('heroLabel')}
               </span>
             </div>
             <p className="text-[#F8F8F8] text-lg md:text-xl font-light leading-relaxed opacity-90">

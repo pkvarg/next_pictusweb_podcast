@@ -247,13 +247,13 @@ const HomeFooter = () => {
             <span className="text-[#F8F8F8]/30 text-[11px] tracking-widest uppercase font-light">
               Core Tools
             </span>
-            <div className="flex text-[#F8F8F8]/40 gap-4 items-center">
-              <Figma className="w-4 h-4 hover:text-pictus-lime transition-colors" strokeWidth={1.5} />
-              <ReactIcon className="w-4 h-4 hover:text-pictus-lime transition-colors" />
-              <Image src="/icons/hero-js.png" alt="JavaScript" width={16} height={16} className="w-4 h-4 opacity-40 hover:opacity-100 transition-opacity" />
-              <Image src="/icons/hero-threejs.png" alt="Three.js" width={16} height={16} className="w-4 h-4 opacity-40 hover:opacity-100 transition-opacity" />
-              <NextjsIcon className="w-4 h-4 hover:text-pictus-lime transition-colors" />
-              <N8nIcon className="w-4 h-4 hover:text-pictus-lime transition-colors" />
+            <div className="flex text-pictus-lime gap-4 items-center">
+              <Figma className="w-4 h-4" strokeWidth={1.5} />
+              <ReactIcon className="w-[22px] h-[22px]" />
+              <Image src="/icons/hero-js.png" alt="JavaScript" width={16} height={16} className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(82%) sepia(47%) saturate(532%) hue-rotate(30deg) brightness(101%) contrast(91%)' }} />
+              <Image src="/icons/hero-threejs.png" alt="Three.js" width={22} height={22} className="w-[22px] h-[22px]" style={{ filter: 'brightness(0) saturate(100%) invert(82%) sepia(47%) saturate(532%) hue-rotate(30deg) brightness(101%) contrast(91%)' }} />
+              <NextjsIcon className="w-4 h-4" />
+              <N8nIcon className="w-[22px] h-[22px]" />
             </div>
           </div>
 
