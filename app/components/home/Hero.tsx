@@ -110,7 +110,7 @@ const Hero = () => {
           <div className="flex items-center gap-6 md:gap-10">
             <Link href="/" className="ml-8">
               <Image
-                src="/PictusLIME.webp"
+                src="/logo-pictusweb.svg"
                 alt="Pictusweb"
                 width={50}
                 height={50}

@@ -32,7 +32,7 @@ const Header = () => {
         <div className="mb-0 lg:mb-2">
           <div className="flex items-center justify-between py-3 md:py-5 md:block">
             <Link href="/">
-              <Image src="/PictusLIME.webp" alt="Pictusweb" width={64} height={64} />
+              <Image src="/logo-pictusweb.svg" alt="Pictusweb" width={64} height={64} />
             </Link>
             <div className="md:hidden">
               <button

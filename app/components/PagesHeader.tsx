@@ -28,7 +28,7 @@ const PagesHeader = () => {
       >
         <div className="flex items-center gap-6 md:gap-10">
           <Link href="/">
-            <Image src="/PictusLIME.webp" alt="Pictusweb" width={50} height={50} className="hidden md:block" />
+            <Image src="/logo-pictusweb.svg" alt="Pictusweb" width={50} height={50} className="hidden md:block" />
             <span className="md:hidden text-[#F8F8F8] text-xl font-bold tracking-tight">PICTUSWEB</span>
           </Link>
           <div className="hidden md:flex items-center gap-10">

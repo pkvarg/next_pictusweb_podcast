@@ -116,7 +116,7 @@ const HomeFooter = () => {
               href="/"
               className="flex items-center gap-2 text-[#F8F8F8] text-lg tracking-tight font-normal mb-6"
             >
-              <Image src="/PictusLIME.webp" alt="Pictusweb" width={36} height={36} />
+              <Image src="/logo-pictusweb.svg" alt="Pictusweb" width={36} height={36} />
               PICTUSWEB
             </Link>
             <ul className="space-y-3">
