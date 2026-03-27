@@ -224,7 +224,7 @@ function GetStartedContent() {
   }
 
   // Validation per step
-  const validateStep = (): string | null => {
+  const validateStep = (skipEmailCheck = false): string | null => {
     switch (STEPS[currentStep]) {
       case 'organization':
         if (!form.firstName.trim()) return t('errorFirstName')
@@ -235,7 +235,7 @@ function GetStartedContent() {
         return null
       case 'account':
         if (!form.email.includes('@')) return t('errorEmail')
-        if (emailAvailable !== true) return t('errorEmailTaken')
+        if (!skipEmailCheck && emailAvailable !== true) return t('errorEmailTaken')
         if (!form.phoneNumber.trim()) return t('errorPhone')
         if (form.password.length < 8) return t('errorPasswordLength')
         if (form.password !== form.confirmPassword) return t('errorPasswordMatch')
@@ -254,17 +254,19 @@ function GetStartedContent() {
 
   const handleNext = async () => {
     // Force email availability re-check on account step before validating
+    let emailChecked = false
     if (STEPS[currentStep] === 'account' && form.email.includes('@')) {
       const available = await checkEmail(form.email)
       if (available !== true) {
         setError(t('errorEmailTaken'))
         return
       }
+      emailChecked = true
     }
 
     // Skip standard validation for verification step — verifyCodes handles it
     if (STEPS[currentStep] !== 'verification') {
-      const validationError = validateStep()
+      const validationError = validateStep(emailChecked)
       if (validationError) {
         setError(validationError)
         return
@@ -553,6 +555,8 @@ function GetStartedContent() {
                 <label className={labelClass}>{t('firstName')} *</label>
                 <input
                   type="text"
+                  name="given-name"
+                  autoComplete="given-name"
                   className={inputClass}
                   value={form.firstName}
                   onChange={(e) => updateForm('firstName', e.target.value)}
@@ -562,6 +566,8 @@ function GetStartedContent() {
                 <label className={labelClass}>{t('lastName')} *</label>
                 <input
                   type="text"
+                  name="family-name"
+                  autoComplete="family-name"
                   className={inputClass}
                   value={form.lastName}
                   onChange={(e) => updateForm('lastName', e.target.value)}
@@ -622,6 +628,8 @@ function GetStartedContent() {
               <label className={labelClass}>{t('street')} *</label>
               <input
                 type="text"
+                name="street-address"
+                autoComplete="street-address"
                 className={inputClass}
                 value={form.street}
                 onChange={(e) => updateForm('street', e.target.value)}
@@ -635,6 +643,8 @@ function GetStartedContent() {
                 <label className={labelClass}>{t('postalCode')} *</label>
                 <input
                   type="text"
+                  name="postal-code"
+                  autoComplete="postal-code"
                   className={inputClass}
                   value={form.postalCode}
                   onChange={(e) => updateForm('postalCode', e.target.value)}
@@ -646,6 +656,8 @@ function GetStartedContent() {
                 <label className={labelClass}>{t('city')} *</label>
                 <input
                   type="text"
+                  name="address-level2"
+                  autoComplete="address-level2"
                   className={inputClass}
                   value={form.city}
                   onChange={(e) => updateForm('city', e.target.value)}
@@ -659,6 +671,8 @@ function GetStartedContent() {
               <label className={labelClass}>{t('country')} *</label>
               <input
                 type="text"
+                name="country-name"
+                autoComplete="country-name"
                 className={inputClass}
                 value={form.country}
                 onChange={(e) => updateForm('country', e.target.value)}
