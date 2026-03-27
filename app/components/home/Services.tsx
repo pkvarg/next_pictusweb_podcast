@@ -69,7 +69,7 @@ const Services = () => {
               </h3>
 
               {/* Description — Satoshi 300, 18px, white 80% */}
-              <p className="text-white/80 text-[14px] md:text-[16px] font-light leading-snug max-w-[265px]">
+              <p className="text-white/80 text-sm md:text-base font-light leading-snug max-w-[265px]">
                 {t(service.descKey)}
               </p>
             </motion.div>

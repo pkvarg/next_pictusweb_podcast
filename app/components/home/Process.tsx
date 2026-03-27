@@ -195,7 +195,7 @@ const Process = () => {
                     <h3 className="text-[#F8F8F8] text-lg md:text-xl font-semibold mb-2">
                       {t(step.titleKey)}
                     </h3>
-                    <p className="text-[#F8F8F8]/50 text-base md:text-lg font-light leading-relaxed">
+                    <p className="text-[#F8F8F8]/70 text-base md:text-lg font-light leading-relaxed">
                       {t(step.descKey)}
                     </p>
                   </div>

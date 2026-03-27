@@ -1,7 +1,8 @@
 import Footer from '@/app/components/Footer'
 import PagesHeader from '@/app/components/PagesHeader'
 import FleetSyncPricing from '@/app/components/FleetSyncPricing'
-import { CheckCircle, Calculator, BarChart3, Users, Calendar, Bell } from 'lucide-react'
+import { CheckCircle, Calculator } from 'lucide-react'
+import Image from 'next/image'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import type { Metadata } from 'next'
@@ -129,81 +130,33 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span>{t('heroFeature6')}</span>
               </div>
+              <div className="flex items-center gap-2 bg-pictus-white/5 border border-pictus-lime/20 px-4 py-2 rounded-full">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>{t('heroFeature7')}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-pictus-white/5 border border-pictus-lime/20 px-4 py-2 rounded-full">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>{t('heroFeature8')}</span>
+              </div>
             </div>
-            <Link
-              href={`/contact?subject=${encodeURIComponent(t('contactHero'))}`}
-              className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-3 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
-            >
-              {t('heroButton')}
-            </Link>
           </div>
 
-          {/* Client Dashboard Mockup */}
-          <div className="relative">
-            <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-3xl p-6 backdrop-blur-sm border border-pictus-lime/30">
-              {/* Dashboard Header */}
-              <div className="bg-pictus-white/10 rounded-2xl p-4 mb-4 backdrop-blur-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <BarChart3 className="w-6 h-6 text-pictus-lime" />
-                    <div>
-                      <div className="font-normal text-2xl text-white">{t('dashboardTitle')}</div>
-                      <div className="text-white text-lg">{t('dashboardSubtitle')}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Bell className="w-5 h-5 text-orange-400" />
-                    <span className="bg-orange-400 text-black px-2 py-1 rounded-full text-xs font-bold">
-                      3
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stats Cards */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-pictus-white/10 rounded-xl p-3 backdrop-blur-sm">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-blue-400" />
-                    <div>
-                      <div className="text-md text-white">{t('dashboardTotalVehicles')}</div>
-                      <div className="text-xl font-bold text-white">12</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-pictus-white/10 rounded-xl p-3 backdrop-blur-sm">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-green-400" />
-                    <div>
-                      <div className="text-md text-white">{t('dashboardThisMonth')}</div>
-                      <div className="text-xl font-bold text-white">2</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Upcoming Tasks */}
-              <div className="bg-pictus-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                <div className="text-xl font-normal text-white mb-4 flex items-center gap-2">
-                  <Bell className="w-6 h-6" />
-                  {t('dashboardUpcomingTasks')}
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-lg">
-                    <span className="text-white font-normal">{t('dashboardTechInspection')}</span>
-                    <span className="text-red-500 font-normal">{t('dashboardDays7')}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-lg">
-                    <span className="text-white font-normal">{t('dashboardWinterTires')}</span>
-                    <span className="text-orange-400 font-normal">{t('dashboardDays14')}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-lg">
-                    <span className="text-white font-normal">{t('dashboardService')}</span>
-                    <span className="text-green-500 font-normal">{t('dashboardCompleted')}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Client Dashboard Screenshots */}
+          <div className="relative flex flex-col gap-4">
+            <Image
+              src="/fleetsync-vehicle-card.webp"
+              alt="FleetSync vehicle card"
+              width={570}
+              height={649}
+              className="rounded-2xl shadow-2xl"
+            />
+            <Image
+              src="/fleetsync-task-overview.webp"
+              alt="FleetSync task overview"
+              width={1152}
+              height={445}
+              className="rounded-2xl shadow-2xl"
+            />
           </div>
         </div>
       </section>
@@ -290,42 +243,6 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
               </div>
               <h3 className="text-2xl font-semibold mb-4">{t('step3Title')}</h3>
               <p className="text-gray-300 leading-relaxed font-light">{t('step3Description')}</p>
-            </div>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
-              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-              <span>{t('feature1')}</span>
-            </div>
-            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
-              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-              <span>{t('feature2')}</span>
-            </div>
-            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
-              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-              <span>{t('feature3')}</span>
-            </div>
-            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
-              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-              <span>{t('feature4')}</span>
-            </div>
-            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
-              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-              <span>{t('feature5')}</span>
-            </div>
-            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
-              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-              <span>{t('feature6')}</span>
-            </div>
-            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
-              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-              <span>{t('heroFeature5')}</span>
-            </div>
-            <div className="flex items-center gap-4 bg-pictus-white/5 rounded-xl p-4 border border-pictus-white/10">
-              <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-              <span>{t('heroFeature6')}</span>
             </div>
           </div>
         </div>

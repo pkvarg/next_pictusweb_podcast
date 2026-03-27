@@ -40,11 +40,8 @@ const ValueProp = () => {
           <p className="text-[#F8F8F8]/80 text-base md:text-lg font-light leading-relaxed max-w-xl mb-4">
             {t('valuePropText2')}
           </p>
-          <p className="text-[#F8F8F8]/80 text-base md:text-lg font-light leading-relaxed max-w-xl mb-4">
-            {t('valuePropText3')}
-          </p>
           <p className="text-[#F8F8F8]/80 text-base md:text-lg font-light leading-relaxed max-w-xl mb-10">
-            {t('valuePropText4')}
+            {t('valuePropText3')}
           </p>
           <Link
             href="/contact"

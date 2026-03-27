@@ -7,6 +7,7 @@ import { useParams, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { fadeIn } from '@/lib/motion'
 import { Send } from 'lucide-react'
+import { Link } from '@/i18n/routing'
 
 const Contact = () => {
   const t = useTranslations('Home')
@@ -17,7 +18,7 @@ const Contact = () => {
   const [email, setEmail] = useState('')
   const [mailMessage, setMailMessage] = useState('')
   const [checkBox, setCheckBox] = useState<boolean>(false)
-  const [showGdpr, setShowGdpr] = useState(false)
+
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
 
@@ -43,10 +44,6 @@ const Contact = () => {
     }
   }, [searchParams])
 
-  const toggleShowGdpr = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    setShowGdpr((prev) => !prev)
-  }
 
   const handleCheckBox = () => {
     setCheckBox((current) => !current)
@@ -458,17 +455,13 @@ const Contact = () => {
                 style={fontSystem}
               >
                 {t('contactAgree')}{' '}
-                <button
+                <Link
+                  href="/gdpr"
                   className="text-pictus-lime/70 hover:text-pictus-lime underline underline-offset-2 transition-colors"
-                  onClick={(e) => toggleShowGdpr(e)}
+                  target="_blank"
                 >
                   {t('contactGdpr')}
-                </button>
-                {showGdpr && (
-                  <span className="block text-[#F8F8F8]/30 text-xs mt-2 leading-relaxed max-w-sm">
-                    {t('gdpr1')}
-                  </span>
-                )}
+                </Link>
               </label>
             </div>
 

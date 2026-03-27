@@ -43,7 +43,7 @@ const Testimonials = () => {
 
           <motion.p
             variants={fadeIn('up', 'tween', 0.2, 0.5)}
-            className="text-[#F8F8F8] text-lg md:text-[26px] font-light leading-relaxed max-w-[445px] md:self-end"
+            className="text-[#F8F8F8] text-lg md:text-xl font-light leading-relaxed max-w-[445px] md:self-end"
             style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
           >
             {t('testimonialsSubtitle')}
@@ -65,7 +65,7 @@ const Testimonials = () => {
               style={cardStyle}
               className="flex flex-col justify-between p-6 md:p-8"
             >
-              <p className="text-white/80 text-sm md:text-[15px] font-light leading-relaxed mb-8">
+              <p className="text-white/80 text-sm md:text-base font-light leading-relaxed mb-8">
                 &ldquo;{t(item.quoteKey)}&rdquo;
               </p>
 
