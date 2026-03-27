@@ -207,14 +207,14 @@ const Hero = () => {
           className="flex flex-col md:flex-row justify-between items-end w-full z-30 gap-12 mt-auto pb-4"
         >
           {/* Left: description */}
-          <div className="max-w-[420px] w-full">
+          <div className="max-w-[640px] w-full">
             <div className="flex items-center gap-6 mb-8">
               <div className="h-px w-10 bg-white/40" />
               <span className="text-[#F8F8F8]/80 text-sm tracking-widest uppercase font-light">
                 {t('heroLabel')}
               </span>
             </div>
-            <p className="text-[#F8F8F8] text-lg md:text-xl font-light leading-relaxed opacity-90">
+            <p className="text-[#F8F8F8] text-lg md:text-xl font-light leading-relaxed opacity-90 whitespace-nowrap">
               {t('heroSubtitle')}
             </p>
           </div>

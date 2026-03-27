@@ -109,7 +109,7 @@ function GetStartedContent() {
   const tierPricing = PRICING[tier] ?? PRICING.FREE
   const pricePerVehicle = tierPricing.monthly
   const pricePerVehicleYearly = tierPricing.yearly
-  const maxVehicles = 999
+  const maxVehicles = tier === 'BASIC' ? 3 : 999
   const totalPrice = isFree
     ? 0
     : billing === 'yearly'
@@ -683,7 +683,7 @@ function GetStartedContent() {
 
             {!isFree && (
               <div>
-                <label className={labelClass}>{t('numberOfVehicles')} * (max {maxVehicles})</label>
+                <label className={labelClass}>{t('numberOfVehicles')} *</label>
                 <input
                   type="number"
                   min={1}
