@@ -153,7 +153,7 @@ const Hero = () => {
         </header>
 
         {/* Testing banner */}
-        <div className="relative z-30 mt-4 mx-auto w-fit px-6 py-2.5 rounded-full border border-red-500/50 bg-red-600/20 backdrop-blur-sm">
+        {/* <div className="relative z-30 mt-4 mx-auto w-fit px-6 py-2.5 rounded-full border border-red-500/50 bg-red-600/20 backdrop-blur-sm">
           <span className="text-red-400 text-[17px] tracking-wide">
             !! {t('testingBanner')}{' '}
             <a
@@ -166,7 +166,7 @@ const Hero = () => {
             </a>{' '}
             !!
           </span>
-        </div>
+        </div> */}
 
         {/* Giant background text */}
         <div
@@ -218,7 +218,6 @@ const Hero = () => {
               {t('heroSubtitle')}
             </p>
           </div>
-
         </motion.div>
       </section>
     </>

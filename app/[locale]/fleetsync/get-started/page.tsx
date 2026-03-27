@@ -694,7 +694,7 @@ function GetStartedContent() {
                 />
                 <p className="text-sm text-gray-400 mt-2 font-light">
                   {t('priceCalculation')}: {form.numberOfVehicles} x €{billing === 'yearly' && pricePerVehicleYearly != null ? pricePerVehicleYearly : pricePerVehicle}/{billing === 'yearly' ? t('year') : t('month')}
-                  {billing === 'yearly' && pricePerVehicleYearly == null && <> x 12 x {yearlyDiscount} ({Math.round((1 - yearlyDiscount) * 100)}% {t('discount')})</>}
+
                   {' '}= <span className="text-pictus-lime font-normal">€{totalPrice}/{billing === 'yearly' ? t('year') : t('month')}</span>
                 </p>
               </div>
@@ -885,7 +885,7 @@ function GetStartedContent() {
               <span className="text-gray-300 font-light">
                 {t('gdprAgree')}{' '}
                 <a
-                  href="/contact#gdpr"
+                  href="/gdpr"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors"
@@ -906,7 +906,7 @@ function GetStartedContent() {
               <span className="text-gray-300 font-light">
                 {t('termsAgree')}{' '}
                 <a
-                  href="/contact#trade-rules"
+                  href="/trade-rules"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors"
