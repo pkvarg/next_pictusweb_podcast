@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: {
         siteName: 'pictusweb.sk',
         url: 'https://www.pictusweb.sk',
         images: [{
-          url: 'https://new.pictusweb.sk/og-pictusweb.webp',
+          url: 'https://new.pictusweb.sk/og-pictusweb.jpg',
           width: 1200,
           height: 630,
           alt: 'pictusweb.sk',
