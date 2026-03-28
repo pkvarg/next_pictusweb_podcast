@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     // Get request body
     const body = await request.json()
-    const { name, email, resetUrl, origin } = body
+    const { name, email, resetUrl, origin, locale } = body
 
     if (!email || !resetUrl) {
       return NextResponse.json(
@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
         email,
         resetUrl,
         origin: origin || 'PICTUSWEB.SK',
+        locale: locale || 'sk',
       },
       {
         headers: {

@@ -166,6 +166,7 @@ function GetStartedContent() {
           email: form.email,
           phoneNumber: fullPhoneNumber,
           firstName: form.firstName,
+          locale: window.location.pathname.split('/')[1] || 'sk',
         }),
       })
       if (res.ok) {

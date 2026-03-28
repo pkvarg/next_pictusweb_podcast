@@ -108,6 +108,7 @@ export default function LoginPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email: username,
+            locale,
             ipAddress: '',
             userAgent: navigator.userAgent,
           }),
@@ -180,6 +181,7 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: username,
+          locale,
           ipAddress: '',
           userAgent: navigator.userAgent,
         }),
@@ -236,7 +238,7 @@ export default function LoginPage() {
                       href="/auth/forgot-password"
                       className="text-sm text-pictus-lime hover:text-pictus-lime600 transition-colors"
                     >
-                      Zabudli ste heslo?
+                      {t('forgotPassword')}
                     </Link>
                   </div>
                   <input

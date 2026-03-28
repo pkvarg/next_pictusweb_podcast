@@ -1,18 +1,28 @@
 'use client'
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useParams } from 'next/navigation'
-//import Link from 'next/link'
 import { Link } from '@/i18n/routing'
 import LanguageBar from './LanguageBar'
 import { useTranslations } from 'next-intl'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { Menu, X } from 'lucide-react'
 
 const PagesHeader = () => {
-  const [navbar, setNavbar] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const t = useTranslations('Home')
   const { locale } = useParams()
   const pathname = usePathname()
+  const router = useRouter()
+  const currentLang = pathname.slice(1, 3)
+  const langPath = pathname.slice(4)
+
+  const languages = [
+    { code: 'en', label: 'EN' },
+    { code: 'sk', label: 'SK' },
+    { code: 'hu', label: 'HU' },
+  ]
 
   const isActive = (path: string) => {
     // Remove locale prefix from pathname for comparison
@@ -22,89 +32,130 @@ const PagesHeader = () => {
   }
 
   return (
-    <nav id="navbar" className="w-full text-white bg-transparent px-6 md:px-12 pt-1">
-      <div className="flex w-full items-center justify-between"
-        style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
+    <>
+      {/* Mobile hamburger - fixed position for z-index */}
+      <button
+        className="md:hidden text-white fixed top-6 right-6 z-50 p-2"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
       >
-        <div className="flex items-center gap-6 md:gap-10">
-          <Link href="/">
-            <Image src="/logo-pictusweb.svg" alt="Pictusweb" width={50} height={50} className="hidden md:block" />
-            <span className="md:hidden text-[#F8F8F8] text-xl font-bold tracking-tight">PICTUSWEB</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-10">
-            <Link
-              href={`/fleetsync`}
-              className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
-                isActive('/fleetsync') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
-              }`}
-            >
-              {t('navbarAutomatizations')}
+        {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+      </button>
+
+      {/* Mobile menu overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 bg-[#161616]/95 backdrop-blur-md flex flex-col items-center justify-center gap-8 md:hidden"
+            style={{
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            }}
+          >
+            <nav className="flex flex-col items-center gap-6">
+              <Link
+                href="/fleetsync"
+                className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t('navbarAutomatizations')}
+              </Link>
+              <Link
+                href="/projects"
+                className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t('navbarProjects')}
+              </Link>
+              <Link
+                href="/podcasts"
+                className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t('navbarPodcasts')}
+              </Link>
+              <Link
+                href="/contact"
+                className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t('navbarContact')}
+              </Link>
+            </nav>
+            <div className="flex items-center gap-4 mt-4">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  className={`text-lg font-medium transition-colors ${
+                    currentLang === lang.code
+                      ? 'text-pictus-lime'
+                      : 'text-[#F8F8F8]/50 hover:text-white'
+                  }`}
+                  onClick={() => {
+                    router.replace(`/${lang.code}/${langPath}`)
+                    setMobileMenuOpen(false)
+                  }}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <nav id="navbar" className="w-full text-white bg-transparent px-6 md:px-12 pt-7 md:pt-1">
+        <div className="flex w-full items-center justify-between"
+          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
+        >
+          <div className="flex items-center gap-6 md:gap-10">
+            <Link href="/">
+              <Image src="/logo-pictusweb.svg" alt="Pictusweb" width={50} height={50} className="hidden md:block" />
+              <Image src="/logo-pictusweb.svg" alt="Pictusweb" width={36} height={36} className="md:hidden" />
             </Link>
-            <Link
-              href={`/projects`}
-              className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
-                isActive('/projects') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
-              }`}
-            >
-              {t('navbarProjects')}
-            </Link>
-            <Link
-              href={`/podcasts`}
-              className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
-                isActive('/podcasts') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
-              }`}
-            >
-              {t('navbarPodcasts')}
-            </Link>
-            <Link
-              href={`/contact`}
-              className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
-                isActive('/contact') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
-              }`}
-            >
-              {t('navbarContact')}
-            </Link>
+            <div className="hidden md:flex items-center gap-10">
+              <Link
+                href={`/fleetsync`}
+                className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
+                  isActive('/fleetsync') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+                }`}
+              >
+                {t('navbarAutomatizations')}
+              </Link>
+              <Link
+                href={`/projects`}
+                className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
+                  isActive('/projects') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+                }`}
+              >
+                {t('navbarProjects')}
+              </Link>
+              <Link
+                href={`/podcasts`}
+                className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
+                  isActive('/podcasts') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+                }`}
+              >
+                {t('navbarPodcasts')}
+              </Link>
+              <Link
+                href={`/contact`}
+                className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
+                  isActive('/contact') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
+                }`}
+              >
+                {t('navbarContact')}
+              </Link>
+            </div>
+          </div>
+          <div className="hidden md:block">
+            <LanguageBar />
           </div>
         </div>
-        <div className="hidden md:block">
-          <LanguageBar />
-        </div>
-        <div className="md:hidden">
-          <button
-            className="p-2 text-white rounded-md outline-none"
-            onClick={() => setNavbar(!navbar)}
-          >
-            {navbar ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
-        </div>
-      </div>
-      {/* Mobile menu */}
-      {navbar && (
-        <div className="md:hidden py-4 flex flex-col items-center gap-4">
-          <Link href="/fleetsync" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
-            {t('navbarAutomatizations')}
-          </Link>
-          <Link href="/projects" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
-            {t('navbarProjects')}
-          </Link>
-          <Link href="/podcasts" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
-            {t('navbarPodcasts')}
-          </Link>
-          <Link href="/contact" className="text-[#F8F8F8] text-lg tracking-widest uppercase font-light" onClick={() => setNavbar(false)}>
-            {t('navbarContact')}
-          </Link>
-          <LanguageBar />
-        </div>
-      )}
-    </nav>
+      </nav>
+    </>
   )
 }
 

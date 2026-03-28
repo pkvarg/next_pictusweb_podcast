@@ -1,6 +1,6 @@
 'use client'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Link } from '@/i18n/routing'
 import { useEffect, useState } from 'react'
 import {
@@ -41,6 +41,8 @@ type Step = 1 | 2 | 3
 const OnboardClientPage = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const pathname = usePathname()
+  const locale = pathname.split('/')[1] || 'sk'
 
   const [currentStep, setCurrentStep] = useState<Step>(1)
   const [loading, setLoading] = useState(false)
@@ -189,6 +191,7 @@ const OnboardClientPage = () => {
           organizationName: organizationName || '',
           submittedBy: session?.user?.email || '',
           billingInterval,
+          locale,
         }),
       })
 
@@ -418,6 +421,7 @@ const OnboardClientPage = () => {
         billingInterval,
         requirePayment,
         agentAttested,
+        locale,
       }
 
       const response = await fetch('/api/onboard-client', {

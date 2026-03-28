@@ -201,6 +201,7 @@ export async function POST(request: NextRequest) {
           userName: `${firstName} ${lastName}`,
           subOrgName: result.subOrg.name,
           subOrgId: result.subOrg.id,
+          locale: userLocale,
         })
       } catch (emailError) {
         console.error('Failed to send benefit admin notification:', emailError)

@@ -46,6 +46,8 @@ export async function POST(request: NextRequest) {
       country,
       tierId,
       purchasedVehicles,
+      // Locale
+      locale,
       // Optional limit overrides
       usersLimit: usersLimitOverride,
       vehiclesLimit: vehiclesLimitOverride,
@@ -155,6 +157,7 @@ export async function POST(request: NextRequest) {
           pendingOnboardingId: pending.id,
           parentOrganizationId: currentUser?.organizationId || '',
           onboardedBy: session.user.email || '',
+          locale: locale || 'sk',
         },
         subscription_data: {
           metadata: {
@@ -262,6 +265,7 @@ export async function POST(request: NextRequest) {
         loginUrl: `${origin}/sk/auth/login`,
         gdprUrl: `${origin}/gdpr`,
         termsUrl: `${origin}/obchodne-podmienky`,
+        locale: locale || 'sk',
       }),
     }).catch((err) => console.error('Welcome email failed:', err))
 

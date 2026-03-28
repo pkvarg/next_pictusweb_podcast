@@ -21,6 +21,7 @@ async function sendLimitReachedEmail(params: {
   resetDate?: string
   contactEmail?: string
   userEmail?: string
+  locale?: string
 }) {
   try {
     const honoApiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/notification-limit`
@@ -51,6 +52,7 @@ export async function checkNotificationLimit(
   organizationId: string,
   countToAdd: number = 1,
   userEmail?: string,
+  locale?: string,
 ): Promise<NotificationCheckResult> {
   const org = await prisma.organization.findUnique({
     where: { id: organizationId },
@@ -84,7 +86,7 @@ export async function checkNotificationLimit(
   }
 
   // BASIC and BUSINESS - yearly tracking
-  return handlePaidTier(org, limit, countToAdd, tierName, userEmail)
+  return handlePaidTier(org, limit, countToAdd, tierName, userEmail, locale)
 }
 
 async function handleFreeTier(
@@ -121,6 +123,7 @@ async function handlePaidTier(
   countToAdd: number,
   tierName: string,
   userEmail?: string,
+  locale?: string,
 ): Promise<NotificationCheckResult> {
   const now = new Date()
   let periodStart = org.notificationPeriodStart
@@ -198,6 +201,7 @@ async function handlePaidTier(
       resetDate: emailPeriodEnd.toLocaleDateString('sk-SK'),
       contactEmail: org.mainContact || undefined,
       userEmail,
+      locale,
     })
 
     return {

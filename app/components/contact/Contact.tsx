@@ -253,6 +253,7 @@ const Contact = () => {
   const subjectTranslations = {
     en: 'Message from pictusweb.sk',
     sk: 'Správa z pictusweb.sk',
+    hu: 'Üzenet a pictusweb.sk-ról',
   }
 
   const subject =

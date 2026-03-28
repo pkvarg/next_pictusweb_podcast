@@ -119,6 +119,7 @@ export async function POST(request: NextRequest) {
         const honoApi = process.env.NEXT_PUBLIC_HONO_API_URL
         const appUrl = process.env.NEXTAUTH_URL || 'https://www.pictusweb.sk'
         const agentEmail = onboardedBy
+        const locale = session.metadata?.locale || 'sk'
         fetch(`${honoApi}/api/pictusweb/client/send-welcome-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -130,6 +131,7 @@ export async function POST(request: NextRequest) {
             loginUrl: `${appUrl}/sk/auth/login`,
             gdprUrl: `${appUrl}/gdpr`,
             termsUrl: `${appUrl}/obchodne-podmienky`,
+            locale,
           }),
         }).catch((err) => console.error('Welcome email (webhook) failed:', err))
 

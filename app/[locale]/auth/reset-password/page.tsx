@@ -14,6 +14,7 @@ function ResetPasswordContent() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [errorType, setErrorType] = useState<'expired' | 'invalid' | 'form' | ''>('')
   const [success, setSuccess] = useState(false)
   const [email, setEmail] = useState('')
   const t = useTranslations('Auth')
@@ -28,7 +29,8 @@ function ResetPasswordContent() {
     // Get token from URL and decode it
     const token = searchParams.get('token')
     if (!token) {
-      setError('Neplatný alebo chýbajúci token')
+      setError(t('invalidOrMissingToken'))
+      setErrorType('invalid')
       return
     }
 
@@ -42,13 +44,15 @@ function ResetPasswordContent() {
       const oneHour = 60 * 60 * 1000
 
       if (tokenAge > oneHour) {
-        setError('Tento odkaz už vypršal. Požiadajte o nový odkaz na obnovenie hesla.')
+        setError(t('linkExpired'))
+        setErrorType('expired')
         return
       }
 
       setEmail(emailFromToken)
     } catch (err) {
-      setError('Neplatný token')
+      setError(t('invalidToken'))
+      setErrorType('invalid')
     }
   }, [searchParams])
 
@@ -60,13 +64,15 @@ function ResetPasswordContent() {
 
     // Validation
     if (newPassword !== confirmPassword) {
-      setError('Heslá sa nezhodujú')
+      setError(t('passwordsDoNotMatch'))
+      setErrorType('form')
       setIsLoading(false)
       return
     }
 
     if (newPassword.length < 8) {
-      setError('Heslo musí mať aspoň 8 znakov')
+      setError(t('passwordTooShort'))
+      setErrorType('form')
       setIsLoading(false)
       return
     }
@@ -112,6 +118,7 @@ function ResetPasswordContent() {
             email: email,
             loginUrl: `${window.location.origin}/${locale}/auth/login`,
             origin: 'PICTUSWEB.SK',
+            locale: locale,
           }),
         },
       )
@@ -124,7 +131,8 @@ function ResetPasswordContent() {
       }, 3000)
     } catch (error) {
       console.error('Reset password error:', error)
-      setError('Nastala chyba pri zmene hesla. Skúste to prosím neskôr.')
+      setError(t('resetPasswordError'))
+      setErrorType('form')
     } finally {
       setIsLoading(false)
     }
@@ -141,7 +149,7 @@ function ResetPasswordContent() {
             className="inline-flex items-center text-[#F8F8F8] hover:text-[#B6E036] transition-colors mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Späť na prihlásenie
+            {t('backToLogin')}
           </Link>
 
           {/* Logo */}
@@ -149,18 +157,18 @@ function ResetPasswordContent() {
             <div className="w-16 h-16 bg-[#B6E036]/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-[#B6E036]">
               <Lock size={32} className="text-[#B6E036]" />
             </div>
-            <h1 className="text-2xl font-bold text-[#F8F8F8] mb-2">Nastavte nové heslo</h1>
-            <p className="text-[#F8F8F8] mt-2">Zadajte nové heslo pre váš účet</p>
+            <h1 className="text-2xl font-bold text-[#F8F8F8] mb-2">{t('setNewPassword')}</h1>
+            <p className="text-[#F8F8F8] mt-2">{t('setNewPasswordSubtitle')}</p>
           </div>
 
           {/* Form */}
           <div className="bg-[#141511] rounded-2xl p-8 border border-[#B6E036]/20 shadow-[0px_4px_12px_rgba(0,0,0,0.5)]">
-            {!success && !error.includes('vypršal') && !error.includes('Neplatný') ? (
+            {!success && errorType !== 'expired' && errorType !== 'invalid' ? (
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email Display */}
                 {email && (
                   <div className="bg-[#B6E036]/5 border border-[#B6E036]/20 rounded-lg px-4 py-3">
-                    <p className="text-sm text-[#F8F8F8]/70">Obnovenie hesla pre:</p>
+                    <p className="text-sm text-[#F8F8F8]/70">{t('resetPasswordFor')}</p>
                     <p className="text-[#F8F8F8] font-medium">{email}</p>
                   </div>
                 )}
@@ -171,7 +179,7 @@ function ResetPasswordContent() {
                     htmlFor="newPassword"
                     className="block text-sm font-medium text-[#F8F8F8] mb-2"
                   >
-                    Nové heslo
+                    {t('newPassword')}
                   </label>
                   <div className="relative">
                     <input
@@ -182,7 +190,7 @@ function ResetPasswordContent() {
                       required
                       minLength={8}
                       className="w-full px-4 py-3 bg-[#141511] border border-[#B6E036]/20 rounded-lg text-[#F8F8F8] placeholder-[#F8F8F8]/40 focus:outline-none focus:ring-2 focus:ring-[#B6E036] focus:border-transparent transition-all pr-12"
-                      placeholder="Zadajte nové heslo (min. 8 znakov)"
+                      placeholder={t('newPasswordPlaceholder')}
                     />
                     <button
                       type="button"
@@ -200,7 +208,7 @@ function ResetPasswordContent() {
                     htmlFor="confirmPassword"
                     className="block text-sm font-medium text-[#F8F8F8] mb-2"
                   >
-                    Potvrďte nové heslo
+                    {t('confirmNewPassword')}
                   </label>
                   <div className="relative">
                     <input
@@ -211,7 +219,7 @@ function ResetPasswordContent() {
                       required
                       minLength={8}
                       className="w-full px-4 py-3 bg-[#141511] border border-[#B6E036]/20 rounded-lg text-[#F8F8F8] placeholder-[#F8F8F8]/40 focus:outline-none focus:ring-2 focus:ring-[#B6E036] focus:border-transparent transition-all pr-12"
-                      placeholder="Zopakujte nové heslo"
+                      placeholder={t('confirmNewPasswordPlaceholder')}
                     />
                     <button
                       type="button"
@@ -224,7 +232,7 @@ function ResetPasswordContent() {
                 </div>
 
                 {/* Error Message */}
-                {error && !error.includes('vypršal') && !error.includes('Neplatný') && (
+                {error && errorType !== 'expired' && errorType !== 'invalid' && (
                   <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg text-sm">
                     {error}
                   </div>
@@ -240,7 +248,7 @@ function ResetPasswordContent() {
                   ) : (
                     <>
                       <Lock className="mr-2 h-4 w-4" />
-                      Nastaviť nové heslo
+                      {t('setNewPasswordButton')}
                     </>
                   )}
                 </button>
@@ -250,19 +258,19 @@ function ResetPasswordContent() {
                 <div className="w-16 h-16 bg-[#B6E036]/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#B6E036]">
                   <Check size={32} className="text-[#B6E036]" />
                 </div>
-                <h3 className="text-xl font-semibold text-[#F8F8F8] mb-3">Heslo bolo zmenené!</h3>
+                <h3 className="text-xl font-semibold text-[#F8F8F8] mb-3">{t('passwordChanged')}</h3>
                 <p className="text-[#F8F8F8]/80 mb-6">
-                  Vaše heslo bolo úspešne zmenené. Teraz sa môžete prihlásiť s novým heslom.
+                  {t('passwordChangedMessage')}
                 </p>
                 <p className="text-sm text-[#F8F8F8]/60 mb-6">
-                  Presmerovanie na prihlasovaciu stránku...
+                  {t('redirectingToLogin')}
                 </p>
                 <Link
                   href="/auth/login"
                   className="inline-flex items-center text-[#B6E036] hover:text-[#A5CF2E] transition-colors"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Prihlásiť sa teraz
+                  {t('loginNow')}
                 </Link>
               </div>
             ) : (
@@ -270,13 +278,13 @@ function ResetPasswordContent() {
                 <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-500">
                   <Lock size={32} className="text-red-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-[#F8F8F8] mb-3">Neplatný odkaz</h3>
+                <h3 className="text-xl font-semibold text-[#F8F8F8] mb-3">{t('invalidLink')}</h3>
                 <p className="text-[#F8F8F8]/80 mb-6">{error}</p>
                 <Link
                   href="/auth/forgot-password"
                   className="inline-block bg-[#B6E036] text-[#141511] px-6 py-3 rounded-[50px] font-bold hover:bg-[#A5CF2E] transition-all mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
                 >
-                  Požiadať o nový odkaz
+                  {t('requestNewLink')}
                 </Link>
                 <div className="mt-4">
                   <Link
@@ -284,7 +292,7 @@ function ResetPasswordContent() {
                     className="inline-flex items-center text-[#B6E036] hover:text-[#A5CF2E] transition-colors"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Späť na prihlásenie
+                    {t('backToLogin')}
                   </Link>
                 </div>
               </div>

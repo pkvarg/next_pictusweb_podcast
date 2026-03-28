@@ -108,17 +108,13 @@ const Hero = () => {
           }}
         >
           <div className="flex items-center gap-6 md:gap-10">
-            <Link href="/" className="ml-8">
+            <Link href="/" className="ml-8 hidden md:block">
               <Image
                 src="/logo-pictusweb.svg"
                 alt="Pictusweb"
                 width={50}
                 height={50}
-                className="hidden md:block"
               />
-              <span className="md:hidden text-[#F8F8F8] text-xl font-bold tracking-tight">
-                PICTUSWEB
-              </span>
             </Link>
             <nav className="hidden md:flex items-center gap-10">
               <Link
@@ -168,19 +164,28 @@ const Hero = () => {
           </span>
         </div> */}
 
-        {/* Giant background text */}
+        {/* Giant background text - Desktop */}
         <div
           className="absolute inset-0 hidden md:flex items-center justify-center z-0 pointer-events-none select-none overflow-hidden w-full -translate-x-[7vw] -translate-y-[10vh]"
           aria-hidden="true"
         >
-          {/* Desktop: horizontal */}
           <h1 className="font-brutal-milk text-[10vw] leading-[0.85] font-bold text-[#F8F8F8]/90 tracking-[0.04em] whitespace-nowrap mt-8 scale-y-[1.7] origin-center">
             PICTUS<span className="ml-[11vw]">WEB</span>
           </h1>
         </div>
 
+        {/* Giant background text - Mobile */}
+        <div
+          className="absolute inset-0 flex md:hidden items-center justify-center z-0 pointer-events-none select-none overflow-hidden -translate-y-[32vh]"
+          aria-hidden="true"
+        >
+          <h1 className="font-brutal-milk text-[15vw] leading-[0.85] font-bold text-[#F8F8F8]/90 tracking-[0.04em] whitespace-nowrap scale-y-[1.7] origin-center">
+            PICTUSWEB
+          </h1>
+        </div>
+
         {/* Centered mascot */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none mt-16">
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none mt-8 md:mt-16">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -214,7 +219,7 @@ const Hero = () => {
                 {t('heroLabel')}
               </span>
             </div>
-            <p className="text-[#F8F8F8] text-lg md:text-xl font-light leading-relaxed opacity-90 whitespace-nowrap">
+            <p className="text-[#F8F8F8] text-lg md:text-xl font-light leading-relaxed opacity-90 md:whitespace-nowrap">
               {t('heroSubtitle')}
             </p>
           </div>

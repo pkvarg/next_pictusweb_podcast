@@ -76,7 +76,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
         </div>
       </div> */}
       {/* Already a client banner */}
-      <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-end">
+      <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-center md:justify-end">
         <Link
           href="/client"
           className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-3 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
@@ -87,7 +87,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <h1 className="text-5xl lg:text-6xl font-light leading-tight text-center">FleetSync</h1>
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
           <div>
             <h2 className="text-4xl lg:text-5xl font-light mb-6 leading-tight">
               <br />
@@ -137,7 +137,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
           </div>
 
           {/* Client Dashboard Screenshots */}
-          <div className="relative flex flex-col gap-4">
+          <div className="relative flex flex-col gap-4 lg:mt-16">
             <Image
               src="/fleetsync-vehicle-card.webp"
               alt="FleetSync vehicle card"

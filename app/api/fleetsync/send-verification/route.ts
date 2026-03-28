@@ -34,7 +34,7 @@ function hashToken(token: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, phoneNumber, firstName } = await request.json()
+    const { email, phoneNumber, firstName, locale } = await request.json()
 
     if (!email || !phoneNumber) {
       return NextResponse.json({ error: 'Email and phone number are required' }, { status: 400 })
@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
         firstName: firstName || 'Zákazník',
         code: emailCode,
         purpose: 'email',
+        locale: locale || 'sk',
       }),
     })
 
