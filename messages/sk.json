@@ -646,9 +646,9 @@
   "Auth": {
     "loginTitle": "Pictusweb Admin",
     "loginSubtitle": "Klientska zóna",
-    "username": "Používateľské meno",
+    "username": "E-mail",
     "password": "Heslo",
-    "usernamePlaceholder": "Zadajte používateľské meno",
+    "usernamePlaceholder": "Zadajte e-mail",
     "passwordPlaceholder": "Zadajte heslo",
     "forgotPassword": "Zabudli ste heslo?",
     "backToLogin": "Späť na prihlásenie",

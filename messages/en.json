@@ -645,9 +645,9 @@
   "Auth": {
     "loginTitle": "Pictusweb Admin",
     "loginSubtitle": "Sign in to access the admin panel",
-    "username": "Username",
+    "username": "Email",
     "password": "Password",
-    "usernamePlaceholder": "Enter your username",
+    "usernamePlaceholder": "Enter your email",
     "passwordPlaceholder": "Enter your password",
     "forgotPassword": "Forgot password?",
     "backToLogin": "Back to login",

@@ -649,9 +649,9 @@
   "Auth": {
     "loginTitle": "Pictusweb Admin",
     "loginSubtitle": "Bejelentkezés az adminisztrációba",
-    "username": "Felhasználónév",
+    "username": "E-mail",
     "password": "Jelszó",
-    "usernamePlaceholder": "Adja meg felhasználónevét",
+    "usernamePlaceholder": "Adja meg e-mail címét",
     "passwordPlaceholder": "Adja meg jelszavát",
     "forgotPassword": "Elfelejtette jelszavát?",
     "backToLogin": "Vissza a bejelentkezéshez",
