@@ -190,7 +190,7 @@ export default function OrganizationManager() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-xl">
             <Building className="w-6 h-6 text-pictus-black" />
@@ -220,7 +220,7 @@ export default function OrganizationManager() {
             {/* New Item Form */}
             {newItem && (
               <div className="bg-white/5 rounded-lg p-4 border border-pictus-lime">
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <input
                     type="text"
                     placeholder="Organization Name *"
@@ -288,7 +288,7 @@ export default function OrganizationManager() {
               >
                 {editingItem?.id === org.id ? (
                   <>
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                       <input
                         type="text"
                         value={editingItem.name}
@@ -333,7 +333,7 @@ export default function OrganizationManager() {
                       </select>
                     </div>
                     {/* Limit overrides row */}
-                    <div className="grid grid-cols-6 gap-3 mt-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mt-3">
                       <div>
                         <label className="text-xs text-gray-400">Users Limit</label>
                         <input
@@ -441,9 +441,9 @@ export default function OrganizationManager() {
                     </div>
                   </>
                 ) : (
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-white text-xl font-light">{org.name}</p>
                         {org.tierRelation && (
                           <span className={`px-2 py-1 text-xs rounded font-medium ${
@@ -478,7 +478,7 @@ export default function OrganizationManager() {
                           </span>
                         )}
                       </div>
-                      <div className="flex gap-4 mt-1">
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
                         {org.mainContact && (
                           <p className="text-gray-400 text-sm">Contact: {org.mainContact}</p>
                         )}
@@ -513,16 +513,16 @@ export default function OrganizationManager() {
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 shrink-0">
                       <button
                         onClick={() => handleEdit(org)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                        className="p-2.5 hover:bg-white/10 rounded-lg transition-all"
                       >
                         <Edit2 className="w-4 h-4 text-pictus-lime" />
                       </button>
                       <button
                         onClick={() => handleDelete(org.id)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                        className="p-2.5 hover:bg-white/10 rounded-lg transition-all"
                       >
                         <Trash2 className="w-4 h-4 text-red-400" />
                       </button>

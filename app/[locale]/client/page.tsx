@@ -234,17 +234,17 @@ const ClientZone = () => {
               </Link>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <div className="flex items-center space-x-2 text-pictus-white">
-                <User size={16} />
-                <span className="text-lg">{session?.user?.name}</span>
+                <User size={16} className="shrink-0" />
+                <span className="text-sm sm:text-lg truncate max-w-[100px] sm:max-w-none">{session?.user?.name}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-lg text-pictus-white hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
+                className="flex items-center text-sm sm:text-lg text-pictus-white hover:text-red-400 transition-colors px-2 sm:px-3 py-2 rounded-lg hover:bg-red-500/10 shrink-0"
               >
-                <LogOut className="mr-2 h-4 w-4" />
-                {t('logOut')}
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{t('logOut')}</span>
               </button>
             </div>
           </div>
@@ -263,13 +263,13 @@ const ClientZone = () => {
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Welcome Section */}
-        <section className="py-20">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl font-light text-pictus-white mb-6 leading-tight">
+        <section className="py-10 sm:py-20">
+          <div className="text-center mb-8 sm:mb-16">
+            <h1 className="text-3xl sm:text-5xl font-light text-pictus-white mb-4 sm:mb-6 leading-tight">
               {t('welcomeTitle')}
             </h1>
-            <p className="text-3xl text-pictus-lime mb-6">{session?.user?.name}</p>
-            <h2 className="text-5xl lg:text-6xl font-light leading-tight text-center mb-8">FleetSync</h2>
+            <p className="text-xl sm:text-3xl text-pictus-lime mb-4 sm:mb-6">{session?.user?.name}</p>
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-light leading-tight text-center mb-6 sm:mb-8">FleetSync</h2>
           </div>
         </section>
 
@@ -352,7 +352,7 @@ const ClientZone = () => {
           <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-xl p-6 backdrop-blur-sm border border-pictus-lime/30">
             <div className="flex items-center gap-3 mb-6">
               <User className="w-6 h-6 text-pictus-lime" />
-              <h2 className="text-3xl font-light text-pictus-white">{t('accountInfo')}</h2>
+              <h2 className="text-2xl sm:text-3xl font-light text-pictus-white">{t('accountInfo')}</h2>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               {/* User Profile */}

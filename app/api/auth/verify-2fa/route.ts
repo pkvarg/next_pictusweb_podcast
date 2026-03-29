@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { createHash, createHmac, randomUUID } from 'crypto'
-
-const prisma = new PrismaClient()
 
 const OTP_SALT = process.env.OTP_SALT!
 const SESSION_SECRET = process.env.VERIFICATION_SESSION_SECRET!

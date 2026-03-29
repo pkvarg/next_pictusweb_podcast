@@ -756,47 +756,47 @@ export default function NotificationSettings({
 
           {/* Tabs */}
           {!hideTabs && (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setActiveTab('types')}
-                className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-xl font-light transition-all ${
                   activeTab === 'types'
                     ? 'bg-pictus-lime text-pictus-black'
                     : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
                 }`}
               >
-                <Bell className="w-5 h-5 inline mr-2" />
+                <Bell className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
                 Typy notifikácií
               </button>
               <button
                 onClick={() => setActiveTab('channels')}
-                className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-xl font-light transition-all ${
                   activeTab === 'channels'
                     ? 'bg-pictus-lime text-pictus-black'
                     : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
                 }`}
               >
-                <MessageSquare className="w-5 h-5 inline mr-2" />
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
                 Kanály
               </button>
               <button
                 onClick={() => setActiveTab('templates')}
-                className={`px-6 py-3 rounded-lg text-xl font-light transition-all ${
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-xl font-light transition-all ${
                   activeTab === 'templates'
                     ? 'bg-pictus-lime text-pictus-black'
                     : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
                 }`}
               >
-                <Sparkles className="w-5 h-5 inline mr-2" />
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
                 Šablóny
               </button>
             </div>
           )}
 
           {/* Content */}
-          <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-light text-pictus-white">
+          <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-4 sm:p-6 border border-pictus-lime/30">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <h3 className="text-xl sm:text-2xl font-light text-pictus-white">
                 {activeTab === 'types' && 'Typy notifikácií'}
                 {activeTab === 'channels' && 'Kanály notifikácií'}
                 {activeTab === 'templates' && 'Šablóny notifikácií'}
@@ -813,13 +813,13 @@ export default function NotificationSettings({
                     })
                     fetchData()
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all text-sm"
+                  className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all text-sm"
                 >
                   🔄 Obnoviť
                 </button>
                 <button
                   onClick={handleAddNew}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+                  className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all text-sm sm:text-base"
                 >
                   <Plus className="w-5 h-5" />
                   Pridať
@@ -831,7 +831,7 @@ export default function NotificationSettings({
             {((activeTab === 'types' && usingDefaultTypeOptions) ||
               (activeTab === 'channels' && usingDefaultChannelOptions)) && (
               <div className="mb-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1">
                     <h4 className="text-blue-300 font-medium mb-2 flex items-center gap-2">
                       <Bell className="w-5 h-5" />
@@ -896,7 +896,7 @@ export default function NotificationSettings({
                     )}
                     {(activeTab === 'types' || activeTab === 'channels') && (
                       <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-pictus-lime text-xs mb-1">Názov *</label>
                             <input
@@ -963,7 +963,7 @@ export default function NotificationSettings({
                           onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                         />
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div>
                             <select
                               value={newItem.notificationType}
@@ -1006,7 +1006,7 @@ export default function NotificationSettings({
                               </p>
                             )}
                           </div>
-                          <div className="col-span-2">
+                          <div className="sm:col-span-2">
                             <label className="block text-xs text-gray-400 mb-2">
                               Intervaly pripomienok (dni relatívne k termínu)
                             </label>
@@ -1118,7 +1118,7 @@ export default function NotificationSettings({
                       {editingItem?.id === option.id ? (
                         <>
                           <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
                                 <label className="block text-pictus-lime text-xs mb-1">Názov</label>
                                 <input
@@ -1248,7 +1248,7 @@ export default function NotificationSettings({
                     >
                       {editingItem?.id === option.id ? (
                         <>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                               <label className="block text-pictus-lime text-xs mb-1">Názov</label>
                               <input
@@ -1339,7 +1339,7 @@ export default function NotificationSettings({
                       {editingItem?.id === template.id ? (
                         <>
                           <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
                                 <label className="block text-pictus-lime text-xs mb-1">Názov</label>
                                 <input

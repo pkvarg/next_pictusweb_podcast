@@ -166,11 +166,11 @@ const Hero = () => {
 
         {/* Giant background text - Desktop */}
         <div
-          className="absolute inset-0 hidden md:flex items-center justify-center z-0 pointer-events-none select-none overflow-hidden w-full -translate-x-[7vw] -translate-y-[10vh]"
+          className="absolute inset-0 hidden md:flex items-center justify-center z-0 pointer-events-none select-none overflow-hidden w-full -translate-x-[10vw] -translate-y-[10vh]"
           aria-hidden="true"
         >
           <h1 className="font-brutal-milk text-[10vw] leading-[0.85] font-bold text-[#F8F8F8]/90 tracking-[0.04em] whitespace-nowrap mt-8 scale-y-[1.7] origin-center">
-            PICTUS<span className="ml-[11vw]">WEB</span>
+            PICTUSWEB
           </h1>
         </div>
 
@@ -184,8 +184,8 @@ const Hero = () => {
           </h1>
         </div>
 
-        {/* Centered mascot */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none mt-8 md:mt-16">
+        {/* Mascot - right side */}
+        <div className="absolute inset-0 flex items-center justify-end z-10 pointer-events-none mt-8 md:mt-16 pr-4 md:pr-[8vw]">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

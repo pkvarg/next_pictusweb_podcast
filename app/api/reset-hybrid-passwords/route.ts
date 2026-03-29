@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { hashPassword } from '../../../lib/isValidPassword'
-
-const prisma = new PrismaClient()
 
 // TESTING ONLY: Reset all hybrid users to default password
 export async function POST(request: NextRequest) {

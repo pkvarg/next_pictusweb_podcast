@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/db/db';
 
 export class TierLimitError extends Error {
   constructor(message: string) {

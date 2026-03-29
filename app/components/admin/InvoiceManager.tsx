@@ -104,47 +104,84 @@ export default function InvoiceManager() {
       {invoices.length === 0 ? (
         <div className="text-center py-12 text-gray-400">No invoices found.</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-gray-700">
-                <th className="pb-3 text-sm font-medium text-gray-400">Invoice #</th>
-                <th className="pb-3 text-sm font-medium text-gray-400">Organization</th>
-                <th className="pb-3 text-sm font-medium text-gray-400">Email</th>
-                <th className="pb-3 text-sm font-medium text-gray-400">Tier</th>
-                <th className="pb-3 text-sm font-medium text-gray-400">Billing</th>
-                <th className="pb-3 text-sm font-medium text-gray-400">Vehicles</th>
-                <th className="pb-3 text-sm font-medium text-gray-400">Total</th>
-                <th className="pb-3 text-sm font-medium text-gray-400">Date</th>
-                <th className="pb-3 text-sm font-medium text-gray-400">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoices.map((invoice) => (
-                <tr key={invoice.id} className="border-b border-gray-800 hover:bg-gray-800/50">
-                  <td className="py-3 text-sm text-white font-mono">{invoice.invoiceNumber}</td>
-                  <td className="py-3 text-sm text-white">{invoice.organizationName}</td>
-                  <td className="py-3 text-sm text-gray-300">{invoice.email}</td>
-                  <td className="py-3 text-sm text-gray-300 capitalize">{invoice.tier}</td>
-                  <td className="py-3 text-sm text-gray-300 capitalize">{invoice.billing}</td>
-                  <td className="py-3 text-sm text-gray-300">{invoice.numberOfVehicles}</td>
-                  <td className="py-3 text-sm text-white font-medium">{formatPrice(invoice.totalPrice)}</td>
-                  <td className="py-3 text-sm text-gray-300">{formatDate(invoice.createdAt)}</td>
-                  <td className="py-3">
-                    <button
-                      onClick={() => handleDownload(invoice)}
-                      disabled={downloadingId === invoice.id}
-                      className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:opacity-50 text-white rounded transition-colors"
-                    >
-                      <Download className="w-3 h-3" />
-                      {downloadingId === invoice.id ? 'Generating...' : 'Download'}
-                    </button>
-                  </td>
+        <>
+          {/* Mobile Invoice Cards */}
+          <div className="md:hidden space-y-3">
+            {invoices.map((invoice) => (
+              <div key={invoice.id} className="bg-white/5 rounded-lg p-4 border border-white/10 space-y-3">
+                {/* Top row: invoice number + total */}
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-mono text-sm font-medium">{invoice.invoiceNumber}</span>
+                  <span className="text-white font-medium">{formatPrice(invoice.totalPrice)}</span>
+                </div>
+                {/* Organization + email */}
+                <div>
+                  <div className="text-sm text-white">{invoice.organizationName}</div>
+                  <div className="text-xs text-gray-400 truncate">{invoice.email}</div>
+                </div>
+                {/* Details row */}
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
+                  <span className="capitalize">{invoice.tier}</span>
+                  <span className="capitalize">{invoice.billing}</span>
+                  <span>{invoice.numberOfVehicles} vehicles</span>
+                  <span>{formatDate(invoice.createdAt)}</span>
+                </div>
+                {/* Download button */}
+                <button
+                  onClick={() => handleDownload(invoice)}
+                  disabled={downloadingId === invoice.id}
+                  className="flex items-center gap-1.5 px-4 py-2.5 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:opacity-50 text-white rounded-lg transition-colors w-full justify-center"
+                >
+                  <Download className="w-4 h-4" />
+                  {downloadingId === invoice.id ? 'Generating...' : 'Download PDF'}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Invoice Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-gray-700">
+                  <th className="pb-3 text-sm font-medium text-gray-400">Invoice #</th>
+                  <th className="pb-3 text-sm font-medium text-gray-400">Organization</th>
+                  <th className="pb-3 text-sm font-medium text-gray-400">Email</th>
+                  <th className="pb-3 text-sm font-medium text-gray-400">Tier</th>
+                  <th className="pb-3 text-sm font-medium text-gray-400">Billing</th>
+                  <th className="pb-3 text-sm font-medium text-gray-400">Vehicles</th>
+                  <th className="pb-3 text-sm font-medium text-gray-400">Total</th>
+                  <th className="pb-3 text-sm font-medium text-gray-400">Date</th>
+                  <th className="pb-3 text-sm font-medium text-gray-400">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {invoices.map((invoice) => (
+                  <tr key={invoice.id} className="border-b border-gray-800 hover:bg-gray-800/50">
+                    <td className="py-3 text-sm text-white font-mono">{invoice.invoiceNumber}</td>
+                    <td className="py-3 text-sm text-white">{invoice.organizationName}</td>
+                    <td className="py-3 text-sm text-gray-300">{invoice.email}</td>
+                    <td className="py-3 text-sm text-gray-300 capitalize">{invoice.tier}</td>
+                    <td className="py-3 text-sm text-gray-300 capitalize">{invoice.billing}</td>
+                    <td className="py-3 text-sm text-gray-300">{invoice.numberOfVehicles}</td>
+                    <td className="py-3 text-sm text-white font-medium">{formatPrice(invoice.totalPrice)}</td>
+                    <td className="py-3 text-sm text-gray-300">{formatDate(invoice.createdAt)}</td>
+                    <td className="py-3">
+                      <button
+                        onClick={() => handleDownload(invoice)}
+                        disabled={downloadingId === invoice.id}
+                        className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:opacity-50 text-white rounded transition-colors"
+                      >
+                        <Download className="w-3 h-3" />
+                        {downloadingId === invoice.id ? 'Generating...' : 'Download'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   )

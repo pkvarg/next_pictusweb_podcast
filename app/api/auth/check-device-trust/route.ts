@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { createHash } from 'crypto'
-
-const prisma = new PrismaClient()
 
 const TRUST_DAYS = 10
 

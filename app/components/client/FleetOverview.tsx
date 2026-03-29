@@ -463,14 +463,14 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-xl">
-            <Car className="w-8 h-8 text-pictus-black" />
+          <div className="p-2 sm:p-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-xl">
+            <Car className="w-6 h-6 sm:w-8 sm:h-8 text-pictus-black" />
           </div>
           <div>
-            <h2 className="text-4xl font-light text-pictus-white">Vaša flotila</h2>
-            <p className="text-xl text-pictus-lime mt-1">
+            <h2 className="text-2xl sm:text-4xl font-light text-pictus-white">Vaša flotila</h2>
+            <p className="text-base sm:text-xl text-pictus-lime mt-1">
               {vehicles.length} {vehicles.length === 1 ? 'vozidlo' : vehicles.length < 5 ? 'vozidlá' : 'vozidiel'}
             </p>
           </div>
@@ -478,7 +478,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
         {isFleetManager && (
           <Link
             href="/client/my-fleet"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white px-5 py-2.5 rounded-lg font-normal hover:from-pictus-lime700 hover:to-pictus-black transition-all text-base shadow-lg"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white px-5 py-2.5 rounded-lg font-normal hover:from-pictus-lime700 hover:to-pictus-black transition-all text-base shadow-lg"
           >
             <Car size={18} />
             Spravovať

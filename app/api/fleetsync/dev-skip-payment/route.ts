@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import bcrypt from 'bcryptjs'
-
-const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   if (process.env.NEXT_PUBLIC_SKIP_VERIFICATION !== 'true') {
@@ -117,7 +115,5 @@ export async function POST(request: NextRequest) {
       error: 'Failed to create account',
       details: error instanceof Error ? error.message : 'Unknown error',
     }, { status: 500 })
-  } finally {
-    await prisma.$disconnect()
   }
 }

@@ -160,8 +160,8 @@ export default function TierManager() {
               className={`rounded-xl p-6 border transition-all ${tierColor(tier.name)}`}
             >
               {/* Tier Header */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${tierBadgeColor(tier.name)}`}>
                     {tier.name}
                   </span>
@@ -200,7 +200,7 @@ export default function TierManager() {
 
               {/* Display Mode */}
               {!isEditing && (
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                   <div>
                     <div className="text-xs text-gray-500 mb-1">Price / vehicle / month</div>
                     <div className="text-lg font-light text-white">

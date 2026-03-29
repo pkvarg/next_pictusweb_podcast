@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { hashPassword } from '../../../lib/isValidPassword'
 import { checkIPBan } from '@/lib/checkIPBan'
 import { checkTierLimit, TierLimitError } from '@/lib/tier-limits'
 import { randomUUID } from 'crypto'
 import axios from 'axios'
-
-const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {

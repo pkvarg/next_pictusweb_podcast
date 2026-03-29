@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { checkTierLimit, TierLimitError } from '@/lib/tier-limits'
-
-const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {

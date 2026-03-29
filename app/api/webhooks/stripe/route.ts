@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
-
-const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -193,7 +191,5 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Webhook processing error:', error)
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 })
-  } finally {
-    await prisma.$disconnect()
   }
 }
