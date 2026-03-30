@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci, canCreateBenefit } = body
+    const { id, name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci, canCreateBenefit, freeTrialEndDate, freeTrialTierId } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Organization ID is required' }, { status: 400 })
@@ -183,6 +183,8 @@ export async function PUT(request: NextRequest) {
         purchasedVehicles: toNullableInt(purchasedVehicles),
         ...(hiddenFromPictusaci !== undefined && { hiddenFromPictusaci: hiddenFromPictusaci === true }),
         ...(canCreateBenefit !== undefined && { canCreateBenefit: canCreateBenefit === true }),
+        ...(freeTrialEndDate !== undefined && { freeTrialEndDate: freeTrialEndDate ? new Date(freeTrialEndDate) : null }),
+        ...(freeTrialTierId !== undefined && { freeTrialTierId: freeTrialTierId || null }),
       },
       include: {
         parentOrganization: {

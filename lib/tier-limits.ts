@@ -1,4 +1,5 @@
 import prisma from '@/db/db';
+import { isExpired, SubscriptionRequiredError } from './subscription-status';
 
 export class TierLimitError extends Error {
   constructor(message: string) {
@@ -20,6 +21,11 @@ export async function checkTierLimit(
 
   if (!org) {
     throw new Error('Organization not found');
+  }
+
+  // Block resource creation if free trial has expired
+  if (isExpired(org)) {
+    throw new SubscriptionRequiredError();
   }
 
   // Benefit org: delegate vehicles/notifications to parent's pool

@@ -337,6 +337,12 @@ model Organization {
   subscriptionStartDate           DateTime?      @map("subscription_start_date")
   subscriptionEndDate             DateTime?      @map("subscription_end_date")
 
+  // Upgrade & free trial
+  pendingTierId                   String?        @map("pending_tier_id")
+  pendingTierStartsAt             DateTime?      @map("pending_tier_starts_at")
+  freeTrialEndDate                DateTime?      @map("free_trial_end_date")
+  freeTrialTierId                 String?        @map("free_trial_tier_id")
+
   // Invoicing / business identification
   ico                             String?        @db.VarChar(20)
   dic                             String?        @db.VarChar(20)

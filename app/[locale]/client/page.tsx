@@ -1,7 +1,7 @@
 'use client'
 import { useSession, signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { Link } from '@/i18n/routing'
 import {
   User,
@@ -22,6 +22,8 @@ import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotifi
 import FleetOverview from '@/app/components/client/FleetOverview'
 import SimpleDutyOverview from '@/app/components/client/SimpleDutyOverview'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
+import ExpiredBanner from '@/app/components/client/ExpiredBanner'
+import UpgradeBanner from '@/app/components/client/UpgradeBanner'
 import VerifyContactInfo from '@/app/components/client/VerifyContactInfo'
 
 interface TierInfo {
@@ -41,13 +43,19 @@ interface Organization {
   tierRelation?: TierInfo
   currentNotificationsCount: number
   notificationsBlocked: boolean
+  freeTrialEndDate: string | null
+  freeTrialTierId: string | null
+  stripeSubscriptionStatus: string | null
+  billingInterval: string | null
 }
 
 const ClientZone = () => {
   const { data: session } = useSession()
   const t = useTranslations('Client')
   const params = useParams()
+  const searchParams = useSearchParams()
   const locale = (params?.locale as string) || 'sk'
+  const showUpgradeBanner = searchParams.get('upgraded') === '1'
   const iframe1Ref = useRef<HTMLIFrameElement>(null)
   const iframe2Ref = useRef<HTMLIFrameElement>(null)
   const iframe3Ref = useRef<HTMLIFrameElement>(null)
@@ -250,6 +258,21 @@ const ClientZone = () => {
           </div>
         </div>
       </header>
+
+      {/* Expired free trial banner */}
+      {organization?.freeTrialEndDate &&
+       new Date(organization.freeTrialEndDate) < new Date() &&
+       !organization.stripeSubscriptionStatus && (
+        <ExpiredBanner
+          tierName={organization.tierRelation?.name || 'BASIC'}
+          endDate={organization.freeTrialEndDate}
+        />
+      )}
+
+      {/* Upgrade success banner */}
+      {showUpgradeBanner && organization?.billingInterval && (
+        <UpgradeBanner billingInterval={organization.billingInterval} />
+      )}
 
       {organization?.tierRelation && (
         <NotificationLimitBanner

@@ -24,6 +24,68 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
+
+        // Handle upgrade from FREE -> paid
+        const upgradeOrgId = session.metadata?.upgradeOrganizationId
+        if (upgradeOrgId) {
+          const targetTierId = session.metadata?.targetTierId
+          const purchasedVehicles = parseInt(session.metadata?.purchasedVehicles || '1')
+          const billingInterval = session.metadata?.billingInterval || 'monthly'
+
+          const targetTier = targetTierId
+            ? await prisma.tier.findUnique({ where: { id: targetTierId } })
+            : null
+
+          if (targetTier) {
+            await prisma.organization.update({
+              where: { id: upgradeOrgId },
+              data: {
+                tierId: targetTier.id,
+                purchasedVehicles,
+                vehiclesLimit: purchasedVehicles,
+                usersLimit: targetTier.usersLimit,
+                notificationsLimit: targetTier.notificationsLimit,
+                templatesLimit: targetTier.templatesLimit,
+                notificationTypesLimit: targetTier.notificationTypesLimit,
+                stripeCustomerId: session.customer as string,
+                stripeSubscriptionId: session.subscription as string,
+                stripeSubscriptionStatus: 'active',
+                billingInterval,
+                subscriptionStartDate: new Date(),
+                notificationPeriodStart: new Date(),
+                notificationsBlocked: false,
+              },
+            })
+            console.log('Successfully upgraded org:', upgradeOrgId, 'to tier:', targetTier.name)
+          }
+          break
+        }
+
+        // Handle activation after free trial expiry
+        const activateOrgId = session.metadata?.activateOrganizationId
+        if (activateOrgId) {
+          const billingInterval = session.metadata?.billingInterval || 'monthly'
+          const activateVehicles = parseInt(session.metadata?.purchasedVehicles || '0') || undefined
+
+          await prisma.organization.update({
+            where: { id: activateOrgId },
+            data: {
+              stripeCustomerId: session.customer as string,
+              stripeSubscriptionId: session.subscription as string,
+              stripeSubscriptionStatus: 'active',
+              billingInterval,
+              subscriptionStartDate: new Date(),
+              notificationPeriodStart: new Date(),
+              notificationsBlocked: false,
+              freeTrialEndDate: null,
+              freeTrialTierId: null,
+              ...(activateVehicles && { purchasedVehicles: activateVehicles, vehiclesLimit: activateVehicles }),
+            },
+          })
+          console.log('Successfully activated subscription for org:', activateOrgId)
+          break
+        }
+
         const pendingId = session.metadata?.pendingOnboardingId
 
         if (!pendingId) {

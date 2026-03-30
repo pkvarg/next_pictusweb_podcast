@@ -33,6 +33,9 @@ interface Organization {
   purchasedVehicles: number | null
   hiddenFromPictusaci: boolean
   canCreateBenefit: boolean
+  freeTrialEndDate: string | null
+  freeTrialTierId: string | null
+  stripeSubscriptionStatus: string | null
   isBenefitOrg: boolean
   createdAt: string
   updatedAt: string
@@ -131,6 +134,8 @@ export default function OrganizationManager() {
       purchasedVehicles: organization.purchasedVehicles ?? '',
       hiddenFromPictusaci: organization.hiddenFromPictusaci || false,
       canCreateBenefit: organization.canCreateBenefit || false,
+      freeTrialEndDate: organization.freeTrialEndDate ? organization.freeTrialEndDate.split('T')[0] : '',
+      freeTrialTierId: organization.freeTrialTierId || '',
     })
   }
 
@@ -153,6 +158,8 @@ export default function OrganizationManager() {
           purchasedVehicles: editingItem.purchasedVehicles === '' ? null : editingItem.purchasedVehicles,
           hiddenFromPictusaci: editingItem.hiddenFromPictusaci,
           canCreateBenefit: editingItem.canCreateBenefit,
+          freeTrialEndDate: editingItem.freeTrialEndDate || null,
+          freeTrialTierId: editingItem.freeTrialTierId || null,
         }),
       })
 
@@ -395,6 +402,40 @@ export default function OrganizationManager() {
                         />
                       </div>
                     </div>
+                    {/* Free trial fields */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+                      <div>
+                        <label className="text-xs text-gray-400">Free Period Ends</label>
+                        <input
+                          type="date"
+                          value={editingItem.freeTrialEndDate}
+                          onChange={(e) => setEditingItem({ ...editingItem, freeTrialEndDate: e.target.value })}
+                          className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-400">Gifted Tier</label>
+                        <select
+                          value={editingItem.freeTrialTierId}
+                          onChange={(e) => setEditingItem({ ...editingItem, freeTrialTierId: e.target.value })}
+                          className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
+                        >
+                          <option value="">None</option>
+                          {tiers.filter(t => t.name !== 'FREE').map((tier) => (
+                            <option key={tier.id} value={tier.id}>
+                              {tier.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {editingItem.freeTrialEndDate && editingItem.freeTrialTierId && (
+                        <div className="flex items-end">
+                          <span className="text-xs text-amber-300 bg-amber-500/10 px-2 py-1.5 rounded-lg">
+                            Free {tiers.find(t => t.id === editingItem.freeTrialTierId)?.name || '?'} until {editingItem.freeTrialEndDate}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     {/* Toggles row */}
                     <div className="flex items-center gap-6 mt-3">
                       <div className="flex items-center gap-2">
@@ -470,6 +511,17 @@ export default function OrganizationManager() {
                           <span className="px-2 py-1 bg-red-500/20 text-red-300 text-xs rounded font-medium">
                             Hidden
                           </span>
+                        )}
+                        {org.freeTrialEndDate && org.freeTrialTierId && (
+                          new Date(org.freeTrialEndDate) < new Date() && !org.stripeSubscriptionStatus ? (
+                            <span className="px-2 py-1 bg-red-500/20 text-red-300 text-xs rounded font-medium">
+                              Expired
+                            </span>
+                          ) : new Date(org.freeTrialEndDate) >= new Date() ? (
+                            <span className="px-2 py-1 bg-amber-500/20 text-amber-300 text-xs rounded font-medium">
+                              Free until {new Date(org.freeTrialEndDate).toLocaleDateString()}
+                            </span>
+                          ) : null
                         )}
                         {org.childOrganizations && org.childOrganizations.length > 0 && (
                           <span className="px-2 py-1 bg-pictus-lime/20 text-pictus-lime text-xs rounded">

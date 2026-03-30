@@ -1,13 +1,33 @@
 import { NextResponse } from 'next/server'
+import prisma from '@/db/db'
 
 export const dynamic = 'force-dynamic'
 
-const HARDCODED_PRICING = [
-  { name: 'BASIC', pricePerVehicle: 2, pricePerVehicleYearly: 20, yearlyDiscount: 0.83, vehiclesLimit: 999 },
-  { name: 'BUSINESS', pricePerVehicle: 3, pricePerVehicleYearly: 30, yearlyDiscount: 0.83, vehiclesLimit: 999 },
-  { name: 'FREE', pricePerVehicle: 0, pricePerVehicleYearly: 0, yearlyDiscount: 1, vehiclesLimit: 1 },
-]
-
 export async function GET() {
-  return NextResponse.json({ pricing: HARDCODED_PRICING })
+  try {
+    const tiers = await prisma.tier.findMany({
+      where: { deletedAt: null },
+      select: {
+        name: true,
+        pricePerVehicle: true,
+        pricePerVehicleYearly: true,
+        yearlyDiscount: true,
+        vehiclesLimit: true,
+      },
+      orderBy: { name: 'asc' },
+    })
+
+    const pricing = tiers.map((t) => ({
+      name: t.name,
+      pricePerVehicle: t.pricePerVehicle ? Number(t.pricePerVehicle) : 0,
+      pricePerVehicleYearly: t.pricePerVehicleYearly ? Number(t.pricePerVehicleYearly) : 0,
+      yearlyDiscount: t.yearlyDiscount ? Number(t.yearlyDiscount) : 1,
+      vehiclesLimit: t.vehiclesLimit,
+    }))
+
+    return NextResponse.json({ pricing })
+  } catch (error) {
+    console.error('Failed to fetch pricing:', error)
+    return NextResponse.json({ error: 'Failed to fetch pricing' }, { status: 500 })
+  }
 }
