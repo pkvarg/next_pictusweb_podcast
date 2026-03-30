@@ -1,7 +1,7 @@
 'use client'
 import { useSession, signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { Link } from '@/i18n/routing'
 import {
   User,
@@ -53,9 +53,14 @@ const ClientZone = () => {
   const { data: session } = useSession()
   const t = useTranslations('Client')
   const params = useParams()
-  const searchParams = useSearchParams()
   const locale = (params?.locale as string) || 'sk'
-  const showUpgradeBanner = searchParams.get('upgraded') === '1'
+  const [showUpgradeBanner, setShowUpgradeBanner] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('upgraded') === '1') {
+      setShowUpgradeBanner(true)
+    }
+  }, [])
   const iframe1Ref = useRef<HTMLIFrameElement>(null)
   const iframe2Ref = useRef<HTMLIFrameElement>(null)
   const iframe3Ref = useRef<HTMLIFrameElement>(null)
