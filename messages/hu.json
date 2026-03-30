@@ -73,6 +73,8 @@
     "reviewsDesignationMich": "Ingatlanközvetítő",
     "reviewsDesignationSam": "Szerző",
     "reviewsDesignationVlado": "Fizioterápeuta",
+    "reviewsJan": "Kiváló és professzionális munka, mindig tartja, amiben megállapodunk, ráadásul kreatív. Mindenkinek ajánlom.",
+    "reviewsDesignationJan": "Tulajdonos",
 
     "heroLabel": "Kreatív stúdió",
     "heroSubtitle": "Modern weboldalak és intelligens megoldások komolyan gondolkodó vállalkozásoknak.",
@@ -109,6 +111,8 @@
     "testimonial5Role": "Szerző - cestazivota.sk",
     "testimonial6": "A Pictuswebet a weboldalem grafikai dizájnjának átalakítása miatt kerestem fel. Az együttműködést nagyon pozitívan értékelem, nagyon kedves, segítőkész és gyors volt. Határozottan ajánlom.",
     "testimonial6Role": "Fizioterápeuta - fyziology.sk",
+    "testimonial7": "Kiváló és professzionális munka, mindig tartja, amiben megállapodunk, ráadásul kreatív. Mindenkinek ajánlom.",
+    "testimonial7Role": "Tulajdonos - bow4bass.com",
 
     "ourProjectsTitle": "projektjeink",
 
@@ -910,7 +914,28 @@
     "activateSuccessDescription": "Az előfizetése most aktív. Teljes hozzáféréssel rendelkezik az összes funkcióhoz.",
     "upgradeSuccessTitle": "Frissítés kész!",
     "upgradeSuccessDescription": "A csomagja sikeresen frissült. Élvezze az új funkciókat.",
-    "goToDashboard": "Vezérlőpultra"
+    "goToDashboard": "Vezérlőpultra",
+    "upgrade": "Frissítés",
+    "upgradePageTitle": "Csomag frissítése",
+    "upgradeCurrentPlan": "Jelenlegi csomag: {tierName}",
+    "upgradePaymentCanceled": "A fizetés megszakadt. Próbálja újra, amikor készen áll.",
+    "upgradeSelectPlan": "Csomag kiválasztása",
+    "upgradeBillingPeriod": "Számlázási időszak",
+    "upgradeMonthly": "Havi",
+    "upgradeYearly": "Éves",
+    "upgradeVehicles": "Járművek száma",
+    "upgradeVehiclePerMonth": "{price}\u20ac/jármű/hó",
+    "upgradePriceSummary": "{count} jármű \u00d7 {price}\u20ac/{period}",
+    "upgradePeriodMonth": "hónap",
+    "upgradePeriodYear": "év",
+    "upgradeProratedNote": "Az arányos árkülönbséget azonnal felszámítjuk.",
+    "upgradeNextCycleNote": "Az új díjszabás a következő számlázási ciklustól lép érvénybe. Ma nem számítunk fel díjat.",
+    "upgradeButton": "Frissítés erre: {tierName}",
+    "upgradeProcessing": "Feldolgozás...",
+    "upgradeError": "Valami hiba történt. Próbálja újra.",
+    "upgradeHighestTier": "A legmagasabb csomagon van",
+    "upgradeAlreadyOn": "A szervezete már a {tierName} csomagon van.",
+    "upgradeBackToDashboard": "Vissza a vezérlőpultra"
   },
   "Benefit": {
     "activateTitle": "Aktiválja a Benefit fiókját",

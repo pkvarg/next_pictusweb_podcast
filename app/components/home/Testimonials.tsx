@@ -12,6 +12,7 @@ const testimonials = [
   { name: 'Michal Dovala', roleKey: 'testimonial4Role', image: '/michal.webp', quoteKey: 'testimonial4' },
   { name: 'Samuel Koriťák', roleKey: 'testimonial5Role', image: '/sam1.webp', quoteKey: 'testimonial5' },
   { name: 'Vladimír Chovanec', roleKey: 'testimonial6Role', image: '/vlado.webp', quoteKey: 'testimonial6' },
+  { name: 'Ján Prievozník', roleKey: 'testimonial7Role', image: '/jp-review.webp', quoteKey: 'testimonial7' },
 ]
 
 const cardStyle = {

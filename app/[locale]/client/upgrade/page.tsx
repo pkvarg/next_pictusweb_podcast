@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
 import { ArrowUp, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 import { Link } from '@/i18n/routing'
+import { useTranslations } from 'next-intl'
 
 interface TierInfo {
   id: string
@@ -35,6 +36,7 @@ interface PricingTier {
 
 export default function UpgradePage() {
   const { data: session } = useSession()
+  const t = useTranslations('Client')
   const params = useParams()
   const router = useRouter()
   const locale = (params?.locale as string) || 'sk'
@@ -107,6 +109,7 @@ export default function UpgradePage() {
     ? (selectedPricing?.pricePerVehicleYearly || 0)
     : (selectedPricing?.pricePerVehicle || 0)
   const totalPrice = pricePerVehicle * vehicleCount
+  const periodLabel = billingInterval === 'yearly' ? t('upgradePeriodYear') : t('upgradePeriodMonth')
 
   const handleUpgrade = async () => {
     setUpgrading(true)
@@ -122,7 +125,7 @@ export default function UpgradePage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Upgrade failed')
+        setError(data.error || t('upgradeError'))
         return
       }
 
@@ -132,7 +135,7 @@ export default function UpgradePage() {
         router.push(`/${locale}/client?upgraded=1`)
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.')
+      setError(t('upgradeError'))
     } finally {
       setUpgrading(false)
     }
@@ -151,10 +154,10 @@ export default function UpgradePage() {
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="bg-white/5 rounded-xl p-8 border border-white/10 text-center">
           <CheckCircle className="w-12 h-12 text-pictus-lime mx-auto mb-4" />
-          <h2 className="text-2xl font-light text-white mb-2">You&apos;re on the highest tier</h2>
-          <p className="text-gray-400">Your organization is already on the {currentTierName} plan.</p>
+          <h2 className="text-2xl font-light text-white mb-2">{t('upgradeHighestTier')}</h2>
+          <p className="text-gray-400">{t('upgradeAlreadyOn', { tierName: currentTierName })}</p>
           <Link href="/client" className="inline-block mt-6 px-6 py-2 bg-pictus-lime text-pictus-black rounded-lg hover:bg-pictus-lime/90 transition-all">
-            Back to Dashboard
+            {t('upgradeBackToDashboard')}
           </Link>
         </div>
       </div>
@@ -164,16 +167,16 @@ export default function UpgradePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-light text-white mb-2">Upgrade Your Plan</h1>
+        <h1 className="text-3xl font-light text-white mb-2">{t('upgradePageTitle')}</h1>
         <p className="text-gray-400">
-          Current plan: <span className="text-pictus-lime font-medium">{currentTierName}</span>
+          {t('upgradeCurrentPlan', { tierName: currentTierName })}
         </p>
       </div>
 
       {canceled && (
         <div className="bg-amber-500/15 border border-amber-500/30 rounded-xl p-4 mb-6 flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
-          <p className="text-amber-300 text-sm">Payment was canceled. You can try again when ready.</p>
+          <p className="text-amber-300 text-sm">{t('upgradePaymentCanceled')}</p>
         </div>
       )}
 
@@ -188,7 +191,7 @@ export default function UpgradePage() {
         {/* Tier Selection */}
         {availableTargets.length > 1 && (
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">Select Plan</label>
+            <label className="text-sm text-gray-400 mb-2 block">{t('upgradeSelectPlan')}</label>
             <div className="grid grid-cols-2 gap-3">
               {availableTargets.map((tier) => (
                 <button
@@ -206,7 +209,7 @@ export default function UpgradePage() {
                 >
                   <p className="font-medium text-lg">{tier}</p>
                   <p className="text-sm mt-1 opacity-70">
-                    {pricing.find((p) => p.name === tier)?.pricePerVehicle || 0}&euro;/vehicle/mo
+                    {t('upgradeVehiclePerMonth', { price: pricing.find((p) => p.name === tier)?.pricePerVehicle || 0 })}
                   </p>
                 </button>
               ))}
@@ -216,7 +219,7 @@ export default function UpgradePage() {
 
         {/* Billing Interval */}
         <div>
-          <label className="text-sm text-gray-400 mb-2 block">Billing Period</label>
+          <label className="text-sm text-gray-400 mb-2 block">{t('upgradeBillingPeriod')}</label>
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setBillingInterval('monthly')}
@@ -226,7 +229,7 @@ export default function UpgradePage() {
                   : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
               }`}
             >
-              Monthly
+              {t('upgradeMonthly')}
             </button>
             <button
               onClick={() => setBillingInterval('yearly')}
@@ -236,14 +239,14 @@ export default function UpgradePage() {
                   : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
               }`}
             >
-              Yearly
+              {t('upgradeYearly')}
             </button>
           </div>
         </div>
 
         {/* Vehicle Count */}
         <div>
-          <label className="text-sm text-gray-400 mb-2 block">Number of Vehicles</label>
+          <label className="text-sm text-gray-400 mb-2 block">{t('upgradeVehicles')}</label>
           <input
             type="number"
             min={1}
@@ -258,7 +261,7 @@ export default function UpgradePage() {
         <div className="bg-white/5 rounded-lg p-4 border border-white/10">
           <div className="flex justify-between items-center">
             <span className="text-gray-400">
-              {vehicleCount} vehicle{vehicleCount !== 1 ? 's' : ''} &times; {pricePerVehicle}&euro;/{billingInterval === 'yearly' ? 'year' : 'month'}
+              {t('upgradePriceSummary', { count: vehicleCount, price: pricePerVehicle, period: periodLabel })}
             </span>
             <span className="text-2xl font-light text-white">
               {totalPrice}&euro;<span className="text-sm text-gray-400">/{billingInterval === 'yearly' ? 'yr' : 'mo'}</span>
@@ -266,9 +269,7 @@ export default function UpgradePage() {
           </div>
           {currentTierName === 'BASIC' && targetTier === 'BUSINESS' && (
             <p className="text-xs text-gray-500 mt-2">
-              {billingInterval === 'yearly'
-                ? 'You will be charged the prorated price difference immediately.'
-                : 'New rate starts on your next billing cycle. No charge today.'}
+              {billingInterval === 'yearly' ? t('upgradeProratedNote') : t('upgradeNextCycleNote')}
             </p>
           )}
         </div>
@@ -284,13 +285,13 @@ export default function UpgradePage() {
           ) : (
             <ArrowUp className="w-5 h-5" />
           )}
-          {upgrading ? 'Processing...' : `Upgrade to ${targetTier}`}
+          {upgrading ? t('upgradeProcessing') : t('upgradeButton', { tierName: targetTier })}
         </button>
       </div>
 
       <div className="mt-6 text-center">
         <Link href="/client" className="text-gray-400 hover:text-white transition-all text-sm">
-          &larr; Back to Dashboard
+          &larr; {t('upgradeBackToDashboard')}
         </Link>
       </div>
     </div>

@@ -8,6 +8,7 @@ import {
   FolderOpen,
   UserCheck,
   LogOut,
+  ArrowUp,
   Mail,
   Settings,
   Lock,
@@ -248,6 +249,15 @@ const ClientZone = () => {
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4">
+              {organization?.tierRelation?.name && organization.tierRelation.name !== 'BUSINESS' && (
+                <Link
+                  href="/client/upgrade"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium shrink-0"
+                >
+                  <ArrowUp size={14} />
+                  <span className="hidden sm:inline">{t('upgrade')}</span>
+                </Link>
+              )}
               <div className="flex items-center space-x-2 text-pictus-white">
                 <User size={16} className="shrink-0" />
                 <span className="text-sm sm:text-lg truncate max-w-[100px] sm:max-w-none">{session?.user?.name}</span>
@@ -296,7 +306,10 @@ const ClientZone = () => {
             <h1 className="text-3xl sm:text-5xl font-light text-pictus-white mb-4 sm:mb-6 leading-tight">
               {t('welcomeTitle')}
             </h1>
-            <p className="text-xl sm:text-3xl text-pictus-lime mb-4 sm:mb-6">{session?.user?.name}</p>
+            <p className="text-xl sm:text-3xl text-pictus-lime mb-2 sm:mb-3">{session?.user?.name}</p>
+            {organization?.tierRelation?.name && (
+              <p className="text-sm text-gray-400 mb-3 sm:mb-4">{organization.tierRelation.name}</p>
+            )}
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-light leading-tight text-center mb-6 sm:mb-8">FleetSync</h2>
           </div>
         </section>

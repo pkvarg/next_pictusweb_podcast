@@ -59,6 +59,8 @@
     "reviewsDesignationMich": "Real Estate Agent",
     "reviewsDesignationSam": "Author",
     "reviewsDesignationVlado": "Physiotherapist",
+    "reviewsJan": "Excellent and professional work, he always delivers on what we agree on, and on top of that he's creative. I recommend him to everyone.",
+    "reviewsDesignationJan": "Owner",
 
     "heroLabel": "Creative Studio",
     "heroSubtitle": "Modern websites and intelligent solutions for businesses that mean it.",
@@ -95,6 +97,8 @@
     "testimonial5Role": "Author - cestazivota.sk",
     "testimonial6": "I sought out Pictusweb for restyling the graphic design of my website. I rate the collaboration very positively, he was very pleasant, helpful and fast. Definitely recommend.",
     "testimonial6Role": "Physiotherapist - fyziology.sk",
+    "testimonial7": "Excellent and professional work, he always delivers on what we agree on, and on top of that he's creative. I recommend him to everyone.",
+    "testimonial7Role": "Owner - bow4bass.com",
 
     "ourProjectsTitle": "our projects",
 
@@ -906,7 +910,28 @@
     "activateSuccessDescription": "Your subscription is now active. You have full access to all features.",
     "upgradeSuccessTitle": "Upgrade Complete!",
     "upgradeSuccessDescription": "Your plan has been upgraded successfully. Enjoy your new features.",
-    "goToDashboard": "Go to Dashboard"
+    "goToDashboard": "Go to Dashboard",
+    "upgrade": "Upgrade",
+    "upgradePageTitle": "Upgrade Your Plan",
+    "upgradeCurrentPlan": "Current plan: {tierName}",
+    "upgradePaymentCanceled": "Payment was canceled. You can try again when ready.",
+    "upgradeSelectPlan": "Select Plan",
+    "upgradeBillingPeriod": "Billing Period",
+    "upgradeMonthly": "Monthly",
+    "upgradeYearly": "Yearly",
+    "upgradeVehicles": "Number of Vehicles",
+    "upgradeVehiclePerMonth": "{price}\u20ac/vehicle/mo",
+    "upgradePriceSummary": "{count} {count, plural, one {vehicle} other {vehicles}} \u00d7 {price}\u20ac/{period}",
+    "upgradePeriodMonth": "month",
+    "upgradePeriodYear": "year",
+    "upgradeProratedNote": "You will be charged the prorated price difference immediately.",
+    "upgradeNextCycleNote": "New rate starts on your next billing cycle. No charge today.",
+    "upgradeButton": "Upgrade to {tierName}",
+    "upgradeProcessing": "Processing...",
+    "upgradeError": "Something went wrong. Please try again.",
+    "upgradeHighestTier": "You're on the highest tier",
+    "upgradeAlreadyOn": "Your organization is already on the {tierName} plan.",
+    "upgradeBackToDashboard": "Back to Dashboard"
   },
   "Benefit": {
     "activateTitle": "Activate Your Benefit Account",
