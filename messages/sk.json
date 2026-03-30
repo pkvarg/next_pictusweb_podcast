@@ -902,7 +902,12 @@
     "activatePayButton": "Zaplatiť a aktivovať",
     "activateProcessing": "Spracováva sa...",
     "activateBackToDashboard": "Späť na panel",
-    "activateError": "Niečo sa pokazilo. Skúste to znova."
+    "activateError": "Niečo sa pokazilo. Skúste to znova.",
+    "activateSuccessTitle": "Predplatné aktivované!",
+    "activateSuccessDescription": "Vaše predplatné je teraz aktívne. Máte plný prístup ku všetkým funkciám.",
+    "upgradeSuccessTitle": "Upgrade dokončený!",
+    "upgradeSuccessDescription": "Váš plán bol úspešne upgradovaný. Užívajte si nové funkcie.",
+    "goToDashboard": "Prejsť na panel"
   },
   "Benefit": {
     "activateTitle": "Aktivujte svoj Benefit účet",

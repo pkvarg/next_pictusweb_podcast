@@ -901,7 +901,12 @@
     "activatePayButton": "Pay & Activate",
     "activateProcessing": "Processing...",
     "activateBackToDashboard": "Back to Dashboard",
-    "activateError": "Something went wrong. Please try again."
+    "activateError": "Something went wrong. Please try again.",
+    "activateSuccessTitle": "Subscription Activated!",
+    "activateSuccessDescription": "Your subscription is now active. You have full access to all features.",
+    "upgradeSuccessTitle": "Upgrade Complete!",
+    "upgradeSuccessDescription": "Your plan has been upgraded successfully. Enjoy your new features.",
+    "goToDashboard": "Go to Dashboard"
   },
   "Benefit": {
     "activateTitle": "Activate Your Benefit Account",

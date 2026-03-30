@@ -905,7 +905,12 @@
     "activatePayButton": "Fizetés és aktiválás",
     "activateProcessing": "Feldolgozás...",
     "activateBackToDashboard": "Vissza a vezérlőpultra",
-    "activateError": "Valami hiba történt. Próbálja újra."
+    "activateError": "Valami hiba történt. Próbálja újra.",
+    "activateSuccessTitle": "Előfizetés aktiválva!",
+    "activateSuccessDescription": "Az előfizetése most aktív. Teljes hozzáféréssel rendelkezik az összes funkcióhoz.",
+    "upgradeSuccessTitle": "Frissítés kész!",
+    "upgradeSuccessDescription": "A csomagja sikeresen frissült. Élvezze az új funkciókat.",
+    "goToDashboard": "Vezérlőpultra"
   },
   "Benefit": {
     "activateTitle": "Aktiválja a Benefit fiókját",
