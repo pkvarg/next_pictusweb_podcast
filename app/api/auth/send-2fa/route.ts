@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { createHash, createHmac } from 'crypto'
+import { rateLimit, rateLimitResponse, getClientIP } from '@/lib/rateLimit'
 
 const OTP_SALT = process.env.OTP_SALT!
 const SESSION_SECRET = process.env.VERIFICATION_SESSION_SECRET!
@@ -36,6 +37,11 @@ export async function POST(request: NextRequest) {
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
+
+    // Rate limit: 10 sends per IP per 15 min
+    const ip = getClientIP(request.headers)
+    const ipLimit = rateLimit({ key: `send_2fa:${ip}`, maxAttempts: 10, windowMs: 15 * 60 * 1000 })
+    if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
 
     // Look up user
     const user = await prisma.user.findUnique({

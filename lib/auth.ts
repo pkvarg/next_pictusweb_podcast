@@ -5,6 +5,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import GitHubProvider from 'next-auth/providers/github'
 import { isValidPassword } from './isValidPassword'
 import prisma from '@/db/db'
+import { rateLimit } from './rateLimit'
 
 // Extend the built-in session types
 declare module 'next-auth' {
@@ -195,9 +196,17 @@ export const authOptions = {
       },
       async authorize(credentials) {
         console.log('Credentials login attempt for:', credentials?.username)
-        
+
         if (!credentials?.username || !credentials?.password) {
           console.log('Missing credentials')
+          return null
+        }
+
+        // Rate limit: 5 failed attempts per email per 15 min
+        const emailKey = `login_fail:${credentials.username.toLowerCase()}`
+        const emailLimit = rateLimit({ key: emailKey, maxAttempts: 5, windowMs: 15 * 60 * 1000, checkOnly: true })
+        if (!emailLimit.success) {
+          console.log('Rate limit exceeded for email:', credentials.username)
           return null
         }
 
@@ -243,6 +252,8 @@ export const authOptions = {
           }
           
           if (!isValidPwd) {
+            // Record the failed attempt for rate limiting
+            rateLimit({ key: emailKey, maxAttempts: 5, windowMs: 15 * 60 * 1000 })
             console.log('Credentials login FAILED for:', credentials.username, '- Invalid password')
             return null
           }

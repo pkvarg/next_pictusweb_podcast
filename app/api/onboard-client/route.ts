@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
 import bcrypt from 'bcryptjs'
 import { stripe, getStripePriceId } from '@/lib/stripe'
+import { rateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +13,10 @@ export async function POST(request: NextRequest) {
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    // Rate limit: 5 per user per hour
+    const userLimit = rateLimit({ key: `onboard_client:${session.user.id}`, maxAttempts: 5, windowMs: 60 * 60 * 1000 })
+    if (!userLimit.success) return rateLimitResponse(userLimit.retryAfterMs)
 
     // Check if user is from PICTUSACI organization
     const currentUser = await prisma.user.findUnique({

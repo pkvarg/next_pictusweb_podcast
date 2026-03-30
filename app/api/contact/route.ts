@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkIPBan } from '@/lib/checkIPBan'
 import db from '@/db/db'
 import axios from 'axios'
+import { rateLimit, rateLimitResponse, getClientIP } from '@/lib/rateLimit'
 
 /**
  * Contact form proxy with IP ban protection
@@ -10,6 +11,11 @@ import axios from 'axios'
  */
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 3 per IP per hour
+    const ip = getClientIP(request.headers)
+    const ipLimit = rateLimit({ key: `contact:${ip}`, maxAttempts: 3, windowMs: 60 * 60 * 1000 })
+    if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
+
     // Check if IP is banned first
     const ipCheck = await checkIPBan(request)
     if (ipCheck.isBanned && ipCheck.banInfo) {

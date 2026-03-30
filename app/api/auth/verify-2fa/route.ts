@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { createHash, createHmac, randomUUID } from 'crypto'
+import { rateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 const OTP_SALT = process.env.OTP_SALT!
 const SESSION_SECRET = process.env.VERIFICATION_SESSION_SECRET!
@@ -50,6 +51,11 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = tokenData.identifier
+
+    // Global lockout: 15 failed attempts per user per hour
+    const lockoutKey = `verify_2fa:${userId}`
+    const lockout = rateLimit({ key: lockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000, checkOnly: true })
+    if (!lockout.success) return rateLimitResponse(lockout.retryAfterMs)
     const tokenHash = hashToken(verificationToken)
 
     const record = await prisma.verificationCode.findUnique({ where: { tokenHash } })
@@ -63,10 +69,12 @@ export async function POST(request: NextRequest) {
     })
 
     if (record.attempts + 1 > MAX_ATTEMPTS) {
+      rateLimit({ key: lockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000 })
       return NextResponse.json({ error: 'Too many attempts. Please request a new code.' }, { status: 429 })
     }
 
     if (record.codeHash !== hashCode(code, userId)) {
+      rateLimit({ key: lockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000 })
       const remaining = MAX_ATTEMPTS - (record.attempts + 1)
       return NextResponse.json(
         { error: 'Incorrect code', attemptsRemaining: remaining },

@@ -74,3 +74,6 @@ mds/gdpr_fleetsync.md
 benefit_docs.md
 mds/verify_2FA.md
 mds/invoice.md
+mds/rate_limits.md
+mds/upgrade_pay.md
+test-rate-limits.mjs

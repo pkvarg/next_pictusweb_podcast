@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkIPBan } from '@/lib/checkIPBan'
 import axios from 'axios'
+import { rateLimit, rateLimitResponse, getClientIP } from '@/lib/rateLimit'
 
 /**
  * Forgot password proxy with IP ban protection
@@ -21,6 +22,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Rate limit: 10 per IP per hour
+    const ip = getClientIP(request.headers)
+    const ipLimit = rateLimit({ key: `forgot_password:${ip}`, maxAttempts: 10, windowMs: 60 * 60 * 1000 })
+    if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
+
     // Get request body
     const body = await request.json()
     const { name, email, resetUrl, origin, locale } = body
@@ -33,6 +39,10 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       )
     }
+
+    // Rate limit: 5 per email per hour
+    const emailLimit = rateLimit({ key: `forgot_password_email:${email.toLowerCase()}`, maxAttempts: 5, windowMs: 60 * 60 * 1000 })
+    if (!emailLimit.success) return rateLimitResponse(emailLimit.retryAfterMs)
 
     // Forward to Hono API
     const honoApiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/email-forgot-password`

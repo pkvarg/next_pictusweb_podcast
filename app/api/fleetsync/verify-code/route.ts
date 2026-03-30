@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { createHash, createHmac } from 'crypto'
+import { rateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 const OTP_SALT = process.env.OTP_SALT!
 const SESSION_SECRET = process.env.VERIFICATION_SESSION_SECRET!
@@ -82,6 +83,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
+    // Global lockout: 15 failed verify attempts per identifier per hour
+    const emailLockoutKey = `verify_onboard:${email.toLowerCase()}`
+    const emailLockout = rateLimit({ key: emailLockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000, checkOnly: true })
+    if (!emailLockout.success) return rateLimitResponse(emailLockout.retryAfterMs)
+    if (phoneNumber) {
+      const phoneLockoutKey = `verify_onboard:${phoneNumber}`
+      const phoneLockout = rateLimit({ key: phoneLockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000, checkOnly: true })
+      if (!phoneLockout.success) return rateLimitResponse(phoneLockout.retryAfterMs)
+    }
+
     // Dev skip: NEXT_PUBLIC_SKIP_VERIFICATION=true accepts '000000'
     if (
       process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true' &&
@@ -108,6 +119,14 @@ export async function POST(request: NextRequest) {
       if (tokenData && tokenData.purpose === 'onboard_phone') {
         phoneVerified = await verifyOneCode(phoneCode, phoneToken, phoneNumber, 'onboard_phone')
       }
+    }
+
+    // Record failed attempts for global lockout
+    if (!emailVerified && emailToken && emailCode) {
+      rateLimit({ key: emailLockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000 })
+    }
+    if (!phoneVerified && phoneToken && phoneCode && phoneNumber) {
+      rateLimit({ key: `verify_onboard:${phoneNumber}`, maxAttempts: 7, windowMs: 60 * 60 * 1000 })
     }
 
     return NextResponse.json({ emailVerified, phoneVerified })

@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import bcrypt from 'bcryptjs'
+import { rateLimit, rateLimitResponse, getClientIP } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 3 per IP per hour
+    const ip = getClientIP(request.headers)
+    const ipLimit = rateLimit({ key: `onboard_free:${ip}`, maxAttempts: 3, windowMs: 60 * 60 * 1000 })
+    if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
+
     const body = await request.json()
     const {
       organizationName,
