@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
 import { CreditCard, Loader2, AlertCircle } from 'lucide-react'
 import { Link } from '@/i18n/routing'
@@ -18,9 +18,9 @@ export default function ActivatePage() {
   const { data: session } = useSession()
   const t = useTranslations('Client')
   const params = useParams()
-  const searchParams = useSearchParams()
   const locale = (params?.locale as string) || 'sk'
 
+  const [canceled, setCanceled] = useState(false)
   const [tierName, setTierName] = useState('')
   const [vehicleCount, setVehicleCount] = useState(1)
   const [pricing, setPricing] = useState<PricingTier[]>([])
@@ -29,7 +29,11 @@ export default function ActivatePage() {
   const [activating, setActivating] = useState(false)
   const [error, setError] = useState('')
 
-  const canceled = searchParams.get('canceled') === '1'
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('canceled') === '1') {
+      setCanceled(true)
+    }
+  }, [])
 
   const fetchData = useCallback(async () => {
     const orgId = (session?.user as any)?.organization

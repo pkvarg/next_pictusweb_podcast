@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
 import { ArrowUp, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 import { Link } from '@/i18n/routing'
@@ -37,9 +37,9 @@ export default function UpgradePage() {
   const { data: session } = useSession()
   const params = useParams()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const locale = (params?.locale as string) || 'sk'
 
+  const [canceled, setCanceled] = useState(false)
   const [org, setOrg] = useState<Organization | null>(null)
   const [pricing, setPricing] = useState<PricingTier[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,7 +50,11 @@ export default function UpgradePage() {
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [vehicleCount, setVehicleCount] = useState(1)
 
-  const canceled = searchParams.get('canceled') === '1'
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('canceled') === '1') {
+      setCanceled(true)
+    }
+  }, [])
 
   const fetchData = useCallback(async () => {
     const orgId = (session?.user as any)?.organization
