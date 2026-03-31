@@ -20,7 +20,7 @@ export async function generateMetadata({
     title: 'FleetSync - ' + t('metaTitle'),
     description: t('metaDescription'),
     keywords:
-      'fleet management, vehicle notifications, STK Slovakia, EK reminders, vehicle tracking, fleet automation',
+      'fleet management, vehicle notifications, STK Slovakia, EK reminders, vehicle tracking, fleet automation, pokuty STK, STK Slovensko, technická kontrola, emisná kontrola, termín STK, pokuta za nepredvedenie vozidla na STK, správa vozidiel, upozornenia STK, správa flotily',
     openGraph: {
       title: 'FleetSync - ' + t('metaTitle'),
       description: t('metaDescription'),
