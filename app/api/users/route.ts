@@ -101,9 +101,8 @@ export async function POST(request: NextRequest) {
 
     if (password && password.trim() !== '') {
       hashedPassword = await hashPassword(password)
-    } else if (!loginProvider || loginProvider === '' || loginProvider === 'hybrid') {
+    } else if (!loginProvider || loginProvider === '' || loginProvider === 'credentials') {
       hashedPassword = await hashPassword(defaultPassword)
-      console.log(`Set default password for new user: ${email}`)
     }
 
     // ── Benefit user flow ──

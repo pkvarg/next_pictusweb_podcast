@@ -23,7 +23,7 @@ interface User {
   isFleetManager: boolean
   password: string | null
   loginProvider: string | null
-  hybridPassword: string | null
+
 }
 
 interface EditUserModalProps {
@@ -256,7 +256,7 @@ export default function EditUserModal({
                 {/* <option value="facebook">Facebook</option>
                 <option value="twitter">Twitter</option>
                 <option value="linkedin">LinkedIn</option> */}
-                <option value="hybrid">Hybrid (OAuth + Password)</option>
+                <option value="credentials">Credentials</option>
               </select>
             </div>
           </div>

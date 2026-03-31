@@ -235,7 +235,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
                 <option value="">None</option>
                 <option value="google">Google</option>
                 <option value="github">GitHub</option>
-                <option value="hybrid">Hybrid (OAuth + Password)</option>
+                <option value="credentials">Credentials</option>
               </select>
             </div>
           </div>

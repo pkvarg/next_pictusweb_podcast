@@ -82,7 +82,7 @@ model User {
   organizationRelation Organization?          @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   isFleetManager       Boolean                @default(false)
   loginProvider        String?
-  hybridPassword       String?
+
   phoneVerified        DateTime?              @map("phone_verified")
   // Benefit fields
   isBenefit              Boolean    @default(false)   @map("is_benefit")
