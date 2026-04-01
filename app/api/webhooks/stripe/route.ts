@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
+import { generateAndSendInvoice } from '@/lib/generateInvoice'
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -84,30 +85,26 @@ export async function POST(request: NextRequest) {
               }).catch((err) => console.error('Upgrade email failed:', err))
 
               // Generate invoice (fire-and-forget)
-              const pricePerVehicle = billingInterval === 'yearly'
+              const upgradePricePerVehicle = billingInterval === 'yearly'
                 ? Number(targetTier.pricePerVehicleYearly || 0)
                 : Number(targetTier.pricePerVehicle || 0)
-              fetch(`${appUrl}/api/fleetsync/generate-invoice`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  organizationName: upgradeOrg?.name || '',
-                  street: upgradeOrg?.street || '',
-                  city: upgradeOrg?.city || '',
-                  postalCode: upgradeOrg?.postalCode || '',
-                  country: upgradeOrg?.country || '',
-                  ico: upgradeOrg?.ico || undefined,
-                  dic: upgradeOrg?.dic || undefined,
-                  firstName: upgradeUser.firstName || '',
-                  lastName: upgradeUser.lastName || '',
-                  email: upgradeUser.email,
-                  tier: targetTier.name,
-                  billing: billingInterval,
-                  numberOfVehicles: purchasedVehicles,
-                  pricePerVehicle,
-                  totalPrice: pricePerVehicle * purchasedVehicles,
-                  locale,
-                }),
+              generateAndSendInvoice({
+                organizationName: upgradeOrg?.name || '',
+                street: upgradeOrg?.street || '',
+                city: upgradeOrg?.city || '',
+                postalCode: upgradeOrg?.postalCode || '',
+                country: upgradeOrg?.country || '',
+                ico: upgradeOrg?.ico || undefined,
+                dic: upgradeOrg?.dic || undefined,
+                firstName: upgradeUser.firstName || '',
+                lastName: upgradeUser.lastName || '',
+                email: upgradeUser.email,
+                tier: targetTier.name,
+                billing: billingInterval,
+                numberOfVehicles: purchasedVehicles,
+                pricePerVehicle: upgradePricePerVehicle,
+                totalPrice: upgradePricePerVehicle * purchasedVehicles,
+                locale,
               }).catch((err) => console.error('Upgrade invoice generation failed:', err))
             }
           }
@@ -172,27 +169,23 @@ export async function POST(request: NextRequest) {
             const activatePricePerVehicle = billingInterval === 'yearly'
               ? Number(activateTier?.pricePerVehicleYearly || 0)
               : Number(activateTier?.pricePerVehicle || 0)
-            fetch(`${activateAppUrl}/api/fleetsync/generate-invoice`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                organizationName: activateOrg?.name || '',
-                street: activateOrg?.street || '',
-                city: activateOrg?.city || '',
-                postalCode: activateOrg?.postalCode || '',
-                country: activateOrg?.country || '',
-                ico: activateOrg?.ico || undefined,
-                dic: activateOrg?.dic || undefined,
-                firstName: activateUser.firstName || '',
-                lastName: activateUser.lastName || '',
-                email: activateUser.email,
-                tier: activateTier?.name || 'BUSINESS',
-                billing: billingInterval,
-                numberOfVehicles: activateVehicleCount,
-                pricePerVehicle: activatePricePerVehicle,
-                totalPrice: activatePricePerVehicle * activateVehicleCount,
-                locale: activateLocale,
-              }),
+            generateAndSendInvoice({
+              organizationName: activateOrg?.name || '',
+              street: activateOrg?.street || '',
+              city: activateOrg?.city || '',
+              postalCode: activateOrg?.postalCode || '',
+              country: activateOrg?.country || '',
+              ico: activateOrg?.ico || undefined,
+              dic: activateOrg?.dic || undefined,
+              firstName: activateUser.firstName || '',
+              lastName: activateUser.lastName || '',
+              email: activateUser.email,
+              tier: activateTier?.name || 'BUSINESS',
+              billing: billingInterval,
+              numberOfVehicles: activateVehicleCount,
+              pricePerVehicle: activatePricePerVehicle,
+              totalPrice: activatePricePerVehicle * activateVehicleCount,
+              locale: activateLocale,
             }).catch((err) => console.error('Activation invoice generation failed:', err))
           }
 
@@ -348,6 +341,73 @@ export async function POST(request: NextRequest) {
             },
           })
           console.log(`Subscription ${subscription.id} canceled`)
+        }
+        break
+      }
+
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice
+
+        // Skip the first invoice from checkout — those are handled in checkout.session.completed
+        if (invoice.billing_reason === 'subscription_create') {
+          console.log('Skipping invoice.paid for subscription_create (handled in checkout):', invoice.id)
+          break
+        }
+
+        const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
+        if (!customerId) break
+
+        const invoiceOrg = await prisma.organization.findFirst({
+          where: { stripeCustomerId: customerId },
+          include: { tierRelation: true },
+        })
+
+        if (!invoiceOrg) {
+          console.error('No org found for Stripe customer:', customerId)
+          break
+        }
+
+        const invoiceUser = await prisma.user.findFirst({
+          where: { organizationId: invoiceOrg.id },
+          select: { email: true, firstName: true, lastName: true },
+        })
+
+        if (invoiceUser?.email && invoiceOrg.tierRelation) {
+          const invBillingInterval = invoiceOrg.billingInterval || 'monthly'
+          const invPricePerVehicle = invBillingInterval === 'yearly'
+            ? Number(invoiceOrg.tierRelation.pricePerVehicleYearly || 0)
+            : Number(invoiceOrg.tierRelation.pricePerVehicle || 0)
+          const invVehicleCount = invoiceOrg.purchasedVehicles || 1
+
+          generateAndSendInvoice({
+            organizationName: invoiceOrg.name,
+            street: invoiceOrg.street || '',
+            city: invoiceOrg.city || '',
+            postalCode: invoiceOrg.postalCode || '',
+            country: invoiceOrg.country || '',
+            ico: invoiceOrg.ico || undefined,
+            dic: invoiceOrg.dic || undefined,
+            firstName: invoiceUser.firstName || '',
+            lastName: invoiceUser.lastName || '',
+            email: invoiceUser.email,
+            tier: invoiceOrg.tierRelation.name,
+            billing: invBillingInterval,
+            numberOfVehicles: invVehicleCount,
+            pricePerVehicle: invPricePerVehicle,
+            totalPrice: invPricePerVehicle * invVehicleCount,
+          }).catch((err) => console.error('Recurring invoice generation failed:', err))
+
+          // Reset notification counter on renewal
+          await prisma.organization.update({
+            where: { id: invoiceOrg.id },
+            data: {
+              notificationPeriodStart: new Date(),
+              currentNotificationsCount: 0,
+              notificationsBlocked: false,
+            },
+          })
+
+          console.log('Recurring invoice generated for org:', invoiceOrg.name, '| invoice:', invoice.id)
         }
         break
       }

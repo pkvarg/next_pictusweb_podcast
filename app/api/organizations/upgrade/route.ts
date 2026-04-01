@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
 import { stripe, getStripePriceId } from '@/lib/stripe'
+import { generateAndSendInvoice } from '@/lib/generateInvoice'
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,6 +67,16 @@ export async function POST(request: NextRequest) {
 
     // CASE: FREE -> paid (new subscription via Checkout)
     if (currentTierName === 'FREE' || !org.stripeSubscriptionId) {
+      // Cancel existing subscription if any (e.g. upgrading before webhook sets subscriptionId)
+      if (org.stripeSubscriptionId) {
+        try {
+          await stripe.subscriptions.cancel(org.stripeSubscriptionId, { prorate: true })
+          console.log('Canceled old subscription (prorated credit):', org.stripeSubscriptionId)
+        } catch (err) {
+          console.error('Failed to cancel old subscription:', err)
+        }
+      }
+
       // Create Stripe Customer if needed
       let customerId = org.stripeCustomerId
       if (!customerId) {
@@ -107,15 +118,73 @@ export async function POST(request: NextRequest) {
 
     // CASE: BASIC -> BUSINESS (existing subscription)
     const subscription = await stripe.subscriptions.retrieve(org.stripeSubscriptionId)
+
+    // If old subscription is no longer active, cancel it and go through checkout
+    if (subscription.status === 'canceled' || subscription.status === 'incomplete_expired') {
+      try { await stripe.subscriptions.cancel(org.stripeSubscriptionId) } catch {}
+      const checkoutSession = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        customer: org.stripeCustomerId!,
+        line_items: [{ price: stripePriceId, quantity: vehicleCount }],
+        metadata: {
+          upgradeOrganizationId: org.id,
+          targetTierId: targetTierRecord.id,
+          purchasedVehicles: String(vehicleCount),
+          billingInterval,
+          locale,
+        },
+        subscription_data: {
+          metadata: { organizationId: org.id },
+        },
+        success_url: `${origin}/${locale}/client/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/${locale}/client/upgrade?canceled=1`,
+      })
+      return NextResponse.json({ checkoutUrl: checkoutSession.url })
+    }
+
     const existingItem = subscription.items.data[0]
 
     if (!existingItem) {
       return NextResponse.json({ error: 'No subscription item found' }, { status: 500 })
     }
 
-    // Determine proration behavior based on billing interval
+    // Cancel old subscription and create new checkout when billing interval changes
     const currentInterval = org.billingInterval || 'monthly'
-    const prorationBehavior = currentInterval === 'yearly' ? 'create_prorations' : 'none'
+    if (currentInterval !== billingInterval) {
+      // Cancel with proration — credits unused time to customer balance
+      await stripe.subscriptions.cancel(org.stripeSubscriptionId, {
+        prorate: true,
+      })
+      console.log('Canceled old subscription for interval change (prorated credit):', org.stripeSubscriptionId)
+
+      const checkoutSession = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        customer: org.stripeCustomerId!,
+        line_items: [{ price: stripePriceId, quantity: vehicleCount }],
+        // Apply customer balance (credit from canceled subscription) to this checkout
+        allow_promotion_codes: false,
+        customer_update: { name: 'auto' },
+        metadata: {
+          upgradeOrganizationId: org.id,
+          targetTierId: targetTierRecord.id,
+          purchasedVehicles: String(vehicleCount),
+          billingInterval,
+          locale,
+        },
+        subscription_data: {
+          metadata: { organizationId: org.id },
+        },
+        success_url: `${origin}/${locale}/client/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/${locale}/client/upgrade?canceled=1`,
+      })
+      return NextResponse.json({ checkoutUrl: checkoutSession.url })
+    }
+
+    // Same interval: update subscription in-place
+    // Prorate if: yearly interval, OR vehicle count increased (higher total cost mid-cycle)
+    const vehiclesIncreased = vehicleCount > (org.purchasedVehicles || 1)
+    const shouldProrate = currentInterval === 'yearly' || vehiclesIncreased
+    const prorationBehavior = shouldProrate ? 'create_prorations' : 'none'
 
     await stripe.subscriptions.update(org.stripeSubscriptionId, {
       items: [{
@@ -142,10 +211,40 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // Generate invoice for prorated upgrade (fire-and-forget)
+    if (shouldProrate) {
+      const upgradeUser = await prisma.user.findFirst({
+        where: { organizationId: org.id },
+        select: { email: true, firstName: true, lastName: true },
+      })
+      if (upgradeUser?.email) {
+        const pricePerVehicle = currentInterval === 'yearly'
+          ? Number(targetTierRecord.pricePerVehicleYearly || 0)
+          : Number(targetTierRecord.pricePerVehicle || 0)
+        generateAndSendInvoice({
+          organizationName: org.name,
+          street: org.street || '',
+          city: org.city || '',
+          postalCode: org.postalCode || '',
+          country: org.country || '',
+          ico: org.ico || undefined,
+          dic: org.dic || undefined,
+          firstName: upgradeUser.firstName || '',
+          lastName: upgradeUser.lastName || '',
+          email: upgradeUser.email,
+          tier: targetTierRecord.name,
+          billing: billingInterval,
+          numberOfVehicles: vehicleCount,
+          pricePerVehicle,
+          totalPrice: pricePerVehicle * vehicleCount,
+        }).catch((err) => console.error('In-place upgrade invoice failed:', err))
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      prorated: currentInterval === 'yearly',
-      message: currentInterval === 'yearly'
+      prorated: shouldProrate,
+      message: shouldProrate
         ? 'Upgraded to BUSINESS. Prorated charge applied.'
         : 'Upgraded to BUSINESS. New rate starts on next billing cycle.',
     })

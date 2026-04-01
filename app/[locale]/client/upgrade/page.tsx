@@ -132,7 +132,7 @@ export default function UpgradePage() {
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl
       } else if (data.success) {
-        router.push(`/${locale}/client?upgraded=1`)
+        router.push(`/${locale}/client?upgraded=1&from=${currentTierName}`)
       }
     } catch (err) {
       setError(t('upgradeError'))

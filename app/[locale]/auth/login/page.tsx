@@ -280,15 +280,15 @@ export default function LoginPage() {
               <form onSubmit={handleVerify2FA} className="space-y-6">
                 <div className="text-center mb-2">
                   <ShieldCheck className="mx-auto mb-3 text-pictus-lime" size={36} />
-                  <h2 className="text-xl font-light text-pictus-white">Overenie prihlásenia</h2>
+                  <h2 className="text-xl font-light text-pictus-white">{t('twoFaTitle')}</h2>
                   <p className="text-sm text-gray-400 mt-1">
-                    Zaslali sme 6-miestny kód na váš email. Zadajte ho nižšie.
+                    {t('twoFaDescription')}
                   </p>
                 </div>
 
                 <div>
                   <label htmlFor="twoFaCode" className="block text-lg font-light text-pictus-white mb-2">
-                    Overovací kód
+                    {t('twoFaCodeLabel')}
                   </label>
                   <input
                     id="twoFaCode"
@@ -311,7 +311,7 @@ export default function LoginPage() {
                     onChange={(e) => setTrustDevice(e.target.checked)}
                     className="w-4 h-4 accent-pictus-lime rounded"
                   />
-                  <span className="text-sm text-gray-300">Dôverovať tomuto zariadeniu 10 dní</span>
+                  <span className="text-sm text-gray-300">{t('twoFaTrustDevice')}</span>
                 </label>
 
                 <div className="text-center">
@@ -322,10 +322,10 @@ export default function LoginPage() {
                     className="text-sm text-pictus-lime hover:text-pictus-lime600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {resending
-                      ? 'Odosielam...'
+                      ? t('twoFaResending')
                       : resendCooldown > 0
-                      ? `Odoslať znova (${resendCooldown}s)`
-                      : 'Odoslať overovací kód znova'}
+                      ? t('twoFaResendCountdown', { seconds: resendCooldown })
+                      : t('twoFaResend')}
                   </button>
                 </div>
 
@@ -338,14 +338,14 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading || twoFaCode.length !== 6}
-                  className="w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
+                  className="w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
                 >
                   {isLoading ? (
                     <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin" />
                   ) : (
                     <>
                       <ShieldCheck className="mr-2 h-4 w-4" />
-                      Potvrdiť
+                      {t('twoFaConfirm')}
                     </>
                   )}
                 </button>
@@ -360,7 +360,7 @@ export default function LoginPage() {
                   }}
                   className="w-full text-sm text-gray-400 hover:text-pictus-white transition-colors"
                 >
-                  ← Späť na prihlásenie
+                  {t('twoFaBackToLogin')}
                 </button>
               </form>
             )}

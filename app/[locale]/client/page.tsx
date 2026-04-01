@@ -56,10 +56,15 @@ const ClientZone = () => {
   const params = useParams()
   const locale = (params?.locale as string) || 'sk'
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false)
+  const [upgradedFromTier, setUpgradedFromTier] = useState<string | null>(null)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('upgraded') === '1') {
-      setShowUpgradeBanner(true)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('upgraded') === '1') {
+        setShowUpgradeBanner(true)
+        setUpgradedFromTier(params.get('from') || null)
+      }
     }
   }, [])
   const iframe1Ref = useRef<HTMLIFrameElement>(null)
@@ -286,7 +291,7 @@ const ClientZone = () => {
 
       {/* Upgrade success banner */}
       {showUpgradeBanner && organization?.billingInterval && (
-        <UpgradeBanner billingInterval={organization.billingInterval} />
+        <UpgradeBanner billingInterval={organization.billingInterval} fromTier={upgradedFromTier} />
       )}
 
       {organization?.tierRelation && (

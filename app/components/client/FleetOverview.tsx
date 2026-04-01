@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Link } from '@/i18n/routing'
 import {
@@ -91,6 +92,7 @@ interface FleetOverviewProps {
 }
 
 const FleetOverview = ({ userId, organization, organizationName, isFleetManager = false }: FleetOverviewProps) => {
+  const t = useTranslations('Client')
   const isPictusaciUser = organizationName === 'PICTUSACI'
   const [vehicles, setVehicles] = useState<MyVehicle[]>([])
   const [notifications, setNotifications] = useState<VehicleNotification[]>([])
@@ -439,20 +441,20 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
           <div className="p-4 bg-pictus-lime/20 rounded-xl inline-block mb-4">
             <Car className="w-12 h-12 text-pictus-lime" />
           </div>
-          <h2 className="text-3xl font-light text-pictus-white mb-3">Vaša flotila je prázdna</h2>
+          <h2 className="text-3xl font-light text-pictus-white mb-3">{t('fleetEmpty')}</h2>
           <p className="text-lg text-pictus-lime mb-6">
             {isFleetManager
-              ? 'Začnite pridaním prvého vozidla do vašej flotily a sledujte všetky dôležité údaje na jednom mieste.'
-              : 'Momentálne nemáte žiadne vozidlá priradené k vašej organizácii.'
+              ? t('fleetEmptyManagerHint')
+              : t('fleetEmptyUserHint')
             }
           </p>
           {isFleetManager && (
             <Link
               href="/client/my-fleet"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-lg shadow-lg hover:shadow-pictus-lime/50"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white px-6 py-3 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-lg shadow-lg hover:shadow-pictus-lime/50"
             >
               <Plus size={20} />
-              Spravovať flotilu
+              {t('fleetManage')}
             </Link>
           )}
         </div>
@@ -469,9 +471,9 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
             <Car className="w-6 h-6 sm:w-8 sm:h-8 text-pictus-black" />
           </div>
           <div>
-            <h2 className="text-2xl sm:text-4xl font-light text-pictus-white">Vaša flotila</h2>
+            <h2 className="text-2xl sm:text-4xl font-light text-pictus-white">{t('fleetTitle')}</h2>
             <p className="text-base sm:text-xl text-pictus-lime mt-1">
-              {vehicles.length} {vehicles.length === 1 ? 'vozidlo' : vehicles.length < 5 ? 'vozidlá' : 'vozidiel'}
+              {t('fleetVehicleCount', { count: vehicles.length })}
             </p>
           </div>
         </div>

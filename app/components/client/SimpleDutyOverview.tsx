@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import {
   Car,
@@ -58,6 +59,7 @@ interface SimpleDutyOverviewProps {
 }
 
 const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewProps) => {
+  const t = useTranslations('Client')
   const isPictusaciUser = organizationName === 'PICTUSACI'
   const [vehiclesWithDuties, setVehiclesWithDuties] = useState<VehicleWithDuty[]>([])
   const [loading, setLoading] = useState(true)
@@ -250,7 +252,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
     return (
       <div className="text-center py-12">
         <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-        <p className="text-pictus-white text-xl font-light">Žiadne vozidlá s úlohami</p>
+        <p className="text-pictus-white text-xl font-light">{t('dutyNoVehicles')}</p>
       </div>
     )
   }
@@ -260,7 +262,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-pictus-lime shrink-0" />
-        <h2 className="text-2xl sm:text-4xl font-light text-pictus-white">Prehľad nasledujúcich úloh</h2>
+        <h2 className="text-2xl sm:text-4xl font-light text-pictus-white">{t('dutyOverviewTitle')}</h2>
       </div>
 
       {/* Rows of vehicles */}
@@ -291,9 +293,9 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                       : 'text-green-400 bg-green-600/30'
                   }`}>
                     {vehicle.daysUntilNext === 0
-                      ? 'Dnes!'
+                      ? t('dutyToday')
                       : vehicle.daysUntilNext === 1
-                      ? 'Zajtra!'
+                      ? t('dutyTomorrow')
                       : `${vehicle.daysUntilNext}d`}
                   </div>
                 )}
@@ -303,7 +305,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
               {vehicle.duties.length > 0 ? (
                 <div className="space-y-1.5">
                   <p className="text-xs text-pictus-white/70">
-                    Nasledujúce úlohy ({vehicle.duties.length}):
+                    {t('dutyUpcoming', { count: vehicle.duties.length })}:
                   </p>
                   {vehicle.duties.map((duty, idx) => (
                     <div key={idx} className="flex items-center justify-between gap-2 text-sm">
@@ -317,7 +319,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                             ? 'bg-orange-600/30 text-orange-400'
                             : 'bg-green-600/30 text-green-400'
                         }`}>
-                          {duty.daysUntil === 0 ? 'Dnes' : duty.daysUntil === 1 ? 'Zajtra' : `${duty.daysUntil}d`}
+                          {duty.daysUntil === 0 ? t('dutyTodayShort') : duty.daysUntil === 1 ? t('dutyTomorrowShort') : `${duty.daysUntil}d`}
                         </span>
                       </div>
                     </div>
@@ -326,7 +328,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
               ) : (
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-400/50" />
-                  <p className="text-sm text-pictus-white/50">Žiadne úlohy (ďalších 60 dní)</p>
+                  <p className="text-sm text-pictus-white/50">{t('dutyNone60Days')}</p>
                 </div>
               )}
             </div>
@@ -371,7 +373,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                 {vehicle.duties.length > 0 ? (
                   <div className="space-y-2">
                     <p className="text-sm text-pictus-white/70">
-                      Nasledujúce úlohy ({vehicle.duties.length}):
+                      {t('dutyUpcoming', { count: vehicle.duties.length })}:
                     </p>
                     <div className="space-y-1">
                       {vehicle.duties.map((duty, idx) => (
@@ -392,9 +394,9 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                               : 'bg-green-600/30 text-green-400'
                           }`}>
                             {duty.daysUntil === 0
-                              ? 'Dnes'
+                              ? t('dutyTodayShort')
                               : duty.daysUntil === 1
-                              ? 'Zajtra'
+                              ? t('dutyTomorrowShort')
                               : `${duty.daysUntil}d`}
                           </span>
                         </div>
@@ -404,7 +406,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                 ) : (
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-green-400/50" />
-                    <p className="text-sm text-pictus-white/50">Žiadne úlohy (ďalších 60 dní)</p>
+                    <p className="text-sm text-pictus-white/50">{t('dutyNone60Days')}</p>
                   </div>
                 )}
               </div>
@@ -420,9 +422,9 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                       : 'text-green-400 bg-green-600/30'
                   }`}>
                     {vehicle.daysUntilNext === 0
-                      ? 'Dnes!'
+                      ? t('dutyToday')
                       : vehicle.daysUntilNext === 1
-                      ? 'Zajtra!'
+                      ? t('dutyTomorrow')
                       : `${vehicle.daysUntilNext}d`}
                   </div>
                 </div>
