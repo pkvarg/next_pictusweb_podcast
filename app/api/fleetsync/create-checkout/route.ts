@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Validate
     if (!organizationName || !tier || !firstName || !lastName || !email || !password) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      return NextResponse.json({ error: 'REQUIRED_FIELDS_MISSING' }, { status: 400 })
     }
 
     if (!['BASIC', 'BUSINESS'].includes(tier)) {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingUser) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
+      return NextResponse.json({ error: 'EMAIL_ALREADY_EXISTS' }, { status: 400 })
     }
 
     // Find the tier

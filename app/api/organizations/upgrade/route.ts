@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
 import { stripe, getStripePriceId } from '@/lib/stripe'
+import Stripe from 'stripe'
 import { generateAndSendInvoice } from '@/lib/generateInvoice'
 
 export async function POST(request: NextRequest) {
@@ -157,6 +158,11 @@ export async function POST(request: NextRequest) {
       })
       console.log('Canceled old subscription for interval change (prorated credit):', org.stripeSubscriptionId)
 
+      // Fetch customer balance (credit from canceled subscription)
+      const customer = await stripe.customers.retrieve(org.stripeCustomerId!) as Stripe.Customer
+      const creditBalance = customer.balance < 0 ? Math.abs(customer.balance) / 100 : 0
+      console.log('Customer credit balance after cancel:', creditBalance)
+
       const checkoutSession = await stripe.checkout.sessions.create({
         mode: 'subscription',
         customer: org.stripeCustomerId!,
@@ -170,6 +176,7 @@ export async function POST(request: NextRequest) {
           purchasedVehicles: String(vehicleCount),
           billingInterval,
           locale,
+          creditBalance: String(creditBalance),
         },
         subscription_data: {
           metadata: { organizationId: org.id },
@@ -177,7 +184,7 @@ export async function POST(request: NextRequest) {
         success_url: `${origin}/${locale}/client/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/${locale}/client/upgrade?canceled=1`,
       })
-      return NextResponse.json({ checkoutUrl: checkoutSession.url })
+      return NextResponse.json({ checkoutUrl: checkoutSession.url, creditBalance })
     }
 
     // Same interval: update subscription in-place
@@ -211,13 +218,31 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Generate invoice for prorated upgrade (fire-and-forget)
-    if (shouldProrate) {
-      const upgradeUser = await prisma.user.findFirst({
-        where: { organizationId: org.id },
-        select: { email: true, firstName: true, lastName: true },
-      })
-      if (upgradeUser?.email) {
+    // Send upgrade email and generate invoice (fire-and-forget)
+    const honoApi = process.env.NEXT_PUBLIC_HONO_API_URL
+    const appUrl = process.env.NEXTAUTH_URL || 'https://www.pictusweb.sk'
+    const upgradeUser = await prisma.user.findFirst({
+      where: { organizationId: org.id },
+      select: { email: true, firstName: true, lastName: true },
+    })
+    if (upgradeUser?.email) {
+      // Send upgrade confirmation email
+      fetch(`${honoApi}/api/pictusweb/client/send-upgrade-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: upgradeUser.email,
+          firstName: upgradeUser.firstName || '',
+          tierName: targetTierRecord.name,
+          billingInterval,
+          vehicleCount,
+          loginUrl: `${appUrl}/${locale}/client`,
+          locale,
+        }),
+      }).catch((err) => console.error('In-place upgrade email failed:', err))
+
+      // Generate invoice for prorated upgrades
+      if (shouldProrate) {
         const pricePerVehicle = currentInterval === 'yearly'
           ? Number(targetTierRecord.pricePerVehicleYearly || 0)
           : Number(targetTierRecord.pricePerVehicle || 0)

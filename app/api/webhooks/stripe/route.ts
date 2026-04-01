@@ -21,10 +21,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
+  console.log(`[Stripe Webhook] Event received: ${event.type} | ID: ${event.id}`)
+
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
+        console.log(`[Stripe Webhook] checkout.session.completed | session: ${session.id} | metadata:`, JSON.stringify(session.metadata))
 
         // Handle upgrade from FREE -> paid
         const upgradeOrgId = session.metadata?.upgradeOrganizationId
@@ -70,6 +73,7 @@ export async function POST(request: NextRequest) {
             })
             if (upgradeUser?.email) {
               // Send upgrade email (fire-and-forget)
+              const creditBalance = parseFloat(session.metadata?.creditBalance || '0')
               fetch(`${honoApi}/api/pictusweb/client/send-upgrade-email`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -81,6 +85,7 @@ export async function POST(request: NextRequest) {
                   vehicleCount: purchasedVehicles,
                   loginUrl: `${appUrl}/${locale}/client`,
                   locale,
+                  creditBalance: creditBalance > 0 ? creditBalance : undefined,
                 }),
               }).catch((err) => console.error('Upgrade email failed:', err))
 
@@ -307,6 +312,7 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
         const status = subscription.status
+        console.log(`[Stripe Webhook] customer.subscription.updated | sub: ${subscription.id} | status: ${status}`)
 
         const org = await prisma.organization.findUnique({
           where: { stripeSubscriptionId: subscription.id },
@@ -327,6 +333,7 @@ export async function POST(request: NextRequest) {
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
+        console.log(`[Stripe Webhook] customer.subscription.deleted | sub: ${subscription.id}`)
 
         const org = await prisma.organization.findUnique({
           where: { stripeSubscriptionId: subscription.id },
@@ -347,6 +354,7 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice
+        console.log(`[Stripe Webhook] invoice.paid | invoice: ${invoice.id} | billing_reason: ${invoice.billing_reason} | customer: ${typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id} | amount: ${invoice.amount_paid}`)
 
         // Skip the first invoice from checkout — those are handled in checkout.session.completed
         if (invoice.billing_reason === 'subscription_create') {
@@ -414,7 +422,7 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
-        console.error('Payment failed for invoice:', invoice.id, 'customer:', invoice.customer)
+        console.error(`[Stripe Webhook] invoice.payment_failed | invoice: ${invoice.id} | customer: ${invoice.customer}`)
         break
       }
 

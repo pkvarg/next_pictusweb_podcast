@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
-import { ArrowUp, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { ArrowUp, Loader2, CheckCircle, AlertCircle, Info } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import { useTranslations } from 'next-intl'
 
@@ -51,6 +51,7 @@ export default function UpgradePage() {
   const [targetTier, setTargetTier] = useState<'BASIC' | 'BUSINESS'>('BUSINESS')
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [vehicleCount, setVehicleCount] = useState(1)
+  const [creditInfo, setCreditInfo] = useState<{ amount: number; checkoutUrl: string } | null>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('canceled') === '1') {
@@ -130,6 +131,11 @@ export default function UpgradePage() {
       }
 
       if (data.checkoutUrl) {
+        if (data.creditBalance > 0) {
+          setCreditInfo({ amount: data.creditBalance, checkoutUrl: data.checkoutUrl })
+          setUpgrading(false)
+          return
+        }
         window.location.href = data.checkoutUrl
       } else if (data.success) {
         router.push(`/${locale}/client?upgraded=1&from=${currentTierName}`)
@@ -274,19 +280,45 @@ export default function UpgradePage() {
           )}
         </div>
 
+        {/* Credit info banner */}
+        {creditInfo && (
+          <div className="bg-pictus-lime/10 border border-pictus-lime/30 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 text-pictus-lime shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-white text-sm font-medium">
+                  {t('upgradeCreditTitle', { amount: creditInfo.amount.toFixed(2) })}
+                </p>
+                <p className="text-gray-400 text-xs mt-1">
+                  {t('upgradeCreditDescription')}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => { window.location.href = creditInfo.checkoutUrl }}
+              className="w-full mt-3 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-white rounded-lg transition-all font-medium text-lg"
+            >
+              <ArrowUp className="w-5 h-5" />
+              {t('upgradeContinueToCheckout')}
+            </button>
+          </div>
+        )}
+
         {/* Upgrade Button */}
-        <button
-          onClick={handleUpgrade}
-          disabled={upgrading}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 text-white rounded-lg transition-all font-medium text-lg"
-        >
-          {upgrading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <ArrowUp className="w-5 h-5" />
-          )}
-          {upgrading ? t('upgradeProcessing') : t('upgradeButton', { tierName: targetTier })}
-        </button>
+        {!creditInfo && (
+          <button
+            onClick={handleUpgrade}
+            disabled={upgrading}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 text-white rounded-lg transition-all font-medium text-lg"
+          >
+            {upgrading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <ArrowUp className="w-5 h-5" />
+            )}
+            {upgrading ? t('upgradeProcessing') : t('upgradeButton', { tierName: targetTier })}
+          </button>
+        )}
       </div>
 
       <div className="mt-6 text-center">

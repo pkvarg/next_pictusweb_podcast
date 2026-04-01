@@ -399,7 +399,12 @@ function GetStartedContent() {
           sessionStorage.removeItem('fleetsync-onboarding-form')
           window.location.href = `/${window.location.pathname.split('/')[1]}/fleetsync/get-started/success?tier=FREE`
         } else {
-          setError(data.error || t('submitError'))
+          const apiErrors: Record<string, string> = {
+            REQUIRED_FIELDS_MISSING: t('errorRequiredFields'),
+            PASSWORD_TOO_SHORT: t('errorPasswordTooShort'),
+            EMAIL_ALREADY_EXISTS: t('errorEmailExists'),
+          }
+          setError(apiErrors[data.error] || t('submitError'))
         }
       } else {
         const res = await fetch('/api/fleetsync/create-checkout', {
@@ -451,7 +456,12 @@ function GetStartedContent() {
           }))
           window.location.href = data.checkoutUrl
         } else if (data.error) {
-          setError(data.error || t('submitError'))
+          const apiErrors: Record<string, string> = {
+            REQUIRED_FIELDS_MISSING: t('errorRequiredFields'),
+            PASSWORD_TOO_SHORT: t('errorPasswordTooShort'),
+            EMAIL_ALREADY_EXISTS: t('errorEmailExists'),
+          }
+          setError(apiErrors[data.error] || t('submitError'))
         }
       }
     } catch {

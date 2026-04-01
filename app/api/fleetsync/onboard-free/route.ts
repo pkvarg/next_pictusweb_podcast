@@ -31,13 +31,13 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!organizationName || !firstName || !lastName || !email || !password) {
       return NextResponse.json(
-        { error: 'Organization name, first name, last name, email, and password are required' },
+        { error: 'REQUIRED_FIELDS_MISSING' },
         { status: 400 }
       )
     }
 
     if (password.length < 8) {
-      return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
+      return NextResponse.json({ error: 'PASSWORD_TOO_SHORT' }, { status: 400 })
     }
 
     // Check if email already exists
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingUser) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
+      return NextResponse.json({ error: 'EMAIL_ALREADY_EXISTS' }, { status: 400 })
     }
 
     // Find the FREE tier
