@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { targetTier, billingInterval, purchasedVehicles } = body
+    const { targetTier, billingInterval, purchasedVehicles, locale: reqLocale } = body
 
     // Validate inputs
     if (!['BASIC', 'BUSINESS'].includes(targetTier)) {
@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
 
     const stripePriceId = await getStripePriceId(targetTier, billingInterval)
     const origin = request.headers.get('origin') || 'https://www.pictusweb.sk'
+    const locale = reqLocale || 'sk'
 
     // CASE: FREE -> paid (new subscription via Checkout)
     if (currentTierName === 'FREE' || !org.stripeSubscriptionId) {
@@ -92,12 +93,13 @@ export async function POST(request: NextRequest) {
           targetTierId: targetTierRecord.id,
           purchasedVehicles: String(vehicleCount),
           billingInterval,
+          locale,
         },
         subscription_data: {
           metadata: { organizationId: org.id },
         },
-        success_url: `${origin}/client/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/client/upgrade?canceled=1`,
+        success_url: `${origin}/${locale}/client/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/${locale}/client/upgrade?canceled=1`,
       })
 
       return NextResponse.json({ checkoutUrl: checkoutSession.url })

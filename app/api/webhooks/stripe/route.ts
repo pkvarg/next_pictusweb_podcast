@@ -57,6 +57,30 @@ export async function POST(request: NextRequest) {
               },
             })
             console.log('Successfully upgraded org:', upgradeOrgId, 'to tier:', targetTier.name)
+
+            // Send upgrade confirmation email (fire-and-forget)
+            const honoApi = process.env.NEXT_PUBLIC_HONO_API_URL
+            const appUrl = process.env.NEXTAUTH_URL || 'https://www.pictusweb.sk'
+            const locale = session.metadata?.locale || 'sk'
+            const upgradeUser = await prisma.user.findFirst({
+              where: { organizationId: upgradeOrgId },
+              select: { email: true, firstName: true },
+            })
+            if (upgradeUser?.email) {
+              fetch(`${honoApi}/api/pictusweb/client/send-upgrade-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email: upgradeUser.email,
+                  firstName: upgradeUser.firstName || '',
+                  tierName: targetTier.name,
+                  billingInterval,
+                  vehicleCount: purchasedVehicles,
+                  loginUrl: `${appUrl}/${locale}/client`,
+                  locale,
+                }),
+              }).catch((err) => console.error('Upgrade email failed:', err))
+            }
           }
           break
         }

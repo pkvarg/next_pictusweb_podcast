@@ -119,7 +119,7 @@ export default function UpgradePage() {
       const res = await fetch('/api/organizations/upgrade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetTier, billingInterval, purchasedVehicles: vehicleCount }),
+        body: JSON.stringify({ targetTier, billingInterval, purchasedVehicles: vehicleCount, locale }),
       })
 
       const data = await res.json()
