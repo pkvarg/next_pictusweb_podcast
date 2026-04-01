@@ -252,7 +252,7 @@ const ClientZone = () => {
               {organization?.tierRelation?.name && organization.tierRelation.name !== 'BUSINESS' && (
                 <Link
                   href="/client/upgrade"
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium shrink-0"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium shrink-0"
                 >
                   <ArrowUp size={14} />
                   <span className="hidden sm:inline">{t('upgrade')}</span>
@@ -424,7 +424,7 @@ const ClientZone = () => {
                 {!showPasswordChange ? (
                   <button
                     onClick={() => setShowPasswordChange(true)}
-                    className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-4 py-2 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-sm"
+                    className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white px-4 py-2 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-sm"
                   >
                     {t('changePasswordButton')}
                   </button>
@@ -525,7 +525,7 @@ const ClientZone = () => {
                       <button
                         type="submit"
                         disabled={isChangingPassword}
-                        className="flex-1 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 focus:outline-none focus:ring-2 focus:ring-pictus-lime transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-pictus-lime/50"
+                        className="flex-1 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 focus:outline-none focus:ring-2 focus:ring-pictus-lime transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-pictus-lime/50"
                       >
                         {isChangingPassword ? (
                           <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin mx-auto" />

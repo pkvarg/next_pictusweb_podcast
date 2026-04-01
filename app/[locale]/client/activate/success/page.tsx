@@ -20,7 +20,7 @@ export default function ActivateSuccessPage() {
 
       <Link
         href="/client"
-        className="inline-block px-8 py-3 rounded-lg bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black font-medium hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all"
+        className="inline-block px-8 py-3 rounded-lg bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white font-medium hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all"
       >
         {t('goToDashboard')}
       </Link>

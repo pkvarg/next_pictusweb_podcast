@@ -199,7 +199,7 @@ export default function ActivatePage() {
         <button
           onClick={handleActivate}
           disabled={activating}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 text-pictus-black rounded-lg transition-all font-medium text-lg"
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 text-white rounded-lg transition-all font-medium text-lg"
         >
           {activating ? (
             <Loader2 className="w-5 h-5 animate-spin" />

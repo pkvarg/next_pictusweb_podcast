@@ -156,7 +156,7 @@ export default function UpgradePage() {
           <CheckCircle className="w-12 h-12 text-pictus-lime mx-auto mb-4" />
           <h2 className="text-2xl font-light text-white mb-2">{t('upgradeHighestTier')}</h2>
           <p className="text-gray-400">{t('upgradeAlreadyOn', { tierName: currentTierName })}</p>
-          <Link href="/client" className="inline-block mt-6 px-6 py-2 bg-pictus-lime text-pictus-black rounded-lg hover:bg-pictus-lime/90 transition-all">
+          <Link href="/client" className="inline-block mt-6 px-6 py-2 bg-pictus-lime text-white rounded-lg hover:bg-pictus-lime/90 transition-all">
             {t('upgradeBackToDashboard')}
           </Link>
         </div>
@@ -278,7 +278,7 @@ export default function UpgradePage() {
         <button
           onClick={handleUpgrade}
           disabled={upgrading}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 text-pictus-black rounded-lg transition-all font-medium text-lg"
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 text-white rounded-lg transition-all font-medium text-lg"
         >
           {upgrading ? (
             <Loader2 className="w-5 h-5 animate-spin" />

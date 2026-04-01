@@ -286,7 +286,7 @@ const EditVehiclePage = () => {
           </p>
           <Link
             href="/client"
-            className="inline-flex items-center gap-2 bg-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime600 text-white px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
           >
             <ArrowLeft size={20} />
             Späť na dashboard
@@ -306,7 +306,7 @@ const EditVehiclePage = () => {
           <p className="text-pictus-lime mb-6">{error}</p>
           <Link
             href="/client/my-fleet"
-            className="inline-flex items-center gap-2 bg-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime600 text-white px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
           >
             <ArrowLeft size={20} />
             Späť na flotilu
@@ -512,7 +512,7 @@ const EditVehiclePage = () => {
             <button
               type="submit"
               disabled={loading || uploading}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-4 rounded-lg font-light hover:from-pictus-lime600 hover:to-pictus-lime700 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white px-6 py-4 rounded-lg font-light hover:from-pictus-lime600 hover:to-pictus-lime700 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading || uploading ? (
                 <>
