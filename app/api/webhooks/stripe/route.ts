@@ -58,15 +58,17 @@ export async function POST(request: NextRequest) {
             })
             console.log('Successfully upgraded org:', upgradeOrgId, 'to tier:', targetTier.name)
 
-            // Send upgrade confirmation email (fire-and-forget)
+            // Send upgrade confirmation email and generate invoice
             const honoApi = process.env.NEXT_PUBLIC_HONO_API_URL
             const appUrl = process.env.NEXTAUTH_URL || 'https://www.pictusweb.sk'
             const locale = session.metadata?.locale || 'sk'
+            const upgradeOrg = await prisma.organization.findUnique({ where: { id: upgradeOrgId } })
             const upgradeUser = await prisma.user.findFirst({
               where: { organizationId: upgradeOrgId },
-              select: { email: true, firstName: true },
+              select: { email: true, firstName: true, lastName: true },
             })
             if (upgradeUser?.email) {
+              // Send upgrade email (fire-and-forget)
               fetch(`${honoApi}/api/pictusweb/client/send-upgrade-email`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -80,6 +82,33 @@ export async function POST(request: NextRequest) {
                   locale,
                 }),
               }).catch((err) => console.error('Upgrade email failed:', err))
+
+              // Generate invoice (fire-and-forget)
+              const pricePerVehicle = billingInterval === 'yearly'
+                ? Number(targetTier.pricePerVehicleYearly || 0)
+                : Number(targetTier.pricePerVehicle || 0)
+              fetch(`${appUrl}/api/fleetsync/generate-invoice`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  organizationName: upgradeOrg?.name || '',
+                  street: upgradeOrg?.street || '',
+                  city: upgradeOrg?.city || '',
+                  postalCode: upgradeOrg?.postalCode || '',
+                  country: upgradeOrg?.country || '',
+                  ico: upgradeOrg?.ico || undefined,
+                  dic: upgradeOrg?.dic || undefined,
+                  firstName: upgradeUser.firstName || '',
+                  lastName: upgradeUser.lastName || '',
+                  email: upgradeUser.email,
+                  tier: targetTier.name,
+                  billing: billingInterval,
+                  numberOfVehicles: purchasedVehicles,
+                  pricePerVehicle,
+                  totalPrice: pricePerVehicle * purchasedVehicles,
+                  locale,
+                }),
+              }).catch((err) => console.error('Upgrade invoice generation failed:', err))
             }
           }
           break
@@ -107,6 +136,66 @@ export async function POST(request: NextRequest) {
             },
           })
           console.log('Successfully activated subscription for org:', activateOrgId)
+
+          // Send activation confirmation email (fire-and-forget)
+          const activateHonoApi = process.env.NEXT_PUBLIC_HONO_API_URL
+          const activateAppUrl = process.env.NEXTAUTH_URL || 'https://www.pictusweb.sk'
+          const activateLocale = session.metadata?.locale || 'sk'
+          const activateOrg = await prisma.organization.findUnique({
+            where: { id: activateOrgId },
+            include: { tierRelation: true },
+          })
+          const activateUser = await prisma.user.findFirst({
+            where: { organizationId: activateOrgId },
+            select: { email: true, firstName: true, lastName: true },
+          })
+          if (activateUser?.email) {
+            const activateVehicleCount = activateVehicles || activateOrg?.purchasedVehicles || 1
+
+            // Send activation email (fire-and-forget)
+            fetch(`${activateHonoApi}/api/pictusweb/client/send-activation-email`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: activateUser.email,
+                firstName: activateUser.firstName || '',
+                tierName: activateOrg?.tierRelation?.name || 'BUSINESS',
+                billingInterval,
+                vehicleCount: activateVehicleCount,
+                loginUrl: `${activateAppUrl}/${activateLocale}/client`,
+                locale: activateLocale,
+              }),
+            }).catch((err) => console.error('Activation email failed:', err))
+
+            // Generate invoice (fire-and-forget)
+            const activateTier = activateOrg?.tierRelation
+            const activatePricePerVehicle = billingInterval === 'yearly'
+              ? Number(activateTier?.pricePerVehicleYearly || 0)
+              : Number(activateTier?.pricePerVehicle || 0)
+            fetch(`${activateAppUrl}/api/fleetsync/generate-invoice`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                organizationName: activateOrg?.name || '',
+                street: activateOrg?.street || '',
+                city: activateOrg?.city || '',
+                postalCode: activateOrg?.postalCode || '',
+                country: activateOrg?.country || '',
+                ico: activateOrg?.ico || undefined,
+                dic: activateOrg?.dic || undefined,
+                firstName: activateUser.firstName || '',
+                lastName: activateUser.lastName || '',
+                email: activateUser.email,
+                tier: activateTier?.name || 'BUSINESS',
+                billing: billingInterval,
+                numberOfVehicles: activateVehicleCount,
+                pricePerVehicle: activatePricePerVehicle,
+                totalPrice: activatePricePerVehicle * activateVehicleCount,
+                locale: activateLocale,
+              }),
+            }).catch((err) => console.error('Activation invoice generation failed:', err))
+          }
+
           break
         }
 

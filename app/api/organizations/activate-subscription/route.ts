@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { billingInterval, purchasedVehicles } = body
+    const { billingInterval, purchasedVehicles, locale } = body
 
     if (!['monthly', 'yearly'].includes(billingInterval)) {
       return NextResponse.json({ error: 'Invalid billing interval' }, { status: 400 })
@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
         activateOrganizationId: org.id,
         billingInterval,
         purchasedVehicles: String(vehicleCount),
+        locale: locale || 'sk',
       },
       subscription_data: {
         metadata: { organizationId: org.id },

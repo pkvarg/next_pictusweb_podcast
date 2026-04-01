@@ -85,7 +85,7 @@ export default function ActivatePage() {
       const res = await fetch('/api/organizations/activate-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ billingInterval, purchasedVehicles: vehicleCount }),
+        body: JSON.stringify({ billingInterval, purchasedVehicles: vehicleCount, locale }),
       })
 
       const data = await res.json()
