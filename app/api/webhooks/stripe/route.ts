@@ -72,24 +72,7 @@ export async function POST(request: NextRequest) {
               select: { email: true, firstName: true, lastName: true },
             })
             if (upgradeUser?.email) {
-              // Send upgrade email (fire-and-forget)
-              const creditBalance = parseFloat(session.metadata?.creditBalance || '0')
-              fetch(`${honoApi}/api/pictusweb/client/send-upgrade-email`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  email: upgradeUser.email,
-                  firstName: upgradeUser.firstName || '',
-                  tierName: targetTier.name,
-                  billingInterval,
-                  vehicleCount: purchasedVehicles,
-                  loginUrl: `${appUrl}/${locale}/client`,
-                  locale,
-                  creditBalance: creditBalance > 0 ? creditBalance : undefined,
-                }),
-              }).catch((err) => console.error('Upgrade email failed:', err))
-
-              // Generate invoice (fire-and-forget)
+              // Generate invoice first, then send upgrade email after a delay to avoid SMTP timeout
               const upgradePricePerVehicle = billingInterval === 'yearly'
                 ? Number(targetTier.pricePerVehicleYearly || 0)
                 : Number(targetTier.pricePerVehicle || 0)
@@ -111,6 +94,23 @@ export async function POST(request: NextRequest) {
                 totalPrice: upgradePricePerVehicle * purchasedVehicles,
                 locale,
               }).catch((err) => console.error('Upgrade invoice generation failed:', err))
+
+              // Send upgrade email after 5s delay to avoid SMTP connection contention
+              setTimeout(() => {
+                fetch(`${honoApi}/api/pictusweb/client/send-upgrade-email`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    email: upgradeUser.email,
+                    firstName: upgradeUser.firstName || '',
+                    tierName: targetTier.name,
+                    billingInterval,
+                    vehicleCount: purchasedVehicles,
+                    loginUrl: `${appUrl}/${locale}/client`,
+                    locale,
+                  }),
+                }).catch((err) => console.error('Upgrade email failed:', err))
+              }, 5000)
             }
           }
           break
@@ -289,22 +289,39 @@ export async function POST(request: NextRequest) {
         // Send welcome email (fire-and-forget)
         const honoApi = process.env.NEXT_PUBLIC_HONO_API_URL
         const appUrl = process.env.NEXTAUTH_URL || 'https://www.pictusweb.sk'
-        const agentEmail = onboardedBy
         const locale = session.metadata?.locale || 'sk'
-        fetch(`${honoApi}/api/pictusweb/client/send-welcome-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: pending.email,
-            firstName: pending.firstName,
-            agentName: agentEmail,
-            agentEmail,
-            loginUrl: `${appUrl}/sk/auth/login`,
-            gdprUrl: `${appUrl}/gdpr`,
-            termsUrl: `${appUrl}/obchodne-podmienky`,
-            locale,
-          }),
-        }).catch((err) => console.error('Welcome email (webhook) failed:', err))
+        const isSelfSignup = onboardedBy === pending.email
+
+        if (isSelfSignup) {
+          // Self-signup: send welcome email with their tier
+          fetch(`${honoApi}/api/pictusweb/client/send-free-welcome-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: pending.email,
+              firstName: pending.firstName,
+              loginUrl: `${appUrl}/${locale}/client`,
+              tierName: tier.name,
+              locale,
+            }),
+          }).catch((err) => console.error('Welcome email (webhook) failed:', err))
+        } else {
+          // Agent-onboarded: use the agent welcome email
+          fetch(`${honoApi}/api/pictusweb/client/send-welcome-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: pending.email,
+              firstName: pending.firstName,
+              agentName: onboardedBy,
+              agentEmail: onboardedBy,
+              loginUrl: `${appUrl}/${locale}/auth/login`,
+              gdprUrl: `${appUrl}/gdpr`,
+              termsUrl: `${appUrl}/obchodne-podmienky`,
+              locale,
+            }),
+          }).catch((err) => console.error('Welcome email (webhook) failed:', err))
+        }
 
         break
       }

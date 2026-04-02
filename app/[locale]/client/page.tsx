@@ -48,6 +48,7 @@ interface Organization {
   freeTrialTierId: string | null
   stripeSubscriptionStatus: string | null
   billingInterval: string | null
+  purchasedVehicles: number | null
 }
 
 const ClientZone = () => {
@@ -86,6 +87,12 @@ const ClientZone = () => {
   const [passwordChangeError, setPasswordChangeError] = useState('')
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('')
 
+  // Vehicle count management
+  const [editingVehicles, setEditingVehicles] = useState(false)
+  const [newVehicleCount, setNewVehicleCount] = useState(1)
+  const [vehicleUpdateLoading, setVehicleUpdateLoading] = useState(false)
+  const [vehicleUpdateMsg, setVehicleUpdateMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
   // Guard: organization deleted
   const isOrgDeleted = (session?.user as any)?.organizationDeleted === true
 
@@ -116,6 +123,30 @@ const ClientZone = () => {
 
   const handleLogout = () => {
     signOut({ callbackUrl: '/' })
+  }
+
+  const handleVehicleUpdate = async () => {
+    setVehicleUpdateLoading(true)
+    setVehicleUpdateMsg(null)
+    try {
+      const res = await fetch('/api/organizations/update-vehicles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehicleCount: newVehicleCount }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setVehicleUpdateMsg({ type: 'error', text: data.error })
+        return
+      }
+      setVehicleUpdateMsg({ type: 'success', text: t('vehicleUpdateSuccess') })
+      setEditingVehicles(false)
+      fetchOrganization()
+    } catch {
+      setVehicleUpdateMsg({ type: 'error', text: t('vehicleUpdateError') })
+    } finally {
+      setVehicleUpdateLoading(false)
+    }
   }
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -557,6 +588,75 @@ const ClientZone = () => {
                 )}
               </div>
             </div>
+
+            {/* Subscription & Vehicles */}
+            {organization && organization.tierRelation?.name !== 'FREE' && organization.billingInterval && (
+              <div className="md:col-span-2 border-t border-pictus-lime/10 pt-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Car className="w-5 h-5 text-pictus-lime" />
+                  <h3 className="text-xl font-normal text-pictus-white">{t('subscriptionInfo')}</h3>
+                </div>
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-pictus-white text-sm font-light">{t('currentPlan')}</label>
+                    <p className="text-pictus-white text-base">{organization.tierRelation?.name} — {organization.billingInterval === 'yearly' ? t('yearly') : t('monthly')}</p>
+                  </div>
+                  <div>
+                    <label className="text-pictus-white text-sm font-light">{t('vehicleCountLabel')}</label>
+                    {organization.billingInterval === 'yearly' ? (
+                      <div>
+                        <p className="text-pictus-white text-base">{organization.purchasedVehicles || 1}</p>
+                        <p className="text-xs text-gray-500 mt-1">{t('vehicleContactSupport')}</p>
+                      </div>
+                    ) : editingVehicles ? (
+                      <div className="flex items-center gap-2 mt-1">
+                        <input
+                          type="number"
+                          min={1}
+                          max={organization.tierRelation?.name === 'BASIC' ? 3 : (organization.purchasedVehicles || 1) * 2}
+                          value={newVehicleCount}
+                          onChange={(e) => setNewVehicleCount(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-20 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
+                        />
+                        <button
+                          onClick={handleVehicleUpdate}
+                          disabled={vehicleUpdateLoading || newVehicleCount === organization.purchasedVehicles}
+                          className="px-3 py-1.5 bg-pictus-lime text-pictus-black rounded-lg text-sm font-medium disabled:opacity-50"
+                        >
+                          {vehicleUpdateLoading ? '...' : t('save')}
+                        </button>
+                        <button
+                          onClick={() => { setEditingVehicles(false); setVehicleUpdateMsg(null) }}
+                          className="px-3 py-1.5 bg-white/10 text-white rounded-lg text-sm"
+                        >
+                          {t('cancel')}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <p className="text-pictus-white text-base">{organization.purchasedVehicles || 1}</p>
+                        <button
+                          onClick={() => { setNewVehicleCount(organization.purchasedVehicles || 1); setEditingVehicles(true); setVehicleUpdateMsg(null) }}
+                          className="text-pictus-lime text-sm hover:underline"
+                        >
+                          {t('changeVehicles')}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-pictus-white text-sm font-light">{t('nextCycleNote')}</label>
+                    <p className="text-xs text-gray-400 mt-1">{t('vehicleNextCycleHint')}</p>
+                  </div>
+                </div>
+                {vehicleUpdateMsg && (
+                  <div className={`mt-3 px-4 py-2 rounded-lg text-sm flex items-center gap-2 ${vehicleUpdateMsg.type === 'success' ? 'bg-green-500/20 border border-green-500/30 text-green-200' : 'bg-red-500/20 border border-red-500/30 text-red-200'}`}>
+                    {vehicleUpdateMsg.type === 'success' ? <Check size={16} /> : <X size={16} />}
+                    {vehicleUpdateMsg.text}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Contact Verification */}
             <div className="md:col-span-2 border-t border-pictus-lime/10 pt-6">

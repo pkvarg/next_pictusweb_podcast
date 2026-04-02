@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
-import { ArrowUp, Loader2, CheckCircle, AlertCircle, Info } from 'lucide-react'
+import { ArrowUp, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import { useTranslations } from 'next-intl'
 
@@ -51,7 +51,6 @@ export default function UpgradePage() {
   const [targetTier, setTargetTier] = useState<'BASIC' | 'BUSINESS'>('BUSINESS')
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [vehicleCount, setVehicleCount] = useState(1)
-  const [creditInfo, setCreditInfo] = useState<{ amount: number; checkoutUrl: string } | null>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('canceled') === '1') {
@@ -95,13 +94,15 @@ export default function UpgradePage() {
   }, [session, fetchData])
 
   const currentTierName = org?.tierRelation?.name || 'FREE'
+  const isPayingUser = currentTierName !== 'FREE' && !!org?.billingInterval
   const maxVehicles = targetTier === 'BASIC' ? 3 : 999
 
   // Determine available upgrade targets
+  const isYearlySubscriber = isPayingUser && org?.billingInterval === 'yearly'
   const availableTargets: ('BASIC' | 'BUSINESS')[] = []
   if (currentTierName === 'FREE') {
     availableTargets.push('BASIC', 'BUSINESS')
-  } else if (currentTierName === 'BASIC') {
+  } else if (currentTierName === 'BASIC' && !isYearlySubscriber) {
     availableTargets.push('BUSINESS')
   }
 
@@ -131,11 +132,6 @@ export default function UpgradePage() {
       }
 
       if (data.checkoutUrl) {
-        if (data.creditBalance > 0) {
-          setCreditInfo({ amount: data.creditBalance, checkoutUrl: data.checkoutUrl })
-          setUpgrading(false)
-          return
-        }
         window.location.href = data.checkoutUrl
       } else if (data.success) {
         router.push(`/${locale}/client?upgraded=1&from=${currentTierName}`)
@@ -159,9 +155,19 @@ export default function UpgradePage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="bg-white/5 rounded-xl p-8 border border-white/10 text-center">
-          <CheckCircle className="w-12 h-12 text-pictus-lime mx-auto mb-4" />
-          <h2 className="text-2xl font-light text-white mb-2">{t('upgradeHighestTier')}</h2>
-          <p className="text-gray-400">{t('upgradeAlreadyOn', { tierName: currentTierName })}</p>
+          {isYearlySubscriber ? (
+            <>
+              <AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+              <h2 className="text-2xl font-light text-white mb-2">{t('upgradeYearlyContactTitle')}</h2>
+              <p className="text-gray-400">{t('upgradeYearlyContactDescription')}</p>
+            </>
+          ) : (
+            <>
+              <CheckCircle className="w-12 h-12 text-pictus-lime mx-auto mb-4" />
+              <h2 className="text-2xl font-light text-white mb-2">{t('upgradeHighestTier')}</h2>
+              <p className="text-gray-400">{t('upgradeAlreadyOn', { tierName: currentTierName })}</p>
+            </>
+          )}
           <Link href="/client" className="inline-block mt-6 px-6 py-2 bg-pictus-lime text-white rounded-lg hover:bg-pictus-lime/90 transition-all">
             {t('upgradeBackToDashboard')}
           </Link>
@@ -226,28 +232,35 @@ export default function UpgradePage() {
         {/* Billing Interval */}
         <div>
           <label className="text-sm text-gray-400 mb-2 block">{t('upgradeBillingPeriod')}</label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setBillingInterval('monthly')}
-              className={`p-3 rounded-lg border transition-all ${
-                billingInterval === 'monthly'
-                  ? 'border-pictus-lime bg-pictus-lime/10 text-white'
-                  : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
-              }`}
-            >
-              {t('upgradeMonthly')}
-            </button>
-            <button
-              onClick={() => setBillingInterval('yearly')}
-              className={`p-3 rounded-lg border transition-all ${
-                billingInterval === 'yearly'
-                  ? 'border-pictus-lime bg-pictus-lime/10 text-white'
-                  : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
-              }`}
-            >
-              {t('upgradeYearly')}
-            </button>
-          </div>
+          {isPayingUser ? (
+            <div className="p-3 rounded-lg border border-pictus-lime bg-pictus-lime/10 text-white">
+              {billingInterval === 'monthly' ? t('upgradeMonthly') : t('upgradeYearly')}
+              <span className="text-xs text-gray-400 ml-2">{t('upgradeBillingLocked')}</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setBillingInterval('monthly')}
+                className={`p-3 rounded-lg border transition-all ${
+                  billingInterval === 'monthly'
+                    ? 'border-pictus-lime bg-pictus-lime/10 text-white'
+                    : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
+                }`}
+              >
+                {t('upgradeMonthly')}
+              </button>
+              <button
+                onClick={() => setBillingInterval('yearly')}
+                className={`p-3 rounded-lg border transition-all ${
+                  billingInterval === 'yearly'
+                    ? 'border-pictus-lime bg-pictus-lime/10 text-white'
+                    : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
+                }`}
+              >
+                {t('upgradeYearly')}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Vehicle Count */}
@@ -256,11 +269,17 @@ export default function UpgradePage() {
           <input
             type="number"
             min={1}
-            max={maxVehicles}
+            max={isPayingUser ? 100 : maxVehicles}
             value={vehicleCount}
-            onChange={(e) => setVehicleCount(Math.min(maxVehicles, Math.max(1, parseInt(e.target.value) || 1)))}
+            onChange={(e) => {
+              const max = isPayingUser ? 100 : maxVehicles
+              setVehicleCount(Math.min(max, Math.max(1, parseInt(e.target.value) || 1)))
+            }}
             className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white text-lg"
           />
+          {isPayingUser && (
+            <p className="text-xs text-gray-500 mt-1">{t('upgradeVehicleMax100')}</p>
+          )}
         </div>
 
         {/* Price Summary */}
@@ -273,51 +292,32 @@ export default function UpgradePage() {
               {totalPrice}&euro;<span className="text-sm text-gray-400">/{billingInterval === 'yearly' ? 'yr' : 'mo'}</span>
             </span>
           </div>
-          {currentTierName === 'BASIC' && targetTier === 'BUSINESS' && (
+          {isPayingUser && (
             <p className="text-xs text-gray-500 mt-2">
-              {billingInterval === 'yearly' ? t('upgradeProratedNote') : t('upgradeNextCycleNote')}
+              {t('upgradeNextCycleNote')}
             </p>
           )}
         </div>
 
-        {/* Credit info banner */}
-        {creditInfo && (
-          <div className="bg-pictus-lime/10 border border-pictus-lime/30 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-pictus-lime shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-white text-sm font-medium">
-                  {t('upgradeCreditTitle', { amount: creditInfo.amount.toFixed(2) })}
-                </p>
-                <p className="text-gray-400 text-xs mt-1">
-                  {t('upgradeCreditDescription')}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => { window.location.href = creditInfo.checkoutUrl }}
-              className="w-full mt-3 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-white rounded-lg transition-all font-medium text-lg"
-            >
-              <ArrowUp className="w-5 h-5" />
-              {t('upgradeContinueToCheckout')}
-            </button>
-          </div>
-        )}
-
         {/* Upgrade Button */}
-        {!creditInfo && (
-          <button
-            onClick={handleUpgrade}
-            disabled={upgrading}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 text-white rounded-lg transition-all font-medium text-lg"
-          >
-            {upgrading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <ArrowUp className="w-5 h-5" />
-            )}
-            {upgrading ? t('upgradeProcessing') : t('upgradeButton', { tierName: targetTier })}
-          </button>
+        <button
+          onClick={handleUpgrade}
+          disabled={upgrading}
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 text-white rounded-lg transition-all font-medium text-lg"
+        >
+          {upgrading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <ArrowUp className="w-5 h-5" />
+          )}
+          {upgrading ? t('upgradeProcessing') : t('upgradeButton', { tierName: targetTier })}
+        </button>
+
+        {/* Support note for paying users */}
+        {isPayingUser && (
+          <p className="text-sm text-white text-center mt-4">
+            {t('upgradeContactSupport')}
+          </p>
         )}
       </div>
 

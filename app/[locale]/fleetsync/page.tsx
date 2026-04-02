@@ -156,6 +156,18 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
+      {/* CTA before Problem Section */}
+      <section className="pb-10">
+        <div className="text-center">
+          <Link
+            href="/fleetsync/get-started?tier=FREE&billing=monthly"
+            className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-4 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
+          >
+            {t('ctaButton2')}
+          </Link>
+        </div>
+      </section>
+
       {/* Problem Section */}
 
       <section className="py-20">

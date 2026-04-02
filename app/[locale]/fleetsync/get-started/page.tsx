@@ -392,6 +392,7 @@ function GetStartedContent() {
             email: form.email,
             password: form.password,
             phoneNumber: fullPhoneNumber,
+            locale: window.location.pathname.split('/')[1] || 'sk',
           }),
         })
         const data = await res.json()
@@ -886,12 +887,12 @@ function GetStartedContent() {
             <h2 className="text-2xl font-light text-pictus-white">{t('step4Title')}</h2>
             <p className="text-gray-400 font-light">{t('step4Subtitle')}</p>
 
-            <label className="flex items-start gap-3 cursor-pointer group p-4 rounded-xl border border-pictus-white/10 hover:border-pictus-lime/30 transition-colors bg-pictus-white/5">
+            <label className="flex items-center gap-3 cursor-pointer group p-4 rounded-xl border border-pictus-white/10 hover:border-pictus-lime/30 transition-colors bg-pictus-white/5">
               <input
                 type="checkbox"
                 checked={form.gdprAccepted}
                 onChange={(e) => updateForm('gdprAccepted', e.target.checked)}
-                className="w-5 h-5 mt-0.5 rounded border-gray-500 text-pictus-lime focus:ring-pictus-lime bg-pictus-white/5 flex-shrink-0 accent-[#B6E036]"
+                className="w-5 h-5 rounded border-gray-500 text-pictus-lime focus:ring-pictus-lime bg-pictus-white/5 flex-shrink-0 accent-[#B6E036]"
               />
               <span className="text-gray-300 font-light">
                 {t('gdprAgree')}{' '}
@@ -907,12 +908,12 @@ function GetStartedContent() {
               </span>
             </label>
 
-            <label className="flex items-start gap-3 cursor-pointer group p-4 rounded-xl border border-pictus-white/10 hover:border-pictus-lime/30 transition-colors bg-pictus-white/5">
+            <label className="flex items-center gap-3 cursor-pointer group p-4 rounded-xl border border-pictus-white/10 hover:border-pictus-lime/30 transition-colors bg-pictus-white/5">
               <input
                 type="checkbox"
                 checked={form.termsAccepted}
                 onChange={(e) => updateForm('termsAccepted', e.target.checked)}
-                className="w-5 h-5 mt-0.5 rounded border-gray-500 text-pictus-lime focus:ring-pictus-lime bg-pictus-white/5 flex-shrink-0 accent-[#B6E036]"
+                className="w-5 h-5 rounded border-gray-500 text-pictus-lime focus:ring-pictus-lime bg-pictus-white/5 flex-shrink-0 accent-[#B6E036]"
               />
               <span className="text-gray-300 font-light">
                 {t('termsAgree')}{' '}

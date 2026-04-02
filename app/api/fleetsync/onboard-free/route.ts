@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
       phoneNumber: rawPhone,
     } = body
     const phoneNumber = rawPhone ? rawPhone.replace(/\s+/g, '') : null
+    const locale = body.locale || 'sk'
 
     // Validate required fields
     if (!organizationName || !firstName || !lastName || !email || !password) {
@@ -111,6 +112,19 @@ export async function POST(request: NextRequest) {
 
       return { organization, user }
     })
+
+    // Send FREE welcome email (fire-and-forget)
+    const origin = request.headers.get('origin') || 'https://www.pictusweb.sk'
+    fetch(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/send-free-welcome-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: result.user.email,
+        firstName: result.user.firstName,
+        loginUrl: `${origin}/${locale}/auth/login`,
+        locale,
+      }),
+    }).catch((err) => console.error('Free welcome email failed:', err))
 
     return NextResponse.json(
       {

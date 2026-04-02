@@ -3,8 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
 import { stripe, getStripePriceId } from '@/lib/stripe'
-import Stripe from 'stripe'
-import { generateAndSendInvoice } from '@/lib/generateInvoice'
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,7 +69,7 @@ export async function POST(request: NextRequest) {
       // Cancel existing subscription if any (e.g. upgrading before webhook sets subscriptionId)
       if (org.stripeSubscriptionId) {
         try {
-          await stripe.subscriptions.cancel(org.stripeSubscriptionId, { prorate: true })
+          await stripe.subscriptions.cancel(org.stripeSubscriptionId, { prorate: true, invoice_now: true })
           console.log('Canceled old subscription (prorated credit):', org.stripeSubscriptionId)
         } catch (err) {
           console.error('Failed to cancel old subscription:', err)
@@ -149,57 +147,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No subscription item found' }, { status: 500 })
     }
 
-    // Cancel old subscription and create new checkout when billing interval changes
+    // Reject yearly subscribers — must contact support for upgrade
     const currentInterval = org.billingInterval || 'monthly'
-    if (currentInterval !== billingInterval) {
-      // Cancel with proration — credits unused time to customer balance
-      await stripe.subscriptions.cancel(org.stripeSubscriptionId, {
-        prorate: true,
-      })
-      console.log('Canceled old subscription for interval change (prorated credit):', org.stripeSubscriptionId)
-
-      // Fetch customer balance (credit from canceled subscription)
-      const customer = await stripe.customers.retrieve(org.stripeCustomerId!) as Stripe.Customer
-      const creditBalance = customer.balance < 0 ? Math.abs(customer.balance) / 100 : 0
-      console.log('Customer credit balance after cancel:', creditBalance)
-
-      const checkoutSession = await stripe.checkout.sessions.create({
-        mode: 'subscription',
-        customer: org.stripeCustomerId!,
-        line_items: [{ price: stripePriceId, quantity: vehicleCount }],
-        // Apply customer balance (credit from canceled subscription) to this checkout
-        allow_promotion_codes: false,
-        customer_update: { name: 'auto' },
-        metadata: {
-          upgradeOrganizationId: org.id,
-          targetTierId: targetTierRecord.id,
-          purchasedVehicles: String(vehicleCount),
-          billingInterval,
-          locale,
-          creditBalance: String(creditBalance),
-        },
-        subscription_data: {
-          metadata: { organizationId: org.id },
-        },
-        success_url: `${origin}/${locale}/client/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/${locale}/client/upgrade?canceled=1`,
-      })
-      return NextResponse.json({ checkoutUrl: checkoutSession.url, creditBalance })
+    if (currentInterval === 'yearly') {
+      return NextResponse.json({ error: 'Yearly subscribers must contact support to upgrade.' }, { status: 400 })
     }
 
-    // Same interval: update subscription in-place
-    // Prorate if: yearly interval, OR vehicle count increased (higher total cost mid-cycle)
-    const vehiclesIncreased = vehicleCount > (org.purchasedVehicles || 1)
-    const shouldProrate = currentInterval === 'yearly' || vehiclesIncreased
-    const prorationBehavior = shouldProrate ? 'create_prorations' : 'none'
+    // Reject billing interval changes (UI prevents this, but enforce server-side)
+    if (currentInterval !== billingInterval) {
+      return NextResponse.json({ error: 'Cannot change billing interval. Contact support.' }, { status: 400 })
+    }
 
+    // Allow vehicle count change during upgrade, capped at 100
+    const newVehicles = Math.min(100, Math.max(1, vehicleCount))
+
+    // Update subscription in-place — new price + quantity kicks in at next billing cycle
     await stripe.subscriptions.update(org.stripeSubscriptionId, {
       items: [{
         id: existingItem.id,
         price: stripePriceId,
-        quantity: vehicleCount,
+        quantity: newVehicles,
       }],
-      proration_behavior: prorationBehavior as any,
+      proration_behavior: 'none' as any,
     })
 
     // Immediately update DB
@@ -207,26 +176,23 @@ export async function POST(request: NextRequest) {
       where: { id: org.id },
       data: {
         tierId: targetTierRecord.id,
-        purchasedVehicles: vehicleCount,
-        vehiclesLimit: vehicleCount,
+        purchasedVehicles: newVehicles,
+        vehiclesLimit: newVehicles,
         usersLimit: targetTierRecord.usersLimit,
         notificationsLimit: targetTierRecord.notificationsLimit,
         templatesLimit: targetTierRecord.templatesLimit,
         notificationTypesLimit: targetTierRecord.notificationTypesLimit,
-        billingInterval,
-        notificationPeriodStart: org.notificationPeriodStart || new Date(),
       },
     })
 
-    // Send upgrade email and generate invoice (fire-and-forget)
+    // Send upgrade email (fire-and-forget)
     const honoApi = process.env.NEXT_PUBLIC_HONO_API_URL
     const appUrl = process.env.NEXTAUTH_URL || 'https://www.pictusweb.sk'
     const upgradeUser = await prisma.user.findFirst({
       where: { organizationId: org.id },
-      select: { email: true, firstName: true, lastName: true },
+      select: { email: true, firstName: true },
     })
     if (upgradeUser?.email) {
-      // Send upgrade confirmation email
       fetch(`${honoApi}/api/pictusweb/client/send-upgrade-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -234,44 +200,17 @@ export async function POST(request: NextRequest) {
           email: upgradeUser.email,
           firstName: upgradeUser.firstName || '',
           tierName: targetTierRecord.name,
-          billingInterval,
-          vehicleCount,
+          billingInterval: currentInterval,
+          vehicleCount: newVehicles,
           loginUrl: `${appUrl}/${locale}/client`,
           locale,
         }),
       }).catch((err) => console.error('In-place upgrade email failed:', err))
-
-      // Generate invoice for prorated upgrades
-      if (shouldProrate) {
-        const pricePerVehicle = currentInterval === 'yearly'
-          ? Number(targetTierRecord.pricePerVehicleYearly || 0)
-          : Number(targetTierRecord.pricePerVehicle || 0)
-        generateAndSendInvoice({
-          organizationName: org.name,
-          street: org.street || '',
-          city: org.city || '',
-          postalCode: org.postalCode || '',
-          country: org.country || '',
-          ico: org.ico || undefined,
-          dic: org.dic || undefined,
-          firstName: upgradeUser.firstName || '',
-          lastName: upgradeUser.lastName || '',
-          email: upgradeUser.email,
-          tier: targetTierRecord.name,
-          billing: billingInterval,
-          numberOfVehicles: vehicleCount,
-          pricePerVehicle,
-          totalPrice: pricePerVehicle * vehicleCount,
-        }).catch((err) => console.error('In-place upgrade invoice failed:', err))
-      }
     }
 
     return NextResponse.json({
       success: true,
-      prorated: shouldProrate,
-      message: shouldProrate
-        ? 'Upgraded to BUSINESS. Prorated charge applied.'
-        : 'Upgraded to BUSINESS. New rate starts on next billing cycle.',
+      message: 'Upgraded to BUSINESS. New rate starts on next billing cycle.',
     })
   } catch (error) {
     console.error('Upgrade error:', error)
