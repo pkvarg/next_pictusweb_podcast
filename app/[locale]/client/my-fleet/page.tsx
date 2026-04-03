@@ -102,6 +102,7 @@ interface Organization {
   purchasedVehicles: number | null
   hiddenFromPictusaci: boolean
   notificationsBlocked: boolean
+  stripeSubscriptionStatus: string | null
   canCreateBenefit: boolean
   isBenefitOrg: boolean
   createdAt?: string
@@ -746,6 +747,7 @@ const MyFleetPage = () => {
           limit={organization.notificationsLimit ?? organization.tierRelation?.notificationsLimit ?? 0}
           tierName={organization.tierRelation?.name ?? 'N/A'}
           blocked={organization.notificationsBlocked}
+          subscriptionStatus={organization.stripeSubscriptionStatus}
         />
       )}
 

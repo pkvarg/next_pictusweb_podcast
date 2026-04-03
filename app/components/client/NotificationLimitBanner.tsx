@@ -6,6 +6,7 @@ interface NotificationLimitBannerProps {
   limit: number
   tierName: string
   blocked?: boolean
+  subscriptionStatus?: string | null
 }
 
 export default function NotificationLimitBanner({
@@ -13,6 +14,7 @@ export default function NotificationLimitBanner({
   limit,
   tierName,
   blocked,
+  subscriptionStatus,
 }: NotificationLimitBannerProps) {
   if (limit <= 0) return null
 
@@ -23,14 +25,22 @@ export default function NotificationLimitBanner({
   if (!blocked && usage < 0.8) return null
 
   if (blocked) {
+    const isCanceled = subscriptionStatus === 'canceled'
+    const isPaymentIssue = subscriptionStatus === 'past_due' || subscriptionStatus === 'unpaid'
+
     return (
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4">
         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300">
           <XCircle size={20} className="flex-shrink-0" />
           <p className="text-sm">
-            Dosiahli ste limit <strong>{limit}</strong> notifikácií pre{' '}
-            <strong>{tierName}</strong> tier. Vytváranie notifikácií je zablokované.
-            Kontaktujte administrátora.
+            {isCanceled ? (
+              <>Vaše predplatné bolo zrušené. Notifikácie sú zablokované. Obnovte predplatné pre pokračovanie.</>
+            ) : isPaymentIssue ? (
+              <>Máte neuhradenú platbu. Notifikácie sú dočasne zablokované. Aktualizujte platobnú metódu.</>
+            ) : (
+              <>Dosiahli ste limit <strong>{limit}</strong> notifikácií pre{' '}
+              <strong>{tierName}</strong> tier. Vytváranie notifikácií je zablokované do ďalšieho fakturačného obdobia.</>
+            )}
           </p>
         </div>
       </div>

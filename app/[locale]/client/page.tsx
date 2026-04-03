@@ -331,6 +331,7 @@ const ClientZone = () => {
           limit={organization.tierRelation.notificationsLimit}
           tierName={organization.tierRelation.name}
           blocked={organization.notificationsBlocked}
+          subscriptionStatus={organization.stripeSubscriptionStatus}
         />
       )}
 
