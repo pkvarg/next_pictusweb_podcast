@@ -2,7 +2,7 @@
 import { useSession, signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
-import { Link } from '@/i18n/routing'
+import { Link, useRouter, usePathname } from '@/i18n/routing'
 import {
   User,
   FolderOpen,
@@ -56,6 +56,8 @@ const ClientZone = () => {
   const t = useTranslations('Client')
   const params = useParams()
   const locale = (params?.locale as string) || 'sk'
+  const router = useRouter()
+  const pathname = usePathname()
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false)
   const [upgradedFromTier, setUpgradedFromTier] = useState<string | null>(null)
 
@@ -302,9 +304,24 @@ const ClientZone = () => {
                   <span className="hidden sm:inline">{t('upgrade')}</span>
                 </Link>
               )}
-              <div className="flex items-center space-x-2 text-pictus-white">
+              <div className="flex items-center gap-0.5 shrink-0">
+                {(['sk', 'en', 'hu'] as const).map((loc) => (
+                  <button
+                    key={loc}
+                    onClick={() => router.replace(pathname, { locale: loc })}
+                    className={`px-1 py-0.5 text-[10px] sm:text-xs sm:px-1.5 rounded transition-all ${
+                      locale === loc
+                        ? 'bg-pictus-lime text-black font-semibold'
+                        : 'text-gray-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {loc.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+              <div className="hidden sm:flex items-center space-x-2 text-pictus-white">
                 <User size={16} className="shrink-0" />
-                <span className="text-sm sm:text-lg truncate max-w-[100px] sm:max-w-none">{session?.user?.name}</span>
+                <span className="text-lg truncate">{session?.user?.name}</span>
               </div>
               <button
                 onClick={handleLogout}

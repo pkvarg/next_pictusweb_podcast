@@ -483,7 +483,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white px-5 py-2.5 rounded-lg font-normal hover:from-pictus-lime700 hover:to-pictus-black transition-all text-base shadow-lg"
           >
             <Car size={18} />
-            Spravovať
+            {t('fleetManageButton')}
             <ArrowRight size={18} />
           </Link>
         )}
@@ -545,7 +545,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   {vehicle.year && (
                     <div className="flex items-center gap-2 mt-1 text-pictus-white/70">
                       <Calendar size={14} />
-                      <span className="text-sm">Rok: {vehicle.year}</span>
+                      <span className="text-sm">{t('fleetYear', { year: vehicle.year })}</span>
                     </div>
                   )}
                   {isPictusaciUser && vehicle.organizationRelation?.name && (
@@ -559,7 +559,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <Gauge size={16} className="text-blue-400" />
-                      <span className="text-xs text-pictus-white/70">Posledný stav</span>
+                      <span className="text-xs text-pictus-white/70">{t('fleetLatestMileage')}</span>
                     </div>
                     {latestMileage ? (
                       <>
@@ -572,7 +572,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                         </p>
                       </>
                     ) : (
-                      <p className="text-sm text-pictus-white/50">Žiadne údaje</p>
+                      <p className="text-sm text-pictus-white/50">{t('fleetNoData')}</p>
                     )}
                   </div>
 
@@ -580,13 +580,13 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <FaEuroSign size={14} className="text-green-400" />
-                      <span className="text-xs text-pictus-white/70">Náklady</span>
+                      <span className="text-xs text-pictus-white/70">{t('fleetExpenses')}</span>
                     </div>
                     <p className="text-2xl font-light text-pictus-white">
                       {formatCurrency(totalExpenses)}
                     </p>
                     <p className="text-xs text-pictus-white/50">
-                      {filterExpenses(vehicle.expenses, expenseFilter).length} {filterExpenses(vehicle.expenses, expenseFilter).length === 1 ? 'záznam' : 'záznamov'}
+                      {t('fleetRecords', { count: filterExpenses(vehicle.expenses, expenseFilter).length })}
                     </p>
                   </div>
                 </div>
@@ -602,7 +602,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                     }`}
                   >
                     <FaEuroSign size={10} />
-                    Celkovo
+                    {t('fleetFilterAll')}
                   </button>
                   <button
                     onClick={() => setVehicleExpenseFilter(vehicle.id, 'thisYear')}
@@ -613,7 +613,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                     }`}
                   >
                     <FaEuroSign size={10} />
-                    Tento rok
+                    {t('fleetFilterThisYear')}
                   </button>
                   <button
                     onClick={() => setVehicleExpenseFilter(vehicle.id, 'thisMonth')}
@@ -624,7 +624,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                     }`}
                   >
                     <FaEuroSign size={10} />
-                    Tento mesiac
+                    {t('fleetFilterThisMonth')}
                   </button>
                 </div>
 
@@ -633,7 +633,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   <div>
                     <div className="flex items-center gap-1.5 mb-2">
                       <FaEuroSign size={12} className="text-pictus-lime" />
-                      <h4 className="text-sm font-normal text-pictus-white">Posledné výdavky</h4>
+                      <h4 className="text-sm font-normal text-pictus-white">{t('fleetRecentExpenses')}</h4>
                     </div>
                     <div className="space-y-1.5">
                       {recentExpenses.map((expense) => (
@@ -677,7 +677,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                 <div className="pt-4 border-t border-pictus-white/10">
                   <div className="flex items-center gap-1.5 mb-2">
                     <Bell size={12} className="text-orange-400" />
-                    <h4 className="text-sm font-normal text-pictus-white">Úlohy</h4>
+                    <h4 className="text-sm font-normal text-pictus-white">{t('fleetDuties')}</h4>
                   </div>
 
                   {/* Duty Filter Buttons */}
@@ -690,7 +690,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                           : 'bg-pictus-white/5 text-pictus-white/70 hover:bg-pictus-white/10'
                       }`}
                     >
-                      Všetky
+                      {t('fleetFilterAllDuties')}
                     </button>
                     <button
                       onClick={() => setVehicleDutyFilter(vehicle.id, 'thisYear')}
@@ -700,7 +700,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                           : 'bg-pictus-white/5 text-pictus-white/70 hover:bg-pictus-white/10'
                       }`}
                     >
-                      Tento rok
+                      {t('fleetFilterThisYear')}
                     </button>
                     <button
                       onClick={() => setVehicleDutyFilter(vehicle.id, 'thisMonth')}
@@ -710,7 +710,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                           : 'bg-pictus-white/5 text-pictus-white/70 hover:bg-pictus-white/10'
                       }`}
                     >
-                      Tento mesiac
+                      {t('fleetFilterThisMonth')}
                     </button>
                   </div>
 
@@ -719,9 +719,9 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                     <div className="mb-2 bg-orange-500/10 border border-orange-500/30 rounded-lg p-3">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-orange-400 font-medium mb-1">Nasledujúca úloha</p>
-                          <p className="text-base font-medium text-pictus-white truncate">{nextDuty.notificationType || 'Bez názvu'}</p>
-                          <p className="text-sm text-pictus-white mb-1.5">Termín: <span className="font-medium">{formatDate(nextDuty.dutyDate)}</span></p>
+                          <p className="text-xs text-orange-400 font-medium mb-1">{t('fleetNextDuty')}</p>
+                          <p className="text-base font-medium text-pictus-white truncate">{nextDuty.notificationType || t('fleetNoTitle')}</p>
+                          <p className="text-sm text-pictus-white mb-1.5">{t('fleetDeadline')} <span className="font-medium">{formatDate(nextDuty.dutyDate)}</span></p>
                           {/* Notification dates */}
                           <div className="flex flex-wrap gap-1">
                             {nextDuty.notifications
@@ -748,7 +748,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                               <div className={`text-base font-bold px-3 py-1.5 rounded whitespace-nowrap ${
                                 isUrgent ? 'bg-red-700/40 text-red-400 border border-red-600/50' : 'bg-orange-500/20 text-orange-400'
                               }`}>
-                                {days === 0 ? 'Dnes!' : days < 0 ? `${Math.abs(days)}d po` : `${days}d`}
+                                {days === 0 ? t('fleetTodayExcl') : days < 0 ? t('fleetDaysAgo', { days: Math.abs(days) }) : t('fleetDaysLeft', { days })}
                               </div>
                             )
                           })()}
@@ -769,11 +769,11 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                           >
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex-1 min-w-0">
-                                <p className="text-base font-medium text-pictus-white truncate">{duty.notificationType || 'Bez názvu'}</p>
-                                <p className="text-sm text-pictus-white mt-1">Termín: <span className="font-medium">{formatDate(duty.dutyDate)}</span></p>
+                                <p className="text-base font-medium text-pictus-white truncate">{duty.notificationType || t('fleetNoTitle')}</p>
+                                <p className="text-sm text-pictus-white mt-1">{t('fleetDeadline')} <span className="font-medium">{formatDate(duty.dutyDate)}</span></p>
                               </div>
                               <div className="text-base font-bold text-pictus-white ml-3 whitespace-nowrap">
-                                {days === 0 ? 'Dnes' : days < 0 ? `${Math.abs(days)}d po` : `${days}d`}
+                                {days === 0 ? t('fleetToday') : days < 0 ? t('fleetDaysAgo', { days: Math.abs(days) }) : t('fleetDaysLeft', { days })}
                               </div>
                             </div>
                             {/* Notification dates with statuses */}
@@ -802,7 +802,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                         const remaining = vehicleDuties.length - 1 - maxShown // -1 because first duty is shown separately
                         return remaining > 0 ? (
                           <p className="text-xs text-pictus-white/50 text-center pt-1">
-                            +{remaining} ďalších
+                            {t('fleetMore', { count: remaining })}
                           </p>
                         ) : null
                       })()}
@@ -810,7 +810,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   ) : (
                     <div className="text-center py-3">
                       <CheckCircle className="w-8 h-8 text-green-400/50 mx-auto mb-1" />
-                      <p className="text-xs text-pictus-white/50">Žiadne úlohy</p>
+                      <p className="text-xs text-pictus-white/50">{t('fleetNoDuties')}</p>
                     </div>
                   )}
                 </div>

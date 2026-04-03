@@ -182,6 +182,9 @@ export async function POST(request: NextRequest) {
         notificationsLimit: targetTierRecord.notificationsLimit,
         templatesLimit: targetTierRecord.templatesLimit,
         notificationTypesLimit: targetTierRecord.notificationTypesLimit,
+        currentNotificationsCount: 0,
+        notificationPeriodStart: new Date(),
+        notificationsBlocked: false,
       },
     })
 
