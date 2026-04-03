@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import bcrypt from 'bcryptjs'
-
-const prisma = new PrismaClient()
+import { rateLimit, rateLimitResponse, getClientIP } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 3 per IP per hour
+    const ip = getClientIP(request.headers)
+    const ipLimit = rateLimit({ key: `onboard_free:${ip}`, maxAttempts: 3, windowMs: 60 * 60 * 1000 })
+    if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
+
     const body = await request.json()
     const {
       organizationName,
@@ -23,17 +27,18 @@ export async function POST(request: NextRequest) {
       phoneNumber: rawPhone,
     } = body
     const phoneNumber = rawPhone ? rawPhone.replace(/\s+/g, '') : null
+    const locale = body.locale || 'sk'
 
     // Validate required fields
     if (!organizationName || !firstName || !lastName || !email || !password) {
       return NextResponse.json(
-        { error: 'Organization name, first name, last name, email, and password are required' },
+        { error: 'REQUIRED_FIELDS_MISSING' },
         { status: 400 }
       )
     }
 
     if (password.length < 8) {
-      return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
+      return NextResponse.json({ error: 'PASSWORD_TOO_SHORT' }, { status: 400 })
     }
 
     // Check if email already exists
@@ -43,7 +48,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingUser) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
+      return NextResponse.json({ error: 'EMAIL_ALREADY_EXISTS' }, { status: 400 })
     }
 
     // Find the FREE tier
@@ -108,6 +113,19 @@ export async function POST(request: NextRequest) {
       return { organization, user }
     })
 
+    // Send FREE welcome email (fire-and-forget)
+    const origin = request.headers.get('origin') || 'https://www.pictusweb.sk'
+    fetch(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/send-free-welcome-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: result.user.email,
+        firstName: result.user.firstName,
+        loginUrl: `${origin}/${locale}/auth/login`,
+        locale,
+      }),
+    }).catch((err) => console.error('Free welcome email failed:', err))
+
     return NextResponse.json(
       {
         success: true,
@@ -126,7 +144,5 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }

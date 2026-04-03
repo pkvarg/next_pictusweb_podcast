@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import bcrypt from 'bcryptjs'
 import { stripe, getStripePriceId } from '@/lib/stripe'
-
-const prisma = new PrismaClient()
+import { rateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,6 +13,10 @@ export async function POST(request: NextRequest) {
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    // Rate limit: 5 per user per hour
+    const userLimit = rateLimit({ key: `onboard_client:${session.user.id}`, maxAttempts: 5, windowMs: 60 * 60 * 1000 })
+    if (!userLimit.success) return rateLimitResponse(userLimit.retryAfterMs)
 
     // Check if user is from PICTUSACI organization
     const currentUser = await prisma.user.findUnique({
@@ -46,6 +49,8 @@ export async function POST(request: NextRequest) {
       country,
       tierId,
       purchasedVehicles,
+      // Locale
+      locale,
       // Optional limit overrides
       usersLimit: usersLimitOverride,
       vehiclesLimit: vehiclesLimitOverride,
@@ -155,6 +160,7 @@ export async function POST(request: NextRequest) {
           pendingOnboardingId: pending.id,
           parentOrganizationId: currentUser?.organizationId || '',
           onboardedBy: session.user.email || '',
+          locale: locale || 'sk',
         },
         subscription_data: {
           metadata: {
@@ -262,6 +268,7 @@ export async function POST(request: NextRequest) {
         loginUrl: `${origin}/sk/auth/login`,
         gdprUrl: `${origin}/gdpr`,
         termsUrl: `${origin}/obchodne-podmienky`,
+        locale: locale || 'sk',
       }),
     }).catch((err) => console.error('Welcome email failed:', err))
 
@@ -278,7 +285,5 @@ export async function POST(request: NextRequest) {
       error: 'Failed to onboard client',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
-  } finally {
-    await prisma.$disconnect()
   }
 }

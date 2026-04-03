@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { hashPassword } from '../../../../lib/isValidPassword'
-
-const prisma = new PrismaClient()
 
 export async function GET(
   request: NextRequest,
@@ -60,15 +58,12 @@ export async function PUT(
     if (isFleetManager !== undefined) updateData.isFleetManager = isFleetManager
     if (loginProvider !== undefined) updateData.loginProvider = loginProvider
 
-    // If setting login provider to hybrid, ALWAYS set default password
-    if (loginProvider === 'hybrid') {
+    // If setting login provider to credentials, set default password when no explicit password provided
+    if (loginProvider === 'credentials' && (!password || password.trim() === '')) {
       const defaultPassword = process.env.DEFAULT_USER_PASSWORD
       updateData.password = await hashPassword(defaultPassword)
-      console.log(`TESTING: Set HYBRID user password to default: ${defaultPassword}`)
     } else if (password !== undefined && password.trim() !== '') {
-      // Hash password if provided (for non-hybrid users)
       updateData.password = await hashPassword(password)
-      console.log(`TESTING: Set custom password for user`)
     }
 
     const user = await prisma.user.update({
@@ -86,13 +81,6 @@ export async function PUT(
         }
       }
     })
-
-    console.log(`TESTING: User ${user.email} updated successfully`)
-    console.log(`TESTING: Final loginProvider: ${user.loginProvider}`)
-    console.log(`TESTING: Has hybridPassword: ${!!user.hybridPassword}`)
-    if (user.hybridPassword) {
-      console.log(`TESTING: HybridPassword hash (first 20 chars): ${user.hybridPassword.substring(0, 20)}...`)
-    }
 
     return NextResponse.json(user)
   } catch (error: any) {

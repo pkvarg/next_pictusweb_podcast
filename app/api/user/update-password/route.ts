@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { hashPassword } from '@/lib/isValidPassword'
 import { checkIPBan } from '@/lib/checkIPBan'
-
-const prisma = new PrismaClient()
+import { rateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,6 +19,10 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, newPassword } = await request.json()
+
+    // Rate limit: 5 per user (email) per hour
+    const userLimit = rateLimit({ key: `update_password:${email?.toLowerCase()}`, maxAttempts: 5, windowMs: 60 * 60 * 1000 })
+    if (!userLimit.success) return rateLimitResponse(userLimit.retryAfterMs)
 
     if (!email || !newPassword) {
       return NextResponse.json({ error: 'Email and new password are required' }, { status: 400 })

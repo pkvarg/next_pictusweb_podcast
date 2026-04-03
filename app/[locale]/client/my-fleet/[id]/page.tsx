@@ -254,7 +254,7 @@ const EditVehiclePage = () => {
           <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h1 className="text-3xl font-light mb-4 text-red-400">Prístup zamietnutý</h1>
           <p className="text-lg text-gray-300 mb-6">
-            Vaša organizácia bola deaktivovaná. Kontaktujte administrátora alebo vášho marketéra.
+            Vaša organizácia bola deaktivovaná.
           </p>
           <p className="text-sm text-gray-500 mb-8">
             Ak si myslíte, že ide o chybu, napíšte na{' '}
@@ -262,13 +262,21 @@ const EditVehiclePage = () => {
               info@pictusweb.sk
             </a>
           </p>
-          <button
-            onClick={() => signOut({ callbackUrl: '/' })}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
-          >
-            <LogOut size={18} />
-            Odhlásiť sa
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Link
+              href="/client/upgrade"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-black font-semibold rounded-lg hover:bg-pictus-lime/80 transition-all"
+            >
+              Upgradovať teraz
+            </Link>
+            <button
+              onClick={() => signOut({ callbackUrl: '/' })}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+            >
+              <LogOut size={18} />
+              Odhlásiť sa
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -286,7 +294,7 @@ const EditVehiclePage = () => {
           </p>
           <Link
             href="/client"
-            className="inline-flex items-center gap-2 bg-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime600 text-white px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
           >
             <ArrowLeft size={20} />
             Späť na dashboard
@@ -306,7 +314,7 @@ const EditVehiclePage = () => {
           <p className="text-pictus-lime mb-6">{error}</p>
           <Link
             href="/client/my-fleet"
-            className="inline-flex items-center gap-2 bg-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime600 text-white px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
           >
             <ArrowLeft size={20} />
             Späť na flotilu
@@ -512,7 +520,7 @@ const EditVehiclePage = () => {
             <button
               type="submit"
               disabled={loading || uploading}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-4 rounded-lg font-light hover:from-pictus-lime600 hover:to-pictus-lime700 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white px-6 py-4 rounded-lg font-light hover:from-pictus-lime600 hover:to-pictus-lime700 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading || uploading ? (
                 <>

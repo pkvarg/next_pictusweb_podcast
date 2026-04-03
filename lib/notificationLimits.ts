@@ -1,12 +1,44 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from '@/db/db'
 
 interface NotificationCheckResult {
   allowed: boolean
   reason?: string
   blocked?: boolean
   limitReached?: boolean
+}
+
+const messages: Record<string, Record<string, string>> = {
+  sk: {
+    orgNotFound: 'Organizácia nebola nájdená',
+    orgDeactivated: 'Organizácia bola deaktivovaná',
+    freeLimitReached: 'Dosiahli ste limit {limit} notifikácií pre FREE tier. Organizácia bola deaktivovaná.',
+    paidLimitBlocked: 'Dosiahli ste ročný limit {limit} notifikácií pre {tier} tier. Limit sa obnoví {date}.',
+    paidLimitReached: 'Dosiahli ste ročný limit {limit} notifikácií pre {tier} tier.',
+  },
+  en: {
+    orgNotFound: 'Organization not found',
+    orgDeactivated: 'Organization has been deactivated',
+    freeLimitReached: 'You have reached the limit of {limit} notifications for the FREE tier. Organization has been deactivated.',
+    paidLimitBlocked: 'You have reached the yearly limit of {limit} notifications for the {tier} tier. Limit resets on {date}.',
+    paidLimitReached: 'You have reached the yearly limit of {limit} notifications for the {tier} tier.',
+  },
+  hu: {
+    orgNotFound: 'A szervezet nem található',
+    orgDeactivated: 'A szervezet deaktiválva lett',
+    freeLimitReached: 'Elérte a FREE szint {limit} értesítési limitjét. A szervezet deaktiválva lett.',
+    paidLimitBlocked: 'Elérte a(z) {tier} szint éves {limit} értesítési limitjét. A limit {date}-kor újul meg.',
+    paidLimitReached: 'Elérte a(z) {tier} szint éves {limit} értesítési limitjét.',
+  },
+}
+
+function t(locale: string, key: string, params?: Record<string, string | number>): string {
+  let text = messages[locale]?.[key] || messages['sk'][key] || key
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      text = text.replace(`{${k}}`, String(v))
+    }
+  }
+  return text
 }
 
 /**
@@ -21,6 +53,7 @@ async function sendLimitReachedEmail(params: {
   resetDate?: string
   contactEmail?: string
   userEmail?: string
+  locale?: string
 }) {
   try {
     const honoApiUrl = `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/notification-limit`
@@ -51,6 +84,7 @@ export async function checkNotificationLimit(
   organizationId: string,
   countToAdd: number = 1,
   userEmail?: string,
+  locale?: string,
 ): Promise<NotificationCheckResult> {
   const org = await prisma.organization.findUnique({
     where: { id: organizationId },
@@ -64,12 +98,14 @@ export async function checkNotificationLimit(
     },
   })
 
+  const loc = locale || 'sk'
+
   if (!org) {
-    return { allowed: false, reason: 'Organizácia nebola nájdená' }
+    return { allowed: false, reason: t(loc, 'orgNotFound') }
   }
 
   if (org.deletedAt) {
-    return { allowed: false, reason: 'Organizácia bola deaktivovaná' }
+    return { allowed: false, reason: t(loc, 'orgDeactivated') }
   }
 
   if (!org.tierRelation) {
@@ -80,17 +116,18 @@ export async function checkNotificationLimit(
   const limit = org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? 0
 
   if (tierName === 'FREE') {
-    return handleFreeTier(org, limit, countToAdd)
+    return handleFreeTier(org, limit, countToAdd, loc)
   }
 
   // BASIC and BUSINESS - yearly tracking
-  return handlePaidTier(org, limit, countToAdd, tierName, userEmail)
+  return handlePaidTier(org, limit, countToAdd, tierName, userEmail, locale)
 }
 
 async function handleFreeTier(
   org: any,
   limit: number,
   countToAdd: number,
+  locale: string,
 ): Promise<NotificationCheckResult> {
   const currentCount = org.currentNotificationsCount
 
@@ -108,7 +145,7 @@ async function handleFreeTier(
     return {
       allowed: false,
       limitReached: true,
-      reason: `Dosiahli ste limit ${limit} notifikácií pre FREE tier. Organizácia bola deaktivovaná. Kontaktujte administrátora pre upgrade.`,
+      reason: t(locale, 'freeLimitReached', { limit }),
     }
   }
 
@@ -121,6 +158,7 @@ async function handlePaidTier(
   countToAdd: number,
   tierName: string,
   userEmail?: string,
+  locale?: string,
 ): Promise<NotificationCheckResult> {
   const now = new Date()
   let periodStart = org.notificationPeriodStart
@@ -158,11 +196,12 @@ async function handlePaidTier(
 
   // Check if blocked
   if (org.notificationsBlocked) {
-    const resetDate = periodEnd.toLocaleDateString('sk-SK')
+    const dateLocale = locale === 'hu' ? 'hu-HU' : locale === 'en' ? 'en-GB' : 'sk-SK'
+    const resetDate = periodEnd.toLocaleDateString(dateLocale)
     return {
       allowed: false,
       blocked: true,
-      reason: `Dosiahli ste ročný limit ${limit} notifikácií pre ${tierName} tier. Limit sa obnoví ${resetDate}. Kontaktujte administrátora.`,
+      reason: t(locale || 'sk', 'paidLimitBlocked', { limit, tier: tierName, date: resetDate }),
     }
   }
 
@@ -198,12 +237,13 @@ async function handlePaidTier(
       resetDate: emailPeriodEnd.toLocaleDateString('sk-SK'),
       contactEmail: org.mainContact || undefined,
       userEmail,
+      locale,
     })
 
     return {
       allowed: false,
       limitReached: true,
-      reason: `Dosiahli ste ročný limit ${limit} notifikácií pre ${tierName} tier. Kontaktujte administrátora.`,
+      reason: t(locale || 'sk', 'paidLimitReached', { limit, tier: tierName }),
     }
   }
 

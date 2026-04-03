@@ -122,6 +122,14 @@ const Feedbacks: React.FC = () => {
       image: 'vlado.webp',
       companyUrl: 'https://fyziology.sk',
     },
+    {
+      testimonial: t('reviewsJan'),
+      name: 'Ján Prievozník',
+      designation: t('reviewsDesignationJan'),
+      company: 'bow4bass.com',
+      image: 'jp-review.webp',
+      companyUrl: 'https://bow4bass.com/',
+    },
   ]
   return (
     <div className={`lg:mx-[15.5%] pt-[70px] lg:pt-[50px] rounded-[20px]`}>

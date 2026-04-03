@@ -31,7 +31,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           url: 'https://www.pictusweb.sk',
           logo: {
             '@type': 'ImageObject',
-            url: 'https://www.pictusweb.sk/pictusweb.webp',
+            url: 'https://www.pictusweb.sk/og-image.webp',
             width: 400,
             height: 400,
           },
@@ -74,7 +74,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         '@type': 'Organization',
         name: 'Pictusweb',
         url: 'https://www.pictusweb.sk',
-        logo: 'https://www.pictusweb.sk/pictusweb.webp',
+        logo: 'https://www.pictusweb.sk/og-image.webp',
         description: data.description,
         contactPoint: {
           '@type': 'ContactPoint',

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { createHash, createHmac } from 'crypto'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-
-const prisma = new PrismaClient()
+import { rateLimit, rateLimitResponse, getClientIP } from '@/lib/rateLimit'
 const OTP_SALT = process.env.OTP_SALT!
 const SESSION_SECRET = process.env.VERIFICATION_SESSION_SECRET!
 const HONO_API = process.env.NEXT_PUBLIC_HONO_API_URL!
@@ -38,6 +37,11 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = session.user.id
+
+    // Rate limit: 10 per IP per hour
+    const ip = getClientIP(request.headers)
+    const ipLimit = rateLimit({ key: `send_phone_verify:${ip}`, maxAttempts: 10, windowMs: 60 * 60 * 1000 })
+    if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
 
     const user = await prisma.user.findUnique({
       where: { id: userId },

@@ -1,0 +1,41 @@
+'use client'
+import React from 'react'
+import { motion } from 'framer-motion'
+import { fadeIn } from '@/lib/motion'
+import { Link } from '@/i18n/routing'
+import { useTranslations } from 'next-intl'
+
+const CallToAction = () => {
+  const t = useTranslations('Home')
+  return (
+    <section className="relative py-32 md:py-40 px-6 md:px-12 overflow-hidden">
+      <div className="relative max-w-4xl mx-auto text-center">
+        <motion.h2
+          variants={fadeIn('up', 'tween', 0.1, 0.6)}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+          className="font-brutal-milk text-white text-4xl md:text-6xl lg:text-8xl lowercase leading-tight mb-10 md:mb-14"
+        >
+          {t('callToActionTitle')}
+        </motion.h2>
+
+        <motion.div
+          variants={fadeIn('up', 'tween', 0.3, 0.5)}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <Link
+            href="/contact"
+            className="inline-block bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-3 rounded-full text-lg font-normal text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all transform hover:scale-105 shadow-lg hover:shadow-pictus-lime/50"
+          >
+            {t('getInTouchButton')}
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+export default CallToAction

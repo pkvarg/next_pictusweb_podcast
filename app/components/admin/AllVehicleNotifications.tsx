@@ -449,7 +449,7 @@ export default function AllVehicleNotifications() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white">All Vehicle Notifications</h2>
           <p className="text-gray-400 mt-1">
@@ -457,17 +457,17 @@ export default function AllVehicleNotifications() {
             {filteredNotifications.length !== 1 ? 's' : ''} total
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col xs:flex-row gap-2">
           <button
             onClick={() => setShowSettings(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
           >
             <Settings className="h-4 w-4" />
             <span>Settings</span>
           </button>
           <button
             onClick={() => setShowBuilder(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
           >
             <Plus className="h-4 w-4" />
             <span>Create New Notification</span>
@@ -544,80 +544,120 @@ export default function AllVehicleNotifications() {
                   <p className="text-gray-400 mt-2">Loading vehicles...</p>
                 </div>
               ) : filteredVehicles.length > 0 ? (
-                <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-white/5 border-b border-white/10">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Registration
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Year
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Note
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Created By
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/10">
-                      {filteredVehicles.map((vehicle) => (
-                        <tr key={vehicle.id} className="hover:bg-white/5 transition-colors">
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <div className="text-sm font-medium text-white">
-                              {vehicle.registration}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <div className="text-sm text-gray-300">{vehicle.type}</div>
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <div className="text-sm text-gray-300">{vehicle.year || 'N/A'}</div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="text-sm text-gray-300 max-w-xs truncate">
-                              {vehicle.note || '-'}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <div className="text-sm text-gray-300">
-                              {vehicle.user
-                                ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim() ||
-                                  vehicle.user.email
-                                : 'N/A'}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleEditVehicle(vehicle)}
-                                className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
-                                title="Edit vehicle"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteVehicle(vehicle.id)}
-                                className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
-                                title="Delete vehicle"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </td>
+                <>
+                  {/* Mobile Vehicle Cards */}
+                  <div className="md:hidden space-y-3">
+                    {filteredVehicles.map((vehicle) => (
+                      <div key={vehicle.id} className="bg-white/5 rounded-lg p-4 border border-white/10 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-white font-medium text-sm">{vehicle.registration}</span>
+                            <span className="text-gray-400 text-sm ml-2">{vehicle.type}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => handleEditVehicle(vehicle)}
+                              className="p-2.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
+                              title="Edit vehicle"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteVehicle(vehicle.id)}
+                              className="p-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
+                              title="Delete vehicle"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
+                          {vehicle.year && <span>Year: {vehicle.year}</span>}
+                          {vehicle.note && <span className="truncate max-w-[200px]">Note: {vehicle.note}</span>}
+                          <span>By: {vehicle.user
+                            ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim() || vehicle.user.email
+                            : 'N/A'}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop Vehicle Table */}
+                  <div className="hidden md:block bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-white/5 border-b border-white/10">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                            Registration
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                            Year
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                            Note
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                            Created By
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                            Actions
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-white/10">
+                        {filteredVehicles.map((vehicle) => (
+                          <tr key={vehicle.id} className="hover:bg-white/5 transition-colors">
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="text-sm font-medium text-white">
+                                {vehicle.registration}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="text-sm text-gray-300">{vehicle.type}</div>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="text-sm text-gray-300">{vehicle.year || 'N/A'}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-sm text-gray-300 max-w-xs truncate">
+                                {vehicle.note || '-'}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="text-sm text-gray-300">
+                                {vehicle.user
+                                  ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim() ||
+                                    vehicle.user.email
+                                  : 'N/A'}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleEditVehicle(vehicle)}
+                                  className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
+                                  title="Edit vehicle"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteVehicle(vehicle.id)}
+                                  className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
+                                  title="Delete vehicle"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               ) : (
                 <div className="text-center py-8 bg-white/5 rounded-lg border border-white/10">
                   <Car className="h-12 w-12 text-gray-600 mx-auto mb-2" />
@@ -750,8 +790,170 @@ export default function AllVehicleNotifications() {
         />
       </div>
 
-      {/* Notifications Table */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
+      {/* Mobile Notification Cards */}
+      <div className="md:hidden space-y-3">
+        {filteredNotifications.map((notification) => (
+          <div
+            key={notification.id}
+            className={`rounded-lg p-4 border space-y-3 ${
+              notification.deletedAt
+                ? 'bg-red-500/10 border-red-500/30 opacity-70'
+                : 'bg-white/5 border-white/10'
+            }`}
+          >
+            {/* Top row: ID + status + actions */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-white font-medium text-sm">#{notification.id}</span>
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(notification.status)}`}
+                >
+                  {notification.status === 'sent'
+                    ? 'Odoslané'
+                    : notification.status === 'confirmed'
+                      ? 'Potvrdené'
+                      : notification.status === 'pending'
+                        ? 'Čaká'
+                        : notification.status === 'failed'
+                          ? 'Zlyhalo'
+                          : notification.status === 'imported'
+                            ? 'Importované'
+                            : notification.status.toLowerCase().startsWith('reminded')
+                              ? 'Pripomenuté'
+                              : notification.status === 'no_response'
+                                ? 'Bez odpovede'
+                                : notification.status}
+                </span>
+                {notification.deletedAt && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30">
+                    DELETED
+                  </span>
+                )}
+              </div>
+            </div>
+            {/* Person + Vehicle */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <div className="text-xs text-gray-500">Person</div>
+                <div className="text-sm text-white">{notification.personName || 'N/A'}</div>
+                {notification.organization?.name && (
+                  <div className="text-xs text-gray-400 flex items-center mt-0.5">
+                    <Building className="h-3 w-3 mr-1" />
+                    {notification.organization.name}
+                  </div>
+                )}
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Vehicle</div>
+                <div className="text-sm text-white">{notification.vehicleRegistration || 'N/A'}</div>
+                {notification.myVehicle?.type && (
+                  <div className="text-xs text-gray-400 mt-0.5">{notification.myVehicle.type}</div>
+                )}
+              </div>
+            </div>
+            {/* Type + Contact */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <div className="text-xs text-gray-500">Type</div>
+                <div className="text-sm text-white">{notification.notificationType || 'N/A'}</div>
+                {notification.notificationChannel && (
+                  <div className="text-xs text-gray-400 mt-0.5">{notification.notificationChannel}</div>
+                )}
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Contact</div>
+                {notification.email && (
+                  <div className="text-xs text-gray-300 flex items-center truncate">
+                    <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
+                    {notification.email}
+                  </div>
+                )}
+                {notification.phoneNumber && (
+                  <div className="text-xs text-gray-300 flex items-center">
+                    <Phone className="h-3 w-3 mr-1 flex-shrink-0" />
+                    {notification.phoneNumber}
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Dates */}
+            <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-400">
+              {notification.notificationDate && (
+                <span suppressHydrationWarning className="text-pictus-lime font-medium">
+                  Notif: {new Date(notification.notificationDate).toLocaleDateString('sk-SK')}
+                </span>
+              )}
+              {notification.dutyDate && (
+                <span suppressHydrationWarning>
+                  Duty: {new Date(notification.dutyDate).toLocaleDateString('sk-SK')}
+                </span>
+              )}
+              {notification.emailSentAt && (
+                <span suppressHydrationWarning>
+                  Email: {new Date(notification.emailSentAt).toLocaleDateString('sk-SK')}
+                </span>
+              )}
+              {notification.confirmedAt && (
+                <span suppressHydrationWarning>
+                  Conf: {new Date(notification.confirmedAt).toLocaleDateString('sk-SK')}
+                </span>
+              )}
+              {notification.deletedAt && (
+                <span suppressHydrationWarning className="text-red-400">
+                  Del: {new Date(notification.deletedAt).toLocaleDateString('sk-SK')}
+                </span>
+              )}
+            </div>
+            {/* Action buttons */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              {!notification.deletedAt && (
+                <>
+                  <button
+                    onClick={() => handleEditNotification(notification)}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all text-sm"
+                    title="Edit this notification"
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={() => handleDuplicate(notification)}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
+                    title="Duplicate this notification"
+                  >
+                    <Copy className="h-4 w-4" />
+                    <span>Duplicate</span>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteNotification(notification.id)}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all text-sm"
+                    title="Delete this notification"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Delete</span>
+                  </button>
+                </>
+              )}
+              {notification.deletedAt && (
+                <>
+                  <button
+                    onClick={() => handleDuplicate(notification)}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
+                    title="Duplicate this notification"
+                  >
+                    <Copy className="h-4 w-4" />
+                    <span>Duplicate</span>
+                  </button>
+                  <span className="text-xs text-gray-500 italic self-center">Deleted</span>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Notifications Table */}
+      <div className="hidden md:block bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-white/5 border-b border-white/10">

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { createHash, createHmac } from 'crypto'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-
-const prisma = new PrismaClient()
+import { rateLimit, rateLimitResponse } from '@/lib/rateLimit'
 const OTP_SALT = process.env.OTP_SALT!
 const SESSION_SECRET = process.env.VERIFICATION_SESSION_SECRET!
 const MAX_ATTEMPTS = 5
@@ -54,6 +53,11 @@ export async function POST(request: NextRequest) {
 
     const purpose = type === 'email' ? 'user_email_verify' : 'user_phone_verify'
 
+    // Global lockout: 15 failed attempts per user per hour
+    const lockoutKey = `verify_contact:${userId}`
+    const lockout = rateLimit({ key: lockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000, checkOnly: true })
+    if (!lockout.success) return rateLimitResponse(lockout.retryAfterMs)
+
     const tokenData = verifyToken(verificationToken)
     if (!tokenData || tokenData.purpose !== purpose || tokenData.identifier !== userId) {
       return NextResponse.json({ error: 'Neplatný alebo expirovaný token' }, { status: 401 })
@@ -72,6 +76,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (record.attempts + 1 > MAX_ATTEMPTS) {
+      rateLimit({ key: lockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000 })
       return NextResponse.json(
         { error: 'Príliš veľa nesprávnych pokusov. Vyžiadajte nový kód.' },
         { status: 429 },
@@ -79,6 +84,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (record.codeHash !== hashCode(code, userId)) {
+      rateLimit({ key: lockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000 })
       const remaining = MAX_ATTEMPTS - (record.attempts + 1)
       return NextResponse.json(
         { error: 'Nesprávny kód', attemptsRemaining: remaining },

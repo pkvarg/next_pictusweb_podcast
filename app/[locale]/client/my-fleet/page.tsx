@@ -102,6 +102,7 @@ interface Organization {
   purchasedVehicles: number | null
   hiddenFromPictusaci: boolean
   notificationsBlocked: boolean
+  stripeSubscriptionStatus: string | null
   canCreateBenefit: boolean
   isBenefitOrg: boolean
   createdAt?: string
@@ -458,8 +459,9 @@ const MyFleetPage = () => {
         throw new Error('Failed to delete vehicle')
       }
 
-      // Refresh the list
+      // Refresh the list and vehicle count
       fetchVehicles()
+      fetchOrganization()
     } catch (err) {
       console.error('Error deleting vehicle:', err)
       alert(t('deleteVehicleFailed'))
@@ -564,13 +566,21 @@ const MyFleetPage = () => {
               info@pictusweb.sk
             </a>
           </p>
-          <button
-            onClick={() => signOut({ callbackUrl: '/' })}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
-          >
-            <LogOut size={18} />
-            {t('logOutButton')}
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Link
+              href="/client/upgrade"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-black font-semibold rounded-lg hover:bg-pictus-lime/80 transition-all"
+            >
+              {t('upgradeNow')}
+            </Link>
+            <button
+              onClick={() => signOut({ callbackUrl: '/' })}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+            >
+              <LogOut size={18} />
+              {t('logOutButton')}
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -745,6 +755,7 @@ const MyFleetPage = () => {
           limit={organization.notificationsLimit ?? organization.tierRelation?.notificationsLimit ?? 0}
           tierName={organization.tierRelation?.name ?? 'N/A'}
           blocked={organization.notificationsBlocked}
+          subscriptionStatus={organization.stripeSubscriptionStatus}
         />
       )}
 
@@ -940,7 +951,7 @@ const MyFleetPage = () => {
                   </p>
                   <Link
                     href="/client/my-fleet/new"
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-8 py-4 rounded-lg font-light hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/50"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white px-8 py-4 rounded-lg font-light hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/50"
                   >
                     <Plus size={24} />
                     {t('addFirstVehicle')}
@@ -1121,7 +1132,7 @@ const MyFleetPage = () => {
                   organization &&
                   organization.currentUsersCount >= (organization.usersLimit ?? organization.tierRelation?.usersLimit ?? Infinity)
                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black'
+                    : 'bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-white'
                 }`}
               >
                 <Plus className="h-4 w-4" />
@@ -1139,7 +1150,7 @@ const MyFleetPage = () => {
                 <p className="text-gray-400">{t('noUsers')}</p>
                 <button
                   onClick={handleCreateUser}
-                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg"
                 >
                   <Plus className="h-4 w-4" />
                   {t('addFirstUser')}
@@ -1296,7 +1307,7 @@ const MyFleetPage = () => {
                       setEditingNotificationId(null)
                       setShowNotificationBuilder(true)
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-white rounded-lg transition-all"
                   >
                     <Plus className="h-4 w-4" />
                     {t('createNotification')}
@@ -1533,7 +1544,7 @@ const MyFleetPage = () => {
                         setEditingNotificationId(null)
                         setShowNotificationBuilder(true)
                       }}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg"
                     >
                       <Plus className="h-5 w-5" />
                       {t('createFirstNotification')}
@@ -1847,7 +1858,7 @@ const MyFleetPage = () => {
               </div>
               <Link
                 href="/client/my-fleet/onboard"
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-white rounded-lg transition-all"
               >
                 <Plus className="h-4 w-4" />
                 {t('onboardNewClient')}
@@ -1865,7 +1876,7 @@ const MyFleetPage = () => {
                 <p className="text-gray-400 mb-6">{t('noOrganizationsHint')}</p>
                 <Link
                   href="/client/my-fleet/onboard"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg"
                 >
                   <Plus className="h-5 w-5" />
                   {t('onboardFirstClient')}

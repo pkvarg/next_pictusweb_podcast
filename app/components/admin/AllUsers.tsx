@@ -138,7 +138,7 @@ export default function AllUsers() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white">All Users</h2>
           <p className="text-gray-400 mt-1">{filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''} total</p>
@@ -164,8 +164,105 @@ export default function AllUsers() {
         />
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
+      {/* Mobile User Cards */}
+      <div className="md:hidden space-y-3">
+        {filteredUsers.map((user) => (
+          <div key={user.id} className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 space-y-3">
+            {/* Top row: avatar + name + actions */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center min-w-0">
+                <div className="flex-shrink-0 h-10 w-10">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 flex items-center justify-center">
+                    <span className="text-pictus-black font-medium text-sm">
+                      {(user.firstName?.[0] || user.email[0]).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+                <div className="ml-3 min-w-0">
+                  <div className="text-sm font-medium text-white truncate">
+                    {user.firstName && user.lastName
+                      ? `${user.firstName} ${user.lastName}`
+                      : user.email
+                    }
+                  </div>
+                  <div className="text-xs text-gray-400 truncate flex items-center">
+                    <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
+                    {user.email}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+                <button
+                  onClick={() => setEditingUser(user)}
+                  className="text-pictus-lime hover:text-pictus-lime600 p-2.5 rounded-lg hover:bg-white/10"
+                  title="Edit user"
+                >
+                  <Edit2 className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setDeletingUser(user)}
+                  className="text-red-400 hover:text-red-300 p-2.5 rounded-lg hover:bg-white/10"
+                  title="Delete user"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+            {/* Badges row */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                user.active
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                  : 'bg-red-500/20 text-red-400 border border-red-500/30'
+              }`}>
+                {user.active ? <UserCheck className="h-3 w-3 mr-1" /> : <UserX className="h-3 w-3 mr-1" />}
+                {user.active ? 'Active' : 'Inactive'}
+              </div>
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
+                {user.role}
+              </span>
+              {user.isFleetManager && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Manager
+                </span>
+              )}
+              {user.isBenefit && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                  <Gift className="h-3 w-3 mr-1" />
+                  Benefit
+                </span>
+              )}
+            </div>
+            {/* Info rows */}
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="text-gray-400 flex items-center">
+                <Building className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+                <span className="truncate">{user.organizationRelation?.name || user.organization || 'N/A'}</span>
+              </div>
+              <div className="text-gray-400 flex items-center">
+                <Phone className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+                <span className="truncate">{user.phoneNumber || 'N/A'}</span>
+              </div>
+              <div className="text-gray-400 flex items-center">
+                <Calendar className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+                {new Date(user.createdAt).toLocaleDateString()}
+              </div>
+              <div className="text-gray-400 flex items-center">
+                <Clock className="h-3.5 w-3.5 mr-1.5 flex-shrink-0 text-pictus-lime/60" />
+                {user.lastLoggedIn ? (
+                  <span>{new Date(user.lastLoggedIn).toLocaleDateString('sk-SK')}</span>
+                ) : (
+                  <span className="text-gray-600">--</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Users Table */}
+      <div className="hidden md:block bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-white/5 border-b border-white/10">
@@ -210,7 +307,7 @@ export default function AllUsers() {
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-white">
-                          {user.firstName && user.lastName 
+                          {user.firstName && user.lastName
                             ? `${user.firstName} ${user.lastName}`
                             : user.email
                           }
@@ -254,7 +351,7 @@ export default function AllUsers() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      user.active 
+                      user.active
                         ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                         : 'bg-red-500/20 text-red-400 border border-red-500/30'
                     }`}>
@@ -285,7 +382,7 @@ export default function AllUsers() {
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-600">—</span>
+                      <span className="text-gray-600">--</span>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

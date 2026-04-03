@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { createHash, createHmac } from 'crypto'
-
-const prisma = new PrismaClient()
+import { rateLimit, rateLimitResponse, getClientIP } from '@/lib/rateLimit'
 
 const OTP_SALT = process.env.OTP_SALT!
 const SESSION_SECRET = process.env.VERIFICATION_SESSION_SECRET!
@@ -33,11 +32,16 @@ function hashToken(token: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, ipAddress, userAgent } = await request.json()
+    const { email, locale, ipAddress, userAgent } = await request.json()
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
+
+    // Rate limit: 10 sends per IP per 15 min
+    const ip = getClientIP(request.headers)
+    const ipLimit = rateLimit({ key: `send_2fa:${ip}`, maxAttempts: 10, windowMs: 15 * 60 * 1000 })
+    if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
 
     // Look up user
     const user = await prisma.user.findUnique({
@@ -93,6 +97,7 @@ export async function POST(request: NextRequest) {
         firstName: user.firstName || 'Zákazník',
         code,
         purpose: '2fa',
+        locale: locale || 'sk',
         ipAddress: ipAddress || 'neznáma',
         userAgent: userAgent || 'neznámy',
       }),

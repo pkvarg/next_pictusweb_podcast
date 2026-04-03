@@ -33,6 +33,9 @@ interface Organization {
   purchasedVehicles: number | null
   hiddenFromPictusaci: boolean
   canCreateBenefit: boolean
+  freeTrialEndDate: string | null
+  freeTrialTierId: string | null
+  stripeSubscriptionStatus: string | null
   isBenefitOrg: boolean
   createdAt: string
   updatedAt: string
@@ -131,6 +134,8 @@ export default function OrganizationManager() {
       purchasedVehicles: organization.purchasedVehicles ?? '',
       hiddenFromPictusaci: organization.hiddenFromPictusaci || false,
       canCreateBenefit: organization.canCreateBenefit || false,
+      freeTrialEndDate: organization.freeTrialEndDate ? organization.freeTrialEndDate.split('T')[0] : '',
+      freeTrialTierId: organization.freeTrialTierId || '',
     })
   }
 
@@ -153,6 +158,8 @@ export default function OrganizationManager() {
           purchasedVehicles: editingItem.purchasedVehicles === '' ? null : editingItem.purchasedVehicles,
           hiddenFromPictusaci: editingItem.hiddenFromPictusaci,
           canCreateBenefit: editingItem.canCreateBenefit,
+          freeTrialEndDate: editingItem.freeTrialEndDate || null,
+          freeTrialTierId: editingItem.freeTrialTierId || null,
         }),
       })
 
@@ -190,7 +197,7 @@ export default function OrganizationManager() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-xl">
             <Building className="w-6 h-6 text-pictus-black" />
@@ -220,7 +227,7 @@ export default function OrganizationManager() {
             {/* New Item Form */}
             {newItem && (
               <div className="bg-white/5 rounded-lg p-4 border border-pictus-lime">
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <input
                     type="text"
                     placeholder="Organization Name *"
@@ -288,7 +295,7 @@ export default function OrganizationManager() {
               >
                 {editingItem?.id === org.id ? (
                   <>
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                       <input
                         type="text"
                         value={editingItem.name}
@@ -333,7 +340,7 @@ export default function OrganizationManager() {
                       </select>
                     </div>
                     {/* Limit overrides row */}
-                    <div className="grid grid-cols-6 gap-3 mt-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mt-3">
                       <div>
                         <label className="text-xs text-gray-400">Users Limit</label>
                         <input
@@ -395,6 +402,40 @@ export default function OrganizationManager() {
                         />
                       </div>
                     </div>
+                    {/* Free trial fields */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+                      <div>
+                        <label className="text-xs text-gray-400">Free Period Ends</label>
+                        <input
+                          type="date"
+                          value={editingItem.freeTrialEndDate}
+                          onChange={(e) => setEditingItem({ ...editingItem, freeTrialEndDate: e.target.value })}
+                          className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-400">Gifted Tier</label>
+                        <select
+                          value={editingItem.freeTrialTierId}
+                          onChange={(e) => setEditingItem({ ...editingItem, freeTrialTierId: e.target.value })}
+                          className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
+                        >
+                          <option value="">None</option>
+                          {tiers.filter(t => t.name !== 'FREE').map((tier) => (
+                            <option key={tier.id} value={tier.id}>
+                              {tier.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {editingItem.freeTrialEndDate && editingItem.freeTrialTierId && (
+                        <div className="flex items-end">
+                          <span className="text-xs text-amber-300 bg-amber-500/10 px-2 py-1.5 rounded-lg">
+                            Free {tiers.find(t => t.id === editingItem.freeTrialTierId)?.name || '?'} until {editingItem.freeTrialEndDate}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     {/* Toggles row */}
                     <div className="flex items-center gap-6 mt-3">
                       <div className="flex items-center gap-2">
@@ -441,9 +482,9 @@ export default function OrganizationManager() {
                     </div>
                   </>
                 ) : (
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-white text-xl font-light">{org.name}</p>
                         {org.tierRelation && (
                           <span className={`px-2 py-1 text-xs rounded font-medium ${
@@ -471,6 +512,17 @@ export default function OrganizationManager() {
                             Hidden
                           </span>
                         )}
+                        {org.freeTrialEndDate && org.freeTrialTierId && (
+                          new Date(org.freeTrialEndDate) < new Date() && !org.stripeSubscriptionStatus ? (
+                            <span className="px-2 py-1 bg-red-500/20 text-red-300 text-xs rounded font-medium">
+                              Expired
+                            </span>
+                          ) : new Date(org.freeTrialEndDate) >= new Date() ? (
+                            <span className="px-2 py-1 bg-amber-500/20 text-amber-300 text-xs rounded font-medium">
+                              Free until {new Date(org.freeTrialEndDate).toLocaleDateString()}
+                            </span>
+                          ) : null
+                        )}
                         {org.childOrganizations && org.childOrganizations.length > 0 && (
                           <span className="px-2 py-1 bg-pictus-lime/20 text-pictus-lime text-xs rounded">
                             <Users className="w-3 h-3 inline mr-1" />
@@ -478,7 +530,7 @@ export default function OrganizationManager() {
                           </span>
                         )}
                       </div>
-                      <div className="flex gap-4 mt-1">
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
                         {org.mainContact && (
                           <p className="text-gray-400 text-sm">Contact: {org.mainContact}</p>
                         )}
@@ -513,16 +565,16 @@ export default function OrganizationManager() {
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 shrink-0">
                       <button
                         onClick={() => handleEdit(org)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                        className="p-2.5 hover:bg-white/10 rounded-lg transition-all"
                       >
                         <Edit2 className="w-4 h-4 text-pictus-lime" />
                       </button>
                       <button
                         onClick={() => handleDelete(org.id)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                        className="p-2.5 hover:bg-white/10 rounded-lg transition-all"
                       >
                         <Trash2 className="w-4 h-4 text-red-400" />
                       </button>

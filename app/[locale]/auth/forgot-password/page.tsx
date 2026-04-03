@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
 
       if (!checkResponse.ok || !checkData.exists) {
         setError(
-          'Ak je tento email zaregistrovaný v našom systéme, poslali sme vám odkaz na obnovenie hesla.',
+          t('emailNotFoundMessage'),
         )
         setIsLoading(false)
         // Show success message even if user doesn't exist for security reasons
@@ -61,6 +61,7 @@ export default function ForgotPasswordPage() {
           email: email,
           resetUrl: resetUrl,
           origin: 'PICTUSWEB.SK',
+          locale: locale,
         }),
       })
 
@@ -76,7 +77,7 @@ export default function ForgotPasswordPage() {
       setSuccess(true)
     } catch (error) {
       console.error('Forgot password error:', error)
-      setError('Nastala chyba. Skúste to prosím neskôr.')
+      setError(t('genericError'))
     } finally {
       setIsLoading(false)
     }
@@ -93,14 +94,14 @@ export default function ForgotPasswordPage() {
             className="inline-flex items-center text-pictus-white hover:text-pictus-lime transition-colors mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Späť na prihlásenie
+            {t('backToLogin')}
           </Link>
 
           {/* Logo */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-light text-pictus-white mb-2">Obnovenie hesla</h1>
+            <h1 className="text-4xl font-light text-pictus-white mb-2">{t('resetPasswordTitle')}</h1>
             <p className="text-pictus-white mt-2">
-              Zadajte svoj email a pošleme vám odkaz na obnovenie hesla.
+              {t('resetPasswordSubtitle')}
             </p>
           </div>
 
@@ -110,7 +111,7 @@ export default function ForgotPasswordPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="email" className="block text-lg font-light text-pictus-white mb-2">
-                    Email
+                    {t('emailLabel')}
                   </label>
                   <div className="relative">
                     <input
@@ -120,7 +121,7 @@ export default function ForgotPasswordPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       className="w-full px-4 py-3 pl-12 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
-                      placeholder="vas.email@priklad.sk"
+                      placeholder={t('emailPlaceholder')}
                     />
                     <Mail
                       className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -145,7 +146,7 @@ export default function ForgotPasswordPage() {
                   ) : (
                     <>
                       <Mail className="mr-2 h-4 w-4" />
-                      Poslať odkaz na obnovenie
+                      {t('sendResetLink')}
                     </>
                   )}
                 </button>
@@ -155,18 +156,17 @@ export default function ForgotPasswordPage() {
                 <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-green-500">
                   <Check size={32} className="text-green-400" />
                 </div>
-                <h3 className="text-2xl font-normal text-pictus-white mb-3">Email bol odoslaný!</h3>
+                <h3 className="text-2xl font-normal text-pictus-white mb-3">{t('emailSent')}</h3>
                 <p className="text-pictus-white/80 mb-6">
-                  Ak je tento email zaregistrovaný v našom systéme, poslali sme vám odkaz na
-                  obnovenie hesla. Skontrolujte si prosím emailovú schránku.
+                  {t('emailSentMessage')}
                 </p>
-                <p className="text-sm text-pictus-white/60 mb-6">Odkaz je platný 1 hodinu.</p>
+                <p className="text-sm text-pictus-white/60 mb-6">{t('linkValidFor')}</p>
                 <Link
                   href="/auth/login"
                   className="inline-flex items-center text-pictus-lime hover:text-pictus-lime600 transition-colors"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Späť na prihlásenie
+                  {t('backToLogin')}
                 </Link>
               </div>
             )}

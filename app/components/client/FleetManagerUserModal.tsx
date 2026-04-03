@@ -101,7 +101,7 @@ export default function FleetManagerUserModal({
         phoneNumber: formData.phoneNumber || null,
         active: formData.active,
         isFleetManager: formData.isFleetManager,
-        loginProvider: 'hybrid',
+        loginProvider: 'credentials',
         locale,
         ...(formData.isBenefit && { isBenefit: true }),
       }

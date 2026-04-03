@@ -1,6 +1,6 @@
 'use client'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Link } from '@/i18n/routing'
 import { useEffect, useState } from 'react'
 import {
@@ -41,6 +41,8 @@ type Step = 1 | 2 | 3
 const OnboardClientPage = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const pathname = usePathname()
+  const locale = pathname.split('/')[1] || 'sk'
 
   const [currentStep, setCurrentStep] = useState<Step>(1)
   const [loading, setLoading] = useState(false)
@@ -189,6 +191,7 @@ const OnboardClientPage = () => {
           organizationName: organizationName || '',
           submittedBy: session?.user?.email || '',
           billingInterval,
+          locale,
         }),
       })
 
@@ -418,6 +421,7 @@ const OnboardClientPage = () => {
         billingInterval,
         requirePayment,
         agentAttested,
+        locale,
       }
 
       const response = await fetch('/api/onboard-client', {
@@ -785,7 +789,7 @@ const OnboardClientPage = () => {
                             onClick={() => setBillingInterval('monthly')}
                             className={`flex-1 text-sm font-light transition-all ${
                               billingInterval === 'monthly'
-                                ? 'bg-pictus-lime text-pictus-black font-normal'
+                                ? 'bg-pictus-lime text-white font-normal'
                                 : 'bg-white/5 text-gray-300 hover:bg-white/10'
                             }`}
                           >
@@ -796,7 +800,7 @@ const OnboardClientPage = () => {
                             onClick={() => setBillingInterval('yearly')}
                             className={`flex-1 text-sm font-light transition-all border-l border-white/10 ${
                               billingInterval === 'yearly'
-                                ? 'bg-pictus-lime text-pictus-black font-normal'
+                                ? 'bg-pictus-lime text-white font-normal'
                                 : 'bg-white/5 text-gray-300 hover:bg-white/10'
                             }`}
                           >
@@ -822,11 +826,11 @@ const OnboardClientPage = () => {
                     <button
                       onClick={handleInvoicingSubmit}
                       disabled={invoicingSubmitting}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {invoicingSubmitting ? (
                         <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-pictus-black border-t-transparent" />
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                           Odosielam...
                         </>
                       ) : (
@@ -851,7 +855,7 @@ const OnboardClientPage = () => {
                 <div
                   className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all ${
                     currentStep >= step
-                      ? 'bg-pictus-lime border-pictus-lime text-pictus-black'
+                      ? 'bg-pictus-lime border-pictus-lime text-white'
                       : 'bg-transparent border-gray-500 text-gray-500'
                   }`}
                 >
@@ -1542,7 +1546,7 @@ const OnboardClientPage = () => {
             {currentStep < 3 ? (
               <button
                 onClick={handleNextStep}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium"
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium"
               >
                 Ďalej
                 <ArrowRight size={20} />

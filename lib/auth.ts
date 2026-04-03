@@ -4,9 +4,8 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import GitHubProvider from 'next-auth/providers/github'
 import { isValidPassword } from './isValidPassword'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from '@/db/db'
+import { rateLimit } from './rateLimit'
 
 // Extend the built-in session types
 declare module 'next-auth' {
@@ -64,12 +63,6 @@ export const authOptions = {
           return false
         }
         
-        // For hybrid login, allow both OAuth and password
-        if (dbUser.loginProvider === 'hybrid') {
-          console.log('ACCESS GRANTED - Hybrid user with OAuth:', user.email)
-          return true
-        }
-        
         console.log('ACCESS GRANTED - User found:', user.email)
         return true
       }
@@ -77,19 +70,14 @@ export const authOptions = {
       return true
     },
     async jwt({ token, user, account }: any) {
-      console.log('TESTING: JWT callback triggered for:', user?.email || token?.email)
-      console.log('TESTING: Account provider:', account?.provider)
-      
       try {
         if (user && account) {
-          console.log('TESTING: Getting user data from database...')
           // Get user data from database for JWT
           const dbUser = await prisma.user.findUnique({
             where: { email: user.email }
           })
           
           if (dbUser) {
-            console.log('TESTING: Found user in database, setting token data')
             token.id = dbUser.id
             token.role = dbUser.role
             token.email = dbUser.email
@@ -109,7 +97,6 @@ export const authOptions = {
               token.organizationDeleted = false
             }
 
-            console.log('TESTING: Updating login tracking...')
             // Update login tracking
             await prisma.user.update({
               where: { id: dbUser.id },
@@ -118,12 +105,9 @@ export const authOptions = {
                 loginCount: { increment: 1 }
               }
             })
-            console.log('TESTING: Login tracking updated successfully')
           } else {
-            console.log('TESTING: User not found in database!')
           }
         } else if (token.email && !token.organization) {
-          console.log('TESTING: Refreshing token organization data...')
           // For existing tokens, ensure we have organization data
           const dbUser = await prisma.user.findUnique({
             where: { email: token.email }
@@ -143,22 +127,25 @@ export const authOptions = {
               token.organizationDeleted = org?.deletedAt ? true : false
             }
 
-            console.log('TESTING: Organization data refreshed')
           }
+        } else if (token.organizationId) {
+          // Always refresh organizationDeleted status from DB
+          const org = await prisma.organization.findUnique({
+            where: { id: token.organizationId as string },
+            select: { deletedAt: true }
+          })
+          token.organizationDeleted = org?.deletedAt ? true : false
         }
-        
-        console.log('TESTING: JWT callback completed successfully')
+
         return token
       } catch (error) {
-        console.error('TESTING: JWT callback error:', error)
+        console.error('JWT callback error:', error)
         return token
       }
     },
     async session({ session, token }: any) {
-      console.log('TESTING: Session callback triggered for:', token?.email)
       try {
         if (token) {
-          console.log('TESTING: Setting session data from token')
           session.user.id = token.id
           session.user.role = token.role?.toLowerCase() || 'client'
           session.user.email = token.email
@@ -167,15 +154,11 @@ export const authOptions = {
           session.user.organization = token.organization
           session.user.isFleetManager = token.isFleetManager || false
           session.user.organizationDeleted = token.organizationDeleted || false
-          console.log('TESTING: Session data set successfully')
-        } else {
-          console.log('TESTING: No token provided to session callback')
         }
-        
-        console.log('TESTING: Session callback completed successfully')
+
         return session
       } catch (error) {
-        console.error('TESTING: Session callback error:', error)
+        console.error('Session callback error:', error)
         return session
       }
     },
@@ -197,9 +180,17 @@ export const authOptions = {
       },
       async authorize(credentials) {
         console.log('Credentials login attempt for:', credentials?.username)
-        
+
         if (!credentials?.username || !credentials?.password) {
           console.log('Missing credentials')
+          return null
+        }
+
+        // Rate limit: 5 failed attempts per email per 15 min
+        const emailKey = `login_fail:${credentials.username.toLowerCase()}`
+        const emailLimit = rateLimit({ key: emailKey, maxAttempts: 5, windowMs: 15 * 60 * 1000, checkOnly: true })
+        if (!emailLimit.success) {
+          console.log('Rate limit exceeded for email:', credentials.username)
           return null
         }
 
@@ -225,26 +216,20 @@ export const authOptions = {
           }
 
           // Check if user is allowed to use credentials login
-          if (user.loginProvider && user.loginProvider !== 'credentials' && user.loginProvider !== 'hybrid') {
+          if (user.loginProvider && user.loginProvider !== 'credentials') {
             console.log('Credentials login FAILED for:', credentials.username, '- User must use:', user.loginProvider)
             return null
           }
 
-          // Check password (hybrid users use regular password field)
+          // Check password
           let isValidPwd = false
           if (user.password) {
-            console.log('TESTING: Login attempt for:', credentials.username)
-            console.log('TESTING: User loginProvider:', user.loginProvider)
-            console.log('TESTING: Provided password:', credentials.password)
-            console.log('TESTING: Password hash (first 20 chars):', user.password.substring(0, 20) + '...')
-            
             isValidPwd = await isValidPassword(credentials.password, user.password)
-            console.log('TESTING: Password validation result:', isValidPwd)
-          } else {
-            console.log('TESTING: No password found for user:', credentials.username)
           }
           
           if (!isValidPwd) {
+            // Record the failed attempt for rate limiting
+            rateLimit({ key: emailKey, maxAttempts: 5, windowMs: 15 * 60 * 1000 })
             console.log('Credentials login FAILED for:', credentials.username, '- Invalid password')
             return null
           }

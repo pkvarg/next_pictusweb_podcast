@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import {
   Car,
@@ -58,6 +59,7 @@ interface SimpleDutyOverviewProps {
 }
 
 const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewProps) => {
+  const t = useTranslations('Client')
   const isPictusaciUser = organizationName === 'PICTUSACI'
   const [vehiclesWithDuties, setVehiclesWithDuties] = useState<VehicleWithDuty[]>([])
   const [loading, setLoading] = useState(true)
@@ -250,7 +252,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
     return (
       <div className="text-center py-12">
         <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-        <p className="text-pictus-white text-xl font-light">Žiadne vozidlá s úlohami</p>
+        <p className="text-pictus-white text-xl font-light">{t('dutyNoVehicles')}</p>
       </div>
     )
   }
@@ -259,8 +261,8 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <Calendar className="w-8 h-8 text-pictus-lime" />
-        <h2 className="text-4xl font-light text-pictus-white">Prehľad nasledujúcich úloh</h2>
+        <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-pictus-lime shrink-0" />
+        <h2 className="text-2xl sm:text-4xl font-light text-pictus-white">{t('dutyOverviewTitle')}</h2>
       </div>
 
       {/* Rows of vehicles */}
@@ -270,7 +272,69 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
             key={vehicle.vehicleId}
             className={`bg-gradient-to-r from-pictus-onyx900/50 to-pictus-black/80 rounded-xl p-4 border-l-4 ${getUrgencyColor(vehicle.urgencyLevel)} transition-all hover:shadow-lg`}
           >
-            <div className="flex items-center gap-4">
+            {/* Mobile layout */}
+            <div className="md:hidden space-y-3">
+              {/* Top row: urgency + vehicle info + days badge */}
+              <div className="flex items-center gap-3">
+                <div className="shrink-0">{getUrgencyIcon(vehicle.urgencyLevel)}</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-light text-pictus-white">{vehicle.registration}</h3>
+                  <p className="text-sm text-pictus-lime">{vehicle.type}</p>
+                  {isPictusaciUser && vehicle.organizationName && (
+                    <p className="text-xs text-pictus-white/60">{vehicle.organizationName}</p>
+                  )}
+                </div>
+                {vehicle.duties.length > 0 && (
+                  <div className={`text-lg font-bold px-3 py-1.5 rounded-lg shrink-0 ${
+                    vehicle.urgencyLevel === 'red'
+                      ? 'text-red-400 bg-red-700/30'
+                      : vehicle.urgencyLevel === 'orange'
+                      ? 'text-orange-400 bg-orange-600/30'
+                      : 'text-green-400 bg-green-600/30'
+                  }`}>
+                    {vehicle.daysUntilNext === 0
+                      ? t('dutyToday')
+                      : vehicle.daysUntilNext === 1
+                      ? t('dutyTomorrow')
+                      : `${vehicle.daysUntilNext}d`}
+                  </div>
+                )}
+              </div>
+
+              {/* Duties list */}
+              {vehicle.duties.length > 0 ? (
+                <div className="space-y-1.5">
+                  <p className="text-xs text-pictus-white/70">
+                    {t('dutyUpcoming', { count: vehicle.duties.length })}:
+                  </p>
+                  {vehicle.duties.map((duty, idx) => (
+                    <div key={idx} className="flex items-center justify-between gap-2 text-sm">
+                      <span className="text-pictus-white font-medium truncate">{duty.type}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-pictus-lime text-xs">{formatDate(duty.date)}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          duty.daysUntil <= 7
+                            ? 'bg-red-700/30 text-red-400'
+                            : duty.daysUntil <= 30
+                            ? 'bg-orange-600/30 text-orange-400'
+                            : 'bg-green-600/30 text-green-400'
+                        }`}>
+                          {duty.daysUntil === 0 ? t('dutyTodayShort') : duty.daysUntil === 1 ? t('dutyTomorrowShort') : `${duty.daysUntil}d`}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-400/50" />
+                  <p className="text-sm text-pictus-white/50">{t('dutyNone60Days')}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop layout */}
+            <div className="hidden md:flex items-center gap-4">
               {/* Urgency indicator */}
               <div className="flex-shrink-0">
                 {getUrgencyIcon(vehicle.urgencyLevel)}
@@ -309,7 +373,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                 {vehicle.duties.length > 0 ? (
                   <div className="space-y-2">
                     <p className="text-sm text-pictus-white/70">
-                      Nasledujúce úlohy ({vehicle.duties.length}):
+                      {t('dutyUpcoming', { count: vehicle.duties.length })}:
                     </p>
                     <div className="space-y-1">
                       {vehicle.duties.map((duty, idx) => (
@@ -330,9 +394,9 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                               : 'bg-green-600/30 text-green-400'
                           }`}>
                             {duty.daysUntil === 0
-                              ? 'Dnes'
+                              ? t('dutyTodayShort')
                               : duty.daysUntil === 1
-                              ? 'Zajtra'
+                              ? t('dutyTomorrowShort')
                               : `${duty.daysUntil}d`}
                           </span>
                         </div>
@@ -342,7 +406,7 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                 ) : (
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-green-400/50" />
-                    <p className="text-sm text-pictus-white/50">Žiadne úlohy (ďalších 60 dní)</p>
+                    <p className="text-sm text-pictus-white/50">{t('dutyNone60Days')}</p>
                   </div>
                 )}
               </div>
@@ -358,9 +422,9 @@ const SimpleDutyOverview = ({ company, organizationName }: SimpleDutyOverviewPro
                       : 'text-green-400 bg-green-600/30'
                   }`}>
                     {vehicle.daysUntilNext === 0
-                      ? 'Dnes!'
+                      ? t('dutyToday')
                       : vehicle.daysUntilNext === 1
-                      ? 'Zajtra!'
+                      ? t('dutyTomorrow')
                       : `${vehicle.daysUntilNext}d`}
                   </div>
                 </div>

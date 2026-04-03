@@ -109,6 +109,11 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
+        if (response.status === 403 && errorData?.limitReached) {
+          alert(errorData.error)
+          window.location.reload()
+          return
+        }
         if (response.status === 403 && errorData?.error) {
           throw new Error(errorData.error)
         }
@@ -150,6 +155,11 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
+        if (response.status === 403 && errorData?.limitReached) {
+          alert(errorData.error)
+          window.location.reload()
+          return
+        }
         if (response.status === 403 && errorData?.error) {
           throw new Error(errorData.error)
         }

@@ -7,23 +7,17 @@ interface MessageProps {
 
 const Message: React.FC<MessageProps> = ({ variant = 'info', children }) => {
   return (
-    <>
-      {variant === 'danger' ? (
-        <div
-          className='text-red-500 border border-red-500 text-[35px] px-4 mb-2 rounded relative'
-          role='alert'
-        >
-          <strong className='font-bold'>{children}</strong>
-        </div>
-      ) : (
-        <div
-          className='text-green-600 border border-green-500 text-[35px] px-4 mb-2 rounded relative'
-          role='alert'
-        >
-          <strong className='font-bold'>{children}</strong>
-        </div>
-      )}
-    </>
+    <div
+      className={`mb-6 px-5 py-4 rounded-xl text-sm font-medium ${
+        variant === 'danger'
+          ? 'bg-red-500/10 border border-red-500/20 text-red-400'
+          : 'bg-pictus-lime/10 border border-pictus-lime/20 text-pictus-lime'
+      }`}
+      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
+      role="alert"
+    >
+      {children}
+    </div>
   )
 }
 

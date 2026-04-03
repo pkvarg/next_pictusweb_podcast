@@ -20,6 +20,7 @@ import {
   Truck,
   MessageSquare,
   DollarSign,
+  FileText,
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -79,6 +80,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       name: 'Tiers & Pricing',
       href: '/admin/tiers',
       icon: DollarSign,
+    },
+    {
+      name: 'Invoices',
+      href: '/admin/invoices',
+      icon: FileText,
     },
   ]
 

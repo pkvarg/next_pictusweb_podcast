@@ -41,6 +41,14 @@ export async function generateMetadata({ params }: {
     const metadata = {
       title: t('metaTitle'),
       description: t('metaDescription'),
+      icons: {
+        icon: [
+          { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+          { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        ],
+        apple: '/apple-touch-icon.png',
+      },
+      manifest: '/site.webmanifest',
       openGraph: {
         title: t('ogTitle'),
         description: t('ogDescription'),
@@ -48,9 +56,9 @@ export async function generateMetadata({ params }: {
         siteName: 'pictusweb.sk',
         url: 'https://www.pictusweb.sk',
         images: [{
-          url: 'https://www.pictusweb.sk/pictusweb.webp',
-          width: 400,
-          height: 400,
+          url: 'https://www.pictusweb.sk/og-image.webp',
+          width: 1200,
+          height: 630,
           alt: 'pictusweb.sk',
         }],
       },

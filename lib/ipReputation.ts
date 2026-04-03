@@ -2,9 +2,7 @@
 // Tracks bot attempts and implements progressive banning
 // PostgreSQL version with Prisma ORM
 
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from '@/db/db'
 
 // In-memory cache for faster lookups (60-second TTL)
 const ipReputationCache = new Map<string, { data: any; timestamp: number }>()

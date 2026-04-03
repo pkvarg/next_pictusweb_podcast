@@ -87,9 +87,7 @@ export default function BenefitActivatePage() {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8 text-center">
             <CheckCircle className="h-16 w-16 text-pictus-lime mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-2">{tb('activateSuccess')}</h1>
-            <p className="text-gray-400 mb-6">
-              {tb('activateSuccessDesc')}
-            </p>
+            <p className="text-gray-400 mb-6">{tb('activateSuccessDesc')}</p>
             <Link
               href="/fleetsync"
               className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black font-medium rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all shadow-lg hover:shadow-pictus-lime/50"
@@ -102,9 +100,7 @@ export default function BenefitActivatePage() {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8 text-center">
             <ShieldCheck className="h-16 w-16 text-red-400 mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-2">{tb('activateExpired')}</h1>
-            <p className="text-gray-400">
-              {tb('activateExpiredDesc')}
-            </p>
+            <p className="text-gray-400">{tb('activateExpiredDesc')}</p>
           </div>
         ) : (
           /* Activation form */
@@ -112,11 +108,11 @@ export default function BenefitActivatePage() {
             <div className="text-center mb-8">
               <ShieldCheck className="h-12 w-12 text-pictus-lime mx-auto mb-4" />
               <h1 className="text-2xl font-bold mb-2">{tb('activateTitle')}</h1>
-              <p className="text-gray-400">
-                {tb('activateWelcome', { orgName: parentOrgName })}
-              </p>
+              <p className="text-gray-400">{tb('activateWelcome', { orgName: parentOrgName })}</p>
               {userName && (
-                <p className="text-gray-500 text-sm mt-1">{tb('activateWelcomeUser', { userName })}</p>
+                <p className="text-gray-500 text-sm mt-1">
+                  {tb('activateWelcomeUser', { userName })}
+                </p>
               )}
             </div>
 
@@ -147,7 +143,6 @@ export default function BenefitActivatePage() {
                     {to('gdprLink')}
                     <ExternalLink className="h-3 w-3 ml-1" />
                   </a>
-                  {' *'}
                 </label>
               </div>
             </div>
@@ -173,7 +168,6 @@ export default function BenefitActivatePage() {
                     {to('termsLink')}
                     <ExternalLink className="h-3 w-3 ml-1" />
                   </a>
-                  {' *'}
                 </label>
               </div>
             </div>

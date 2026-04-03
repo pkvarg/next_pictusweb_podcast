@@ -630,7 +630,12 @@ export default function NotificationBuilder({
         const limitError = responses.find((r) => r.status === 403)
         if (limitError) {
           const errorData = await limitError.json().catch(() => null)
-          alert(errorData?.error || 'Dosiahli ste limit notifikácií. Kontaktujte administrátora.')
+          if (errorData?.limitReached) {
+            alert(errorData.error)
+            window.location.reload()
+            return
+          }
+          alert(errorData?.error || 'Notification limit reached.')
           return
         }
 

@@ -6,7 +6,19 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import PagesHeader from '@/app/components/PagesHeader'
 import Footer from '@/app/components/Footer'
-import { CheckCircle, Eye, EyeOff, ArrowLeft, ArrowRight, Loader2, Building2, UserPlus, ShieldCheck, FileCheck, CreditCard } from 'lucide-react'
+import {
+  CheckCircle,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  ArrowRight,
+  Loader2,
+  Building2,
+  UserPlus,
+  ShieldCheck,
+  FileCheck,
+  CreditCard,
+} from 'lucide-react'
 
 const STEPS = ['organization', 'account', 'verification', 'agreements', 'review'] as const
 type Step = (typeof STEPS)[number]
@@ -47,7 +59,9 @@ function GetStartedContent() {
   const billingParam = searchParams.get('billing') || 'monthly'
   const tier = ['FREE', 'BASIC', 'BUSINESS'].includes(tierParam) ? tierParam : 'FREE'
   const isFree = tier === 'FREE'
-  const [billing, setBilling] = useState<'monthly' | 'yearly'>(billingParam === 'yearly' ? 'yearly' : 'monthly')
+  const [billing, setBilling] = useState<'monthly' | 'yearly'>(
+    billingParam === 'yearly' ? 'yearly' : 'monthly',
+  )
 
   const [currentStep, setCurrentStep] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -60,7 +74,11 @@ function GetStartedContent() {
   const [resendCooldown, setResendCooldown] = useState(0)
   const [emailToken, setEmailToken] = useState('')
   const [phoneToken, setPhoneToken] = useState('')
-  const [pricingData, setPricingData] = useState<{ name: string; pricePerVehicle: number; pricePerVehicleYearly: number | null; yearlyDiscount: number; vehiclesLimit: number }[]>([])
+  const PRICING: Record<string, { monthly: number; yearly: number }> = {
+    FREE: { monthly: 0, yearly: 0 },
+    BASIC: { monthly: 2, yearly: 20 },
+    BUSINESS: { monthly: 3, yearly: 30 },
+  }
 
   const [form, setForm] = useState<FormData>({
     organizationName: '',
@@ -101,26 +119,15 @@ function GetStartedContent() {
     }
   }, [])
 
-  // Fetch pricing from database
-  useEffect(() => {
-    fetch('/api/tiers/pricing')
-      .then((res) => res.json())
-      .then((data) => { if (data.pricing) setPricingData(data.pricing) })
-      .catch(() => {})
-  }, [])
-
-  // Price calculation from DB
-  const tierPricing = pricingData.find((p) => p.name === tier)
-  const pricePerVehicle = tierPricing?.pricePerVehicle ?? (tier === 'BASIC' ? 2 : tier === 'BUSINESS' ? 3 : 0)
-  const yearlyDiscount = tierPricing?.yearlyDiscount ?? 0.83
-  const maxVehicles = tierPricing?.vehiclesLimit ?? 999
-  const pricePerVehicleYearly = tierPricing?.pricePerVehicleYearly ?? null
+  // Hardcoded pricing
+  const tierPricing = PRICING[tier] ?? PRICING.FREE
+  const pricePerVehicle = tierPricing.monthly
+  const pricePerVehicleYearly = tierPricing.yearly
+  const maxVehicles = tier === 'BASIC' ? 3 : 999
   const totalPrice = isFree
     ? 0
     : billing === 'yearly'
-      ? pricePerVehicleYearly != null
-        ? +(pricePerVehicleYearly * form.numberOfVehicles).toFixed(2)
-        : +(pricePerVehicle * 12 * yearlyDiscount * form.numberOfVehicles).toFixed(2)
+      ? pricePerVehicleYearly * form.numberOfVehicles
       : pricePerVehicle * form.numberOfVehicles
 
   // Resend cooldown timer
@@ -173,6 +180,7 @@ function GetStartedContent() {
           email: form.email,
           phoneNumber: fullPhoneNumber,
           firstName: form.firstName,
+          locale: window.location.pathname.split('/')[1] || 'sk',
         }),
       })
       if (res.ok) {
@@ -231,18 +239,19 @@ function GetStartedContent() {
   }
 
   // Validation per step
-  const validateStep = (): string | null => {
+  const validateStep = (skipEmailCheck = false): string | null => {
     switch (STEPS[currentStep]) {
       case 'organization':
         if (!form.firstName.trim()) return t('errorFirstName')
         if (!form.lastName.trim()) return t('errorLastName')
-        if (!form.street.trim() || !form.city.trim() || !form.postalCode.trim()) return t('errorAddress')
+        if (!form.street.trim() || !form.city.trim() || !form.postalCode.trim())
+          return t('errorAddress')
         if (!form.country.trim()) return t('errorCountry')
         if (!isFree && form.numberOfVehicles < 1) return t('errorVehicles')
         return null
       case 'account':
         if (!form.email.includes('@')) return t('errorEmail')
-        if (emailAvailable !== true) return t('errorEmailTaken')
+        if (!skipEmailCheck && emailAvailable !== true) return t('errorEmailTaken')
         if (!form.phoneNumber.trim()) return t('errorPhone')
         if (form.password.length < 8) return t('errorPasswordLength')
         if (form.password !== form.confirmPassword) return t('errorPasswordMatch')
@@ -261,17 +270,19 @@ function GetStartedContent() {
 
   const handleNext = async () => {
     // Force email availability re-check on account step before validating
+    let emailChecked = false
     if (STEPS[currentStep] === 'account' && form.email.includes('@')) {
       const available = await checkEmail(form.email)
       if (available !== true) {
         setError(t('errorEmailTaken'))
         return
       }
+      emailChecked = true
     }
 
     // Skip standard validation for verification step — verifyCodes handles it
     if (STEPS[currentStep] !== 'verification') {
-      const validationError = validateStep()
+      const validationError = validateStep(emailChecked)
       if (validationError) {
         setError(validationError)
         return
@@ -285,7 +296,11 @@ function GetStartedContent() {
     }
 
     // Auto-prefill account email from organizationContact if email is still empty
-    if (STEPS[currentStep] === 'organization' && form.organizationContact.trim() && !form.email.trim()) {
+    if (
+      STEPS[currentStep] === 'organization' &&
+      form.organizationContact.trim() &&
+      !form.email.trim()
+    ) {
       updateForm('email', form.organizationContact.trim())
     }
 
@@ -313,6 +328,69 @@ function GetStartedContent() {
     setCurrentStep((prev) => Math.max(prev - 1, 0))
   }
 
+  const skipVerificationAllowed = process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true'
+
+  const handleSkipPayment = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/fleetsync/dev-skip-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          organizationName: form.organizationName,
+          organizationContact: form.organizationContact,
+          ico: form.ico,
+          dic: form.dic,
+          street: form.street,
+          city: form.city,
+          postalCode: form.postalCode,
+          country: form.country,
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          password: form.password,
+          phoneNumber: fullPhoneNumber,
+          tier,
+          billing,
+          numberOfVehicles: form.numberOfVehicles,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Dev skip payment failed')
+        return
+      }
+      sessionStorage.setItem(
+        'fleetsync-invoice-data',
+        JSON.stringify({
+          organizationName: form.organizationName,
+          street: form.street,
+          city: form.city,
+          postalCode: form.postalCode,
+          country: form.country,
+          ico: form.ico,
+          dic: form.dic,
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          tier,
+          billing,
+          numberOfVehicles: form.numberOfVehicles,
+          pricePerVehicle:
+            billing === 'yearly' ? (pricePerVehicleYearly ?? pricePerVehicle) : pricePerVehicle,
+          totalPrice,
+        }),
+      )
+      const locale = window.location.pathname.split('/')[1]
+      window.location.href = `/${locale}/fleetsync/get-started/success?tier=${tier}&session_id=dev-skip`
+    } catch {
+      setError('Dev skip payment failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Submit (final step)
   const handleSubmit = async () => {
     setLoading(true)
@@ -337,6 +415,7 @@ function GetStartedContent() {
             email: form.email,
             password: form.password,
             phoneNumber: fullPhoneNumber,
+            locale: window.location.pathname.split('/')[1] || 'sk',
           }),
         })
         const data = await res.json()
@@ -344,7 +423,12 @@ function GetStartedContent() {
           sessionStorage.removeItem('fleetsync-onboarding-form')
           window.location.href = `/${window.location.pathname.split('/')[1]}/fleetsync/get-started/success?tier=FREE`
         } else {
-          setError(data.error || t('submitError'))
+          const apiErrors: Record<string, string> = {
+            REQUIRED_FIELDS_MISSING: t('errorRequiredFields'),
+            PASSWORD_TOO_SHORT: t('errorPasswordTooShort'),
+            EMAIL_ALREADY_EXISTS: t('errorEmailExists'),
+          }
+          setError(apiErrors[data.error] || t('submitError'))
         }
       } else {
         const res = await fetch('/api/fleetsync/create-checkout', {
@@ -371,15 +455,44 @@ function GetStartedContent() {
         })
         const data = await res.json()
         if (data.checkoutUrl) {
-          sessionStorage.setItem('fleetsync-onboarding-form', JSON.stringify({
-            form,
-            step: currentStep,
-            verificationSent,
-            billing,
-          }))
+          sessionStorage.setItem(
+            'fleetsync-onboarding-form',
+            JSON.stringify({
+              form,
+              step: currentStep,
+              verificationSent,
+              billing,
+            }),
+          )
+          sessionStorage.setItem(
+            'fleetsync-invoice-data',
+            JSON.stringify({
+              organizationName: form.organizationName,
+              street: form.street,
+              city: form.city,
+              postalCode: form.postalCode,
+              country: form.country,
+              ico: form.ico,
+              dic: form.dic,
+              firstName: form.firstName,
+              lastName: form.lastName,
+              email: form.email,
+              tier,
+              billing,
+              numberOfVehicles: form.numberOfVehicles,
+              pricePerVehicle:
+                billing === 'yearly' ? (pricePerVehicleYearly ?? pricePerVehicle) : pricePerVehicle,
+              totalPrice,
+            }),
+          )
           window.location.href = data.checkoutUrl
-        } else {
-          setError(data.error || t('submitError'))
+        } else if (data.error) {
+          const apiErrors: Record<string, string> = {
+            REQUIRED_FIELDS_MISSING: t('errorRequiredFields'),
+            PASSWORD_TOO_SHORT: t('errorPasswordTooShort'),
+            EMAIL_ALREADY_EXISTS: t('errorEmailExists'),
+          }
+          setError(apiErrors[data.error] || t('submitError'))
         }
       }
     } catch {
@@ -411,7 +524,9 @@ function GetStartedContent() {
               {isDone ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`w-8 lg:w-16 h-0.5 ${isDone ? 'bg-green-600' : 'bg-pictus-white/10'}`} />
+              <div
+                className={`w-8 lg:w-16 h-0.5 ${isDone ? 'bg-green-600' : 'bg-pictus-white/10'}`}
+              />
             )}
           </div>
         )
@@ -444,32 +559,32 @@ function GetStartedContent() {
                   {isFree ? (
                     <p className="text-lg font-normal text-pictus-white">{t('freeForever')}</p>
                   ) : (
-                  <div className="flex gap-2 mt-1">
-                    <button
-                      type="button"
-                      onClick={() => setBilling('monthly')}
-                      className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                        billing === 'monthly'
-                          ? 'bg-pictus-lime text-pictus-black font-normal'
-                          : 'bg-pictus-white/10 text-gray-400 hover:bg-pictus-white/20'
-                      }`}
-                    >
-                      {t('monthly')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setBilling('yearly')}
-                      className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                        billing === 'yearly'
-                          ? 'bg-pictus-lime text-pictus-black font-normal'
-                          : 'bg-pictus-white/10 text-gray-400 hover:bg-pictus-white/20'
-                      }`}
-                    >
-                      {t('yearly')}
-                    </button>
-                  </div>
-                )}
-              </div>
+                    <div className="flex gap-2 mt-1">
+                      <button
+                        type="button"
+                        onClick={() => setBilling('monthly')}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          billing === 'monthly'
+                            ? 'bg-pictus-lime text-pictus-black font-normal'
+                            : 'bg-pictus-white/10 text-gray-400 hover:bg-pictus-white/20'
+                        }`}
+                      >
+                        {t('monthly')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBilling('yearly')}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          billing === 'yearly'
+                            ? 'bg-pictus-lime text-pictus-black font-normal'
+                            : 'bg-pictus-white/10 text-gray-400 hover:bg-pictus-white/20'
+                        }`}
+                      >
+                        {t('yearly')}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
               {isFree && (
                 <p className="mt-3 text-xs text-yellow-400/80 flex items-start gap-1.5">
@@ -484,6 +599,8 @@ function GetStartedContent() {
                 <label className={labelClass}>{t('firstName')} *</label>
                 <input
                   type="text"
+                  name="given-name"
+                  autoComplete="given-name"
                   className={inputClass}
                   value={form.firstName}
                   onChange={(e) => updateForm('firstName', e.target.value)}
@@ -493,6 +610,8 @@ function GetStartedContent() {
                 <label className={labelClass}>{t('lastName')} *</label>
                 <input
                   type="text"
+                  name="family-name"
+                  autoComplete="family-name"
                   className={inputClass}
                   value={form.lastName}
                   onChange={(e) => updateForm('lastName', e.target.value)}
@@ -553,6 +672,8 @@ function GetStartedContent() {
               <label className={labelClass}>{t('street')} *</label>
               <input
                 type="text"
+                name="street-address"
+                autoComplete="street-address"
                 className={inputClass}
                 value={form.street}
                 onChange={(e) => updateForm('street', e.target.value)}
@@ -566,6 +687,8 @@ function GetStartedContent() {
                 <label className={labelClass}>{t('postalCode')} *</label>
                 <input
                   type="text"
+                  name="postal-code"
+                  autoComplete="postal-code"
                   className={inputClass}
                   value={form.postalCode}
                   onChange={(e) => updateForm('postalCode', e.target.value)}
@@ -577,6 +700,8 @@ function GetStartedContent() {
                 <label className={labelClass}>{t('city')} *</label>
                 <input
                   type="text"
+                  name="address-level2"
+                  autoComplete="address-level2"
                   className={inputClass}
                   value={form.city}
                   onChange={(e) => updateForm('city', e.target.value)}
@@ -590,6 +715,8 @@ function GetStartedContent() {
               <label className={labelClass}>{t('country')} *</label>
               <input
                 type="text"
+                name="country-name"
+                autoComplete="country-name"
                 className={inputClass}
                 value={form.country}
                 onChange={(e) => updateForm('country', e.target.value)}
@@ -600,19 +727,29 @@ function GetStartedContent() {
 
             {!isFree && (
               <div>
-                <label className={labelClass}>{t('numberOfVehicles')} * (max {maxVehicles})</label>
+                <label className={labelClass}>{t('numberOfVehicles')} *</label>
                 <input
                   type="number"
                   min={1}
                   max={maxVehicles}
                   className={inputClass}
                   value={form.numberOfVehicles}
-                  onChange={(e) => updateForm('numberOfVehicles', Math.min(maxVehicles, Math.max(1, parseInt(e.target.value) || 1)))}
+                  onChange={(e) =>
+                    updateForm(
+                      'numberOfVehicles',
+                      Math.min(maxVehicles, Math.max(1, parseInt(e.target.value) || 1)),
+                    )
+                  }
                 />
                 <p className="text-sm text-gray-400 mt-2 font-light">
-                  {t('priceCalculation')}: {form.numberOfVehicles} x €{billing === 'yearly' && pricePerVehicleYearly != null ? pricePerVehicleYearly : pricePerVehicle}/{billing === 'yearly' ? t('year') : t('month')}
-                  {billing === 'yearly' && pricePerVehicleYearly == null && <> x 12 x {yearlyDiscount} ({Math.round((1 - yearlyDiscount) * 100)}% {t('discount')})</>}
-                  {' '}= <span className="text-pictus-lime font-normal">€{totalPrice}/{billing === 'yearly' ? t('year') : t('month')}</span>
+                  {t('priceCalculation')}: {form.numberOfVehicles} x €
+                  {billing === 'yearly' && pricePerVehicleYearly != null
+                    ? pricePerVehicleYearly
+                    : pricePerVehicle}
+                  /{billing === 'yearly' ? t('year') : t('month')} ={' '}
+                  <span className="text-pictus-lime font-normal">
+                    €{totalPrice}/{billing === 'yearly' ? t('year') : t('month')}
+                  </span>
                 </p>
               </div>
             )}
@@ -654,7 +791,9 @@ function GetStartedContent() {
             <div>
               <label className={labelClass}>{t('phoneNumber')} *</label>
               <div className="flex gap-2">
-                <span className="flex items-center px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-gray-400 font-light text-sm select-none">+421</span>
+                <span className="flex items-center px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-gray-400 font-light text-sm select-none">
+                  +421
+                </span>
                 <input
                   type="tel"
                   className={inputClass}
@@ -666,10 +805,15 @@ function GetStartedContent() {
                   placeholder="9XX XXX XXX"
                 />
               </div>
-              <p className="text-sm text-gray-500 mt-1 font-light">
+              <p className="text-sm text-yellow-400/80 mt-2 font-light bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-3 py-2">
                 {t('phoneSkOnly')}{' '}
-{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                <Link href="/contact" className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors">{t('phoneSkContact')}</Link>
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                <Link
+                  href="/contact"
+                  className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors"
+                >
+                  {t('phoneSkContact')}
+                </Link>
               </p>
             </div>
 
@@ -708,7 +852,11 @@ function GetStartedContent() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-3.5 text-gray-400 hover:text-pictus-white"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -744,7 +892,9 @@ function GetStartedContent() {
                   maxLength={6}
                   className={`${inputClass} tracking-[0.5em] text-center text-lg font-mono`}
                   value={form.emailCode}
-                  onChange={(e) => updateForm('emailCode', e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={(e) =>
+                    updateForm('emailCode', e.target.value.replace(/\D/g, '').slice(0, 6))
+                  }
                   placeholder="000000"
                 />
               </div>
@@ -763,7 +913,9 @@ function GetStartedContent() {
                   maxLength={6}
                   className={`${inputClass} tracking-[0.5em] text-center text-lg font-mono`}
                   value={form.phoneCode}
-                  onChange={(e) => updateForm('phoneCode', e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={(e) =>
+                    updateForm('phoneCode', e.target.value.replace(/\D/g, '').slice(0, 6))
+                  }
                   placeholder="000000"
                 />
               </div>
@@ -781,7 +933,6 @@ function GetStartedContent() {
             >
               {resendCooldown > 0 ? `${t('resendIn')} ${resendCooldown}s` : t('resendCodes')}
             </button>
-
           </div>
         )
 
@@ -792,45 +943,43 @@ function GetStartedContent() {
             <h2 className="text-2xl font-light text-pictus-white">{t('step4Title')}</h2>
             <p className="text-gray-400 font-light">{t('step4Subtitle')}</p>
 
-            <label className="flex items-start gap-3 cursor-pointer group p-4 rounded-xl border border-pictus-white/10 hover:border-pictus-lime/30 transition-colors bg-pictus-white/5">
+            <label className="flex items-center gap-3 cursor-pointer group p-4 rounded-xl border border-pictus-white/10 hover:border-pictus-lime/30 transition-colors bg-pictus-white/5">
               <input
                 type="checkbox"
                 checked={form.gdprAccepted}
                 onChange={(e) => updateForm('gdprAccepted', e.target.checked)}
-                className="w-5 h-5 mt-0.5 rounded border-gray-500 text-pictus-lime focus:ring-pictus-lime bg-pictus-white/5 flex-shrink-0 accent-[#B6E036]"
+                className="w-5 h-5 rounded border-gray-500 text-pictus-lime focus:ring-pictus-lime bg-pictus-white/5 flex-shrink-0 accent-[#B6E036]"
               />
               <span className="text-gray-300 font-light">
                 {t('gdprAgree')}{' '}
                 <a
-                  href="/contact#gdpr"
+                  href="/gdpr"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors"
                 >
                   {t('gdprLink')}
                 </a>
-                {' *'}
               </span>
             </label>
 
-            <label className="flex items-start gap-3 cursor-pointer group p-4 rounded-xl border border-pictus-white/10 hover:border-pictus-lime/30 transition-colors bg-pictus-white/5">
+            <label className="flex items-center gap-3 cursor-pointer group p-4 rounded-xl border border-pictus-white/10 hover:border-pictus-lime/30 transition-colors bg-pictus-white/5">
               <input
                 type="checkbox"
                 checked={form.termsAccepted}
                 onChange={(e) => updateForm('termsAccepted', e.target.checked)}
-                className="w-5 h-5 mt-0.5 rounded border-gray-500 text-pictus-lime focus:ring-pictus-lime bg-pictus-white/5 flex-shrink-0 accent-[#B6E036]"
+                className="w-5 h-5 rounded border-gray-500 text-pictus-lime focus:ring-pictus-lime bg-pictus-white/5 flex-shrink-0 accent-[#B6E036]"
               />
               <span className="text-gray-300 font-light">
                 {t('termsAgree')}{' '}
                 <a
-                  href="/contact#trade-rules"
+                  href="/trade-rules"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors"
                 >
                   {t('termsLink')}
                 </a>
-                {' *'}
               </span>
             </label>
           </div>
@@ -871,11 +1020,15 @@ function GetStartedContent() {
                   </>
                 )}
                 <div className="text-gray-400">{t('address')}</div>
-                <div className="text-pictus-white">{form.street}, {form.postalCode} {form.city}, {form.country}</div>
+                <div className="text-pictus-white">
+                  {form.street}, {form.postalCode} {form.city}, {form.country}
+                </div>
                 <div className="text-gray-400">{t('selectedTier')}</div>
                 <div className="text-pictus-lime">{tier}</div>
                 <div className="text-gray-400">{t('billing')}</div>
-                <div className="text-pictus-white">{isFree ? t('freeForever') : billing === 'yearly' ? t('yearly') : t('monthly')}</div>
+                <div className="text-pictus-white">
+                  {isFree ? t('freeForever') : billing === 'yearly' ? t('yearly') : t('monthly')}
+                </div>
                 {!isFree && (
                   <>
                     <div className="text-gray-400">{t('numberOfVehicles')}</div>
@@ -897,7 +1050,9 @@ function GetStartedContent() {
               </h3>
               <div className="grid grid-cols-2 gap-3 text-sm font-light">
                 <div className="text-gray-400">{t('fullName')}</div>
-                <div className="text-pictus-white">{form.firstName} {form.lastName}</div>
+                <div className="text-pictus-white">
+                  {form.firstName} {form.lastName}
+                </div>
                 <div className="text-gray-400">{t('email')}</div>
                 <div className="text-pictus-white">{form.email}</div>
                 <div className="text-gray-400">{t('phoneNumber')}</div>
@@ -997,6 +1152,14 @@ function GetStartedContent() {
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               {isFree ? t('createAccount') : t('proceedToPayment')}
+            </button>
+          )}
+          {skipVerificationAllowed && !isFree && currentStep === STEPS.length - 1 && (
+            <button
+              onClick={handleSkipPayment}
+              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-red-600 text-white font-normal hover:bg-red-700 transition-all text-sm"
+            >
+              DEV: Skip Payment
             </button>
           )}
         </div>

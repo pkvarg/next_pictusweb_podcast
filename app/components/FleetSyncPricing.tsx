@@ -3,15 +3,7 @@ import { useState } from 'react'
 import { CheckCircle } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 
-interface TierPricing {
-  name: string
-  pricePerVehicle: number
-  pricePerVehicleYearly: number | null
-  yearlyDiscount: number
-}
-
 interface FleetSyncPricingProps {
-  pricing: TierPricing[]
   translations: {
     pricingTitle: string
     pricingTitleHighlight: string
@@ -39,27 +31,17 @@ interface FleetSyncPricingProps {
   }
 }
 
-const FleetSyncPricing = ({ pricing, translations: t }: FleetSyncPricingProps) => {
+const PRICING = {
+  FREE: { monthly: 0, yearly: 0 },
+  BASIC: { monthly: 2, yearly: 20 },
+  BUSINESS: { monthly: 3, yearly: 30 },
+} as const
+
+const FleetSyncPricing = ({ translations: t }: FleetSyncPricingProps) => {
   const [isYearly, setIsYearly] = useState(false)
 
-  const getPricing = (tierName: string) => pricing.find((p) => p.name === tierName)
-  const basicTier = getPricing('BASIC')
-  const businessTier = getPricing('BUSINESS')
-
-  const basicMonthly = basicTier?.pricePerVehicle ?? 2
-  const businessMonthly = businessTier?.pricePerVehicle ?? 3
-  const yearlyDiscount = basicTier?.yearlyDiscount ?? 0.83
-
-  const basicPrice = isYearly
-    ? basicTier?.pricePerVehicleYearly != null
-      ? basicTier.pricePerVehicleYearly
-      : +(basicMonthly * 12 * yearlyDiscount).toFixed(0)
-    : basicMonthly
-  const businessPrice = isYearly
-    ? businessTier?.pricePerVehicleYearly != null
-      ? businessTier.pricePerVehicleYearly
-      : +(businessMonthly * 12 * yearlyDiscount).toFixed(0)
-    : businessMonthly
+  const basicPrice = isYearly ? PRICING.BASIC.yearly : PRICING.BASIC.monthly
+  const businessPrice = isYearly ? PRICING.BUSINESS.yearly : PRICING.BUSINESS.monthly
 
   return (
     <section className="py-20">
@@ -147,8 +129,14 @@ const FleetSyncPricing = ({ pricing, translations: t }: FleetSyncPricingProps) =
                 </li>
               ))}
             </ul>
-            <Link
+            {/* <Link
               href={`/contact?subject=${encodeURIComponent(t.basicContact)}`}
+              className="block w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black font-normal px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center mt-auto shadow-lg hover:shadow-pictus-lime/50"
+            >
+              {t.basicButton}
+            </Link> */}
+            <Link
+              href={`/fleetsync/get-started?tier=BASIC&billing=${isYearly ? 'yearly' : 'monthly'}`}
               className="block w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black font-normal px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center mt-auto shadow-lg hover:shadow-pictus-lime/50"
             >
               {t.basicButton}
@@ -173,8 +161,14 @@ const FleetSyncPricing = ({ pricing, translations: t }: FleetSyncPricingProps) =
                 </li>
               ))}
             </ul>
-            <Link
+            {/* <Link
               href={`/contact?subject=${encodeURIComponent(t.businessContact)}`}
+              className="block w-full bg-pictus-white/10 hover:bg-pictus-white/20 px-6 py-3 rounded-full transition-colors text-center mt-auto"
+            >
+              {t.businessButton}
+            </Link> */}
+            <Link
+              href={`/fleetsync/get-started?tier=BUSINESS&billing=${isYearly ? 'yearly' : 'monthly'}`}
               className="block w-full bg-pictus-white/10 hover:bg-pictus-white/20 px-6 py-3 rounded-full transition-colors text-center mt-auto"
             >
               {t.businessButton}

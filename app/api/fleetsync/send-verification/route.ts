@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { createHash, randomUUID } from 'crypto'
 import { createHmac } from 'crypto'
-
-const prisma = new PrismaClient()
+import { rateLimit, rateLimitResponse, getClientIP } from '@/lib/rateLimit'
 
 const OTP_SALT = process.env.OTP_SALT!
 const SESSION_SECRET = process.env.VERIFICATION_SESSION_SECRET!
@@ -34,11 +33,16 @@ function hashToken(token: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, phoneNumber, firstName } = await request.json()
+    const { email, phoneNumber, firstName, locale } = await request.json()
 
     if (!email || !phoneNumber) {
       return NextResponse.json({ error: 'Email and phone number are required' }, { status: 400 })
     }
+
+    // Rate limit: 5 sends per IP per hour
+    const ip = getClientIP(request.headers)
+    const ipLimit = rateLimit({ key: `send_verification:${ip}`, maxAttempts: 5, windowMs: 60 * 60 * 1000 })
+    if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
 
     const expiresAt = Date.now() + EXPIRES_MINUTES * 60 * 1000
     const expiresAtDate = new Date(expiresAt)
@@ -103,6 +107,7 @@ export async function POST(request: NextRequest) {
         firstName: firstName || 'Zákazník',
         code: emailCode,
         purpose: 'email',
+        locale: locale || 'sk',
       }),
     })
 

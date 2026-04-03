@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/db/db'
 import { hashPassword } from '../../../lib/isValidPassword'
 import { checkIPBan } from '@/lib/checkIPBan'
 import { checkTierLimit, TierLimitError } from '@/lib/tier-limits'
 import { randomUUID } from 'crypto'
 import axios from 'axios'
-
-const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {
@@ -103,9 +101,8 @@ export async function POST(request: NextRequest) {
 
     if (password && password.trim() !== '') {
       hashedPassword = await hashPassword(password)
-    } else if (!loginProvider || loginProvider === '' || loginProvider === 'hybrid') {
+    } else if (!loginProvider || loginProvider === '' || loginProvider === 'credentials') {
       hashedPassword = await hashPassword(defaultPassword)
-      console.log(`Set default password for new user: ${email}`)
     }
 
     // ── Benefit user flow ──
@@ -201,6 +198,7 @@ export async function POST(request: NextRequest) {
           userName: `${firstName} ${lastName}`,
           subOrgName: result.subOrg.name,
           subOrgId: result.subOrg.id,
+          locale: userLocale,
         })
       } catch (emailError) {
         console.error('Failed to send benefit admin notification:', emailError)
