@@ -907,6 +907,7 @@
     "vehicleContactSupport": "To change vehicle count, contact info@pictusweb.sk.",
     "nextCycleNote": "Billing",
     "vehicleNextCycleHint": "Changes take effect on your next billing cycle.",
+    "yearlyContactSupport": "For changes to your yearly subscription, contact info@pictusweb.sk.",
     "vehicleUpdateSuccess": "Vehicle count updated. New rate starts next cycle.",
     "vehicleUpdateError": "Failed to update vehicle count.",
     "expiredTitle": "Your free {tierName} period ended on {endDate}",

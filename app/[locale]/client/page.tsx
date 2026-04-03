@@ -672,7 +672,11 @@ const ClientZone = () => {
                   </div>
                   <div>
                     <label className="text-pictus-white text-sm font-light">{t('nextCycleNote')}</label>
-                    <p className="text-xs text-gray-400 mt-1">{t('vehicleNextCycleHint')}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {organization.billingInterval === 'yearly'
+                        ? t('yearlyContactSupport')
+                        : t('vehicleNextCycleHint')}
+                    </p>
                   </div>
                 </div>
                 {vehicleUpdateMsg && (

@@ -911,6 +911,7 @@
     "vehicleContactSupport": "A járművek számának módosításához írjon az info@pictusweb.sk címre.",
     "nextCycleNote": "Számlázás",
     "vehicleNextCycleHint": "A változások a következő számlázási ciklustól lépnek érvénybe.",
+    "yearlyContactSupport": "Az éves előfizetés módosításához írjon az info@pictusweb.sk címre.",
     "vehicleUpdateSuccess": "Járművek száma frissítve. Az új díjszabás a következő ciklustól érvényes.",
     "vehicleUpdateError": "Nem sikerült frissíteni a járművek számát.",
     "expiredTitle": "Az ingyenes {tierName} időszaka lejárt: {endDate}",

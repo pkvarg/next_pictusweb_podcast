@@ -908,6 +908,7 @@
     "vehicleContactSupport": "Pre zmenu počtu vozidiel kontaktujte info@pictusweb.sk.",
     "nextCycleNote": "Fakturácia",
     "vehicleNextCycleHint": "Zmeny sa prejavia od ďalšieho fakturačného cyklu.",
+    "yearlyContactSupport": "Pre zmeny v ročnom predplatnom kontaktujte info@pictusweb.sk.",
     "vehicleUpdateSuccess": "Počet vozidiel bol aktualizovaný. Nová sadzba od ďalšieho cyklu.",
     "vehicleUpdateError": "Nepodarilo sa aktualizovať počet vozidiel.",
     "expiredTitle": "Vaše bezplatné obdobie {tierName} skončilo {endDate}",
