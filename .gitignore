@@ -80,3 +80,5 @@ test-rate-limits.mjs
 
 mds/upgrade_scenarios.md
 mds/test.md
+mds/invoice_generator.md
+mds/release_notes_sender.md
