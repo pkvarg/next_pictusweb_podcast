@@ -458,8 +458,9 @@ const MyFleetPage = () => {
         throw new Error('Failed to delete vehicle')
       }
 
-      // Refresh the list
+      // Refresh the list and vehicle count
       fetchVehicles()
+      fetchOrganization()
     } catch (err) {
       console.error('Error deleting vehicle:', err)
       alert(t('deleteVehicleFailed'))
