@@ -1514,8 +1514,8 @@ export default function NotificationBuilder({
       {/* Intervals Modal */}
       {showIntervalsModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-pictus-onyx900 border border-pictus-lime/30 rounded-xl p-6 max-w-md w-full">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-pictus-onyx900 border border-pictus-lime/30 rounded-xl p-6 max-w-md w-full max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between mb-6 shrink-0">
               <h3 className="text-2xl font-light text-white">Upraviť intervaly</h3>
               <button
                 onClick={() => setShowIntervalsModal(false)}
@@ -1525,11 +1525,11 @@ export default function NotificationBuilder({
               </button>
             </div>
 
-            <div className="space-y-4 mb-6">
-              <p className="text-gray-400 text-sm">
-                Nastavte dni pred/po dátume úlohy kedy sa majú odoslať notifikácie.
-              </p>
+            <p className="text-gray-400 text-sm mb-4 shrink-0">
+              Nastavte dni pred/po dátume úlohy kedy sa majú odoslať notifikácie.
+            </p>
 
+            <div className="space-y-2 overflow-y-auto max-h-[40vh] mb-4 pr-1">
               {reminderIntervals.map((interval, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <select
@@ -1563,21 +1563,20 @@ export default function NotificationBuilder({
                   </button>
                 </div>
               ))}
-
-              <button
-                type="button"
-                onClick={() => {
-                  // Add a new interval (default to -7 days)
-                  setReminderIntervals([...reminderIntervals, -7])
-                }}
-                className="w-full px-4 py-2 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-colors flex items-center justify-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Pridať interval
-              </button>
             </div>
 
-            <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setReminderIntervals([...reminderIntervals, -7])
+              }}
+              className="w-full px-4 py-2 mb-4 shrink-0 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Pridať interval
+            </button>
+
+            <div className="flex gap-3 shrink-0 pt-4 border-t border-white/10">
               <button
                 type="button"
                 onClick={() => setShowIntervalsModal(false)}
