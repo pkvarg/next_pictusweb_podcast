@@ -566,13 +566,21 @@ const MyFleetPage = () => {
               info@pictusweb.sk
             </a>
           </p>
-          <button
-            onClick={() => signOut({ callbackUrl: '/' })}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
-          >
-            <LogOut size={18} />
-            {t('logOutButton')}
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Link
+              href="/client/upgrade"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-black font-semibold rounded-lg hover:bg-pictus-lime/80 transition-all"
+            >
+              {t('upgradeNow')}
+            </Link>
+            <button
+              onClick={() => signOut({ callbackUrl: '/' })}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+            >
+              <LogOut size={18} />
+              {t('logOutButton')}
+            </button>
+          </div>
         </div>
       </div>
     )

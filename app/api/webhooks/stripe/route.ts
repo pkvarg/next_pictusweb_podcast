@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
                 subscriptionStartDate: new Date(),
                 notificationPeriodStart: new Date(),
                 notificationsBlocked: false,
+                deletedAt: null,
               },
             })
             console.log('Successfully upgraded org:', upgradeOrgId, 'to tier:', targetTier.name)
@@ -132,6 +133,7 @@ export async function POST(request: NextRequest) {
               subscriptionStartDate: new Date(),
               notificationPeriodStart: new Date(),
               notificationsBlocked: false,
+              deletedAt: null,
               freeTrialEndDate: null,
               freeTrialTierId: null,
               ...(activateVehicles && { purchasedVehicles: activateVehicles, vehiclesLimit: activateVehicles }),

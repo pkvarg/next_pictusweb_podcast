@@ -128,6 +128,13 @@ export const authOptions = {
             }
 
           }
+        } else if (token.organizationId) {
+          // Always refresh organizationDeleted status from DB
+          const org = await prisma.organization.findUnique({
+            where: { id: token.organizationId as string },
+            select: { deletedAt: true }
+          })
+          token.organizationDeleted = org?.deletedAt ? true : false
         }
 
         return token
