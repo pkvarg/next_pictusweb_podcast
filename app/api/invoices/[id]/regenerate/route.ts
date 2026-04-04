@@ -34,6 +34,7 @@ export async function GET(
       pricePerVehicle: invoice.pricePerVehicle,
       totalPrice: invoice.totalPrice,
       createdAt: invoice.createdAt.toISOString(),
+      paymentType: invoice.paymentType,
     }
 
     const honoApi = process.env.NEXT_PUBLIC_HONO_API_URL

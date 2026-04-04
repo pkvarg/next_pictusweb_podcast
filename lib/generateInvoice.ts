@@ -1,6 +1,6 @@
 import prisma from '@/db/db'
 
-async function generateInvoiceNumber(): Promise<string> {
+export async function generateInvoiceNumber(): Promise<string> {
   const now = new Date()
   const yy = String(now.getFullYear()).slice(-2)
   const mm = String(now.getMonth() + 1).padStart(2, '0')
@@ -33,6 +33,7 @@ interface InvoiceData {
   numberOfVehicles: number
   pricePerVehicle: number
   totalPrice: number
+  paymentType?: string
   locale?: string
 }
 
@@ -57,6 +58,7 @@ export async function generateAndSendInvoice(data: InvoiceData): Promise<void> {
       numberOfVehicles: data.numberOfVehicles,
       pricePerVehicle: data.pricePerVehicle,
       totalPrice: data.totalPrice,
+      paymentType: data.paymentType || 'stripe',
     },
   })
 
@@ -83,6 +85,7 @@ export async function generateAndSendInvoice(data: InvoiceData): Promise<void> {
       pricePerVehicle: invoice.pricePerVehicle,
       totalPrice: invoice.totalPrice,
       createdAt: invoice.createdAt.toISOString(),
+      paymentType: invoice.paymentType,
       sendEmail: true,
       locale: data.locale || 'sk',
     }),

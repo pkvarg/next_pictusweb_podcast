@@ -531,6 +531,7 @@ model Invoice {
   numberOfVehicles  Int      @map("number_of_vehicles")
   pricePerVehicle   Float    @map("price_per_vehicle")
   totalPrice        Float    @map("total_price")
+  paymentType       String   @default("stripe") @map("payment_type") @db.VarChar(20)
   createdAt         DateTime @default(now()) @map("created_at")
 
   @@map("invoices")

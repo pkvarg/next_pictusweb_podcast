@@ -29,6 +29,8 @@ export async function GET(request: NextRequest) {
             notificationsLimit: true,
             templatesLimit: true,
             notificationTypesLimit: true,
+            pricePerVehicle: true,
+            pricePerVehicleYearly: true,
           }
         },
         parentOrganization: {
