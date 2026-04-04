@@ -367,6 +367,9 @@ model Organization {
   isBenefitOrg                    Boolean        @default(false) @map("is_benefit_org")
   canCreateBenefit                Boolean        @default(false) @map("can_create_benefit")
 
+  // Newsletter
+  newsletterOptOut                Boolean        @default(false) @map("newsletter_opt_out")
+
   // Relations
   users                           User[]
   vehicles                        MyVehicle[]

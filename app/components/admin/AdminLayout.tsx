@@ -21,6 +21,7 @@ import {
   MessageSquare,
   DollarSign,
   FileText,
+  Newspaper,
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -85,6 +86,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       name: 'Invoices',
       href: '/admin/invoices',
       icon: FileText,
+    },
+    {
+      name: 'Release Notes',
+      href: '/admin/release-notes',
+      icon: Newspaper,
     },
   ]
 
