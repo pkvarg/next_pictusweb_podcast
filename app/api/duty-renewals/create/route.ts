@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
           dutyBatchId: newDutyBatchId,
           renewedFromBatchId: sourceBatchId,
           isPdr: false,
+          isAggressiveMode: baseNotif.isAggressiveMode,
           organizationId: baseData.organizationId,
           vehicleRegistration: baseData.vehicleRegistration,
           notificationType: baseData.notificationType,
@@ -128,8 +129,9 @@ export async function POST(request: NextRequest) {
     }
 
     // If original had PDR reminder, create new one
+    // When aggressive mode is enabled, PDR is deferred — n8n creates it after aggressive resolves
     let newPdrReminder = null
-    if (originalPdrReminder) {
+    if (originalPdrReminder && !baseNotif.isAggressiveMode) {
       const pdrReminderDate = new Date(newDutyDateObj)
       pdrReminderDate.setDate(pdrReminderDate.getDate() + 1) // 1 day after duty
 

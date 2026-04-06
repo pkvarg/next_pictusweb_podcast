@@ -82,3 +82,11 @@ mds/upgrade_scenarios.md
 mds/test.md
 mds/invoice_generator.md
 mds/release_notes_sender.md
+n8n/FLEETSYNC&DEMO_03_antibot_token_FIXED.json
+n8n/FLEETSYNC&DEMO_04_Follow-up Confirmation Check.json
+n8n/FLEETSYNC&DEMO_02_w_token.json
+n8n/Confirm.json
+n8n/Reminders.json
+n8n/Today's_notifs.json
+mds/aggressive_mode.md
+n8n/Aggressive_mode.json

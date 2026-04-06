@@ -33,6 +33,10 @@ interface VehicleNotification {
   isPdr: boolean
   pdrReminderFor: string | null
   renewedFromBatchId: string | null
+  isAggressiveMode: boolean
+  aggressiveStart: string | null
+  aggressiveEnd: string | null
+  aggressiveDaysSent: number
   organizationId: string | null
   organization?: {
     id: string
@@ -670,6 +674,11 @@ const VehicleNotificationsDashboard = ({ company, organizationName }: VehicleNot
                                         🔄 PDR
                                       </span>
                                     )}
+                                    {notification.isAggressiveMode && (
+                                      <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">
+                                        ⚠️ Aggressive{notification.aggressiveStart && ` (${notification.aggressiveDaysSent}/30)`}
+                                      </span>
+                                    )}
                                   </div>
                                   <p className="text-pictus-white text-lg">
                                     {notification.notificationChannel}
@@ -780,6 +789,11 @@ const VehicleNotificationsDashboard = ({ company, organizationName }: VehicleNot
                           {notification.isPdr && (
                             <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
                               🔄 PDR
+                            </span>
+                          )}
+                          {notification.isAggressiveMode && (
+                            <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">
+                              ⚠️ Aggressive{notification.aggressiveStart && ` (${notification.aggressiveDaysSent}/30)`}
                             </span>
                           )}
                         </div>

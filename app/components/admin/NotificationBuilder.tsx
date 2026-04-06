@@ -101,6 +101,7 @@ export default function NotificationBuilder({
   const [reminderIntervals, setReminderIntervals] = useState<number[]>([-30, -14, -3, 0])
   const [showIntervalsModal, setShowIntervalsModal] = useState(false)
   const [enablePdr, setEnablePdr] = useState(false)
+  const [enableAggressive, setEnableAggressive] = useState(false)
 
   const [formData, setFormData] = useState({
     templateId: '',
@@ -590,9 +591,9 @@ export default function NotificationBuilder({
           return notificationDate >= today
         })
 
-        // Generate a batch ID if there are multiple valid intervals OR if PDR is enabled
+        // Generate a batch ID if there are multiple valid intervals OR if PDR/Aggressive is enabled
         const dutyBatchId =
-          validIntervals.length > 1 || enablePdr
+          validIntervals.length > 1 || enablePdr || enableAggressive
             ? `batch_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
             : null
 
@@ -610,6 +611,7 @@ export default function NotificationBuilder({
             ...formData,
             notificationDate: notificationDate.toISOString().split('T')[0],
             dutyBatchId, // Include batch ID in payload
+            isAggressiveMode: enableAggressive,
           }
 
           console.log('[NotificationBuilder] Creating notification with payload:', payload)
@@ -646,7 +648,8 @@ export default function NotificationBuilder({
           const skipped = reminderIntervals.length - validIntervals.length
 
           // If PDR is enabled, create PDR reminder notification
-          if (enablePdr && dutyBatchId) {
+          // When aggressive mode is also enabled, PDR is deferred — n8n creates it after aggressive resolves
+          if (enablePdr && dutyBatchId && !enableAggressive) {
             try {
               const pdrReminderDate = new Date(formData.dutyDate)
               pdrReminderDate.setDate(pdrReminderDate.getDate() + 1) // 1 day after duty
@@ -690,8 +693,15 @@ export default function NotificationBuilder({
               ? 'Notifikácia bola úspešne vytvorená!'
               : `${count} notifikácií bolo úspešne vytvorených!`
 
-          if (enablePdr) {
+          if (enablePdr && !enableAggressive) {
             message += '\n\n🔄 PDR pripomienka bola tiež vytvorená pre deň po úlohe.'
+          }
+
+          if (enableAggressive) {
+            message += '\n\n⚠️ Agresívny režim je zapnutý — po vyčerpaní pripomienok bude systém odosielať denné pripomienky 30 dní.'
+            if (enablePdr) {
+              message += '\n🔄 PDR pripomienka bude vytvorená automaticky po ukončení agresívneho cyklu.'
+            }
           }
 
           if (skipped > 0) {
@@ -1023,6 +1033,37 @@ export default function NotificationBuilder({
                 </div>
               </div>
 
+              {/* Aggressive Mode Toggle — BUSINESS tier only */}
+              {organizationTier === 'BUSINESS' && (
+                <div className="md:col-span-2">
+                  <div className={`flex items-center gap-3 p-4 rounded-lg ${enableAggressive ? 'bg-orange-500/15 border border-orange-500/40' : 'bg-orange-500/10 border border-orange-500/30'}`}>
+                    <input
+                      type="checkbox"
+                      id="enableAggressive"
+                      checked={enableAggressive}
+                      onChange={(e) => setEnableAggressive(e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 focus:ring-offset-gray-900"
+                    />
+                    <div className="flex-1">
+                      <label
+                        htmlFor="enableAggressive"
+                        className="text-white font-light text-base cursor-pointer"
+                      >
+                        ⚠️ Aggressive Mode (30-dňové denné pripomienky)
+                      </label>
+                      <p className="text-orange-300 text-sm mt-1">
+                        Po vyčerpaní štandardných pripomienok systém bude odosielať denné pripomienky po dobu 30 dní, kým klient nepotvrdí.
+                      </p>
+                      {enableAggressive && enablePdr && (
+                        <p className="text-orange-200 text-xs mt-2 bg-orange-500/10 px-2 py-1 rounded">
+                          🔄 PDR pripomienka bude odložená — vytvorí sa až po ukončení agresívneho cyklu.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Duty Date */}
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
@@ -1353,12 +1394,28 @@ export default function NotificationBuilder({
                 >
                   {enablePdr ? '🔄 Zapnuté' : 'Vypnuté'}
                 </div>
-                {enablePdr && (
+                {enablePdr && !enableAggressive && (
                   <p className="text-blue-300 text-sm mt-2">
                     Bude vytvorená pripomienka deň po termíne úlohy na zadanie nového termínu.
                   </p>
                 )}
+                {enablePdr && enableAggressive && (
+                  <p className="text-orange-300 text-sm mt-2">
+                    PDR bude odložené — vytvorí sa automaticky po ukončení agresívneho cyklu.
+                  </p>
+                )}
               </div>
+              {enableAggressive && (
+                <div className="md:col-span-2">
+                  <p className="text-gray-400 text-sm">Aggressive Mode</p>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-base bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                    ⚠️ Zapnuté (30 dní)
+                  </div>
+                  <p className="text-orange-300 text-sm mt-2">
+                    Po vyčerpaní pripomienok bude systém odosielať denné pripomienky 30 dní.
+                  </p>
+                </div>
+              )}
               <div className="md:col-span-2">
                 <p className="text-gray-400 text-sm mb-2">Dátumy notifikácií</p>
                 <div className="text-white text-lg">

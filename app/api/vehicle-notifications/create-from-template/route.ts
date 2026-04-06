@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
       dutyBatchId,
       isPdr,
       pdrReminderFor,
+      isAggressiveMode,
     } = body
 
     if (!dutyDate) {
@@ -52,6 +53,14 @@ export async function POST(request: NextRequest) {
           { status: 403 }
         )
       }
+
+      // Aggressive mode is BUSINESS tier only
+      if (isAggressiveMode && org?.tierRelation?.name !== 'BUSINESS') {
+        return NextResponse.json(
+          { error: 'Aggressive mode is only available for BUSINESS tier' },
+          { status: 403 }
+        )
+      }
     }
 
     let notificationData: any = {
@@ -64,6 +73,7 @@ export async function POST(request: NextRequest) {
       dutyBatchId: dutyBatchId || null,
       isPdr: isPdr || false,
       pdrReminderFor: pdrReminderFor || null,
+      isAggressiveMode: isAggressiveMode || false,
     }
 
     if (vehicleId) {

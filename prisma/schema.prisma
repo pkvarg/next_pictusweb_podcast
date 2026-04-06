@@ -105,6 +105,10 @@ model VehicleNotification {
   isPdr                Boolean       @default(false) @map("is_pdr")
   pdrReminderFor       String?       @map("pdr_reminder_for") @db.VarChar(50) // For PDR reminder: which batch it reminds about
   renewedFromBatchId   String?       @map("renewed_from_batch_id") @db.VarChar(50) // Tracks renewal lineage
+  isAggressiveMode     Boolean       @default(false) @map("is_aggressive_mode")
+  aggressiveStart      DateTime?     @map("aggressive_start")
+  aggressiveEnd        DateTime?     @map("aggressive_end")
+  aggressiveDaysSent   Int           @default(0) @map("aggressive_days_sent")
   organizationId       String?       @map("organization_id")  // TEXT to match organizations.id
   organization         Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   personName           String?       @db.VarChar(100)
@@ -138,6 +142,7 @@ model VehicleNotification {
   @@index([isPdr])
   @@index([pdrReminderFor])
   @@index([renewedFromBatchId])
+  @@index([isAggressiveMode])
   @@index([organizationId])
   @@map("vehiclenotification")
 }
