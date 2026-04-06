@@ -81,12 +81,26 @@ interface DashboardStats {
 
 type TimeFilter = 'all' | 'week' | 'month'
 
+interface Translations {
+  aggressiveBadge: string
+  aggressiveBadgeDay: string
+  pdrBadge: string
+}
+
 interface VehicleNotificationsDashboardProps {
   company: string
   organizationName?: string
+  translations?: Translations
 }
 
-const VehicleNotificationsDashboard = ({ company, organizationName }: VehicleNotificationsDashboardProps) => {
+const defaultTranslations: Translations = {
+  aggressiveBadge: 'Aggressive',
+  aggressiveBadgeDay: 'Aggressive ({day}/30)',
+  pdrBadge: 'PDR',
+}
+
+const VehicleNotificationsDashboard = ({ company, organizationName, translations }: VehicleNotificationsDashboardProps) => {
+  const t = translations || defaultTranslations
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all')
@@ -671,12 +685,12 @@ const VehicleNotificationsDashboard = ({ company, organizationName }: VehicleNot
                                     </p>
                                     {notification.isPdr && (
                                       <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
-                                        🔄 PDR
+                                        🔄 {t.pdrBadge}
                                       </span>
                                     )}
                                     {notification.isAggressiveMode && (
                                       <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">
-                                        ⚠️ Aggressive{notification.aggressiveStart && ` (${notification.aggressiveDaysSent}/30)`}
+                                        ⚠️ {notification.aggressiveStart ? t.aggressiveBadgeDay.replace('{day}', String(notification.aggressiveDaysSent)) : t.aggressiveBadge}
                                       </span>
                                     )}
                                   </div>

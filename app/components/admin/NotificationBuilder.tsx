@@ -66,6 +66,268 @@ interface User {
   phoneNumber: string | null
 }
 
+export interface NotificationBuilderTranslations {
+  // Headers/Steps
+  createTitle: string
+  duplicateTitle: string
+  step0Label: string
+  step1Label: string
+  step2Label: string
+  step3Label: string
+  stepOf: string
+  // Step 0 - Organization
+  selectOrg: string
+  selectOrgDesc: string
+  selectOrgPlaceholder: string
+  selectOrgRequired: string
+  continue: string
+  // Step 1 - Template
+  selectTemplate: string
+  customNotification: string
+  customNotificationDesc: string
+  daysBefore: string
+  backToOrgSelection: string
+  // Step 2 - Details
+  notificationDetails: string
+  vehicleLabel: string
+  selectVehicle: string
+  notificationTypeLabel: string
+  selectType: string
+  customTypeOption: string
+  usingDefaultOptions: string
+  customTypesBusinessOnly: string
+  customTypePlaceholder: string
+  backToDropdown: string
+  channelLabel: string
+  selectChannel: string
+  pdrLabel: string
+  pdrDesc: string
+  aggressiveLabel: string
+  aggressiveDesc: string
+  aggressivePdrDeferred: string
+  dutyDateLabel: string
+  dutyDateRequired: string
+  reminderIntervals: string
+  editIntervals: string
+  willCreate: string
+  notificationSingular: string
+  notificationFew: string
+  notificationMany: string
+  onDutyDay: string
+  daysAfter: string
+  daysBefore2: string
+  pastDate: string
+  singleIntervalHint: string
+  editIntervalsHint: string
+  selectUserOptional: string
+  selectUserPlaceholder: string
+  personNameLabel: string
+  personNamePlaceholder: string
+  emailLabel: string
+  orSelectUser: string
+  emailPlaceholder: string
+  emailRequired: string
+  phoneLabel: string
+  phonePlaceholder: string
+  phoneRequired: string
+  organizationLabel: string
+  organizationPlaceholder: string
+  selectedInStep0: string
+  messageLabel: string
+  messageHint: string
+  messageContainsInfo: string
+  requiredFieldMissing: string
+  selectDutyDateToContinue: string
+  back: string
+  continueToReview: string
+  // Step 3 - Review
+  reviewNotification: string
+  sendTimeInfo: string
+  notSelected: string
+  notSet: string
+  pdrEnabled: string
+  pdrDisabled: string
+  pdrWillCreate: string
+  pdrDeferredReview: string
+  aggressiveModeReview: string
+  aggressiveEnabled: string
+  aggressiveReviewDesc: string
+  notificationDates: string
+  dateInPast: string
+  contactPerson: string
+  phoneReview: string
+  emailMessage: string
+  warnings: string
+  creating: string
+  createNotification: string
+  // Intervals Modal
+  editIntervalsTitle: string
+  editIntervalsDesc: string
+  addInterval: string
+  cancel: string
+  done: string
+  dayBefore: string
+  daysBefore3: string
+  daysBeforeMany: string
+  dayAfter: string
+  daysAfter2: string
+  daysAfterMany: string
+  before: string
+  after: string
+  // Validation
+  validationTypeRequired: string
+  validationChannelRequired: string
+  validationDutyDateRequired: string
+  validationIntervalsRequired: string
+  validationAllPast: string
+  validationNoNotifications: string
+  validationEmailRequired: string
+  validationPhoneRequired: string
+  validationEmailRequiredEmail: string
+  validationPhoneRequiredSms: string
+  validationErrors: string
+  successSingle: string
+  successMultiple: string
+  pdrCreated: string
+  aggressiveEnabled2: string
+  aggressivePdrDeferred2: string
+  intervalsPastSkipped: string
+  someFailed: string
+  createError: string
+  validationPastIntervals: string
+}
+
+const defaultTranslations: NotificationBuilderTranslations = {
+  // Headers/Steps
+  createTitle: 'Vytvoriť novú notifikáciu',
+  duplicateTitle: 'Duplikovať notifikáciu',
+  step0Label: 'Vybrať organizáciu',
+  step1Label: 'Vybrať šablónu',
+  step2Label: 'Vyplniť detaily',
+  step3Label: 'Skontrolovať a vytvoriť',
+  stepOf: 'Krok __step__ z 3:',
+  // Step 0 - Organization
+  selectOrg: 'Vybrať organizáciu',
+  selectOrgDesc: 'Vyberte organizáciu pre túto notifikáciu z dostupných organizácií.',
+  selectOrgPlaceholder: 'Vyberte organizáciu...',
+  selectOrgRequired: 'Prosím vyberte organizáciu',
+  continue: 'Pokračovať',
+  // Step 1 - Template
+  selectTemplate: 'Vybrať šablónu',
+  customNotification: 'Vlastná notifikácia',
+  customNotificationDesc: 'Vytvorte od začiatku pomocou rozbaľovacích ponúk',
+  daysBefore: 'dní pred',
+  backToOrgSelection: '← Späť na výber organizácie',
+  // Step 2 - Details
+  notificationDetails: 'Detaily notifikácie',
+  vehicleLabel: 'Vozidlo',
+  selectVehicle: 'Vybrať vozidlo...',
+  notificationTypeLabel: 'Typ notifikácie',
+  selectType: 'Vybrať typ...',
+  customTypeOption: '✏️ Vlastný (zadajte svoj)...',
+  usingDefaultOptions: 'Používajú sa predvolené možnosti (nie sú nakonfigurované možnosti pre',
+  customTypesBusinessOnly: 'ℹ️ Vlastné typy notifikácií sú dostupné iba pre Business tier',
+  customTypePlaceholder: 'Zadajte vlastný typ notifikácie...',
+  backToDropdown: '← Späť na rozbaľovaciu ponuku',
+  channelLabel: 'Kanál',
+  selectChannel: 'Vybrať kanál...',
+  pdrLabel: '🔄 Post-Duty Renewal (PDR)',
+  pdrDesc: 'Automaticky vytvorí pripomienku deň po termíne úlohy pre plánovanie ďalšej úlohy',
+  aggressiveLabel: '⚠️ Aggressive Mode (30-dňové denné pripomienky)',
+  aggressiveDesc: 'Po vyčerpaní štandardných pripomienok systém bude odosielať denné pripomienky po dobu 30 dní, kým klient nepotvrdí.',
+  aggressivePdrDeferred: '🔄 PDR pripomienka bude odložená — vytvorí sa až po ukončení agresívneho cyklu.',
+  dutyDateLabel: 'Dátum úlohy *',
+  dutyDateRequired: 'Dátum úlohy je povinný pre vytvorenie notifikácie',
+  reminderIntervals: 'Intervaly pripomienok',
+  editIntervals: '✏️ Upraviť intervaly',
+  willCreate: 'Vytvorí sa',
+  notificationSingular: 'notifikácia',
+  notificationFew: 'notifikácie',
+  notificationMany: 'notifikácií',
+  onDutyDay: 'V deň úlohy',
+  daysAfter: '+__days__ dní',
+  daysBefore2: '__days__ dní',
+  pastDate: '(minulosť)',
+  singleIntervalHint: 'Pre jednorázovú notifikáciu nastavte len jeden interval.',
+  editIntervalsHint: 'Upravte intervaly alebo pridajte vlastné dni pred/po dátume úlohy.',
+  selectUserOptional: 'Vybrať používateľa (voliteľné - vyplní meno, email a telefón)',
+  selectUserPlaceholder: 'Vyberte používateľa alebo zadajte manuálne...',
+  personNameLabel: 'Meno osoby (alebo vyberte používateľa)',
+  personNamePlaceholder: 'Zadajte meno manuálne...',
+  emailLabel: 'Email',
+  orSelectUser: '(alebo vyberte používateľa)',
+  emailPlaceholder: 'Zadajte email manuálne...',
+  emailRequired: '⚠️ Email je povinný pre zvolený kanál',
+  phoneLabel: 'Telefónne číslo',
+  phonePlaceholder: 'Zadajte telefón manuálne...',
+  phoneRequired: '⚠️ Telefónne číslo je povinné pre zvolený kanál',
+  organizationLabel: 'Organizácia',
+  organizationPlaceholder: 'Organizácia...',
+  selectedInStep0: 'Vybrané v kroku 0',
+  messageLabel: 'Správa',
+  messageHint: '... už obsahuje ŠPZ, úlohu a dátum. Zadajte oslovenie alebo pozdrav.',
+  messageContainsInfo: 'Správa už obsahuje ŠPZ, úlohu a dátum.',
+  requiredFieldMissing: 'Vyžadované pole chýba',
+  selectDutyDateToContinue: 'Prosím vyberte dátum úlohy pre pokračovanie',
+  back: 'Späť',
+  continueToReview: 'Pokračovať na kontrolu',
+  // Step 3 - Review
+  reviewNotification: 'Skontrolovať notifikáciu',
+  sendTimeInfo: 'Notifikácie sa odosielajú denne medzi 8:00 – 9:00. Ak potrebujete iný čas, kontaktujte info@pictusweb.sk.',
+  notSelected: 'Nevybrané',
+  notSet: 'Nenastavené',
+  pdrEnabled: '🔄 Zapnuté',
+  pdrDisabled: 'Vypnuté',
+  pdrWillCreate: 'Bude vytvorená pripomienka deň po termíne úlohy na zadanie nového termínu.',
+  pdrDeferredReview: 'PDR bude odložené — vytvorí sa automaticky po ukončení agresívneho cyklu.',
+  aggressiveModeReview: 'Aggressive Mode',
+  aggressiveEnabled: '⚠️ Zapnuté (30 dní)',
+  aggressiveReviewDesc: 'Po vyčerpaní pripomienok bude systém odosielať denné pripomienky 30 dní.',
+  notificationDates: 'Dátumy notifikácií',
+  dateInPast: '- Dátum je v minulosti!',
+  contactPerson: 'Kontaktná osoba',
+  phoneReview: 'Telefón',
+  emailMessage: 'Emailová správa',
+  warnings: '⚠️ Upozornenia:',
+  creating: 'Vytváram...',
+  createNotification: 'Vytvoriť notifikáciu',
+  // Intervals Modal
+  editIntervalsTitle: 'Upraviť intervaly',
+  editIntervalsDesc: 'Nastavte dni pred/po dátume úlohy kedy sa majú odoslať notifikácie.',
+  addInterval: 'Pridať interval',
+  cancel: 'Zrušiť',
+  done: 'Hotovo',
+  dayBefore: 'deň',
+  daysBefore3: 'dni',
+  daysBeforeMany: 'dní',
+  dayAfter: 'deň',
+  daysAfter2: 'dni',
+  daysAfterMany: 'dní',
+  before: 'pred',
+  after: 'po',
+  // Validation
+  validationTypeRequired: 'Typ notifikácie je povinný',
+  validationChannelRequired: 'Kanál notifikácie je povinný',
+  validationDutyDateRequired: 'Dátum úlohy je povinný',
+  validationIntervalsRequired: 'Musí byť zadaný aspoň jeden interval pripomienky',
+  validationAllPast: 'Všetky intervaly vedú do minulosti',
+  validationNoNotifications: 'Nebudú vytvorené žiadne notifikácie. Zvoľte iný dátum úlohy.',
+  validationEmailRequired: 'Email je povinný pre kanál Email/Sms',
+  validationPhoneRequired: 'Telefónne číslo je povinné pre kanál Email/Sms',
+  validationEmailRequiredEmail: 'Email je povinný pre kanál Email',
+  validationPhoneRequiredSms: 'Telefónne číslo je povinné pre kanál SMS',
+  validationErrors: 'Chyby validácie:',
+  successSingle: 'Notifikácia bola úspešne vytvorená!',
+  successMultiple: '__count__ notifikácií bolo úspešne vytvorených!',
+  pdrCreated: '🔄 PDR pripomienka bola tiež vytvorená pre deň po úlohe.',
+  aggressiveEnabled2: '⚠️ Agresívny režim je zapnutý — po vyčerpaní pripomienok bude systém odosielať denné pripomienky 30 dní.',
+  aggressivePdrDeferred2: '🔄 PDR pripomienka bude vytvorená automaticky po ukončení agresívneho cyklu.',
+  intervalsPastSkipped: '__skipped__ intervalov v minulosti bolo preskočených.',
+  someFailed: 'Niektoré notifikácie sa nepodarilo vytvoriť',
+  createError: 'Chyba pri vytváraní notifikácie',
+  validationPastIntervals: 'intervalov vedie do minulosti',
+}
+
 interface NotificationBuilderProps {
   organization?: string
   organizationTier?: string | null
@@ -73,6 +335,7 @@ interface NotificationBuilderProps {
   onSuccess?: () => void
   onCancel?: () => void
   hideChannelDropdown?: boolean
+  translations?: NotificationBuilderTranslations
 }
 
 export default function NotificationBuilder({
@@ -82,7 +345,9 @@ export default function NotificationBuilder({
   onSuccess,
   onCancel,
   hideChannelDropdown = false,
+  translations,
 }: NotificationBuilderProps) {
+  const tr = translations || defaultTranslations
   // If organization is provided, skip Step 0 (organization selection)
   const [step, setStep] = useState(initialOrganization ? 1 : 0)
   const [organization, setOrganization] = useState(initialOrganization || '')
@@ -496,22 +761,22 @@ export default function NotificationBuilder({
 
     // Check if notification type is provided
     if (!formData.notificationType || formData.notificationType.trim() === '') {
-      errors.push('Typ notifikácie je povinný')
+      errors.push(tr.validationTypeRequired)
     }
 
     // Check if notification channel is provided
     if (!formData.notificationChannel || formData.notificationChannel.trim() === '') {
-      errors.push('Kanál notifikácie je povinný')
+      errors.push(tr.validationChannelRequired)
     }
 
     // Check if duty date is provided
     if (!formData.dutyDate) {
-      errors.push('Dátum úlohy je povinný')
+      errors.push(tr.validationDutyDateRequired)
     }
 
     // Check if intervals are provided
     if (reminderIntervals.length === 0) {
-      errors.push('Musí byť zadaný aspoň jeden interval pripomienky')
+      errors.push(tr.validationIntervalsRequired)
     }
 
     // Check for past intervals (not today - today is allowed)
@@ -535,8 +800,8 @@ export default function NotificationBuilder({
         const futureCount = reminderIntervals.length - pastIntervals.length
         if (futureCount === 0) {
           errors.push(
-            `Všetky intervaly vedú do minulosti: ${pastIntervals.join(', ')} dní. ` +
-              'Nebudú vytvorené žiadne notifikácie. Zvoľte iný dátum úlohy.',
+            `${tr.validationAllPast}: ${pastIntervals.join(', ')} dní. ` +
+              tr.validationNoNotifications,
           )
         } else {
           // Just warn, don't block - these will be filtered out during creation
@@ -552,26 +817,26 @@ export default function NotificationBuilder({
     if (channel.includes('email') && channel.includes('sms')) {
       // Email/Sms channel requires both
       if (!formData.email || formData.email.trim() === '') {
-        errors.push('Email je povinný pre kanál Email/Sms')
+        errors.push(tr.validationEmailRequired)
       }
       if (!formData.phoneNumber || formData.phoneNumber.trim() === '') {
-        errors.push('Telefónne číslo je povinné pre kanál Email/Sms')
+        errors.push(tr.validationPhoneRequired)
       }
     } else if (channel.includes('email')) {
       // Email channel requires email
       if (!formData.email || formData.email.trim() === '') {
-        errors.push('Email je povinný pre kanál Email')
+        errors.push(tr.validationEmailRequiredEmail)
       }
     } else if (channel.includes('sms')) {
       // SMS channel requires phone
       if (!formData.phoneNumber || formData.phoneNumber.trim() === '') {
-        errors.push('Telefónne číslo je povinné pre kanál SMS')
+        errors.push(tr.validationPhoneRequiredSms)
       }
     }
 
     // If there are validation errors, show them and stop
     if (errors.length > 0) {
-      alert('Chyby validácie:\n\n' + errors.join('\n\n'))
+      alert(tr.validationErrors + '\n\n' + errors.join('\n\n'))
       return
     }
 
@@ -690,33 +955,33 @@ export default function NotificationBuilder({
 
           let message =
             count === 1
-              ? 'Notifikácia bola úspešne vytvorená!'
-              : `${count} notifikácií bolo úspešne vytvorených!`
+              ? tr.successSingle
+              : tr.successMultiple.replace('__count__', String(count))
 
           if (enablePdr && !enableAggressive) {
-            message += '\n\n🔄 PDR pripomienka bola tiež vytvorená pre deň po úlohe.'
+            message += '\n\n' + tr.pdrCreated
           }
 
           if (enableAggressive) {
-            message += '\n\n⚠️ Agresívny režim je zapnutý — po vyčerpaní pripomienok bude systém odosielať denné pripomienky 30 dní.'
+            message += '\n\n' + tr.aggressiveEnabled2
             if (enablePdr) {
-              message += '\n🔄 PDR pripomienka bude vytvorená automaticky po ukončení agresívneho cyklu.'
+              message += '\n' + tr.aggressivePdrDeferred2
             }
           }
 
           if (skipped > 0) {
-            message += `\n\n${skipped} interval${skipped === 1 ? '' : 'ov'} v minulosti bol${skipped === 1 ? '' : 'o'} preskočených.`
+            message += '\n\n' + tr.intervalsPastSkipped.replace('__skipped__', String(skipped))
           }
 
           alert(message)
           if (onSuccess) onSuccess()
         } else {
-          alert('Niektoré notifikácie sa nepodarilo vytvoriť')
+          alert(tr.someFailed)
         }
       }
     } catch (error) {
       console.error('Failed to create notification:', error)
-      alert('Chyba pri vytváraní notifikácie')
+      alert(tr.createError)
     } finally {
       setLoading(false)
     }
@@ -732,12 +997,12 @@ export default function NotificationBuilder({
           </div>
           <div>
             <h2 className="text-3xl font-light text-pictus-white">
-              {duplicateData ? 'Duplikovať notifikáciu' : 'Vytvoriť novú notifikáciu'}
+              {duplicateData ? tr.duplicateTitle : tr.createTitle}
             </h2>
             <p className="text-gray-400 text-lg">
               {step === 0
-                ? 'Vybrať organizáciu'
-                : `Krok ${step} z 3: ${step === 1 ? 'Vybrať šablónu' : step === 2 ? 'Vyplniť detaily' : 'Skontrolovať a vytvoriť'}`}
+                ? tr.step0Label
+                : `${tr.stepOf.replace('__step__', String(step))} ${step === 1 ? tr.step1Label : step === 2 ? tr.step2Label : tr.step3Label}`}
             </p>
           </div>
         </div>
@@ -768,10 +1033,10 @@ export default function NotificationBuilder({
           <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
             <div className="flex items-center gap-2 mb-4">
               <Building className="w-5 h-5 text-pictus-lime" />
-              <h3 className="text-2xl font-light text-pictus-white">Vybrať organizáciu</h3>
+              <h3 className="text-2xl font-light text-pictus-white">{tr.selectOrg}</h3>
             </div>
             <p className="text-gray-400 mb-4">
-              Vyberte organizáciu pre túto notifikáciu z dostupných organizácií.
+              {tr.selectOrgDesc}
             </p>
             <select
               value={organization}
@@ -783,7 +1048,7 @@ export default function NotificationBuilder({
               }}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white text-lg focus:outline-none focus:border-pictus-lime mb-4"
             >
-              <option value="">Vyberte organizáciu...</option>
+              <option value="">{tr.selectOrgPlaceholder}</option>
               {organizations.map((org) => (
                 <option key={org.id} value={org.name}>
                   {org.name}
@@ -795,13 +1060,13 @@ export default function NotificationBuilder({
                 if (organization) {
                   setStep(1)
                 } else {
-                  alert('Prosím vyberte organizáciu')
+                  alert(tr.selectOrgRequired)
                 }
               }}
               disabled={!organization}
               className="w-full px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 disabled:cursor-not-allowed text-pictus-black text-lg rounded-lg transition-all"
             >
-              Pokračovať
+              {tr.continue}
             </button>
           </div>
         </div>
@@ -813,7 +1078,7 @@ export default function NotificationBuilder({
           <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="w-5 h-5 text-pictus-lime" />
-              <h3 className="text-2xl font-light text-pictus-white">Vybrať šablónu</h3>
+              <h3 className="text-2xl font-light text-pictus-white">{tr.selectTemplate}</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -825,9 +1090,9 @@ export default function NotificationBuilder({
                 className="p-6 bg-gradient-to-br from-gray-600/20 to-gray-800/20 rounded-xl border border-gray-500/30 hover:border-pictus-lime/50 transition-all text-left"
               >
                 <Copy className="w-8 h-8 text-gray-400 mb-2" />
-                <h4 className="text-xl font-light text-pictus-white mb-1">Vlastná notifikácia</h4>
+                <h4 className="text-xl font-light text-pictus-white mb-1">{tr.customNotification}</h4>
                 <p className="text-gray-400 text-sm">
-                  Vytvorte od začiatku pomocou rozbaľovacích ponúk
+                  {tr.customNotificationDesc}
                 </p>
               </button>
 
@@ -844,7 +1109,7 @@ export default function NotificationBuilder({
                   <h4 className="text-xl font-light text-pictus-white mb-1">{template.name}</h4>
                   <p className="text-gray-400 text-sm">
                     {template.notificationType} • {template.notificationChannel}
-                    {template.daysBeforeDuty && ` • ${template.daysBeforeDuty} dní pred`}
+                    {template.daysBeforeDuty && ` • ${template.daysBeforeDuty} ${tr.daysBefore}`}
                   </p>
                 </button>
               ))}
@@ -856,7 +1121,7 @@ export default function NotificationBuilder({
                 onClick={() => setStep(0)}
                 className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
               >
-                ← Späť na výber organizácie
+                {tr.backToOrgSelection}
               </button>
             )}
           </div>
@@ -867,21 +1132,21 @@ export default function NotificationBuilder({
       {step === 2 && (
         <div className="space-y-4">
           <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
-            <h3 className="text-2xl font-light text-pictus-white mb-4">Detaily notifikácie</h3>
+            <h3 className="text-2xl font-light text-pictus-white mb-4">{tr.notificationDetails}</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Vehicle Selection */}
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Car className="w-4 h-4 inline mr-1" />
-                  Vozidlo
+                  {tr.vehicleLabel}
                 </label>
                 <select
                   value={formData.vehicleId}
                   onChange={(e) => handleVehicleSelect(e.target.value)}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                 >
-                  <option value="">Vybrať vozidlo...</option>
+                  <option value="">{tr.selectVehicle}</option>
                   {vehicles.map((vehicle) => (
                     <option key={vehicle.id} value={vehicle.id}>
                       {vehicle.registration} - {vehicle.type}
@@ -894,7 +1159,7 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Bell className="w-4 h-4 inline mr-1" />
-                  Typ notifikácie
+                  {tr.notificationTypeLabel}
                 </label>
                 {!useCustomType ? (
                   <>
@@ -914,25 +1179,25 @@ export default function NotificationBuilder({
                       }
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     >
-                      <option value="">Vybrať typ...</option>
+                      <option value="">{tr.selectType}</option>
                       {typeOptions.map((option) => (
                         <option key={option.id} value={option.label}>
                           {option.label}
                         </option>
                       ))}
                       {(organizationTier === 'BUSINESS' || organizationTier === undefined) && (
-                        <option value="__CUSTOM__">✏️ Vlastný (zadajte svoj)...</option>
+                        <option value="__CUSTOM__">{tr.customTypeOption}</option>
                       )}
                     </select>
                     {usingDefaultTypeOptions && (
                       <p className="text-yellow-400 text-xs mt-1">
-                        Používajú sa predvolené možnosti (nie sú nakonfigurované možnosti pre{' '}
+                        {tr.usingDefaultOptions}{' '}
                         {organization})
                       </p>
                     )}
                     {organizationTier && organizationTier !== 'BUSINESS' && (
                       <p className="text-blue-400 text-xs mt-1">
-                        ℹ️ Vlastné typy notifikácií sú dostupné iba pre Business tier
+                        {tr.customTypesBusinessOnly}
                       </p>
                     )}
                   </>
@@ -948,7 +1213,7 @@ export default function NotificationBuilder({
                         !!formData.templateId &&
                         !!templates.find((t) => t.id === formData.templateId)?.notificationType
                       }
-                      placeholder="Zadajte vlastný typ notifikácie..."
+                      placeholder={tr.customTypePlaceholder}
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     />
                     <button
@@ -959,7 +1224,7 @@ export default function NotificationBuilder({
                       }}
                       className="text-xs text-gray-400 hover:text-pictus-lime transition-colors"
                     >
-                      ← Späť na rozbaľovaciu ponuku
+                      {tr.backToDropdown}
                     </button>
                   </div>
                 )}
@@ -969,7 +1234,7 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <MessageSquare className="w-4 h-4 inline mr-1" />
-                  Kanál
+                  {tr.channelLabel}
                 </label>
                 {hideChannelDropdown ? (
                   <input
@@ -991,7 +1256,7 @@ export default function NotificationBuilder({
                       }
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
                     >
-                      <option value="">Vybrať kanál...</option>
+                      <option value="">{tr.selectChannel}</option>
                       {filteredChannelOptions.map((option) => (
                         <option key={option.id} value={option.label}>
                           {option.label}
@@ -1000,7 +1265,7 @@ export default function NotificationBuilder({
                     </select>
                     {usingDefaultChannelOptions && (
                       <p className="text-yellow-400 text-xs mt-1">
-                        Používajú sa predvolené možnosti (nie sú nakonfigurované možnosti pre{' '}
+                        {tr.usingDefaultOptions}{' '}
                         {organization})
                       </p>
                     )}
@@ -1023,11 +1288,10 @@ export default function NotificationBuilder({
                       htmlFor="enablePdr"
                       className="text-white font-light text-base cursor-pointer"
                     >
-                      🔄 Post-Duty Renewal (PDR)
+                      {tr.pdrLabel}
                     </label>
                     <p className="text-blue-300 text-sm mt-1">
-                      Automaticky vytvorí pripomienku deň po termíne úlohy pre plánovanie ďalšej
-                      úlohy
+                      {tr.pdrDesc}
                     </p>
                   </div>
                 </div>
@@ -1049,14 +1313,14 @@ export default function NotificationBuilder({
                         htmlFor="enableAggressive"
                         className="text-white font-light text-base cursor-pointer"
                       >
-                        ⚠️ Aggressive Mode (30-dňové denné pripomienky)
+                        {tr.aggressiveLabel}
                       </label>
                       <p className="text-orange-300 text-sm mt-1">
-                        Po vyčerpaní štandardných pripomienok systém bude odosielať denné pripomienky po dobu 30 dní, kým klient nepotvrdí.
+                        {tr.aggressiveDesc}
                       </p>
                       {enableAggressive && enablePdr && (
                         <p className="text-orange-200 text-xs mt-2 bg-orange-500/10 px-2 py-1 rounded">
-                          🔄 PDR pripomienka bude odložená — vytvorí sa až po ukončení agresívneho cyklu.
+                          {tr.aggressivePdrDeferred}
                         </p>
                       )}
                     </div>
@@ -1068,7 +1332,7 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Calendar className="w-4 h-4 inline mr-1" />
-                  Dátum úlohy *
+                  {tr.dutyDateLabel}
                 </label>
                 <input
                   type="date"
@@ -1082,7 +1346,7 @@ export default function NotificationBuilder({
                 {!formData.dutyDate && (
                   <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
                     <AlertCircle className="h-3 w-3" />
-                    Dátum úlohy je povinný pre vytvorenie notifikácie
+                    {tr.dutyDateRequired}
                   </p>
                 )}
               </div>
@@ -1092,24 +1356,24 @@ export default function NotificationBuilder({
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-pictus-lime text-sm">
                     <Bell className="w-4 h-4 inline mr-1" />
-                    Intervaly pripomienok
+                    {tr.reminderIntervals}
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowIntervalsModal(true)}
                     className="text-xs text-pictus-lime hover:text-pictus-lime400 transition-colors"
                   >
-                    ✏️ Upraviť intervaly
+                    {tr.editIntervals}
                   </button>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                   <p className="text-gray-400 text-base mb-3">
-                    Vytvorí sa {reminderIntervals.length}{' '}
+                    {tr.willCreate} {reminderIntervals.length}{' '}
                     {reminderIntervals.length === 1
-                      ? 'notifikácia'
+                      ? tr.notificationSingular
                       : reminderIntervals.length < 5
-                        ? 'notifikácie'
-                        : 'notifikácií'}
+                        ? tr.notificationFew
+                        : tr.notificationMany}
                     :
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -1123,10 +1387,10 @@ export default function NotificationBuilder({
                               className="px-3 py-2 bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg text-pictus-lime text-sm"
                             >
                               {interval === 0
-                                ? 'V deň úlohy'
+                                ? tr.onDutyDay
                                 : interval > 0
-                                  ? `+${interval} dní`
-                                  : `${interval} dní`}
+                                  ? tr.daysAfter.replace('__days__', String(interval))
+                                  : tr.daysBefore2.replace('__days__', String(interval))}
                             </div>
                           )
                         }
@@ -1164,11 +1428,11 @@ export default function NotificationBuilder({
                               className={`text-xs ${isPast ? 'text-red-400/70' : 'text-pictus-lime/70'}`}
                             >
                               {interval === 0
-                                ? 'V deň úlohy'
+                                ? tr.onDutyDay
                                 : interval > 0
-                                  ? `+${interval} dní`
-                                  : `${interval} dní`}
-                              {isPast && ' (minulosť)'}
+                                  ? tr.daysAfter.replace('__days__', String(interval))
+                                  : tr.daysBefore2.replace('__days__', String(interval))}
+                              {isPast && ` ${tr.pastDate}`}
                             </div>
                           </div>
                         )
@@ -1176,8 +1440,8 @@ export default function NotificationBuilder({
                   </div>
                   <p className="text-gray-400 text-base mt-3">
                     {reminderIntervals.length === 1
-                      ? 'Pre jednorázovú notifikáciu nastavte len jeden interval.'
-                      : 'Upravte intervaly alebo pridajte vlastné dni pred/po dátume úlohy.'}
+                      ? tr.singleIntervalHint
+                      : tr.editIntervalsHint}
                   </p>
                 </div>
               </div>
@@ -1188,13 +1452,13 @@ export default function NotificationBuilder({
               <div className="md:col-span-2">
                 <label className="block text-pictus-lime text-sm mb-2">
                   <User className="w-4 h-4 inline mr-1" />
-                  Vybrať používateľa (voliteľné - vyplní meno, email a telefón)
+                  {tr.selectUserOptional}
                 </label>
                 <select
                   onChange={(e) => handleUserSelect(e.target.value)}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                 >
-                  <option value="">Vyberte používateľa alebo zadajte manuálne...</option>
+                  <option value="">{tr.selectUserPlaceholder}</option>
                   {users.map((user) => (
                     <option key={user.id} value={user.id}>
                       {`${user.firstName || ''} ${user.lastName || ''}`.trim()} - {user.email}
@@ -1207,14 +1471,14 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <User className="w-4 h-4 inline mr-1" />
-                  Meno osoby (alebo vyberte používateľa)
+                  {tr.personNameLabel}
                 </label>
                 <input
                   type="text"
                   value={formData.personName}
                   onChange={(e) => setFormData({ ...formData, personName: e.target.value })}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-                  placeholder="Zadajte meno manuálne..."
+                  placeholder={tr.personNamePlaceholder}
                 />
               </div>
 
@@ -1222,14 +1486,14 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Mail className="w-4 h-4 inline mr-1" />
-                  Email
+                  {tr.emailLabel}
                   {(() => {
                     const channel = formData.notificationChannel.toLowerCase()
                     const isRequired = channel.includes('email')
                     return isRequired ? (
                       <span className="text-red-400 ml-1">*</span>
                     ) : (
-                      ' (alebo vyberte používateľa)'
+                      ` ${tr.orSelectUser}`
                     )
                   })()}
                 </label>
@@ -1238,7 +1502,7 @@ export default function NotificationBuilder({
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-                  placeholder="Zadajte email manuálne..."
+                  placeholder={tr.emailPlaceholder}
                 />
                 {(() => {
                   const channel = formData.notificationChannel.toLowerCase()
@@ -1246,7 +1510,7 @@ export default function NotificationBuilder({
                   if (isRequired && (!formData.email || formData.email.trim() === '')) {
                     return (
                       <p className="text-red-400 text-xs mt-1">
-                        ⚠️ Email je povinný pre zvolený kanál
+                        {tr.emailRequired}
                       </p>
                     )
                   }
@@ -1258,14 +1522,14 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Phone className="w-4 h-4 inline mr-1" />
-                  Telefónne číslo
+                  {tr.phoneLabel}
                   {(() => {
                     const channel = formData.notificationChannel.toLowerCase()
                     const isRequired = channel.includes('sms')
                     return isRequired ? (
                       <span className="text-red-400 ml-1">*</span>
                     ) : (
-                      ' (alebo vyberte používateľa)'
+                      ` ${tr.orSelectUser}`
                     )
                   })()}
                 </label>
@@ -1274,7 +1538,7 @@ export default function NotificationBuilder({
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-                  placeholder="Zadajte telefón manuálne..."
+                  placeholder={tr.phonePlaceholder}
                 />
                 {(() => {
                   const channel = formData.notificationChannel.toLowerCase()
@@ -1282,7 +1546,7 @@ export default function NotificationBuilder({
                   if (isRequired && (!formData.phoneNumber || formData.phoneNumber.trim() === '')) {
                     return (
                       <p className="text-red-400 text-xs mt-1">
-                        ⚠️ Telefónne číslo je povinné pre zvolený kanál
+                        {tr.phoneRequired}
                       </p>
                     )
                   }
@@ -1294,16 +1558,16 @@ export default function NotificationBuilder({
               <div>
                 <label className="block text-pictus-lime text-sm mb-2">
                   <Building className="w-4 h-4 inline mr-1" />
-                  Organizácia
+                  {tr.organizationLabel}
                 </label>
                 <input
                   type="text"
                   value={organization}
                   disabled
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 cursor-not-allowed"
-                  placeholder="Organizácia..."
+                  placeholder={tr.organizationPlaceholder}
                 />
-                <p className="text-gray-500 text-xs mt-1">Vybrané v kroku 0</p>
+                <p className="text-gray-500 text-xs mt-1">{tr.selectedInStep0}</p>
               </div>
             </div>
 
@@ -1311,15 +1575,15 @@ export default function NotificationBuilder({
             <div className="mt-4">
               <label className="block text-pictus-lime text-sm mb-2">
                 <Mail className="w-4 h-4 inline mr-1" />
-                Správa{' '}
-                <span>... už obsahuje ŠPZ, úlohu a dátum. Zadajte oslovenie alebo pozdrav.</span>
+                {tr.messageLabel}{' '}
+                <span>{tr.messageHint}</span>
               </label>
               <textarea
                 value={formData.emailMessage}
                 onChange={(e) => setFormData({ ...formData, emailMessage: e.target.value })}
                 rows={4}
                 className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-                placeholder="Správa už obsahuje ŠPZ, úlohu a dátum."
+                placeholder={tr.messageContainsInfo}
               />
             </div>
 
@@ -1328,10 +1592,10 @@ export default function NotificationBuilder({
               <div className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
                 <p className="text-red-400 font-medium mb-2 flex items-center gap-2">
                   <AlertCircle className="h-5 w-5" />
-                  Vyžadované pole chýba
+                  {tr.requiredFieldMissing}
                 </p>
                 <ul className="text-red-300 text-sm space-y-1 list-disc list-inside">
-                  {!formData.dutyDate && <li>Prosím vyberte dátum úlohy pre pokračovanie</li>}
+                  {!formData.dutyDate && <li>{tr.selectDutyDateToContinue}</li>}
                 </ul>
               </div>
             )}
@@ -1341,15 +1605,15 @@ export default function NotificationBuilder({
                 onClick={() => setStep(1)}
                 className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
               >
-                Späť
+                {tr.back}
               </button>
               <button
                 onClick={() => setStep(3)}
                 disabled={!formData.dutyDate}
                 className="flex-1 px-6 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 disabled:cursor-not-allowed text-pictus-black rounded-lg transition-all"
-                title={!formData.dutyDate ? 'Dátum úlohy je povinný' : ''}
+                title={!formData.dutyDate ? tr.validationDutyDateRequired : ''}
               >
-                Pokračovať na kontrolu
+                {tr.continueToReview}
               </button>
             </div>
           </div>
@@ -1360,28 +1624,29 @@ export default function NotificationBuilder({
       {step === 3 && (
         <div className="space-y-4">
           <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
-            <h3 className="text-2xl font-light text-pictus-white mb-4">Skontrolovať notifikáciu</h3>
+            <h3 className="text-2xl font-light text-pictus-white mb-2">{tr.reviewNotification}</h3>
+            <p className="text-white text-sm mb-4">{tr.sendTimeInfo}</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
-                <p className="text-gray-400 text-sm">Vozidlo</p>
+                <p className="text-gray-400 text-sm">{tr.vehicleLabel}</p>
                 <p className="text-white text-lg">
-                  {vehicles.find((v) => v.id === formData.vehicleId)?.registration || 'Nevybrané'}
+                  {vehicles.find((v) => v.id === formData.vehicleId)?.registration || tr.notSelected}
                 </p>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Typ notifikácie</p>
-                <p className="text-white text-lg">{formData.notificationType || 'Nenastavené'}</p>
+                <p className="text-gray-400 text-sm">{tr.notificationTypeLabel}</p>
+                <p className="text-white text-lg">{formData.notificationType || tr.notSet}</p>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Kanál</p>
+                <p className="text-gray-400 text-sm">{tr.channelLabel}</p>
                 <p className="text-white text-lg">
-                  {formData.notificationChannel || 'Nenastavené'}
+                  {formData.notificationChannel || tr.notSet}
                 </p>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Dátum úlohy</p>
-                <p className="text-white text-lg">{formData.dutyDate || 'Nenastavené'}</p>
+                <p className="text-gray-400 text-sm">{tr.dutyDateLabel}</p>
+                <p className="text-white text-lg">{formData.dutyDate || tr.notSet}</p>
               </div>
               <div className="md:col-span-2">
                 <p className="text-gray-400 text-sm">Post-Duty Renewal (PDR)</p>
@@ -1392,32 +1657,32 @@ export default function NotificationBuilder({
                       : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                   }`}
                 >
-                  {enablePdr ? '🔄 Zapnuté' : 'Vypnuté'}
+                  {enablePdr ? tr.pdrEnabled : tr.pdrDisabled}
                 </div>
                 {enablePdr && !enableAggressive && (
                   <p className="text-blue-300 text-sm mt-2">
-                    Bude vytvorená pripomienka deň po termíne úlohy na zadanie nového termínu.
+                    {tr.pdrWillCreate}
                   </p>
                 )}
                 {enablePdr && enableAggressive && (
                   <p className="text-orange-300 text-sm mt-2">
-                    PDR bude odložené — vytvorí sa automaticky po ukončení agresívneho cyklu.
+                    {tr.pdrDeferredReview}
                   </p>
                 )}
               </div>
               {enableAggressive && (
                 <div className="md:col-span-2">
-                  <p className="text-gray-400 text-sm">Aggressive Mode</p>
+                  <p className="text-gray-400 text-sm">{tr.aggressiveModeReview}</p>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-base bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                    ⚠️ Zapnuté (30 dní)
+                    {tr.aggressiveEnabled}
                   </div>
                   <p className="text-orange-300 text-sm mt-2">
-                    Po vyčerpaní pripomienok bude systém odosielať denné pripomienky 30 dní.
+                    {tr.aggressiveReviewDesc}
                   </p>
                 </div>
               )}
               <div className="md:col-span-2">
-                <p className="text-gray-400 text-sm mb-2">Dátumy notifikácií</p>
+                <p className="text-gray-400 text-sm mb-2">{tr.notificationDates}</p>
                 <div className="text-white text-lg">
                   {formData.dutyDate && reminderIntervals.length > 0 ? (
                     <div className="space-y-1">
@@ -1447,37 +1712,37 @@ export default function NotificationBuilder({
                               {isPast && '⚠️ '}
                               {dateStr} (
                               {interval === 0
-                                ? 'v deň úlohy'
+                                ? tr.onDutyDay.toLowerCase()
                                 : interval > 0
-                                  ? `+${interval} dní`
-                                  : `${interval} dní`}
-                              ){isPast && ' - Dátum je v minulosti!'}
+                                  ? tr.daysAfter.replace('__days__', String(interval))
+                                  : tr.daysBefore2.replace('__days__', String(interval))}
+                              ){isPast && ` ${tr.dateInPast}`}
                             </div>
                           )
                         })}
                     </div>
                   ) : (
-                    'Nenastavené'
+                    tr.notSet
                   )}
                 </div>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Kontaktná osoba</p>
-                <p className="text-white text-lg">{formData.personName || 'Nenastavené'}</p>
+                <p className="text-gray-400 text-sm">{tr.contactPerson}</p>
+                <p className="text-white text-lg">{formData.personName || tr.notSet}</p>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Email</p>
-                <p className="text-white text-lg">{formData.email || 'Nenastavené'}</p>
+                <p className="text-gray-400 text-sm">{tr.emailLabel}</p>
+                <p className="text-white text-lg">{formData.email || tr.notSet}</p>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Telefón</p>
-                <p className="text-white text-lg">{formData.phoneNumber || 'Nenastavené'}</p>
+                <p className="text-gray-400 text-sm">{tr.phoneReview}</p>
+                <p className="text-white text-lg">{formData.phoneNumber || tr.notSet}</p>
               </div>
             </div>
 
             {formData.emailMessage && (
               <div className="mb-6">
-                <p className="text-gray-400 text-sm mb-2">Emailová správa</p>
+                <p className="text-gray-400 text-sm mb-2">{tr.emailMessage}</p>
                 <div className="p-4 bg-white/5 rounded-lg">
                   <p className="text-white whitespace-pre-wrap">{formData.emailMessage}</p>
                 </div>
@@ -1492,18 +1757,18 @@ export default function NotificationBuilder({
               // Check channel-specific requirements
               if (channel.includes('email') && channel.includes('sms')) {
                 if (!formData.email || formData.email.trim() === '') {
-                  warnings.push('Email je povinný pre kanál Email/Sms')
+                  warnings.push(tr.validationEmailRequired)
                 }
                 if (!formData.phoneNumber || formData.phoneNumber.trim() === '') {
-                  warnings.push('Telefónne číslo je povinné pre kanál Email/Sms')
+                  warnings.push(tr.validationPhoneRequired)
                 }
               } else if (channel.includes('email')) {
                 if (!formData.email || formData.email.trim() === '') {
-                  warnings.push('Email je povinný pre kanál Email')
+                  warnings.push(tr.validationEmailRequiredEmail)
                 }
               } else if (channel.includes('sms')) {
                 if (!formData.phoneNumber || formData.phoneNumber.trim() === '') {
-                  warnings.push('Telefónne číslo je povinné pre kanál SMS')
+                  warnings.push(tr.validationPhoneRequiredSms)
                 }
               }
 
@@ -1522,7 +1787,7 @@ export default function NotificationBuilder({
 
                 if (pastCount > 0) {
                   warnings.push(
-                    `${pastCount} ${pastCount === 1 ? 'interval vedie' : 'intervaly vedú'} do minulosti`,
+                    `${pastCount} ${tr.validationPastIntervals}`,
                   )
                 }
               }
@@ -1530,7 +1795,7 @@ export default function NotificationBuilder({
               if (warnings.length > 0) {
                 return (
                   <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
-                    <p className="text-red-400 font-medium mb-2">⚠️ Upozornenia:</p>
+                    <p className="text-red-400 font-medium mb-2">{tr.warnings}</p>
                     <ul className="text-red-300 text-sm space-y-1 list-disc list-inside">
                       {warnings.map((warning, idx) => (
                         <li key={idx}>{warning}</li>
@@ -1547,7 +1812,7 @@ export default function NotificationBuilder({
                 onClick={() => setStep(2)}
                 className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
               >
-                Späť
+                {tr.back}
               </button>
               <button
                 onClick={handleSubmit}
@@ -1555,11 +1820,11 @@ export default function NotificationBuilder({
                 className="flex-1 flex items-center justify-center gap-2 px-6 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 disabled:cursor-not-allowed text-pictus-black rounded-lg transition-all"
               >
                 {loading ? (
-                  'Vytváram...'
+                  tr.creating
                 ) : (
                   <>
                     <Save className="w-5 h-5" />
-                    Vytvoriť notifikáciu
+                    {tr.createNotification}
                   </>
                 )}
               </button>
@@ -1573,7 +1838,7 @@ export default function NotificationBuilder({
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-pictus-onyx900 border border-pictus-lime/30 rounded-xl p-6 max-w-md w-full max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between mb-6 shrink-0">
-              <h3 className="text-2xl font-light text-white">Upraviť intervaly</h3>
+              <h3 className="text-2xl font-light text-white">{tr.editIntervalsTitle}</h3>
               <button
                 onClick={() => setShowIntervalsModal(false)}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -1583,7 +1848,7 @@ export default function NotificationBuilder({
             </div>
 
             <p className="text-gray-400 text-sm mb-4 shrink-0">
-              Nastavte dni pred/po dátume úlohy kedy sa majú odoslať notifikácie.
+              {tr.editIntervalsDesc}
             </p>
 
             <div className="space-y-2 overflow-y-auto max-h-[40vh] mb-4 pr-1">
@@ -1601,10 +1866,10 @@ export default function NotificationBuilder({
                     {Array.from({ length: 33 }, (_, i) => -30 + i).map((day) => (
                       <option key={day} value={day}>
                         {day === 0
-                          ? 'V deň úlohy'
+                          ? tr.onDutyDay
                           : day < 0
-                            ? `${Math.abs(day)} ${Math.abs(day) === 1 ? 'deň' : Math.abs(day) < 5 ? 'dni' : 'dní'} pred`
-                            : `${day} ${day === 1 ? 'deň' : day < 5 ? 'dni' : 'dní'} po`}
+                            ? `${Math.abs(day)} ${Math.abs(day) === 1 ? tr.dayBefore : Math.abs(day) < 5 ? tr.daysBefore3 : tr.daysBeforeMany} ${tr.before}`
+                            : `${day} ${day === 1 ? tr.dayAfter : day < 5 ? tr.daysAfter2 : tr.daysAfterMany} ${tr.after}`}
                       </option>
                     ))}
                   </select>
@@ -1630,7 +1895,7 @@ export default function NotificationBuilder({
               className="w-full px-4 py-2 mb-4 shrink-0 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               <Plus className="h-4 w-4" />
-              Pridať interval
+              {tr.addInterval}
             </button>
 
             <div className="flex gap-3 shrink-0 pt-4 border-t border-white/10">
@@ -1639,14 +1904,14 @@ export default function NotificationBuilder({
                 onClick={() => setShowIntervalsModal(false)}
                 className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
               >
-                Zrušiť
+                {tr.cancel}
               </button>
               <button
                 type="button"
                 onClick={() => setShowIntervalsModal(false)}
                 className="flex-1 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
               >
-                Hotovo
+                {tr.done}
               </button>
             </div>
           </div>

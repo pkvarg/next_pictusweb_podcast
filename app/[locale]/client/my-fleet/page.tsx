@@ -24,12 +24,12 @@ import {
   Sparkles,
   RotateCcw,
 } from 'lucide-react'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import ExpensesModal from '@/app/components/client/ExpensesModal'
 import MileageModal from '@/app/components/client/MileageModal'
 import FleetManagerUserModal from '@/app/components/client/FleetManagerUserModal'
-import NotificationBuilder from '@/app/components/admin/NotificationBuilder'
+import NotificationBuilder, { type NotificationBuilderTranslations } from '@/app/components/admin/NotificationBuilder'
 import NotificationSettings from '@/app/components/admin/NotificationSettings'
 import RenewalsContent from '@/app/components/client/RenewalsContent'
 import { FaEuroSign } from 'react-icons/fa'
@@ -126,6 +126,9 @@ interface VehicleNotification {
   id: number
   dutyBatchId: string | null
   isPdr?: boolean
+  isAggressiveMode?: boolean
+  aggressiveStart?: string | null
+  aggressiveDaysSent?: number
   organizationId: string | null
   organization?: {
     id: string
@@ -169,6 +172,130 @@ const MyFleetPage = () => {
   const t = useTranslations('Client')
   const params = useParams()
   const locale = (params?.locale as string) || 'sk'
+
+  const nbTranslations: NotificationBuilderTranslations = useMemo(() => ({
+    createTitle: t('nbCreateTitle'),
+    duplicateTitle: t('nbDuplicateTitle'),
+    step0Label: t('nbStep0Label'),
+    step1Label: t('nbStep1Label'),
+    step2Label: t('nbStep2Label'),
+    step3Label: t('nbStep3Label'),
+    stepOf: t('nbStepOf'),
+    selectOrg: t('nbSelectOrg'),
+    selectOrgDesc: t('nbSelectOrgDesc'),
+    selectOrgPlaceholder: t('nbSelectOrgPlaceholder'),
+    selectOrgRequired: t('nbSelectOrgRequired'),
+    continue: t('nbContinue'),
+    selectTemplate: t('nbSelectTemplate'),
+    customNotification: t('nbCustomNotification'),
+    customNotificationDesc: t('nbCustomNotificationDesc'),
+    daysBefore: t('nbDaysBefore'),
+    backToOrgSelection: t('nbBackToOrgSelection'),
+    notificationDetails: t('nbNotificationDetails'),
+    vehicleLabel: t('nbVehicleLabel'),
+    selectVehicle: t('nbSelectVehicle'),
+    notificationTypeLabel: t('nbNotificationTypeLabel'),
+    selectType: t('nbSelectType'),
+    customTypeOption: t('nbCustomTypeOption'),
+    usingDefaultOptions: t('nbUsingDefaultOptions'),
+    customTypesBusinessOnly: t('nbCustomTypesBusinessOnly'),
+    customTypePlaceholder: t('nbCustomTypePlaceholder'),
+    backToDropdown: t('nbBackToDropdown'),
+    channelLabel: t('nbChannelLabel'),
+    selectChannel: t('nbSelectChannel'),
+    pdrLabel: t('nbPdrLabel'),
+    pdrDesc: t('nbPdrDesc'),
+    aggressiveLabel: t('nbAggressiveLabel'),
+    aggressiveDesc: t('nbAggressiveDesc'),
+    aggressivePdrDeferred: t('nbAggressivePdrDeferred'),
+    dutyDateLabel: t('nbDutyDateLabel'),
+    dutyDateRequired: t('nbDutyDateRequired'),
+    reminderIntervals: t('nbReminderIntervals'),
+    editIntervals: t('nbEditIntervals'),
+    willCreate: t('nbWillCreate'),
+    notificationSingular: t('nbNotificationSingular'),
+    notificationFew: t('nbNotificationFew'),
+    notificationMany: t('nbNotificationMany'),
+    onDutyDay: t('nbOnDutyDay'),
+    daysAfter: t('nbDaysAfter'),
+    daysBefore2: t('nbDaysBefore2'),
+    pastDate: t('nbPastDate'),
+    singleIntervalHint: t('nbSingleIntervalHint'),
+    editIntervalsHint: t('nbEditIntervalsHint'),
+    selectUserOptional: t('nbSelectUserOptional'),
+    selectUserPlaceholder: t('nbSelectUserPlaceholder'),
+    personNameLabel: t('nbPersonNameLabel'),
+    personNamePlaceholder: t('nbPersonNamePlaceholder'),
+    emailLabel: t('nbEmailLabel'),
+    orSelectUser: t('nbOrSelectUser'),
+    emailPlaceholder: t('nbEmailPlaceholder'),
+    emailRequired: t('nbEmailRequired'),
+    phoneLabel: t('nbPhoneLabel'),
+    phonePlaceholder: t('nbPhonePlaceholder'),
+    phoneRequired: t('nbPhoneRequired'),
+    organizationLabel: t('nbOrganizationLabel'),
+    organizationPlaceholder: t('nbOrganizationPlaceholder'),
+    selectedInStep0: t('nbSelectedInStep0'),
+    messageLabel: t('nbMessageLabel'),
+    messageHint: t('nbMessageHint'),
+    messageContainsInfo: t('nbMessageContainsInfo'),
+    requiredFieldMissing: t('nbRequiredFieldMissing'),
+    selectDutyDateToContinue: t('nbSelectDutyDateToContinue'),
+    back: t('nbBack'),
+    continueToReview: t('nbContinueToReview'),
+    reviewNotification: t('nbReviewNotification'),
+    sendTimeInfo: t('nbSendTimeInfo'),
+    notSelected: t('nbNotSelected'),
+    notSet: t('nbNotSet'),
+    pdrEnabled: t('nbPdrEnabled'),
+    pdrDisabled: t('nbPdrDisabled'),
+    pdrWillCreate: t('nbPdrWillCreate'),
+    pdrDeferredReview: t('nbPdrDeferredReview'),
+    aggressiveModeReview: t('nbAggressiveModeReview'),
+    aggressiveEnabled: t('nbAggressiveEnabled'),
+    aggressiveReviewDesc: t('nbAggressiveReviewDesc'),
+    notificationDates: t('nbNotificationDates'),
+    dateInPast: t('nbDateInPast'),
+    contactPerson: t('nbContactPerson'),
+    phoneReview: t('nbPhoneReview'),
+    emailMessage: t('nbEmailMessage'),
+    warnings: t('nbWarnings'),
+    creating: t('nbCreating'),
+    createNotification: t('nbCreateNotification'),
+    editIntervalsTitle: t('nbEditIntervalsTitle'),
+    editIntervalsDesc: t('nbEditIntervalsDesc'),
+    addInterval: t('nbAddInterval'),
+    cancel: t('nbCancel'),
+    done: t('nbDone'),
+    dayBefore: t('nbDayBefore'),
+    daysBefore3: t('nbDaysBefore3'),
+    daysBeforeMany: t('nbDaysBeforeMany'),
+    dayAfter: t('nbDayAfter'),
+    daysAfter2: t('nbDaysAfter2'),
+    daysAfterMany: t('nbDaysAfterMany'),
+    before: t('nbBefore'),
+    after: t('nbAfter'),
+    validationTypeRequired: t('nbValidationTypeRequired'),
+    validationChannelRequired: t('nbValidationChannelRequired'),
+    validationDutyDateRequired: t('nbValidationDutyDateRequired'),
+    validationIntervalsRequired: t('nbValidationIntervalsRequired'),
+    validationAllPast: t('nbValidationAllPast'),
+    validationNoNotifications: t('nbValidationNoNotifications'),
+    validationEmailRequired: t('nbValidationEmailRequired'),
+    validationPhoneRequired: t('nbValidationPhoneRequired'),
+    validationEmailRequiredEmail: t('nbValidationEmailRequiredEmail'),
+    validationPhoneRequiredSms: t('nbValidationPhoneRequiredSms'),
+    validationErrors: t('nbValidationErrors'),
+    successSingle: t('nbSuccessSingle'),
+    successMultiple: t('nbSuccessMultiple'),
+    pdrCreated: t('nbPdrCreated'),
+    aggressiveEnabled2: t('nbAggressiveEnabled2'),
+    aggressivePdrDeferred2: t('nbAggressivePdrDeferred2'),
+    intervalsPastSkipped: t('nbIntervalsPastSkipped'),
+    someFailed: t('nbSomeFailed'),
+    createError: t('nbCreateError'),
+    validationPastIntervals: t('nbValidationPastIntervals'),
+  }), [t])
 
   // Check for tab query parameter
   useEffect(() => {
@@ -1300,6 +1427,9 @@ const MyFleetPage = () => {
                     <p className="text-gray-400 mt-1">
                       {t('notificationsOrg', { name: organization?.name || t('organizationLoading'), filtered: filteredNotifications.length, total: notifications.length, used: organization?.currentNotificationsCount ?? 0, limit: organization?.notificationsLimit ?? organization?.tierRelation?.notificationsLimit ?? '—' })}
                     </p>
+                    <p className="text-white text-sm mt-1">
+                      {t('notificationsSendTime')}
+                    </p>
                   </div>
                   <button
                     onClick={() => {
@@ -1565,7 +1695,8 @@ const MyFleetPage = () => {
                         </div>
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <span className="text-xs text-gray-400">{notification.notificationType || '-'}</span>
-                          {notification.isPdr && <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">PDR</span>}
+                          {notification.isPdr && <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">{t('pdrBadge')}</span>}
+                          {notification.isAggressiveMode && <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">⚠️ {notification.aggressiveStart ? t('aggressiveBadgeDay', { day: notification.aggressiveDaysSent || 0 }) : t('aggressiveBadge')}</span>}
                           <span className="text-xs text-gray-500">{notification.notificationChannel || '-'}</span>
                           <span className={`inline-flex px-2 py-0.5 text-xs rounded-full ${notification.status === 'sent' || notification.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : notification.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : notification.status === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'}`}>
                             {notification.status === 'sent' ? t('statusSent') : notification.status === 'confirmed' ? t('statusConfirmed') : notification.status === 'pending' ? t('statusPending') : notification.status === 'failed' ? t('statusFailed') : notification.status === 'imported' ? t('statusImported') : notification.status.startsWith('reminded') ? t('statusReminded') : notification.status === 'no_response' ? t('statusNoResponse') : notification.status}
@@ -1638,7 +1769,12 @@ const MyFleetPage = () => {
                                 </div>
                                 {notification.isPdr && (
                                   <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
-                                    🔄 PDR
+                                    🔄 {t('pdrBadge')}
+                                  </span>
+                                )}
+                                {notification.isAggressiveMode && (
+                                  <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">
+                                    ⚠️ {notification.aggressiveStart ? t('aggressiveBadgeDay', { day: notification.aggressiveDaysSent || 0 }) : t('aggressiveBadge')}
                                   </span>
                                 )}
                               </div>
@@ -1741,6 +1877,7 @@ const MyFleetPage = () => {
                     organizationTier={organization.tierRelation?.name || null}
                     hideChannelDropdown={true}
                     duplicateData={duplicateNotificationData}
+                    translations={nbTranslations}
                     onSuccess={async () => {
                       // If we're editing, delete the original notification
                       if (editingNotificationId) {
