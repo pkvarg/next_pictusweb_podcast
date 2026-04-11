@@ -15,6 +15,12 @@ interface Organization {
   freeTrialEndDate: string | null
 }
 
+function formatContent(content: string): string {
+  if (!content) return content
+  if (content.includes('<')) return content
+  return '<p>' + content.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>'
+}
+
 function buildPreviewHtml(htmlContent: string, subject: string): string {
   const pictusLime = '#B6E036'
   const pictusWhite = '#F8F8F8'
@@ -350,7 +356,7 @@ export default function ReleaseNotesManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           subject,
-          htmlContent,
+          htmlContent: formatContent(htmlContent),
           organizationIds: Array.from(selectedIds),
         }),
       })
@@ -572,7 +578,7 @@ export default function ReleaseNotesManager() {
             </div>
             <div className="overflow-y-auto max-h-[70vh]">
               <iframe
-                srcDoc={buildPreviewHtml(htmlContent, subject)}
+                srcDoc={buildPreviewHtml(formatContent(htmlContent), subject)}
                 title="Email preview"
                 className="w-full border-0"
                 style={{ minHeight: '600px', height: '70vh' }}
