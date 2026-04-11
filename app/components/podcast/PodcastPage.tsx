@@ -293,7 +293,7 @@ const PodcastPage = ({ podcasts }: PodcastPageProps) => {
                 {/* Podcast Image */}
                 <div className="aspect-video relative overflow-hidden">
                   <div
-                    className="absolute inset-0"
+                    className="absolute inset-0 pointer-events-none"
                     style={{
                       background: 'linear-gradient(135deg, rgba(182,224,54,0.08) 0%, rgba(23,24,22,0.5) 100%)',
                     }}
