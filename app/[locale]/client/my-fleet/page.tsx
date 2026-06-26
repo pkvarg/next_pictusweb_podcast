@@ -224,6 +224,7 @@ const MyFleetPage = () => {
     editIntervalsHint: t('nbEditIntervalsHint'),
     selectUserOptional: t('nbSelectUserOptional'),
     selectUserPlaceholder: t('nbSelectUserPlaceholder'),
+    selectUserPlaceholderClient: t('nbSelectUserPlaceholderClient'),
     personNameLabel: t('nbPersonNameLabel'),
     personNamePlaceholder: t('nbPersonNamePlaceholder'),
     emailLabel: t('nbEmailLabel'),
@@ -321,6 +322,7 @@ const MyFleetPage = () => {
   const [error, setError] = useState('')
   const [expensesModalOpen, setExpensesModalOpen] = useState(false)
   const [mileageModalOpen, setMileageModalOpen] = useState(false)
+  const [notificationModalOpen, setNotificationModalOpen] = useState(false)
   const [selectedVehicle, setSelectedVehicle] = useState<MyVehicle | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>('vehicles')
   const [organization, setOrganization] = useState<Organization | null>(null)
@@ -1192,6 +1194,16 @@ const MyFleetPage = () => {
                               <Gauge size={16} />
                               {t('mileageButton')}
                             </button>
+                            <button
+                              onClick={() => {
+                                setSelectedVehicle(vehicle)
+                                setNotificationModalOpen(true)
+                              }}
+                              className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                            >
+                              <Bell size={16} />
+                              {t('notificationButton')}
+                            </button>
                           </div>
                         </div>
                       )}
@@ -1876,6 +1888,7 @@ const MyFleetPage = () => {
                     organization={organization.name}
                     organizationTier={organization.tierRelation?.name || null}
                     hideChannelDropdown={true}
+                    clientMode={true}
                     duplicateData={duplicateNotificationData}
                     translations={nbTranslations}
                     onSuccess={async () => {
@@ -2172,6 +2185,40 @@ const MyFleetPage = () => {
             vehicleRegistration={selectedVehicle.registration}
             onSuccess={fetchVehicles}
           />
+          {/* Notification Builder Modal (prefilled with this vehicle) */}
+          {notificationModalOpen && organization && (
+            <div
+              className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-4 sm:p-6"
+              onClick={() => {
+                setNotificationModalOpen(false)
+                setSelectedVehicle(null)
+              }}
+            >
+              <div
+                className="relative w-full max-w-3xl my-8 bg-gradient-to-br from-pictus-onyx900 to-pictus-black rounded-2xl border border-pictus-lime/30 shadow-2xl p-4 sm:p-8"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <NotificationBuilder
+                  organization={organization.name}
+                  organizationTier={organization.tierRelation?.name || null}
+                  hideChannelDropdown={true}
+                  clientMode={true}
+                  prefillVehicleId={selectedVehicle.id}
+                  translations={nbTranslations}
+                  onSuccess={() => {
+                    setNotificationModalOpen(false)
+                    setSelectedVehicle(null)
+                    fetchNotifications()
+                    fetchOrganization()
+                  }}
+                  onCancel={() => {
+                    setNotificationModalOpen(false)
+                    setSelectedVehicle(null)
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </>
       )}
 

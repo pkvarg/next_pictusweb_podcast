@@ -121,6 +121,7 @@ export interface NotificationBuilderTranslations {
   editIntervalsHint: string
   selectUserOptional: string
   selectUserPlaceholder: string
+  selectUserPlaceholderClient: string
   personNameLabel: string
   personNamePlaceholder: string
   emailLabel: string
@@ -252,6 +253,7 @@ const defaultTranslations: NotificationBuilderTranslations = {
   editIntervalsHint: 'Upravte intervaly alebo pridajte vlastné dni pred/po dátume úlohy.',
   selectUserOptional: 'Vybrať používateľa (voliteľné - vyplní meno, email a telefón)',
   selectUserPlaceholder: 'Vyberte používateľa alebo zadajte manuálne...',
+  selectUserPlaceholderClient: 'Vyberte používateľa...',
   personNameLabel: 'Meno osoby (alebo vyberte používateľa)',
   personNamePlaceholder: 'Zadajte meno manuálne...',
   emailLabel: 'Email',
@@ -332,6 +334,8 @@ interface NotificationBuilderProps {
   organization?: string
   organizationTier?: string | null
   duplicateData?: any
+  prefillVehicleId?: string
+  clientMode?: boolean
   onSuccess?: () => void
   onCancel?: () => void
   hideChannelDropdown?: boolean
@@ -342,6 +346,8 @@ export default function NotificationBuilder({
   organization: initialOrganization,
   organizationTier,
   duplicateData,
+  prefillVehicleId,
+  clientMode = false,
   onSuccess,
   onCancel,
   hideChannelDropdown = false,
@@ -359,6 +365,7 @@ export default function NotificationBuilder({
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [users, setUsers] = useState<User[]>([])
+  const [selectedUserId, setSelectedUserId] = useState<string>('')
   const [usingDefaultTypeOptions, setUsingDefaultTypeOptions] = useState(false)
   const [usingDefaultChannelOptions, setUsingDefaultChannelOptions] = useState(false)
   const [notificationDaysOffset, setNotificationDaysOffset] = useState<number | ''>('')
@@ -370,7 +377,7 @@ export default function NotificationBuilder({
 
   const [formData, setFormData] = useState({
     templateId: '',
-    vehicleId: '',
+    vehicleId: prefillVehicleId || '',
     notificationType: '',
     notificationChannel: hideChannelDropdown ? (organizationTier === 'FREE' ? 'Email' : 'Email/Sms') : '',
     dutyDate: '',
@@ -593,6 +600,37 @@ export default function NotificationBuilder({
     fetchUsers,
   ])
 
+  // Client mode: auto-select the only vehicle when the fleet has exactly one
+  useEffect(() => {
+    if (!clientMode || duplicateData) return
+    if (vehicles.length === 1) {
+      setFormData((prev) =>
+        prev.vehicleId
+          ? prev
+          : {
+              ...prev,
+              vehicleId: vehicles[0].id,
+              organizationId: vehicles[0].organizationId || prev.organizationId,
+            },
+      )
+    }
+  }, [clientMode, vehicles, duplicateData])
+
+  // Client mode: auto-select the only user when the organization has exactly one
+  useEffect(() => {
+    if (!clientMode || duplicateData) return
+    if (users.length === 1 && !selectedUserId) {
+      const u = users[0]
+      setSelectedUserId(u.id)
+      setFormData((prev) => ({
+        ...prev,
+        personName: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+        email: u.email,
+        phoneNumber: u.phoneNumber || '',
+      }))
+    }
+  }, [clientMode, users, duplicateData, selectedUserId])
+
   useEffect(() => {
     if (duplicateData) {
       // Get organization from duplicateData - prioritize organizationId, fallback to organization relation or company field
@@ -701,6 +739,7 @@ export default function NotificationBuilder({
   }
 
   const handleUserSelect = (userId: string) => {
+    setSelectedUserId(userId)
     const user = users.find((u) => u.id === userId)
     if (user) {
       setFormData({
@@ -708,6 +747,14 @@ export default function NotificationBuilder({
         personName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
         email: user.email,
         phoneNumber: user.phoneNumber || '',
+      })
+    } else {
+      // Cleared selection
+      setFormData({
+        ...formData,
+        personName: '',
+        email: '',
+        phoneNumber: '',
       })
     }
   }
@@ -1455,10 +1502,11 @@ export default function NotificationBuilder({
                   {tr.selectUserOptional}
                 </label>
                 <select
+                  value={selectedUserId}
                   onChange={(e) => handleUserSelect(e.target.value)}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                 >
-                  <option value="">{tr.selectUserPlaceholder}</option>
+                  <option value="">{clientMode ? tr.selectUserPlaceholderClient : tr.selectUserPlaceholder}</option>
                   {users.map((user) => (
                     <option key={user.id} value={user.id}>
                       {`${user.firstName || ''} ${user.lastName || ''}`.trim()} - {user.email}
@@ -1477,7 +1525,10 @@ export default function NotificationBuilder({
                   type="text"
                   value={formData.personName}
                   onChange={(e) => setFormData({ ...formData, personName: e.target.value })}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                  readOnly={clientMode}
+                  className={`w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime ${
+                    clientMode ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
                   placeholder={tr.personNamePlaceholder}
                 />
               </div>
@@ -1501,7 +1552,10 @@ export default function NotificationBuilder({
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                  readOnly={clientMode}
+                  className={`w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime ${
+                    clientMode ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
                   placeholder={tr.emailPlaceholder}
                 />
                 {(() => {
@@ -1537,7 +1591,10 @@ export default function NotificationBuilder({
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                  readOnly={clientMode}
+                  className={`w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime ${
+                    clientMode ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
                   placeholder={tr.phonePlaceholder}
                 />
                 {(() => {
