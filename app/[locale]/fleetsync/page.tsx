@@ -2,8 +2,9 @@ import Footer from '@/app/components/Footer'
 import PagesHeader from '@/app/components/PagesHeader'
 import FleetSyncPricing from '@/app/components/FleetSyncPricing'
 import FleetAnalyticsShowcase from '@/app/components/FleetAnalyticsShowcase'
+import HeroVehicleCard from '@/app/components/HeroVehicleCard'
+import HeroTaskOverview from '@/app/components/HeroTaskOverview'
 import { CheckCircle, Calculator } from 'lucide-react'
-import Image from 'next/image'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import type { Metadata } from 'next'
@@ -137,22 +138,10 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             </div>
           </div>
 
-          {/* Client Dashboard Screenshots */}
+          {/* Client Dashboard Preview - localized HTML recreations */}
           <div className="relative flex flex-col gap-4 lg:mt-16">
-            <Image
-              src="/fleetsync-vehicle-card.webp"
-              alt="FleetSync vehicle card"
-              width={570}
-              height={649}
-              className="rounded-2xl shadow-2xl"
-            />
-            <Image
-              src="/fleetsync-task-overview.webp"
-              alt="FleetSync task overview"
-              width={1152}
-              height={445}
-              className="rounded-2xl shadow-2xl"
-            />
+            <HeroVehicleCard />
+            <HeroTaskOverview />
           </div>
         </div>
       </section>
