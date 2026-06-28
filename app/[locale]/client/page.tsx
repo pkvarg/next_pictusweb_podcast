@@ -21,6 +21,7 @@ import {
 import { useEffect, useRef, useState, useCallback } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
 import FleetOverview from '@/app/components/client/FleetOverview'
+import FleetExpenseAnalytics from '@/app/components/client/FleetExpenseAnalytics'
 import SimpleDutyOverview from '@/app/components/client/SimpleDutyOverview'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
 import ExpiredBanner from '@/app/components/client/ExpiredBanner'
@@ -404,6 +405,21 @@ const ClientZone = () => {
               }
               organizationName={organization.name}
               isFleetManager={session?.user?.isFleetManager || false}
+            />
+          </section>
+        )}
+
+        {/* Fleet Expense Analytics - BUSINESS tier only, and only when expense data exists */}
+        {organization?.name && organization?.tierRelation?.name === 'BUSINESS' && (
+          <section id="expense-analytics" className="mb-16">
+            <FleetExpenseAnalytics
+              organization={
+                organization.name === 'PICTUSACI'
+                  ? 'all'
+                  : organization.name === 'demo'
+                  ? 'demo'
+                  : organization.name
+              }
             />
           </section>
         )}

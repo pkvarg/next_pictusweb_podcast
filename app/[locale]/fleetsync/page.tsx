@@ -1,6 +1,7 @@
 import Footer from '@/app/components/Footer'
 import PagesHeader from '@/app/components/PagesHeader'
 import FleetSyncPricing from '@/app/components/FleetSyncPricing'
+import FleetAnalyticsShowcase from '@/app/components/FleetAnalyticsShowcase'
 import { CheckCircle, Calculator } from 'lucide-react'
 import Image from 'next/image'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
@@ -331,6 +332,25 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
         </div>
       </section> */}
 
+      {/* Analytics Showcase Section - BUSINESS feature preview */}
+      <section className="py-20">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <span className="inline-block mb-5 px-4 py-1.5 rounded-full text-sm font-medium bg-pictus-lime/15 text-pictus-lime border border-pictus-lime/30">
+              {t('analyticsShowcaseBadge')}
+            </span>
+            <h2 className="text-4xl font-light mb-6">
+              {t('analyticsShowcaseTitle')}{' '}
+              <span className="text-pictus-lime">{t('analyticsShowcaseHighlight')}</span>
+            </h2>
+            <p className="text-2xl text-gray-300 max-w-3xl mx-auto font-light">
+              {t('analyticsShowcaseSubtitle')}
+            </p>
+          </div>
+          <FleetAnalyticsShowcase />
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <FleetSyncPricing
         translations={{
@@ -379,6 +399,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
             t('businessFeatures4'),
             // t('businessFeatures5'),
             t('businessFeatures6'),
+            t('businessFeatures11'),
             t('businessFeatures7'),
             t('businessFeatures8'),
             t('businessFeatures9'),
