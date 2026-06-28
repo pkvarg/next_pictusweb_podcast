@@ -325,9 +325,6 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
       <section className="py-20">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-12">
-            <span className="inline-block mb-5 px-4 py-1.5 rounded-full text-sm font-medium bg-pictus-lime/15 text-pictus-lime border border-pictus-lime/30">
-              {t('analyticsShowcaseBadge')}
-            </span>
             <h2 className="text-4xl font-light mb-6">
               {t('analyticsShowcaseTitle')}{' '}
               <span className="text-pictus-lime">{t('analyticsShowcaseHighlight')}</span>
