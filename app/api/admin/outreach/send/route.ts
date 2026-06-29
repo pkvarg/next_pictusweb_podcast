@@ -8,8 +8,9 @@ const MAX_RECIPIENTS = 200
 export async function POST(request: NextRequest) {
   try {
     // Admin-only: this endpoint can email arbitrary recipients.
+    // Note: the session callback lowercases role, so it's 'admin' (not 'ADMIN').
     const session = await getServerSession(authOptions)
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || (session.user as any).role?.toLowerCase() !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
