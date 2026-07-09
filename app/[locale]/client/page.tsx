@@ -94,7 +94,10 @@ const ClientZone = () => {
   const [editingVehicles, setEditingVehicles] = useState(false)
   const [newVehicleCount, setNewVehicleCount] = useState(1)
   const [vehicleUpdateLoading, setVehicleUpdateLoading] = useState(false)
-  const [vehicleUpdateMsg, setVehicleUpdateMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [vehicleUpdateMsg, setVehicleUpdateMsg] = useState<{
+    type: 'success' | 'error'
+    text: string
+  } | null>(null)
 
   // Guard: organization deleted
   const isOrgDeleted = (session?.user as any)?.organizationDeleted === true
@@ -248,9 +251,7 @@ const ClientZone = () => {
             <X className="w-10 h-10 text-red-400" />
           </div>
           <h1 className="text-3xl font-light mb-4 text-red-400">{t('accessDenied')}</h1>
-          <p className="text-lg text-gray-300 mb-6">
-            {t('orgDeactivated')}
-          </p>
+          <p className="text-lg text-gray-300 mb-6">{t('orgDeactivated')}</p>
           <p className="text-sm text-gray-500 mb-8">
             {t('orgDeactivatedHint')}{' '}
             <a href="mailto:info@pictusweb.sk" className="text-pictus-lime hover:underline">
@@ -296,15 +297,16 @@ const ClientZone = () => {
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4">
-              {organization?.tierRelation?.name && organization.tierRelation.name !== 'BUSINESS' && (
-                <Link
-                  href="/client/upgrade"
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium shrink-0"
-                >
-                  <ArrowUp size={14} />
-                  <span className="hidden sm:inline">{t('upgrade')}</span>
-                </Link>
-              )}
+              {organization?.tierRelation?.name &&
+                organization.tierRelation.name !== 'BUSINESS' && (
+                  <Link
+                    href="/client/upgrade"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium shrink-0"
+                  >
+                    <ArrowUp size={14} />
+                    <span className="hidden sm:inline">{t('upgrade')}</span>
+                  </Link>
+                )}
               <div className="flex items-center gap-0.5 shrink-0">
                 {(['sk', 'en', 'hu'] as const).map((loc) => (
                   <button
@@ -338,13 +340,13 @@ const ClientZone = () => {
 
       {/* Expired free trial banner */}
       {organization?.freeTrialEndDate &&
-       new Date(organization.freeTrialEndDate) < new Date() &&
-       !organization.stripeSubscriptionStatus && (
-        <ExpiredBanner
-          tierName={organization.tierRelation?.name || 'BASIC'}
-          endDate={organization.freeTrialEndDate}
-        />
-      )}
+        new Date(organization.freeTrialEndDate) < new Date() &&
+        !organization.stripeSubscriptionStatus && (
+          <ExpiredBanner
+            tierName={organization.tierRelation?.name || 'BASIC'}
+            endDate={organization.freeTrialEndDate}
+          />
+        )}
 
       {/* Upgrade success banner */}
       {showUpgradeBanner && organization?.billingInterval && (
@@ -369,11 +371,15 @@ const ClientZone = () => {
             <h1 className="text-3xl sm:text-5xl font-light text-pictus-white mb-4 sm:mb-6 leading-tight">
               {t('welcomeTitle')}
             </h1>
-            <p className="text-xl sm:text-3xl text-pictus-lime mb-2 sm:mb-3">{session?.user?.name}</p>
+            <p className="text-xl sm:text-3xl text-pictus-lime mb-2 sm:mb-3">
+              {session?.user?.name}
+            </p>
             {organization?.tierRelation?.name && (
               <p className="text-sm text-gray-400 mb-3 sm:mb-4">{organization.tierRelation.name}</p>
             )}
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-light leading-tight text-center mb-6 sm:mb-8">FleetSync</h2>
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-light leading-tight text-center mb-6 sm:mb-8">
+              FleetSync
+            </h2>
           </div>
         </section>
 
@@ -385,7 +391,7 @@ const ClientZone = () => {
             </div>
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
               <iframe
-                src="https://metabase-u840kgwk0scgkwk8gks0sgs4.pictusweb.com/public/dashboard/56b38c4b-0a20-4810-b4b9-3194b7552fc3"
+                src={process.env.NEXT_PUBLIC_METABASE_DASHBOARD_URL}
                 className="w-full h-svh rounded-2xl border border-purple-500/30 bg-white/10 backdrop-blur-sm overflow-hidden"
               ></iframe>
             </div>
@@ -400,8 +406,8 @@ const ClientZone = () => {
                 organization.name === 'PICTUSACI'
                   ? 'all'
                   : organization.name === 'demo'
-                  ? 'demo'
-                  : organization.name
+                    ? 'demo'
+                    : organization.name
               }
               organizationName={organization.name}
               isFleetManager={session?.user?.isFleetManager || false}
@@ -417,8 +423,8 @@ const ClientZone = () => {
                 organization.name === 'PICTUSACI'
                   ? 'all'
                   : organization.name === 'demo'
-                  ? 'demo'
-                  : organization.name
+                    ? 'demo'
+                    : organization.name
               }
             />
           </section>
@@ -433,8 +439,8 @@ const ClientZone = () => {
                   organization.name === 'PICTUSACI'
                     ? 'all'
                     : organization.name === 'demo'
-                    ? 'demo'
-                    : organization.name
+                      ? 'demo'
+                      : organization.name
                 }
                 organizationName={organization.name}
               />
@@ -471,7 +477,9 @@ const ClientZone = () => {
           <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-xl p-6 backdrop-blur-sm border border-pictus-lime/30">
             <div className="flex items-center gap-3 mb-6">
               <User className="w-6 h-6 text-pictus-lime" />
-              <h2 className="text-2xl sm:text-3xl font-light text-pictus-white">{t('accountInfo')}</h2>
+              <h2 className="text-2xl sm:text-3xl font-light text-pictus-white">
+                {t('accountInfo')}
+              </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               {/* User Profile */}
@@ -486,7 +494,9 @@ const ClientZone = () => {
                     <p className="text-pictus-white text-base">{session?.user?.name}</p>
                   </div>
                   <div>
-                    <label className="text-pictus-white text-sm font-light">{t('emailLabel')}</label>
+                    <label className="text-pictus-white text-sm font-light">
+                      {t('emailLabel')}
+                    </label>
                     <p className="text-pictus-white text-base">{session?.user?.email}</p>
                   </div>
                 </div>
@@ -632,77 +642,112 @@ const ClientZone = () => {
             </div>
 
             {/* Subscription & Vehicles */}
-            {organization && organization.tierRelation?.name !== 'FREE' && organization.billingInterval && (
-              <div className="md:col-span-2 border-t border-pictus-lime/10 pt-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Car className="w-5 h-5 text-pictus-lime" />
-                  <h3 className="text-xl font-normal text-pictus-white">{t('subscriptionInfo')}</h3>
+            {organization &&
+              organization.tierRelation?.name !== 'FREE' &&
+              organization.billingInterval && (
+                <div className="md:col-span-2 border-t border-pictus-lime/10 pt-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Car className="w-5 h-5 text-pictus-lime" />
+                    <h3 className="text-xl font-normal text-pictus-white">
+                      {t('subscriptionInfo')}
+                    </h3>
+                  </div>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-pictus-white text-sm font-light">
+                        {t('currentPlan')}
+                      </label>
+                      <p className="text-pictus-white text-base">
+                        {organization.tierRelation?.name} —{' '}
+                        {organization.billingInterval === 'yearly' ? t('yearly') : t('monthly')}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-pictus-white text-sm font-light">
+                        {t('vehicleCountLabel')}
+                      </label>
+                      {organization.billingInterval === 'yearly' ? (
+                        <div>
+                          <p className="text-pictus-white text-base">
+                            {organization.purchasedVehicles || 1}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">{t('vehicleContactSupport')}</p>
+                        </div>
+                      ) : editingVehicles ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <input
+                            type="number"
+                            min={1}
+                            max={
+                              organization.tierRelation?.name === 'BASIC'
+                                ? 3
+                                : (organization.purchasedVehicles || 1) * 2
+                            }
+                            value={newVehicleCount}
+                            onChange={(e) =>
+                              setNewVehicleCount(Math.max(1, parseInt(e.target.value) || 1))
+                            }
+                            className="w-20 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
+                          />
+                          <button
+                            onClick={handleVehicleUpdate}
+                            disabled={
+                              vehicleUpdateLoading ||
+                              newVehicleCount === organization.purchasedVehicles
+                            }
+                            className="px-3 py-1.5 bg-pictus-lime text-pictus-black rounded-lg text-sm font-medium disabled:opacity-50"
+                          >
+                            {vehicleUpdateLoading ? '...' : t('save')}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingVehicles(false)
+                              setVehicleUpdateMsg(null)
+                            }}
+                            className="px-3 py-1.5 bg-white/10 text-white rounded-lg text-sm"
+                          >
+                            {t('cancel')}
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <p className="text-pictus-white text-base">
+                            {organization.purchasedVehicles || 1}
+                          </p>
+                          <button
+                            onClick={() => {
+                              setNewVehicleCount(organization.purchasedVehicles || 1)
+                              setEditingVehicles(true)
+                              setVehicleUpdateMsg(null)
+                            }}
+                            className="text-pictus-lime text-sm hover:underline"
+                          >
+                            {t('changeVehicles')}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label className="text-pictus-white text-sm font-light">
+                        {t('nextCycleNote')}
+                      </label>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {organization.billingInterval === 'yearly'
+                          ? t('yearlyContactSupport')
+                          : t('vehicleNextCycleHint')}
+                      </p>
+                    </div>
+                  </div>
+                  {vehicleUpdateMsg && (
+                    <div
+                      className={`mt-3 px-4 py-2 rounded-lg text-sm flex items-center gap-2 ${vehicleUpdateMsg.type === 'success' ? 'bg-green-500/20 border border-green-500/30 text-green-200' : 'bg-red-500/20 border border-red-500/30 text-red-200'}`}
+                    >
+                      {vehicleUpdateMsg.type === 'success' ? <Check size={16} /> : <X size={16} />}
+                      {vehicleUpdateMsg.text}
+                    </div>
+                  )}
                 </div>
-                <div className="grid sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="text-pictus-white text-sm font-light">{t('currentPlan')}</label>
-                    <p className="text-pictus-white text-base">{organization.tierRelation?.name} — {organization.billingInterval === 'yearly' ? t('yearly') : t('monthly')}</p>
-                  </div>
-                  <div>
-                    <label className="text-pictus-white text-sm font-light">{t('vehicleCountLabel')}</label>
-                    {organization.billingInterval === 'yearly' ? (
-                      <div>
-                        <p className="text-pictus-white text-base">{organization.purchasedVehicles || 1}</p>
-                        <p className="text-xs text-gray-500 mt-1">{t('vehicleContactSupport')}</p>
-                      </div>
-                    ) : editingVehicles ? (
-                      <div className="flex items-center gap-2 mt-1">
-                        <input
-                          type="number"
-                          min={1}
-                          max={organization.tierRelation?.name === 'BASIC' ? 3 : (organization.purchasedVehicles || 1) * 2}
-                          value={newVehicleCount}
-                          onChange={(e) => setNewVehicleCount(Math.max(1, parseInt(e.target.value) || 1))}
-                          className="w-20 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
-                        />
-                        <button
-                          onClick={handleVehicleUpdate}
-                          disabled={vehicleUpdateLoading || newVehicleCount === organization.purchasedVehicles}
-                          className="px-3 py-1.5 bg-pictus-lime text-pictus-black rounded-lg text-sm font-medium disabled:opacity-50"
-                        >
-                          {vehicleUpdateLoading ? '...' : t('save')}
-                        </button>
-                        <button
-                          onClick={() => { setEditingVehicles(false); setVehicleUpdateMsg(null) }}
-                          className="px-3 py-1.5 bg-white/10 text-white rounded-lg text-sm"
-                        >
-                          {t('cancel')}
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <p className="text-pictus-white text-base">{organization.purchasedVehicles || 1}</p>
-                        <button
-                          onClick={() => { setNewVehicleCount(organization.purchasedVehicles || 1); setEditingVehicles(true); setVehicleUpdateMsg(null) }}
-                          className="text-pictus-lime text-sm hover:underline"
-                        >
-                          {t('changeVehicles')}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="text-pictus-white text-sm font-light">{t('nextCycleNote')}</label>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {organization.billingInterval === 'yearly'
-                        ? t('yearlyContactSupport')
-                        : t('vehicleNextCycleHint')}
-                    </p>
-                  </div>
-                </div>
-                {vehicleUpdateMsg && (
-                  <div className={`mt-3 px-4 py-2 rounded-lg text-sm flex items-center gap-2 ${vehicleUpdateMsg.type === 'success' ? 'bg-green-500/20 border border-green-500/30 text-green-200' : 'bg-red-500/20 border border-red-500/30 text-red-200'}`}>
-                    {vehicleUpdateMsg.type === 'success' ? <Check size={16} /> : <X size={16} />}
-                    {vehicleUpdateMsg.text}
-                  </div>
-                )}
-              </div>
-            )}
+              )}
 
             {/* Contact Verification */}
             <div className="md:col-span-2 border-t border-pictus-lime/10 pt-6">
