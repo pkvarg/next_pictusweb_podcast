@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { LogIn, ShieldCheck } from 'lucide-react'
-import PagesHeader from '@/app/components/PagesHeader'
-import Footer from '@/app/components/Footer'
+import PictusPagesHeader from '@/app/components/home/pictus/PictusPagesHeader'
+import PictusFooter from '@/app/components/home/pictus/PictusFooter'
 import { Link } from '@/i18n/routing'
 
 type Step = 'credentials' | '2fa'
@@ -38,7 +38,6 @@ export default function LoginPage() {
     }
   }, [session, locale, checking2FA])
 
-  // Read device token from cookie via API and check trust
   async function checkDeviceTrust(userId: string): Promise<boolean> {
     try {
       const cookieRes = await fetch('/api/auth/trust-device/read')
@@ -76,30 +75,25 @@ export default function LoginPage() {
       }
 
       if (result?.ok) {
-        // Block the session useEffect from auto-redirecting while we check 2FA
         setChecking2FA(true)
 
-        // Get session to find userId and role
         await new Promise((r) => setTimeout(r, 400))
         const sessionRes = await fetch('/api/auth/session')
         const sessionData = await sessionRes.json()
         const userId = sessionData?.user?.id || ''
         const role = sessionData?.user?.role || 'client'
 
-        // Dev mode: skip 2FA entirely when NEXT_PUBLIC_SKIP_VERIFICATION=true
         if (process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true') {
           window.location.href = `/${locale}/${role === 'admin' ? 'admin' : 'client'}`
           return
         }
 
-        // Check if this device is trusted → skip 2FA
         const trusted = await checkDeviceTrust(userId)
         if (trusted) {
           window.location.href = `/${locale}/${role === 'admin' ? 'admin' : 'client'}`
           return
         }
 
-        // Not trusted → send 2FA code and show step 2
         setPendingUserId(userId)
         setPendingRole(role)
 
@@ -149,7 +143,6 @@ export default function LoginPage() {
         return
       }
 
-      // If trusting device, save the device token as HttpOnly cookie
       if (trustDevice && data.deviceToken) {
         await fetch('/api/auth/trust-device', {
           method: 'POST',
@@ -168,8 +161,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (resendCooldown <= 0) return
-    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setResendCooldown((c) => c - 1), 1000)
+    return () => clearTimeout(timer)
   }, [resendCooldown])
 
   const handleResend2FA = async () => {
@@ -197,77 +190,61 @@ export default function LoginPage() {
     }
   }
 
-  const inputClass =
-    'w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all'
-
   return (
-    <section className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black font-brutal-milk">
-      <PagesHeader />
-      <div className="flex items-center justify-center px-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <p className="text-pictus-white mt-2">{t('loginSubtitle')}</p>
-          </div>
+    <div className="pl" data-locale={locale}>
+      <PictusPagesHeader />
+      <main className="section-shell auth-shell">
+        <div className="auth-col">
+          {step === 'credentials' && (
+            <div className="auth-head">
+              <h1>{t('signIn')}</h1>
+              <p>{t('loginSubtitle')}</p>
+            </div>
+          )}
 
-          <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 backdrop-blur-xl rounded-2xl p-8 border border-pictus-lime/30">
-
-            {/* ── Step 1: Credentials ── */}
+          <div className="auth-card">
+            {/* Step 1: Credentials */}
             {step === 'credentials' && (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="username" className="block text-lg font-light text-pictus-white mb-2">
-                    {t('username')}
-                  </label>
+              <form onSubmit={handleSubmit} className="auth-form">
+                <div className="auth-field">
+                  <label htmlFor="username">{t('username')}</label>
                   <input
                     id="username"
                     type="text"
+                    className="auth-input"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    className={inputClass}
                     placeholder={t('usernamePlaceholder')}
                   />
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label htmlFor="password" className="block text-lg font-light text-pictus-white">
-                      {t('password')}
-                    </label>
-                    <Link
-                      href="/auth/forgot-password"
-                      className="text-sm text-pictus-lime hover:text-pictus-lime600 transition-colors"
-                    >
+                <div className="auth-field">
+                  <div className="auth-field-head">
+                    <label htmlFor="password">{t('password')}</label>
+                    <Link href="/auth/forgot-password" className="auth-link">
                       {t('forgotPassword')}
                     </Link>
                   </div>
                   <input
                     id="password"
                     type="password"
+                    className="auth-input"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className={inputClass}
                     placeholder={t('passwordPlaceholder')}
                   />
                 </div>
 
-                {error && (
-                  <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg text-sm">
-                    {error}
-                  </div>
-                )}
+                {error && <div className="auth-alert is-error">{error}</div>}
 
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-pictus-lime/50"
-                >
+                <button type="submit" disabled={isLoading} className="button button-primary">
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin" />
+                    <span className="auth-spinner" />
                   ) : (
                     <>
-                      <LogIn className="mr-2 h-4 w-4" />
+                      <LogIn className="h-4 w-4" />
                       {t('signIn')}
                     </>
                   )}
@@ -275,76 +252,70 @@ export default function LoginPage() {
               </form>
             )}
 
-            {/* ── Step 2: 2FA ── */}
+            {/* Step 2: 2FA */}
             {step === '2fa' && (
-              <form onSubmit={handleVerify2FA} className="space-y-6">
-                <div className="text-center mb-2">
-                  <ShieldCheck className="mx-auto mb-3 text-pictus-lime" size={36} />
-                  <h2 className="text-xl font-light text-pictus-white">{t('twoFaTitle')}</h2>
-                  <p className="text-sm text-gray-400 mt-1">
-                    {t('twoFaDescription')}
-                  </p>
+              <form onSubmit={handleVerify2FA} className="auth-form">
+                <div className="auth-head" style={{ marginBottom: 0 }}>
+                  <span className="auth-icon">
+                    <ShieldCheck size={30} />
+                  </span>
+                  <h1 style={{ fontSize: '1.6rem' }}>{t('twoFaTitle')}</h1>
+                  <p>{t('twoFaDescription')}</p>
                 </div>
 
-                <div>
-                  <label htmlFor="twoFaCode" className="block text-lg font-light text-pictus-white mb-2">
-                    {t('twoFaCodeLabel')}
-                  </label>
+                <div className="auth-field">
+                  <label htmlFor="twoFaCode">{t('twoFaCodeLabel')}</label>
                   <input
                     id="twoFaCode"
                     type="text"
                     inputMode="numeric"
                     maxLength={6}
+                    className="auth-input auth-code"
                     value={twoFaCode}
                     onChange={(e) => setTwoFaCode(e.target.value.replace(/\D/g, ''))}
                     required
-                    className={`${inputClass} text-center text-2xl tracking-widest`}
                     placeholder="000000"
                     autoFocus
                   />
                 </div>
 
-                <label className="flex items-center gap-3 cursor-pointer">
+                <label className="auth-checkbox">
                   <input
                     type="checkbox"
                     checked={trustDevice}
                     onChange={(e) => setTrustDevice(e.target.checked)}
-                    className="w-4 h-4 accent-pictus-lime rounded"
                   />
-                  <span className="text-sm text-gray-300">{t('twoFaTrustDevice')}</span>
+                  <span>{t('twoFaTrustDevice')}</span>
                 </label>
 
-                <div className="text-center">
+                <div style={{ textAlign: 'center' }}>
                   <button
                     type="button"
                     onClick={handleResend2FA}
                     disabled={resending || resendCooldown > 0}
-                    className="text-sm text-pictus-lime hover:text-pictus-lime600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="auth-link"
+                    style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
                   >
                     {resending
                       ? t('twoFaResending')
                       : resendCooldown > 0
-                      ? t('twoFaResendCountdown', { seconds: resendCooldown })
-                      : t('twoFaResend')}
+                        ? t('twoFaResendCountdown', { seconds: resendCooldown })
+                        : t('twoFaResend')}
                   </button>
                 </div>
 
-                {error && (
-                  <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg text-sm">
-                    {error}
-                  </div>
-                )}
+                {error && <div className="auth-alert is-error">{error}</div>}
 
                 <button
                   type="submit"
                   disabled={isLoading || twoFaCode.length !== 6}
-                  className="w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
+                  className="button button-primary"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin" />
+                    <span className="auth-spinner" />
                   ) : (
                     <>
-                      <ShieldCheck className="mr-2 h-4 w-4" />
+                      <ShieldCheck className="h-4 w-4" />
                       {t('twoFaConfirm')}
                     </>
                   )}
@@ -358,7 +329,8 @@ export default function LoginPage() {
                     setTwoFaCode('')
                     setError('')
                   }}
-                  className="w-full text-sm text-gray-400 hover:text-pictus-white transition-colors"
+                  className="auth-note"
+                  style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
                 >
                   {t('twoFaBackToLogin')}
                 </button>
@@ -366,8 +338,8 @@ export default function LoginPage() {
             )}
           </div>
         </div>
-      </div>
-      <Footer />
-    </section>
+      </main>
+      <PictusFooter homeBase={`/${locale}`} />
+    </div>
   )
 }

@@ -1,24 +1,22 @@
 import React from 'react'
-import PagesHeader from '@/app/components/PagesHeader'
-import Footer from '@/app/components/Footer'
+import PictusPagesHeader from '@/app/components/home/pictus/PictusPagesHeader'
+import PictusFooter from '@/app/components/home/pictus/PictusFooter'
 import TradeRulesContent from '@/app/components/contact/TradeRulesContent'
 import { setRequestLocale } from 'next-intl/server'
 
 const TradeRulesPage = async ({ params }: { params: Promise<{ locale: string }> }) => {
-  const { locale: paramLocale } = await params
-  setRequestLocale(paramLocale)
+  const { locale } = await params
+  setRequestLocale(locale)
 
   return (
-    <div className="min-h-screen bg-[#161616] text-white relative">
-      <div className="fixed inset-0 z-0 pointer-events-none stars-small" />
-      <div className="fixed inset-0 z-0 pointer-events-none stars-medium" />
-      <div className="fixed inset-0 z-0 pointer-events-none stars-large" />
-
-      <div className="relative z-10">
-        <PagesHeader />
-        <TradeRulesContent />
-        <Footer />
-      </div>
+    <div className="pl" data-locale={locale}>
+      <PictusPagesHeader />
+      <main id="main" className="section-shell legal-shell">
+        <div className="layout-container">
+          <TradeRulesContent />
+        </div>
+      </main>
+      <PictusFooter homeBase={`/${locale}`} />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { CheckCircle } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 
 interface FleetSyncPricingProps {
@@ -42,134 +42,97 @@ const FleetSyncPricing = ({ translations: t }: FleetSyncPricingProps) => {
 
   const basicPrice = isYearly ? PRICING.BASIC.yearly : PRICING.BASIC.monthly
   const businessPrice = isYearly ? PRICING.BUSINESS.yearly : PRICING.BUSINESS.monthly
+  const billing = isYearly ? 'yearly' : 'monthly'
 
   return (
-    <section className="py-20">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-light mb-6">
-            {t.pricingTitle} <span className="text-pictus-lime">{t.pricingTitleHighlight}</span>
-          </h2>
-          <p className="text-2xl text-gray-300 font-thin">{t.pricingSubtitle}</p>
-        </div>
+    <section className="section-shell" id="pricing">
+      <div className="layout-container">
+        <header className="section-heading fs-heading">
+          <p className="section-kicker">{t.pricingTitleHighlight}</p>
+          <h2>{t.pricingTitle}</h2>
+          <p>{t.pricingSubtitle}</p>
+        </header>
 
-        {/* Monthly / Yearly Toggle */}
-        <div className="flex items-center justify-center gap-4 mb-12">
-          <span
-            className={`text-lg ${!isYearly ? 'text-pictus-white font-medium' : 'text-gray-400'}`}
-          >
-            {t.monthly}
-          </span>
+        <div className="fs-billing">
+          <span className={`fs-billing-label${!isYearly ? ' is-active' : ''}`}>{t.monthly}</span>
           <button
-            onClick={() => setIsYearly(!isYearly)}
-            className={`relative w-16 h-8 rounded-full transition-colors ${isYearly ? 'bg-pictus-lime' : 'bg-gray-600'}`}
+            type="button"
+            className={`fs-toggle${isYearly ? ' is-on' : ''}`}
+            onClick={() => setIsYearly((v) => !v)}
+            aria-label={`${t.monthly} / ${t.yearly}`}
+            aria-pressed={isYearly}
           >
-            <div
-              className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-transform ${isYearly ? 'translate-x-9' : 'translate-x-1'}`}
-            />
+            <span className="fs-toggle-knob" />
           </button>
-          <div className="flex items-center gap-2">
-            <span
-              className={`text-lg ${isYearly ? 'text-pictus-white font-medium' : 'text-gray-400'}`}
-            >
-              {t.yearly}
-            </span>
-            {isYearly && (
-              <span className="bg-pictus-lime/20 text-pictus-lime text-sm px-3 py-1 rounded-full border border-pictus-lime/30">
-                {t.yearlySave}
-              </span>
-            )}
-          </div>
+          <span className={`fs-billing-label${isYearly ? ' is-active' : ''}`}>{t.yearly}</span>
+          {isYearly && <span className="fs-save-badge">{t.yearlySave}</span>}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="fs-plans">
           {/* FREE */}
-          <div className="bg-pictus-white/5 backdrop-blur-sm rounded-3xl p-8 border border-pictus-white/10 flex flex-col">
-            <h3 className="text-2xl font-semibold mb-2">{t.free}</h3>
-            <div className="text-4xl font-bold mb-1">€0</div>
-            <p className="text-gray-400 mb-6 text-sm">{t.perVehicle}</p>
-            <ul className="space-y-3 mb-8 flex-grow">
+          <div className="fs-plan">
+            <h3>{t.free}</h3>
+            <div className="fs-plan-price">
+              <span className="fs-amount">€0</span>
+            </div>
+            <p className="fs-plan-sub">{t.perVehicle}</p>
+            <ul className="fs-plan-features">
               {t.freeFeatures.filter(Boolean).map((feature, i) => (
-                <li key={i} className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>{feature}</span>
+                <li key={i}>
+                  <Check /> <span>{feature}</span>
                 </li>
               ))}
             </ul>
-            {/* <p className="text-xs text-yellow-400/80 mb-4 flex items-start gap-1.5">
-              <span className="mt-0.5 flex-shrink-0">⚠</span>
-              {t.freePlanLimit}
-            </p> */}
             <Link
-              href={`/fleetsync/get-started?tier=FREE&billing=${isYearly ? 'yearly' : 'monthly'}`}
-              className="block w-full bg-pictus-white/10 hover:bg-pictus-white/20 px-6 py-3 rounded-full transition-colors text-center mt-auto"
+              href={`/fleetsync/get-started?tier=FREE&billing=${billing}`}
+              className="button button-secondary"
             >
               {t.freeButton}
             </Link>
           </div>
 
-          {/* BASIC - Popular */}
-          <div className="bg-pictus-white/5 backdrop-blur-sm rounded-3xl p-8 border-2 border-pictus-lime/40 relative flex flex-col">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-6 py-1 rounded-full text-sm font-medium text-pictus-black">
-              {t.basicPopular}
+          {/* BASIC — popular */}
+          <div className="fs-plan is-popular">
+            <span className="fs-plan-badge">{t.basicPopular}</span>
+            <h3>{t.basic}</h3>
+            <div className="fs-plan-price">
+              <span className="fs-amount">€{basicPrice}</span>
+              <span className="fs-period">{isYearly ? t.perYear : t.perMonth}</span>
             </div>
-            <h3 className="text-2xl font-semibold mb-2">{t.basic}</h3>
-            <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-4xl font-bold">€{basicPrice}</span>
-              <span className="text-lg text-gray-400 font-thin">
-                {isYearly ? t.perYear : t.perMonth}
-              </span>
-            </div>
-            <p className="text-gray-400 mb-6 text-sm">{t.perVehicle}</p>
-            <ul className="space-y-3 mb-8 flex-grow">
+            <p className="fs-plan-sub">{t.perVehicle}</p>
+            <ul className="fs-plan-features">
               {t.basicFeatures.filter(Boolean).map((feature, i) => (
-                <li key={i} className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>{feature}</span>
+                <li key={i}>
+                  <Check /> <span>{feature}</span>
                 </li>
               ))}
             </ul>
-            {/* <Link
-              href={`/contact?subject=${encodeURIComponent(t.basicContact)}`}
-              className="block w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black font-normal px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center mt-auto shadow-lg hover:shadow-pictus-lime/50"
-            >
-              {t.basicButton}
-            </Link> */}
             <Link
-              href={`/fleetsync/get-started?tier=BASIC&billing=${isYearly ? 'yearly' : 'monthly'}`}
-              className="block w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black font-normal px-6 py-3 rounded-full transition-all transform hover:scale-105 text-center mt-auto shadow-lg hover:shadow-pictus-lime/50"
+              href={`/fleetsync/get-started?tier=BASIC&billing=${billing}`}
+              className="button button-primary"
             >
               {t.basicButton}
             </Link>
           </div>
 
           {/* BUSINESS */}
-          <div className="bg-pictus-white/5 backdrop-blur-sm rounded-3xl p-8 border border-pictus-white/10 flex flex-col">
-            <h3 className="text-2xl font-semibold mb-2">{t.business}</h3>
-            <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-4xl font-bold">€{businessPrice}</span>
-              <span className="text-lg text-gray-400 font-thin">
-                {isYearly ? t.perYear : t.perMonth}
-              </span>
+          <div className="fs-plan">
+            <h3>{t.business}</h3>
+            <div className="fs-plan-price">
+              <span className="fs-amount">€{businessPrice}</span>
+              <span className="fs-period">{isYearly ? t.perYear : t.perMonth}</span>
             </div>
-            <p className="text-gray-400 mb-6 text-sm">{t.perVehicle}</p>
-            <ul className="space-y-3 mb-8 flex-grow">
+            <p className="fs-plan-sub">{t.perVehicle}</p>
+            <ul className="fs-plan-features">
               {t.businessFeatures.filter(Boolean).map((feature, i) => (
-                <li key={i} className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>{feature}</span>
+                <li key={i}>
+                  <Check /> <span>{feature}</span>
                 </li>
               ))}
             </ul>
-            {/* <Link
-              href={`/contact?subject=${encodeURIComponent(t.businessContact)}`}
-              className="block w-full bg-pictus-white/10 hover:bg-pictus-white/20 px-6 py-3 rounded-full transition-colors text-center mt-auto"
-            >
-              {t.businessButton}
-            </Link> */}
             <Link
-              href={`/fleetsync/get-started?tier=BUSINESS&billing=${isYearly ? 'yearly' : 'monthly'}`}
-              className="block w-full bg-pictus-white/10 hover:bg-pictus-white/20 px-6 py-3 rounded-full transition-colors text-center mt-auto"
+              href={`/fleetsync/get-started?tier=BUSINESS&billing=${billing}`}
+              className="button button-secondary"
             >
               {t.businessButton}
             </Link>

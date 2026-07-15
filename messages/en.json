@@ -13,7 +13,6 @@
     "footerCategory2": "About Us",
     "footerCategory3": "Contact",
     "footerForClients": "For Clients",
-
     "navbarOffer": "Offer",
     "navbarAutomatizations": "FleetSync",
     "navbarProjects": "Projects",
@@ -25,7 +24,6 @@
     "heroTitle1": "Webs.",
     "heroTitle2": "Eshops. Blogs.",
     "heroTitle3": "Podcasts. Ai Services.",
-
     "offerTitle": "Do you need...",
     "offer1": "A modern website?",
     "offer2": "A microsite?",
@@ -36,8 +34,7 @@
     "offer3desc": "Do you have an old web? We offer you a redesign and content update so that your web will keep up with the trends.",
     "offer4desc": "We'll make you a complex web with custom content administration and advanced features.",
     "offerButton": "Get a quote",
-
-    "ourProjectsTitle": "Projects",
+    "ourProjectsTitle": "our projects",
     "ourProjectsBow4bass": "Bow maker presentational web",
     "ourProjectsIoana": "Simple presentational web of a designer",
     "ourProjectsPrud": "Modern book eshop",
@@ -47,7 +44,6 @@
     "ourProjectsEstate": "Real estate calculator",
     "ourProjectsLibro": "Custom social network with Pusher chat",
     "ourProjectsChurch": "Church web with admin menu",
-
     "reviewsTitle": "Testimonials",
     "reviewsIoana": "Peter succeeded to make me a website with professionalism promptitude, good quality and reasonable price. I am very happy with the result. Thank you Peter ❤️.",
     "reviewsTom": "Cooperation with Peter is excellent, great communication and result. He enjoys his job, does it honestly and thoroughly. I definitely count on him in my next projects.",
@@ -55,23 +51,19 @@
     "reviewsMich": "If you are looking for someone reliable and smart, Peter is your man. I am very satisfied with his work and recommend working with him.",
     "reviewsSam": "Excellent cooperation, easy understanding of my requests and comments, flexible for options that were subject to my decision.",
     "reviewsVlado": "I contacted Pictusweb for styling the graphic design of my website. I rate the cooperation very positively, the gentleman was very pleasant, helpful and fast in his work. I definitely recommend to anyone looking for styling for their website.",
-
     "reviewsDesignationMich": "Real Estate Agent",
     "reviewsDesignationSam": "Author",
     "reviewsDesignationVlado": "Physiotherapist",
     "reviewsJan": "Excellent and professional work, he always delivers on what we agree on, and on top of that he's creative. I recommend him to everyone.",
     "reviewsDesignationJan": "Owner",
-
     "heroLabel": "Creative Studio",
     "heroSubtitle": "Modern websites and intelligent solutions for businesses that mean it.",
-
     "valuePropTitle1": "We're a small team,",
     "valuePropTitle2": "but with a big vision.",
     "valuePropText1": "What connects us is a sense for design, logic, and technical thinking.",
     "valuePropText2": "And this is our little buddy Pictus, who gives our world a face.",
     "valuePropText3": "Together, we create things that are beautiful, functional, meaningful, and sustainable.",
     "valuePropButton": "Let's get to know each other",
-
     "processTitle": "A process you won't get lost in",
     "processSubtitle": "Collaboration doesn't have to feel like a burden. Every step leads to a result that exceeds your expectations.",
     "processStep1Title": "Understanding the project",
@@ -85,7 +77,6 @@
     "processStep5Title": "Delivery and next steps",
     "processStep5Desc": "We deliver the output, prepare it for use, and hand it over with confidence. It doesn't end there. When needed, we can keep improving it together.",
     "processButton": "Start collaboration",
-
     "testimonialsTitle": "What our clients say",
     "testimonialsSubtitle": "Every project is a collaboration. Feedback from clients helps us grow and improve what we do. A few words from people we've worked with.",
     "testimonial1": "Peter managed to create my website professionally, promptly, with quality and at a reasonable price. I'm very happy with the result. Thank you Peter.",
@@ -99,15 +90,11 @@
     "testimonial6Role": "Physiotherapist - fyziology.sk",
     "testimonial7": "Excellent and professional work, he always delivers on what we agree on, and on top of that he's creative. I recommend him to everyone.",
     "testimonial7Role": "Owner - bow4bass.com",
-
-    "ourProjectsTitle": "our projects",
-
     "homeFooterProcess": "Process",
     "homeFooterWebs": "Websites",
     "homeFooterRedesign": "Website redesign",
     "homeFooterAI": "AI solutions",
     "homeFooterAIMedia": "AI media",
-
     "serviceWebLabel": "Web development",
     "serviceWebDesc": "We're here to build websites, from strategy to final build.",
     "serviceRedesignLabel": "Website redesign",
@@ -116,14 +103,11 @@
     "serviceMediaDesc": "We'll help you create content with AI quickly and without chaos.",
     "serviceAILabel": "AI solutions",
     "serviceAIDesc": "We'll set up AI tools that save you time and simplify your processes.",
-
     "noPodcastsTitle": "No Podcasts Found",
     "noPodcastsDesc": "Check back soon for new AI-generated podcasts!",
-
     "getInTouch": "Do you want to find out more?",
     "callToActionTitle": "let's create something!",
     "getInTouchButton": "Get in touch!",
-
     "podcastsTitle": "Podcasts",
     "podcastsBack": "Back to All Podcasts",
     "podcastsFilter": "Filter by",
@@ -134,7 +118,6 @@
     "podcastVoice": "Voice:",
     "podcastNeedPodcast": "Save your voice.",
     "podcastNeedPodcastAction": "Run your own AI podcast!",
-
     "contactTitle": "Send us a message",
     "contactName": "Name",
     "contactSubject": "Subject",
@@ -149,7 +132,6 @@
     "contactError": "Not sent! Contact us via info@pictusweb.sk, please.",
     "contactError2": "Error! Write to info@pictusweb.sk, please.",
     "contactSuccess": "Message successfully sent!",
-
     "contactAboutTitle": "About us",
     "contactAboutAccount": "Banking Contact IBAN:",
     "contactAboutSR": "Slovakia",
@@ -157,9 +139,7 @@
     "contactAboutReg2": "in the commercial register of the Nitra District Court:",
     "contactAboutReg3": "Department: Ltd. Insert number: 57457/N",
     "contactAboutReg4": "The company is not a VAT payer.",
-
     "cookies": "This page uses anonymous analytics to improve user experience. We do not use functional or marketing cookies.",
-
     "counterVisitors": "Visitors count",
     "counterBots": "Bots count",
     "counterEmails": "Emails count",
@@ -179,60 +159,44 @@
     "metaDescription": "We build modern websites and FleetSync - a smart notification system for vehicle management. Inspections, insurance, service and more. Custom AI solutions.",
     "ogTitle": "Pictusweb - Websites, FleetSync vehicle notifications & AI solutions",
     "ogDescription": "We build modern websites and FleetSync - a smart notification system for vehicle management. Inspections, insurance, service and more. Custom AI solutions.",
-
     "gdprTitle": "PERSONAL DATA PROCESSING POLICY",
     "gdprIntro": "We take personal data protection seriously. It is important to us that your personal data is secure. All personal data collected during your visit to our website www.pictusweb.sk is processed in accordance with personal data protection law as well as in compliance with applicable European legislation. From 25.05.2018, inclusive, your personal data is processed in accordance with REGULATION (EU) 2016/679 OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation = GDPR) and in accordance with Act No. 18/2018 Coll. on personal data protection and on amendments to certain acts as amended and effective from 25.05.2018.",
-
     "gdprWhatMeansTitle": "What does this mean for you and your personal data?",
     "gdprWhatMeansText": "Your personal data is any information that relates to you and on the basis of which you are an identifiable subject for us as a natural person. This occurs in cases where we can directly or indirectly identify you, particularly based on a commonly applicable identifier or other identifier, such as name, surname, identification number, location data or online identifier, or based on one or more characteristics or features that constitute your physical identity, physiological identity, genetic identity, psychological identity, mental identity, economic identity, cultural identity or social identity. This is, for example, identification of your person based on a number, code or one or more elements specific to you. Personal data therefore includes mainly contact details of a natural person, their IP address, and may include information about the use of services or about activities and preferences of a natural person.",
-
     "gdprDataCollectedTitle": "What data do we store?",
     "gdprDataCollectedText": "During your visit to our website, we record the IP address assigned to you by your internet provider, from which pages you visited our site, how long you stayed on our site, which specific subpages you view, etc. This information is considered personal data as it is your online identifier, and therefore we handle this data with increased care.",
-
     "gdprCookiesTitle": "Cookies and tracking",
     "gdprCookiesIntro": "This website uses the following types of cookies and technologies:",
     "gdprCookiesEssentialTitle": "1. Essential cookies",
     "gdprCookiesEssentialText": "These cookies are necessary for the basic functioning of the website and cannot be disabled:\n- Storing your consent to cookies (CookieConsent) - 365 days\n- Contact form functionality",
     "gdprCookiesAnalyticsTitle": "2. Analytics cookies (optional)",
     "gdprCookiesAnalyticsText": "With your consent, we use our own analytics tool Umami for:\n- Measuring website traffic\n- Analyzing visitor behavior (anonymously)\n- Improving user experience",
-
     "gdprCookiesNotUsedTitle": "3. What we don't use",
     "gdprCookiesNotUsedText": "We do not use:\n- Marketing cookies\n- Third-party advertising cookies\n- Social media cookies\n- Third-party tracking cookies",
     "gdprCookiesManagementTitle": "Consent management",
     "gdprCookiesManagementText": "You can change your consent to analytics cookies at any time:\n- By clearing browser data\n- By contacting us at info@pictusweb.sk\n- The banner will appear again when visiting the site after clearing cookies",
     "gdprCookiesVisitorsTitle": "Visitor tracking",
     "gdprCookiesVisitorsText": "Basic visitor counter works without cookies and records only the total number of visits without identifying individual users.",
-
     "gdprOtherDataTitle": "Other personal data",
     "gdprOtherDataText": "You voluntarily enter your personal data only into the contact form on our website: We store these personal data: email address, name and phone number, if you choose to provide it. Your personal data is used for the purposes specified in these policies, and only to the necessary extent.",
-
     "gdprProcessingTitle": "What is personal data processing?",
     "gdprProcessingText": "The legal term processing of personal data should be understood as a processing operation or set of processing operations performed on personal data or on sets of personal data, in particular their collection, recording, organization, structuring, storage, adaptation, retrieval, consultation, use, disclosure by transmission, dissemination or otherwise making available, alignment or combination, restriction, erasure, regardless of whether it is performed by automated or non-automated means. Simply put, it involves collecting personal data, storing it on information carriers, making it accessible, editing or changing it, searching, using, transferring, distributing, publishing, storing, exchanging, sorting or combining, blocking and destroying. There is indeed a lot, but only based on the data you provide can we provide services and products that specifically improve your life.",
-
     "gdprPurposesTitle": "What do we use this information about you for (purposes)? And on what legal basis?",
     "gdprPurposesText": "The controller for the purposes of personal data processing is Pictusweb, s.r.o., Nábrežná 42, 940 02 Nové Zámky, Slovakia, a company registered in the Commercial Register of the Nitra District Court, section: Sro, insert number: 57457/N. Personal data collection occurs on the website www.pictusweb.sk name, surname, email - communication with the customer about order processing, order delivery, delivery of additional information from the supplier = the legal basis for processing this personal data is contract performance; mobile number - for the purpose of informing about order status VIP care for paying customers = the legal basis is the legitimate interest of the controller to provide the customer with the highest value for their money; Product recommendations on websites: We publish your recommendation (reference) for our products only based on your explicit consent to such use, which you grant us in response to a separate email in which we ask for permission. We publish your photo only with your consent and whenever you withdraw your consent, we will remove your photo and recommendation from the site and destroy your data. At the same time, we declare that we will not publish sensitive data about your sexual orientation, health status, race or ethnicity without your explicit consent.",
-
     "gdprRetentionTitle": "Data retention period",
     "gdprRetentionText": "Personal data is stored by the controller for the stated purposes for a period of 10 years, unless special legal regulations (tax, labor law, archiving, accounting regulations) stipulate otherwise or until you withdraw your consent (provided that we are not bound by special regulation to further archive your data). In the time period from granting consent to its withdrawal, the processing of your personal data is lawful, even if you withdrew your consent after granting it.",
-
     "gdprSecurityTitle": "Security",
     "gdprSecurityText": "If our systems were to be attacked by a hacker attack, or otherwise our system was attacked and even just a threat of data leak arose, you will be informed within 72 hours by our support about the measures taken and at the same time within the same period we will also communicate with the supervisory authority in the field of personal data protection in Slovakia - with the Office for Personal Data Protection.",
-
     "gdprRightsTitle": "Your rights",
     "gdprRightsText": "As a data subject, i.e. a person whose personal data is processed - you have the right to be informed about the controller's data - i.e. the person who processes your data. The controller for the purposes of personal data processing is Pictusweb, s.r.o., Nábrežná 42, 940 02 Nové Zámky, Slovakia, a company registered in the Commercial Register of the Nitra District Court, section: Sro, insert number: 57457/N.",
-
     "gdprContactTitle": "Contact persons:",
     "gdprContactText": "Peter Varga; e-mail: peter.varga@pictusweb.sk You have the right to access the data we process about you. If you want to know what specific data we store about your person, we will gladly provide it to you in writing upon request. As a data subject, you have the right to rectification of the provided data, or their completion in case of any inaccuracies/incompleteness. After achieving the purpose of providing personal data - i.e. after providing performance from the consumer contract and terminating the use of products through access passwords, you have the 'right to be forgotten' = the right to erasure of the provided data. The right to erasure of provided personal data also applies if you withdraw your consent to the processing of your personal data. In cases where we process your personal data based on your consent, you have the right to withdraw this consent at any time. Withdrawing consent is as simple as granting it: either click the unsubscribe button in the email campaign or write to us at the contact email: info@pictusweb.sk. In cases where personal data processing is based on our legitimate interest, you have the right to object to our legitimate interest. If we handle your objection as justified, we will delete your data processed on the stated basis from our systems. We will also delete them if it is proven that the data was processed unlawfully. The right to erasure of your personal data is not absolute. If we need your data to fulfill our legal obligations imposed by tax laws, accounting regulations and other special legal regulations; for this purpose of fulfilling our legal obligations, we will have to continue processing them. As a data subject, you have the right to request restriction of processing of your personal data, in case you contest the accuracy of personal data, during the period of verification of data accuracy; or if personal data processing is unlawful and instead of data erasure you will request restriction of their processing; and also if the controller does not need your personal data for the purpose stated, but you need them to establish, possibly defend your legal claims (complaints, court disputes - otherwise data would be erased and we could not provide them to you). When restricting personal data processing, your data will remain in our systems, but we will no longer use them for our purposes. The controller will notify you of any change, correction, or erasure of your personal data upon your request. You also have the right to request data portability to another controller, whose details you notify us in writing. Technically feasible is the transfer of email address, other data due to the difference in purposes of their processing (see above) we cannot provide to you in machine-readable and portable form to another controller for technical reasons. All your requests when exercising your above-mentioned rights, objection to the controller's legitimate interest or consent to personal data processing, we will handle within 48 hours of receipt; in case of a complicated request, no later than 1 month from receipt of the request. The controller declares that there is no transfer of personal data to third countries, and your data is stored on servers located in the EU. If transfer to third countries should occur, it is caused by technical operations of our intermediaries who are major players in the market, and therefore in the intermediary contracts we have concluded with them, the security of your data as well as data transfer outside the EU are addressed to the maximum possible extent. The supervisory authority over personal data processing is the Office for Personal Data Protection of the Slovak Republic. If we do not respond to your request within 1 month of its receipt, you have the right to contact the Office for Personal Data Protection according to § 100 of Act No. 18/2018 Coll. in the valid and effective wording (proceedings on personal data protection).",
-
     "gdprProcessorsTitle": "Processors (data recipients) - or who else has access to your data?",
     "gdprProcessorsText": "Hosting is provided to us by these companies:",
-
     "gdprThirdPartyTitle": "Third party links",
     "gdprThirdPartyText": "Sometimes on our pages we refer to third party services and products. The websites of these third parties have their own privacy policies and are independent of ours. Therefore, we bear no legal responsibility for the content and activities of these third parties. Nevertheless, it is our effort to maintain a high level of security. Therefore, if you have any suspicion of unfair behavior by these third parties, contact us at info@pictusweb.sk. Thank you.",
-
     "gdprNoSharingTitle": "We do not provide your data to third parties",
     "gdprNoSharingText": "We do not sell, trade or otherwise provide your personal data to third parties. We believe this is not fair and your personal data is the most sensitive thing you can provide to us. Handing over your personal data to state organizations is only based on law or valid official or court decisions in accordance with the legal regulations of the Slovak Republic. Changes in personal data protection conditions If we decide to change the personal data protection conditions, we will publish them on this page and inform you by email. These conditions are valid from 26.5.2022.",
-
     "gdprFleetSyncTitle": "CONSENT TO PERSONAL DATA PROCESSING – FLEETSYNC",
     "gdprFleetSyncText1": "As a data subject and representative of a company/organization (hereinafter \"Represented Entity\"), you voluntarily grant consent to Pictusweb s.r.o., registered at Nábrežná 4895/42, Nové Zámky 940 02, Slovakia, Company ID: 54631068, Tax ID: 2121741424 (hereinafter \"Controller\"), for the processing of personal data and vehicle data provided for the FleetSync notification service.",
     "gdprFleetSyncDataTitle": "Scope of processed data",
@@ -243,41 +207,29 @@
     "gdprFleetSyncConsentText": "Consent is granted for an indefinite period or until its withdrawal. You may withdraw consent at any time by sending a written request or email to the Controller's contact details listed at www.pictusweb.sk. Withdrawal of consent does not affect the lawfulness of processing prior to its withdrawal.",
     "gdprFleetSyncComplianceTitle": "Legislative compliance",
     "gdprFleetSyncComplianceText": "The Controller declares that personal data will be processed in compliance with applicable legislation of the European Union and the Slovak Republic, in particular with Regulation (EU) 2016/679 (GDPR) and Act No. 18/2018 Coll. on personal data protection.",
-
     "tradeRulesTitle": "GENERAL TERMS AND CONDITIONS",
     "tradeRulesSection1Title": "1. GENERAL PROVISIONS",
     "tradeRulesSection1Text": "These general terms and conditions (hereinafter referred to as \"GTC\") regulate the rights and obligations of the contracting parties arising from the purchase contract concluded between the Buyer - Consumer and the Seller. The subject of the purchase contract is the purchase and sale of online products through the website www.pictusweb.sk, or products in electronic form uploaded on electronic data carriers. Seller: Pictusweb, s.r.o., Nábrežná 42, 940 02 Nové Zámky, Slovakia, company registered in the Commercial Register of the District Court Nitra, section: Sro, file number: 57457/N. Email: info@pictusweb.sk Company ID: 54 631 068 Tax ID: 2121741424 The company is not a VAT payer. Bank connection: Fio banka IBAN: SK68 8330 0000 0022 0221 4313 BIC: FIOZSKBAXXX Pictusweb, s.r.o. is registered in the commercial register of the District Court Nitra: Section: Sro File number: 57457/N Buyer - hereinafter referred to as consumer - is a natural person who, when concluding and fulfilling this purchase contract, does not act within the scope of their business, employment or profession, or an entrepreneur - legal entity who, when concluding and fulfilling the consumer contract, acts within the scope of their commercial activity or other business activity. Legal relations of the seller with the buyer who is an entrepreneur, not expressly regulated by these GTC or the contract between the seller and buyer, are governed by the relevant provisions of Act No. 513/1991 Coll., the Commercial Code as amended, as well as related regulations. In case of any differences between the GTC and individual contract, the contract text takes precedence. Products - represent online services for creating websites and e-shops and consulting in the field of software development;",
-
     "tradeRulesSection2Title": "2. PRODUCT ORDER AND CONCLUSION OF PURCHASE CONTRACT",
     "tradeRulesSection2Text": "The consumer proposes to conclude a contract with the seller by sending an order through the website www.pictusweb.sk. The condition for validity of the electronic order is filling in all prescribed data and requirements requested when filling out the order. The order is a proposal for a purchase contract. The conclusion of the purchase contract occurs by accepting the proposal to conclude the purchase contract by the Seller, whereby the Seller does not carry out formal confirmation of the order, the proposal to conclude the purchase contract from the Consumer is accepted by a factual act - i.e. by delivering the Product to the Consumer's email address. By placing an order, the Buyer expresses their agreement with the general terms and conditions for delivery of the Product declared by the Seller. Relations between the Buyer and Seller are governed by these general terms and conditions, which are binding for both parties, the Civil Code (Act No. 40/1964 Coll. as amended) and legal regulations of the Slovak Republic, unless the contracting parties agree otherwise. Disputes arising from the relationship between the Consumer and Seller are subject to the jurisdiction of Slovak Republic courts and are decided in accordance with valid and effective legal regulations.",
-
     "tradeRulesSection3Title": "3. PRODUCTS",
     "tradeRulesSection3Text": "Individual products result from the current offer.",
-
     "tradeRulesSection4Title": "4. PRODUCT PRICES",
     "tradeRulesSection4Text": "The Buyer undertakes to pay the purchase price stated in the order with the Seller for the ordered Product valid at the time of ordering the Products. All prices are without VAT, as the company is not a VAT payer. The Seller reserves the right to printing errors. The purchase price will be considered paid only after crediting the entire purchase price for a separate part of delivery to the Seller's current account. The Seller reserves ownership rights to the goods until full payment of the purchase price. The invoice issued based on the purchase contract between the Seller and Buyer is simultaneously a tax document and is sent to the Buyer electronically. Upon request of the Buyer, the invoice can also be sent by mail. Receipt of goods by the Buyer is possible only after its full payment, unless agreed otherwise. Receipt of the product means receipt of access data to products through email communication.",
-
     "tradeRulesSection5Title": "5. SELLER'S COPYRIGHT AND CONTRACTUAL PENALTY FOR THEIR VIOLATION",
     "tradeRulesSection5Text": "Products that are the subject of sale on this page are the exclusive intellectual property of author Peter Varga under the Copyright Act, Act No. 185/2015 Coll. as amended, and only the author has exclusive personal and property rights to these works under provisions §§ 19 and 20 of the cited law. The Seller as license acquirer from the author sells the author's works with his consent exclusively for personal purposes of consumers. The Buyer - Consumer is entitled to use the provided Products exclusively for their own personal purposes, i.e. for purposes that are not directly or indirectly commercial. The Buyer - Consumer is not entitled to make Products available to the new public in any way, i.e. distribute or mediate to third parties, is not entitled to process, modify, reproduce and publicly distribute products without the author's consent. In case of violation of the author's copyright in any form and manner, the Seller (as well as the author himself) is entitled to demand a contractual penalty from the Buyer, which will be calculated as the product of the price of online products at the time of contract conclusion and persons to whom the Seller's online products were made available through unauthorized activity of the Buyer.",
-
     "tradeRulesSection6Title": "6. PAYMENT CONDITIONS, DELIVERY TIME AND DELIVERY CONDITIONS",
     "tradeRulesSection6Text": "The Buyer will pay the purchase price for provided online products and services in advance by transfer to the bank account stated on the Seller's website. Payment is made to the seller's account held at Fio bank. For payment by bank transfer in advance to the account, the delivery period begins on the day the payment is credited to the Seller's account. The delivery period may be extended appropriately to circumstances if the delay is caused by circumstances not caused by the seller. In case of extending the delivery period, the seller will notify the Buyer of the expected delivery date and will request approval from the buyer.",
-
     "tradeRulesSection7Title": "7. LIABILITY FOR DEFECTS AND WARRANTY CONDITIONS",
     "tradeRulesSection7Text": "In case of occurrence of a defect in the Seller's online products: 1) If it is a defect that can be removed depending on the nature of the provided performance, the Buyer has the right to have it removed free of charge, timely and properly. The Seller is obliged to remove the defect without undue delay. The Seller can always replace defective performance with defect-free performance instead of removing the defect, if this is realistically possible and if it does not cause serious difficulties to the Buyer. 2) If it is a defect that cannot be removed and prevents the performance from being properly used, the Buyer has the right to withdraw from the contract. The same rights belong to the Buyer if these are removable defects, but the Buyer cannot properly use the performance due to repeated occurrence of the defect after repair or due to a larger number of defects. If it concerns other non-removable defects, the Buyer has the right to a reasonable discount from the product or service price. For online products purchased through the website www.pictusweb.sk, the statutory warranty period of 24 months applies. The warranty period according to this paragraph begins from the receipt of performance by the Buyer. Receipt of performance is considered providing login data for the buyer after payment of the purchase price by the Buyer. In case of complaint, grievance or suggestion, the Buyer can contact the Seller at email address peter.varga@pictusweb.sk. If the complaint is justified and depending on the nature of the performance defect, for non-removable defect the Buyer has the right to withdraw from the contract and the Seller will return the purchase price of the complained online product or service to the Buyer within 48 hours from confirmation of the complaint with simultaneous immediate (i.e. immediately after delivery of withdrawal to the Seller) termination of validity of the Consumer's access data to the purchased online product. For removable performance defects, the Seller will provide the Buyer with the possibility of remedy of the stated defect based on the nature of the product. In case of withdrawal from the contract after partial defect-free use of online products, the Buyer will be returned an aliquot part of the purchase price.",
-
     "tradeRulesSection8Title": "8. WITHDRAWAL FROM CONTRACT",
     "tradeRulesSection8Text": "In case of purchase of online products by a natural person, it is not possible to withdraw from the contract with the Seller and request return of the purchase price, as under provision § 7 para. 6 letter l) of Act No. 102/2014 Coll. on consumer protection when selling goods or providing services based on a contract concluded at a distance or contract concluded outside the seller's business premises, the consumer cannot withdraw from a contract whose subject is provision of electronic content other than on a tangible medium, if its provision started with the consumer's express consent and the consumer declared that they were properly informed that by expressing this consent they lose the right to withdraw from the contract. Return of the purchase price for electronic content in case of purchase of online products by a natural person is not possible if these GTC do not stipulate otherwise. Similarly, it is not possible to request return of the purchase price by the Buyer of electronic content in case of non-use of electronic content. In case a person purchases goods in connection with their business activity (determined by stating company ID on the purchase document), the right to withdraw from the purchase contract does not arise, as the Commercial Code does not allow this possibility.",
-
     "tradeRulesSection9Title": "9. SECURITY AND PERSONAL DATA PROTECTION",
     "tradeRulesSection9Text": "The Seller declares that all personal data are confidential and will be used exclusively to fulfill the purchase contract between the Seller and Buyer and for related marketing purposes and will not otherwise be published and provided to third parties except for situations related to distribution or payment transactions concerning the ordered goods. More about personal data protection is stated in a separate section accessible on the Seller's website in the Personal Data Protection section. The Seller will use publication of the Buyer's story and successes achieved as a result of using the Seller's online products, i.e. for the purpose of so-called reference to the Seller's online products exclusively for the Seller's marketing purposes and for informing the public and only after prior consent of the Buyer. Special categories of personal data that reveal racial or ethnic origin, political opinions, religious belief or worldview, membership in political parties or political movements, membership in trade union organizations and health-related data will not be published except for data that the Buyer himself states in his story sent to the Seller.",
-
     "tradeRulesSection10Title": "10. CHOICE OF JURISDICTION AND GOVERNING LAW",
     "tradeRulesSection10Text": "The contracting parties are aware that all possible disputes arising in connection with the Seller's sales on their website will be resolved before Slovak Republic courts and according to generally binding legal regulations of the Slovak Republic.",
-
     "tradeRulesSection11Title": "11. FINAL PROVISIONS",
     "tradeRulesSection11Text": "These terms and conditions apply in the stated wording on the seller's website on the day of sending the electronic order in case there is no other written agreement between the participants. Date of last update: 01.03.2026",
-
     "tradeRulesFleetSyncTitle": "GENERAL TERMS AND CONDITIONS – FLEETSYNC",
     "tradeRulesFleetSyncSubtitle": "Pictusweb s.r.o. | Nábrežná 42, 940 02 Nové Zámky | Company ID: 54 631 068 | Tax ID: 2121741424 | Effective date: 01.03.2026",
     "tradeRulesFleetSyncSection1Title": "1. GENERAL PROVISIONS",
@@ -312,7 +264,6 @@
     "tradeRulesFleetSyncSection15Text": "15.1. Invalidity of any provision does not affect the validity of others.\n15.2. These GTC take effect upon publication on the Service's website.\n15.3. The current version of the GTC is always available on the FleetSync website.\n15.4. In case of conflict between the Slovak and foreign language version, the Slovak version prevails.",
     "tradeRulesFleetSyncContactTitle": "PROVIDER CONTACT DETAILS",
     "tradeRulesFleetSyncContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Slovak Republic\nCompany ID: 54 631 068 | Tax ID: 2121741424\nEmail: info@pictusweb.sk\nPhone: +421 948 024 638\nWeb: pictusweb.sk",
-
     "projectsSubtitle": "A selection of our projects. Each one is unique — from design through development to deployment.",
     "projectBow4bassDesc": "Website for an artisan double bass bow maker. Showcasing handcrafted bows, repairs and restoration with a focus on historical authenticity. Custom admin panel for content management.",
     "projectIoanaDesc": "Portfolio website for an illustrator and designer. Gallery of works with animations and a delicate visual style reflecting the artist's creative signature.",
@@ -328,7 +279,6 @@
     "newServicesLabel": "New services",
     "latestTitle": "Latest",
     "latestTitleHighlight": "AI solutions",
-
     "service1Title": "FleetSync",
     "service1Subtitle": "Smart management of your vehicles",
     "service1Description": "Eliminate fines for missed inspections and save time with automatic notifications for technical inspections, tire changes and service checks.",
@@ -340,7 +290,6 @@
     "service1Feature6": "Documents expiry",
     "service1Price": "From €60/vehicle/year",
     "service1Badge": "NEW",
-
     "service2Title": "AI Podcasts",
     "service2Subtitle": "Podcast creation using AI",
     "service2Description": "We create websites with AI services for your blogs. Turn your blog into a podcast!",
@@ -350,35 +299,29 @@
     "service2Feature4": "Multi-language",
     "service2Price": "",
     "service2Badge": "NEW",
-
     "learnMore": "Learn more"
   },
   "Podcasts": {
     "podcastHeroTitle1": "AI",
     "podcastHeroTitle2": "Podcast Solutions",
     "podcastHeroSubtitle": "Turn your blog into an interactive podcast",
-
     "serviceCard1Title": "📝 Blog + AI",
     "serviceCard1Description": "Your blog becomes a podcast. Don't waste time recording, AI will do it for you based on your text input.",
     "serviceCard2Title": "🎙️ Multiple Voices",
     "serviceCard2Description": "Choose from AI voices that match your brand tone. Professional, casual, or authoritative.",
     "serviceCard3Title": "🌐 Multiple Languages",
     "serviceCard3Description": "Reach global audiences effortlessly.",
-
     "examplesSectionTitle": "Explore our",
     "examplesSectionTitleHighlight": "Podcast examples",
-
     "filterCategoryLabel": "Category",
     "filterLanguageLabel": "Language",
     "filterAllCategories": "All",
     "filterAllLanguages": "All languages",
     "filterSlovak": "Slovak",
     "filterEnglish": "English",
-
     "podcastCategoryLabel": "Category:",
     "languageIndicatorSlovak": "🇸🇰 Slovak",
     "languageIndicatorEnglish": "🇬🇧 English",
-
     "noResultsTitle": "No podcasts found",
     "noResultsDescription": "Try adjusting your filters to see more results",
     "noPodcastsFound": "No podcasts found"
@@ -407,7 +350,6 @@
     "heroFeature8": "Documents expiry",
     "heroButton": "Get free demo",
     "alreadyClient": "Already a client? Enter",
-
     "dashboardTitle": "FleetSync Dashboard",
     "dashboardSubtitle": "Vehicle Management",
     "dashboardTotalVehicles": "Total Vehicles",
@@ -419,7 +361,6 @@
     "dashboardDays7": "7 days",
     "dashboardDays14": "14 days",
     "dashboardCompleted": "Completed",
-
     "mockupTK": "Tech inspection",
     "mockupTKDate": "15.03.2025",
     "mockupTKStatus": "✓ Notification sent",
@@ -432,7 +373,6 @@
     "mockupInsurance": "Insurance",
     "mockupInsuranceDate": "31.12.2024",
     "mockupInsuranceStatus": "🚨 Critical!",
-
     "problemTitle": "Do you know",
     "problemTitleHighlight": "this problem?",
     "problemSubtitle": "Slovak companies pay thousands of euros annually in fines for missed vehicle maintenance",
@@ -448,7 +388,6 @@
     "problem4Title": "Stress and worries",
     "problem4Issue": "Constant monitoring",
     "problem4Detail": "Fear of missing deadlines",
-
     "solutionTitle": "Our",
     "solutionTitleHighlight": "solution",
     "solutionSubtitle": "Intelligent system that monitors everything for you and notifies you on time",
@@ -458,8 +397,6 @@
     "step2Description": "AI system notifies and tracks your confirmations. Dashboards in the client zone provide you with a perfect overview of all tasks related to your vehicles.",
     "step3Title": "Receive notifications",
     "step3Description": "SMS and email notifications at intervals you choose. You have enough time to plan everything without stress.",
-
-
     "calculatorTitle": "Savings",
     "calculatorTitleHighlight": "calculator",
     "calculatorWithout": "Your costs without system",
@@ -475,7 +412,6 @@
     "calculatorSavings": "Your savings:",
     "calculatorROI": "ROI: 197%",
     "calculatorROIDesc": "Investment pays back in first year",
-
     "pricingTitle": "Transparent",
     "pricingTitleHighlight": "pricing",
     "pricingSubtitle": "No setup fees • Price per vehicle",
@@ -543,7 +479,6 @@
     "analyticsShowcaseSubtitle": "From the expenses you enter on the vehicle cards, you automatically get clear charts — costs by category, monthly trends and per-vehicle comparison.",
     "businessButton": "Get started",
     "businessContact": "I want to start with the Business plan for vehicle notifications (€3/vehicle/month)",
-
     "ctaTitle": "Ready to eliminate",
     "ctaTitleHighlight": "fines?",
     "ctaSubtitle1": "Get a 15-minute personalized demo of the system for your company.",
@@ -555,7 +490,6 @@
     "pageSubtitle": "Set up your account in a few simple steps",
     "freePlanLimit": "The FREE plan is limited to 10 email notifications.",
     "backToPricing": "Back to pricing",
-
     "step1Title": "Organization Details",
     "step1Subtitle": "Tell us about your company",
     "step2Title": "Your Account",
@@ -566,7 +500,6 @@
     "step4Subtitle": "Please review and accept the following",
     "step5Title": "Review & Confirm",
     "step5Subtitle": "Please review your information before proceeding",
-
     "selectedTier": "Selected Tier",
     "billing": "Billing",
     "freeForever": "Free",
@@ -574,7 +507,6 @@
     "yearly": "Yearly",
     "year": "year",
     "month": "month",
-
     "orgName": "Organization Name",
     "orgNamePlaceholder": "Your company name",
     "orgNameAutoHint": "Leave empty for individuals",
@@ -597,7 +529,6 @@
     "priceCalculation": "Price",
     "totalPrice": "Total Price",
     "discount": "discount",
-
     "firstName": "First Name",
     "lastName": "Last Name",
     "email": "Email",
@@ -609,7 +540,6 @@
     "passwordHint": "Minimum 8 characters",
     "confirmPassword": "Confirm Password",
     "fullName": "Full Name",
-
     "verificationInfo": "We sent verification codes to your email and phone number. Enter them below to verify your identity. For testing, use code: 000000",
     "emailCode": "Email Verification Code",
     "phoneCodeLabel": "Phone Verification Code",
@@ -620,21 +550,18 @@
     "verificationSendError": "Failed to send verification codes",
     "verificationInvalid": "Invalid verification code(s). Please try again.",
     "verificationError": "Verification failed. Please try again.",
-
     "gdprAgree": "I agree to the",
     "gdprLink": "GDPR Privacy Policy",
     "termsAgree": "I agree to the",
     "termsLink": "General Terms and Conditions",
     "gdprAcceptedLabel": "GDPR Privacy Policy accepted",
     "termsAcceptedLabel": "General Terms and Conditions accepted",
-
     "reviewOrganization": "Organization",
     "reviewAccount": "Account",
     "back": "Back",
     "next": "Next",
     "createAccount": "Create Account",
     "proceedToPayment": "Proceed to Payment",
-
     "errorOrgName": "Organization name is required",
     "errorAddress": "Street, city and postal code are required",
     "errorCountry": "Country is required",
@@ -653,7 +580,6 @@
     "errorRequiredFields": "Organization name, first name, last name, email, and password are required.",
     "errorPasswordTooShort": "Password must be at least 8 characters.",
     "errorEmailExists": "This email is already registered.",
-
     "successTitle": "Account Created Successfully!",
     "successDescriptionFree": "Your free FleetSync account has been created. You can now log in and start managing your vehicles.",
     "successDescriptionPaid": "Payment successful! Your FleetSync account has been created. You can now log in and start managing your vehicles.",
@@ -665,7 +591,6 @@
     "downloadInvoice": "Download Invoice",
     "invoiceError": "Failed to generate invoice. Please try again later.",
     "invoiceSentToEmail": "The invoice has been sent to your email.",
-
     "cancelTitle": "Payment Canceled",
     "cancelDescription": "Your payment was not completed. No charges were made. You can try again or contact us for help.",
     "tryAgain": "Try Again",
@@ -964,7 +889,7 @@
     "activateYearly": "Yearly",
     "activateVehicles": "Number of Vehicles",
     "activateVehicleMin": "Minimum: 1 vehicle",
-    "activatePriceSummary": "{count} {count, plural, one {vehicle} other {vehicles}} \u00d7 {price}\u20ac/{period}",
+    "activatePriceSummary": "{count} {count, plural, one {vehicle} other {vehicles}} × {price}€/{period}",
     "activatePeriodMonth": "month",
     "activatePeriodYear": "year",
     "activatePayButton": "Pay & Activate",
@@ -986,8 +911,8 @@
     "upgradeYearly": "Yearly",
     "upgradeVehicles": "Number of Vehicles",
     "upgradeVehicleMax100": "Max 100 vehicles. For more, contact info@pictusweb.sk.",
-    "upgradeVehiclePerMonth": "{price}\u20ac/vehicle/mo",
-    "upgradePriceSummary": "{count} {count, plural, one {vehicle} other {vehicles}} \u00d7 {price}\u20ac/{period}",
+    "upgradeVehiclePerMonth": "{price}€/vehicle/mo",
+    "upgradePriceSummary": "{count} {count, plural, one {vehicle} other {vehicles}} × {price}€/{period}",
     "upgradePeriodMonth": "month",
     "upgradePeriodYear": "year",
     "upgradeProratedNote": "You will be charged the prorated price difference immediately.",
@@ -1200,5 +1125,166 @@
     "authError": "An authentication error occurred.",
     "errorLabel": "Error:",
     "tryAgain": "Try Again"
+  },
+  "Landing": {
+    "skipLink": "Skip to content",
+    "nav": {
+      "services": "Services",
+      "about": "About",
+      "work": "Work",
+      "process": "Process",
+      "contact": "Contact",
+      "menu": "Menu",
+      "aria": "Main navigation",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "title": "Welcome to the digital oasis",
+      "lede": "We build websites and digital tools that work for you and your customers.",
+      "cta": "Start a project",
+      "actionsAria": "Intro actions"
+    },
+    "services": {
+      "kicker": "Services",
+      "title": "What we can help with",
+      "subtitle": "Pick what you need right now. The active service shows detail and a visual on the left.",
+      "visualButton": "See our work",
+      "rows": [
+        {
+          "title": "Websites",
+          "summary": "We design and build your site from the ground up. You always know what stage we're at and what comes next.",
+          "alt": "Websites"
+        },
+        {
+          "title": "Web redesign",
+          "summary": "When a site has been through too much and it shows. We take a fresh look and give it new life.",
+          "alt": "Web redesign"
+        },
+        {
+          "title": "AI podcasts",
+          "summary": "We create content with AI so it feels natural, professional, and genuinely valuable.",
+          "alt": "AI podcasts"
+        },
+        {
+          "title": "Fleetsync",
+          "summary": "A system to manage your car and its service tasks. Fewer forgotten deadlines, fewer “we should have handled this last month” moments.",
+          "alt": "Fleetsync"
+        },
+        {
+          "title": "Ongoing support",
+          "summary": "Websites change. So do businesses. We're here for you even after handover.",
+          "alt": "Ongoing support"
+        }
+      ]
+    },
+    "about": {
+      "title": "About us and Pictus",
+      "text": "Two ordinary people who love digital work. And yes, Pictus really is a member of the team.",
+      "cta": "Get to know us"
+    },
+    "work": {
+      "kicker": "Selected work",
+      "title": "What Pictus is proud of"
+    },
+    "process": {
+      "kicker": "Process",
+      "title": "How working with us works",
+      "visualButton": "See our work",
+      "rows": [
+        {
+          "title": "Listen",
+          "summary": "We start with a conversation to find out what you really need, who it's for, and how the whole thing should feel."
+        },
+        {
+          "title": "Shape",
+          "summary": "We turn what we heard into structure and direction. Clear logic before we touch anything visual."
+        },
+        {
+          "title": "Build",
+          "summary": "Once we agree on the shape, we move into design and development. Step by step, with milestones you'll always know about."
+        },
+        {
+          "title": "Hand over",
+          "summary": "We hand over a working result you can use, with an explanation of how, and the reassurance that we're here if anything comes up."
+        }
+      ]
+    },
+    "testimonials": {
+      "title": "What made Pictus happy",
+      "items": [
+        {
+          "quote": "Peter created my website professionally, promptly, with quality and at a reasonable price. I'm very happy with the result. Thank you, Peter.",
+          "name": "Ioana Mindrila",
+          "role": "Designer - IoanaM"
+        },
+        {
+          "quote": "Working with Peter is excellent — great communication and a great result. He enjoys the work and does it honestly and thoroughly. I'll definitely count on him for my future projects.",
+          "name": "Tomáš Dovala",
+          "role": "CEO - Dovala Construction"
+        },
+        {
+          "quote": "I've worked with Peter for many years in different areas, and his friendly approach and willingness to help always make my day. Thank you.",
+          "name": "Leo Grman",
+          "role": "Manager - prud.sk"
+        },
+        {
+          "quote": "If you're looking for someone reliable and skilled, Peter is your guy. I'm very happy with his work and recommend working with him.",
+          "name": "Michal Dovala",
+          "role": "Real estate agent - michaldovala.sk"
+        },
+        {
+          "quote": "Excellent cooperation, easy understanding of my requirements and comments, and flexibility with the options I had to choose from.",
+          "name": "Samuel Koriťák",
+          "role": "Author - cestazivota.sk"
+        },
+        {
+          "quote": "I approached Pictusweb to style the graphic design of my website. I rate the cooperation very positively — he was very pleasant, helpful, and fast. I definitely recommend him.",
+          "name": "Vladimír Chovanec",
+          "role": "Physiotherapist - fyziology.sk"
+        },
+        {
+          "quote": "Great and professional work, always sticks to what we agree on, and he's creative on top of that. I recommend him to everyone.",
+          "name": "Ján Prievozník",
+          "role": "Owner - bow4bass.com"
+        }
+      ]
+    },
+    "cta": {
+      "title": "Get in touch, we'd love to hear from you",
+      "form": {
+        "name": "Name",
+        "email": "Email",
+        "emailPlaceholder": "E-mail",
+        "projectType": "Project type",
+        "message": "Message",
+        "send": "Send",
+        "sending": "Sending…",
+        "success": "Thank you! We'll be in touch soon.",
+        "error": "Something went wrong. Please try again.",
+        "options": [
+          "Websites",
+          "Web redesign",
+          "AI podcasts",
+          "Fleetsync",
+          "Branding",
+          "Ongoing support",
+          "I'm not sure"
+        ]
+      }
+    },
+    "footer": {
+      "brand": "Pictusweb",
+      "contactLabel": "Contact",
+      "forClients": "For clients",
+      "portfolio": "Portfolio",
+      "navAria": "Footer navigation",
+      "servicesAria": "Footer services",
+      "legalAria": "Legal links",
+      "service1": "Website design & development",
+      "service2": "Website redesign",
+      "service3": "AI Podcasts",
+      "service4": "Fleetsync",
+      "terms": "Terms & conditions"
+    }
   }
 }

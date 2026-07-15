@@ -1,43 +1,44 @@
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
       colors: {
         // Pictus Brand Colors
         pictus: {
-          black: '#141511',
-          white: '#F8F8F8',
-          lime: '#B6E036',
-          // Lemon Lime Palette
-          lime50: '#F7FCE9',
-          lime100: '#EFFBD3',
-          lime200: '#DFFA7',
-          lime300: '#CEEA7B',
-          lime400: '#BEE34F',
-          lime500: '#AEDD22',
-          lime600: '#9BD015',
-          lime700: '#88B419',
-          lime800: '#6F9618',
-          lime900: '#5C7D17',
-          lime950: '#32470C',
-          // Onyx Palette (Dark grays)
+          black: '#0e0f10',
+          white: '#f4f2ee',
+          // Moss accent ramp (Digital Oasis) — replaces the old lemon-lime scale
+          // so the whole app UI reads in the same moss-on-graphite spirit.
+          lime: '#94b84a',
+          lime50: '#eef4dd',
+          lime100: '#e4ecc9',
+          lime200: '#d3e0a8',
+          lime300: '#c8da90',
+          lime400: '#b5c97a',
+          lime500: '#a6c05f',
+          lime600: '#7a9c36',
+          lime700: '#62801f',
+          lime800: '#4c6417',
+          lime900: '#3d4a22',
+          lime950: '#2a331a',
+          // Graphite ramp (warm-dark neutrals)
           onyx50: '#F3F4F1',
           onyx100: '#E7E9E3',
           onyx200: '#CFD2C8',
           onyx300: '#B7BBAA',
-          onyx400: '#9FA8F',
+          onyx400: '#9FA88F',
           onyx500: '#878F71',
-          onyx600: '#6C710B',
-          onyx700: '#515944',
-          onyx800: '#3B3920',
-          onyx900: '#1B1C17',
-          onyx950: '#13140D',
+          onyx600: '#6e6c68',
+          onyx700: '#3f423f',
+          onyx800: '#202325',
+          onyx900: '#191b1d',
+          onyx950: '#131415',
           // Bright Snow Palette (Light grays)
           snow50: '#F2F2F2',
           snow100: '#E6E6E6',
@@ -56,12 +57,11 @@ const config: Config = {
         'brutal-milk': ['"Brutal Milk"', 'sans-serif'],
       },
       backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
   },
   plugins: [],
-};
-export default config;
+}
+export default config
