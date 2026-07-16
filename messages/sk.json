@@ -1149,6 +1149,9 @@
       "title": "S čím ti vieme pomôcť",
       "subtitle": "Vyber si, čo práve potrebuješ. Aktívna služba ukáže detail a vizuál vľavo.",
       "visualButton": "Pozri práce",
+      "podcastsButton": "Pozri podcasty",
+      "fleetsyncButton": "Pozri FleetSync",
+      "contactButton": "Napíš nám",
       "rows": [
         {
           "title": "Webové stránky",
@@ -1157,12 +1160,12 @@
         },
         {
           "title": "Web redesign",
-          "summary": "Keď web prežil príliš veľa a je to na ňom vidno. Pozrieme sa naň čerstvým pohľadom a dáme mu nový život.",
+          "summary": "Máš starší web, ktorý potrebuje osviežiť? Dáme mu moderný dizajn, rýchlosť a druhý dych — bez straty toho, čo funguje.",
           "alt": "Web redesign"
         },
         {
           "title": "AI podcasty",
-          "summary": "Vytvárame obsah pomocou AI tak, aby pôsobil prirodzene, profesionálne a mal reálnu hodnotu.",
+          "summary": "Z tvojho blogu či textu vytvoríme plnohodnotný AI podcast — prirodzený, profesionálny a vo viacerých jazykoch. Ukážky nájdeš v sekcii Podcasty.",
           "alt": "AI podcasty"
         },
         {

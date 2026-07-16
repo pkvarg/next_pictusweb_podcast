@@ -1,8 +1,14 @@
 'use client'
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useParams } from 'next/navigation'
 
 type ServiceRow = { title: string; summary: string; alt: string }
+
+// Service rows whose CTA links to a dedicated page instead of "#selected-work".
+const PODCASTS_INDEX = 2
+const FLEETSYNC_INDEX = 3
+const SUPPORT_INDEX = 4
 
 const images = [
   '/pictus/services/web.png',
@@ -14,8 +20,22 @@ const images = [
 
 const PictusServices = () => {
   const t = useTranslations('Landing')
+  const { locale } = useParams()
   const rows = t.raw('services.rows') as ServiceRow[]
   const [active, setActive] = useState(0)
+
+  let ctaHref = '#selected-work'
+  let ctaLabel = t('services.visualButton')
+  if (active === PODCASTS_INDEX) {
+    ctaHref = `/${locale as string}/podcasts`
+    ctaLabel = t('services.podcastsButton')
+  } else if (active === FLEETSYNC_INDEX) {
+    ctaHref = `/${locale as string}/fleetsync`
+    ctaLabel = t('services.fleetsyncButton')
+  } else if (active === SUPPORT_INDEX) {
+    ctaHref = '#contact'
+    ctaLabel = t('services.contactButton')
+  }
 
   return (
     <section className="section-shell" id="services" aria-labelledby="services-title">
@@ -58,8 +78,8 @@ const PictusServices = () => {
                 alt={rows[active]?.alt ?? ''}
                 loading="lazy"
               />
-              <a className="button button-primary service-visual-button" href="#selected-work">
-                {t('services.visualButton')}
+              <a className="button button-primary service-visual-button" href={ctaHref}>
+                {ctaLabel}
               </a>
             </div>
           </div>

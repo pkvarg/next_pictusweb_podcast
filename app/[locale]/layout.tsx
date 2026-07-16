@@ -12,18 +12,21 @@ import AuthSessionProvider from '@/app/components/SessionProvider'
 import { prodLogger } from '@/lib/prodLogger'
 import ClientErrorHandler from '@/app/components/ClientErrorHandler'
 import ConditionalUmami from '@/app/components/ConditionalUmami'
+import CookieBanner from '@/app/components/CookieBanner'
 
 const inter = Yanone_Kaffeesatz({ subsets: ['latin'] })
 
-export async function generateMetadata({ params }: {
+export async function generateMetadata({
+  params,
+}: {
   params: Promise<{ locale: string }>
 }): Promise<Metadata> {
   prodLogger.serverComponentStart('generateMetadata', { hasParams: !!params })
-  
+
   try {
     const { locale } = await params
     prodLogger.info('generateMetadata: params resolved', { locale })
-    
+
     // Validate locale and enable static rendering
     let validLocale = locale
     if (!['en', 'sk', 'hu'].includes(locale)) {
@@ -31,12 +34,15 @@ export async function generateMetadata({ params }: {
       // Fallback to default locale
       validLocale = 'sk'
     }
-    
+
     // Enable static rendering for next-intl
     setRequestLocale(validLocale)
-    
+
     const t = await getTranslations({ locale: validLocale, namespace: 'Home' })
-    prodLogger.info('generateMetadata: translations loaded', { locale: validLocale, namespace: 'Home' })
+    prodLogger.info('generateMetadata: translations loaded', {
+      locale: validLocale,
+      namespace: 'Home',
+    })
 
     const metadata = {
       title: t('metaTitle'),
@@ -55,30 +61,35 @@ export async function generateMetadata({ params }: {
         type: 'website',
         siteName: 'pictusweb.sk',
         url: 'https://www.pictusweb.sk',
-        images: [{
-          url: 'https://www.pictusweb.sk/og-image.webp',
-          width: 1200,
-          height: 630,
-          alt: 'pictusweb.sk',
-        }],
+        images: [
+          {
+            url: 'https://www.pictusweb.sk/og-image.webp',
+            width: 1200,
+            height: 630,
+            alt: 'pictusweb.sk',
+          },
+        ],
       },
       alternates: {
-        canonical: validLocale === 'sk' ? 'https://www.pictusweb.sk/' : `https://www.pictusweb.sk/${validLocale}`,
+        canonical:
+          validLocale === 'sk'
+            ? 'https://www.pictusweb.sk/'
+            : `https://www.pictusweb.sk/${validLocale}`,
         languages: {
-          'en': 'https://www.pictusweb.sk/en',
-          'sk': 'https://www.pictusweb.sk/sk',
-          'hu': 'https://www.pictusweb.sk/hu',
+          en: 'https://www.pictusweb.sk/en',
+          sk: 'https://www.pictusweb.sk/sk',
+          hu: 'https://www.pictusweb.sk/hu',
         },
       },
     }
-    
+
     prodLogger.serverComponentEnd('generateMetadata')
     return metadata
   } catch (error) {
     prodLogger.error('Error in generateMetadata', {
       component: 'generateMetadata',
       error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
     })
     throw error
   }
@@ -95,13 +106,16 @@ export default async function RootLayout({
   children: React.ReactNode
   params: Promise<{ locale: 'en' | 'sk' | 'hu' }>
 }>) {
-  prodLogger.serverComponentStart('LocaleRootLayout', { hasParams: !!params, hasChildren: !!children })
-  
+  prodLogger.serverComponentStart('LocaleRootLayout', {
+    hasParams: !!params,
+    hasChildren: !!children,
+  })
+
   try {
     prodLogger.info('LocaleRootLayout: awaiting params')
     const { locale } = await params
     prodLogger.info('LocaleRootLayout: params resolved', { locale })
-    
+
     // Validate locale and enable static rendering
     let validLocale = locale
     if (!['en', 'sk', 'hu'].includes(locale)) {
@@ -109,13 +123,15 @@ export default async function RootLayout({
       // Fallback to default locale
       validLocale = 'sk'
     }
-    
+
     // Enable static rendering for next-intl
     setRequestLocale(validLocale)
-    
+
     prodLogger.info('LocaleRootLayout: loading messages')
     const messages = await getMessages({ locale: validLocale })
-    prodLogger.info('LocaleRootLayout: messages loaded', { messageKeys: Object.keys(messages || {}).length })
+    prodLogger.info('LocaleRootLayout: messages loaded', {
+      messageKeys: Object.keys(messages || {}).length,
+    })
 
     const result = (
       <NextIntlClientProvider messages={messages}>
@@ -132,20 +148,21 @@ export default async function RootLayout({
                 <Toaster />
                 <PodcastPlayer />
                 <ScrollToTop />
+                <CookieBanner />
               </body>
             </AudioProvider>
           </AuthSessionProvider>
         </html>
       </NextIntlClientProvider>
     )
-    
+
     prodLogger.serverComponentEnd('LocaleRootLayout')
     return result
   } catch (error) {
     prodLogger.error('Error in LocaleRootLayout', {
       component: 'LocaleRootLayout',
       error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
     })
     throw error
   }

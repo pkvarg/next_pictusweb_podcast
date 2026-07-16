@@ -394,7 +394,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .pl .section-shell[id] {
-  scroll-margin-top: 88px;
+  scroll-margin-top: 150px;
 }
 
 .pl .section-muted {
@@ -3855,5 +3855,34 @@ input[type='date']::-webkit-calendar-picker-indicator {
     flex-direction: column;
     align-items: flex-start;
     gap: 14px;
+  }
+}
+
+/* CTA anchor now lives on the form so "#contact" links land on the form,
+   not above the oversized heading. Offset for the sticky header. */
+.pl .cta .contact-card {
+  scroll-margin-top: 250px;
+}
+
+/* #services should scroll to the top of its title (like #contact), so cancel
+   the section's top padding that otherwise pushes the heading ~110px down. */
+.pl #services {
+  scroll-margin-top: calc(-1 * clamp(72px, 7.6vw, 116px));
+}
+
+/* Land each section's title at the top on anchor navigation (like #contact),
+   by cancelling the section's own top padding via a negative scroll offset. */
+.pl #selected-work {
+  scroll-margin-top: calc(-1 * clamp(72px, 10vw, 148px));
+}
+.pl #process {
+  scroll-margin-top: calc(-1 * clamp(76px, 8vw, 124px));
+}
+.pl #about {
+  scroll-margin-top: calc(-1 * clamp(92px, 8vw, 122px));
+}
+@media (max-width: 980px) {
+  .pl #about {
+    scroll-margin-top: calc(-1 * clamp(72px, 12vw, 104px));
   }
 }

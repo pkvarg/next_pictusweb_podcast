@@ -1149,6 +1149,9 @@
       "title": "Miben tudunk segíteni",
       "subtitle": "Válaszd ki, mire van most szükséged. Az aktív szolgáltatás bal oldalon mutatja a részletet és a vizuált.",
       "visualButton": "Nézd meg a munkáinkat",
+      "podcastsButton": "Podcastok megtekintése",
+      "fleetsyncButton": "FleetSync megtekintése",
+      "contactButton": "Írj nekünk",
       "rows": [
         {
           "title": "Weboldalak",
@@ -1157,12 +1160,12 @@
         },
         {
           "title": "Webes újratervezés",
-          "summary": "Amikor egy oldal túl sokat élt meg, és ez látszik is rajta. Friss szemmel nézünk rá, és új életet lehelünk belé.",
+          "summary": "Van egy régebbi weboldalad, amely ráférne egy frissítésre? Modern dizájnt, gyorsaságot és új lendületet adunk neki — anélkül, hogy elveszne, ami már működik.",
           "alt": "Webes újratervezés"
         },
         {
           "title": "AI podcastok",
-          "summary": "AI segítségével készítünk tartalmat úgy, hogy természetesnek, profinak hasson és valódi értéke legyen.",
+          "summary": "Blogodból vagy szövegedből teljes értékű AI podcastot készítünk — természetes, profi és több nyelven. Mintákat a Podcastok oldalon hallgathatsz.",
           "alt": "AI podcastok"
         },
         {

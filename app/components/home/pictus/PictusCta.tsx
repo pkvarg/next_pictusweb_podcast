@@ -83,11 +83,7 @@ const PictusCta = () => {
   const formRef = useRef<HTMLFormElement>(null)
 
   return (
-    <section
-      className="section-shell section-muted cta"
-      id="contact"
-      aria-labelledby="contact-title"
-    >
+    <section className="section-shell section-muted cta" aria-labelledby="contact-title">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="cta-background"
@@ -99,7 +95,7 @@ const PictusCta = () => {
         aria-hidden="true"
       />
       <div className="layout-container cta-content">
-        <form className="contact-card" ref={formRef} onSubmit={handleSubmit}>
+        <form className="contact-card" id="contact" ref={formRef} onSubmit={handleSubmit}>
           <div className="contact-field">
             <label htmlFor="contact-name">{th('contactName')}</label>
             <input

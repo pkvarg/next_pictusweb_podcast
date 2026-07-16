@@ -1,8 +1,6 @@
 'use client'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
-import { updateVisitors } from '@/lib/visitorsCounter'
-import CookieConsent from 'react-cookie-consent'
 import Image from 'next/image'
 
 const satoshi = { fontFamily: 'Satoshi, system-ui, sans-serif' }
@@ -10,59 +8,8 @@ const satoshi = { fontFamily: 'Satoshi, system-ui, sans-serif' }
 const Footer = () => {
   const t = useTranslations('Home')
 
-  const increaseVisitors = async () => {
-    await updateVisitors()
-  }
-
   return (
     <footer className="bg-pictus-onyx950 pb-10 pt-20" style={satoshi}>
-      <CookieConsent
-        location="bottom"
-        style={{
-          background: 'rgba(14, 15, 16, 0.9)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          color: '#e4e4e7',
-          fontSize: '15px',
-          textAlign: 'start',
-          borderTop: '1px solid rgba(148, 184, 74, 0.15)',
-          padding: '14px 24px',
-          alignItems: 'center',
-        }}
-        buttonStyle={{
-          background: '#94b84a',
-          color: '#0e0f10',
-          fontSize: '14px',
-          fontWeight: 700,
-          padding: '10px 32px',
-          borderRadius: '9999px',
-          border: 'none',
-        }}
-        buttonText="OK"
-        expires={365}
-        enableDeclineButton
-        onDecline={() => {
-          localStorage.setItem('CookieConsent', 'false')
-          increaseVisitors()
-        }}
-        declineButtonStyle={{
-          background: 'transparent',
-          color: '#a1a1aa',
-          fontSize: '14px',
-          fontWeight: 400,
-          padding: '10px 24px',
-          borderRadius: '9999px',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-        }}
-        declineButtonText={t('cookiesDisagree')}
-        onAccept={() => {
-          localStorage.setItem('CookieConsent', 'true')
-          increaseVisitors()
-        }}
-      >
-        {t('cookies')}
-      </CookieConsent>
-
       <div className="mx-auto w-[min(100%-2rem,1296px)]">
         <div className="grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-[1.6fr_1fr_1fr]">
           {/* Brand + contact */}

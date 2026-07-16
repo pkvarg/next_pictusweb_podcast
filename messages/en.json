@@ -1149,6 +1149,9 @@
       "title": "What we can help with",
       "subtitle": "Pick what you need right now. The active service shows detail and a visual on the left.",
       "visualButton": "See our work",
+      "podcastsButton": "See podcasts",
+      "fleetsyncButton": "See FleetSync",
+      "contactButton": "Get in touch",
       "rows": [
         {
           "title": "Websites",
@@ -1157,12 +1160,12 @@
         },
         {
           "title": "Web redesign",
-          "summary": "When a site has been through too much and it shows. We take a fresh look and give it new life.",
+          "summary": "Got an older site that needs a refresh? We give it a modern design, better speed and a second wind — without losing what already works.",
           "alt": "Web redesign"
         },
         {
           "title": "AI podcasts",
-          "summary": "We create content with AI so it feels natural, professional, and genuinely valuable.",
+          "summary": "We turn your blog or text into a full AI podcast — natural, professional and in multiple languages. Hear samples on the Podcasts page.",
           "alt": "AI podcasts"
         },
         {
