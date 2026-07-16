@@ -250,7 +250,7 @@ const ClientZone = () => {
           <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/15 flex items-center justify-center">
             <X className="w-10 h-10 text-red-400" />
           </div>
-          <h1 className="text-3xl font-light mb-4 text-red-400">{t('accessDenied')}</h1>
+          <h1 className="text-3xl font-bold mb-4 text-red-400">{t('accessDenied')}</h1>
           <p className="text-lg text-gray-300 mb-6">{t('orgDeactivated')}</p>
           <p className="text-sm text-gray-500 mb-8">
             {t('orgDeactivatedHint')}{' '}
@@ -290,7 +290,7 @@ const ClientZone = () => {
                   <UserCheck size={18} className="text-pictus-black" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-light">Pictusweb</h1>
+                  <h1 className="text-2xl font-bold">Pictusweb</h1>
                   <p className="text-lg text-pictus-lime hidden sm:block">FleetSync</p>
                 </div>
               </Link>
@@ -368,7 +368,7 @@ const ClientZone = () => {
         {/* Welcome Section */}
         <section className="py-10 sm:py-20">
           <div className="text-center mb-8 sm:mb-16">
-            <h1 className="text-3xl sm:text-5xl font-light text-pictus-white mb-4 sm:mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-6xl font-extrabold text-pictus-white mb-4 sm:mb-6 leading-[0.95]">
               {t('welcomeTitle')}
             </h1>
             <p className="text-xl sm:text-3xl text-pictus-lime mb-2 sm:mb-3">
@@ -377,7 +377,7 @@ const ClientZone = () => {
             {organization?.tierRelation?.name && (
               <p className="text-sm text-gray-400 mb-3 sm:mb-4">{organization.tierRelation.name}</p>
             )}
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-light leading-tight text-center mb-6 sm:mb-8">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold leading-[0.95] text-center mb-6 sm:mb-8">
               FleetSync
             </h2>
           </div>
@@ -477,7 +477,7 @@ const ClientZone = () => {
           <div className="bg-pictus-onyx900 rounded-3xl p-6 sm:p-8 border border-white/[0.06]">
             <div className="flex items-center gap-3 mb-6">
               <User className="w-6 h-6 text-pictus-lime" />
-              <h2 className="text-2xl sm:text-3xl font-light text-pictus-white">
+              <h2 className="text-2xl sm:text-3xl font-bold text-pictus-white">
                 {t('accountInfo')}
               </h2>
             </div>
@@ -486,7 +486,7 @@ const ClientZone = () => {
               <div className="">
                 <div className="flex items-center gap-2 mb-3">
                   <User className="w-5 h-5 text-pictus-lime" />
-                  <h3 className="text-xl font-normal text-pictus-white">{t('userProfile')}</h3>
+                  <h3 className="text-xl font-bold text-pictus-white">{t('userProfile')}</h3>
                 </div>
                 <div className="space-y-2">
                   <div>
@@ -506,7 +506,7 @@ const ClientZone = () => {
               <div className="">
                 <div className="flex items-center gap-2 mb-3">
                   <Lock className="w-5 h-5 text-pictus-lime" />
-                  <h3 className="text-xl font-normal text-pictus-white">{t('changePassword')}</h3>
+                  <h3 className="text-xl font-bold text-pictus-white">{t('changePassword')}</h3>
                 </div>
 
                 {!showPasswordChange ? (
@@ -648,9 +648,7 @@ const ClientZone = () => {
                 <div className="md:col-span-2 border-t border-white/[0.06] pt-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Car className="w-5 h-5 text-pictus-lime" />
-                    <h3 className="text-xl font-normal text-pictus-white">
-                      {t('subscriptionInfo')}
-                    </h3>
+                    <h3 className="text-xl font-bold text-pictus-white">{t('subscriptionInfo')}</h3>
                   </div>
                   <div className="grid sm:grid-cols-3 gap-4">
                     <div>

@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { usePathname, useRouter } from 'next/navigation'
 import { Link } from '@/i18n/routing'
+import { Menu, X } from 'lucide-react'
 
 const languages = [
   { code: 'sk', label: 'SK', flag: '🇸🇰' },
@@ -93,10 +94,11 @@ const PictusPagesHeader = () => {
             className="menu-control"
             type="button"
             aria-controls="primary-nav"
+            aria-label={tl('nav.menu')}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
           >
-            {tl('nav.menu')}
+            {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
           </button>
         </div>
       </div>

@@ -15,7 +15,7 @@ const Footer = () => {
   }
 
   return (
-    <footer className="bg-pictus-onyx900 pb-[76px] pt-20" style={satoshi}>
+    <footer className="bg-pictus-onyx950 pb-10 pt-20" style={satoshi}>
       <CookieConsent
         location="bottom"
         style={{
@@ -63,59 +63,79 @@ const Footer = () => {
         {t('cookies')}
       </CookieConsent>
 
-      <div className="mx-auto grid w-[min(100%-2rem,1296px)] grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-[minmax(0,1fr)_184px_260px]">
-        {/* Brand column */}
-        <div className="grid content-start gap-8">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-base font-bold text-pictus-white"
-            aria-label="Pictus home"
-          >
-            <Image src="/pictus/PictusMOSS.svg" width={26} height={26} alt="" />
-            Pictusweb
-          </Link>
-          <div className="grid gap-2 text-[0.95rem] leading-tight text-pictus-white/75">
-            <strong className="font-bold text-pictus-lime">Kontakt</strong>
-            <a href="tel:+421948024638" className="hover:text-pictus-white">
-              +421 948 024 638
-            </a>
-            <a href="mailto:info@pictusweb.sk" className="hover:text-pictus-white">
-              info@pictusweb.sk
-            </a>
+      <div className="mx-auto w-[min(100%-2rem,1296px)]">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-[1.6fr_1fr_1fr]">
+          {/* Brand + contact */}
+          <div className="grid max-w-[340px] content-start gap-6">
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 text-[1.2rem] font-bold text-pictus-white"
+              aria-label="Pictus home"
+            >
+              <Image src="/pictus/PictusMOSS.svg" width={30} height={30} alt="" />
+              Pictusweb
+            </Link>
+            <div className="grid gap-2.5 text-[0.95rem] leading-tight text-pictus-white/70">
+              <span className="mb-1 text-[0.74rem] font-bold uppercase tracking-[0.14em] text-pictus-lime">
+                {t('footerCategory3')}
+              </span>
+              <a href="tel:+421948024638" className="hover:text-pictus-white">
+                +421 948 024 638
+              </a>
+              <a href="mailto:info@pictusweb.sk" className="hover:text-pictus-white">
+                info@pictusweb.sk
+              </a>
+            </div>
+            <Link
+              href="/client"
+              className="inline-flex w-fit items-center gap-1.5 font-bold text-pictus-lime transition-colors hover:text-pictus-lime300"
+            >
+              {t('footerForClients')} <span aria-hidden="true">→</span>
+            </Link>
           </div>
-          <Link
-            href="/client"
-            className="font-bold text-pictus-lime transition-colors hover:text-pictus-lime300"
-          >
-            {t('footerForClients')}
-          </Link>
+
+          {/* Pages */}
+          <nav className="grid content-start gap-3.5 text-[0.98rem]">
+            <span className="mb-1 text-[0.74rem] font-bold uppercase tracking-[0.14em] text-pictus-lime">
+              {t('footerCategory2')}
+            </span>
+            <Link href="/fleetsync" className="text-pictus-white/70 hover:text-pictus-white">
+              {t('footerService6')}
+            </Link>
+            <Link href="/projects" className="text-pictus-white/70 hover:text-pictus-white">
+              {t('navbarProjects')}
+            </Link>
+            <Link href="/podcasts" className="text-pictus-white/70 hover:text-pictus-white">
+              {t('navbarPodcasts')}
+            </Link>
+            <Link href="/contact" className="text-pictus-white/70 hover:text-pictus-white">
+              {t('navbarContact')}
+            </Link>
+          </nav>
+
+          {/* Company blurb */}
+          <div className="grid content-start gap-3.5 text-[0.98rem]">
+            <span className="mb-1 text-[0.74rem] font-bold uppercase tracking-[0.14em] text-pictus-lime">
+              Pictusweb
+            </span>
+            <p className="max-w-[280px] leading-relaxed text-pictus-white/70">
+              {t('companyDescription1')}
+            </p>
+          </div>
         </div>
 
-        {/* Pages */}
-        <nav className="grid content-start gap-[18px] text-[0.95rem] text-pictus-white/75">
-          <Link href="/fleetsync" className="hover:text-pictus-white">
-            {t('footerService6')}
-          </Link>
-          <Link href="/projects" className="hover:text-pictus-white">
-            {t('navbarProjects')}
-          </Link>
-          <Link href="/podcasts" className="hover:text-pictus-white">
-            {t('navbarPodcasts')}
-          </Link>
-          <Link href="/contact" className="hover:text-pictus-white">
-            {t('navbarContact')}
-          </Link>
-        </nav>
-
-        {/* Legal / meta */}
-        <div className="grid content-start gap-[18px] text-[0.95rem] text-pictus-white/75">
-          <Link href="/gdpr" className="hover:text-pictus-white">
-            GDPR
-          </Link>
-          <Link href="/trade-rules" className="hover:text-pictus-white">
-            {t('footerTradeRules')}
-          </Link>
-          <p className="mt-2 text-pictus-white/50">&copy; {new Date().getFullYear()} Pictusweb</p>
+        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row sm:items-center">
+          <p className="text-[0.9rem] text-pictus-white/50">
+            &copy; {new Date().getFullYear()} Pictusweb
+          </p>
+          <div className="flex gap-6 text-[0.9rem] text-pictus-white/50">
+            <Link href="/gdpr" className="hover:text-pictus-lime">
+              GDPR
+            </Link>
+            <Link href="/trade-rules" className="hover:text-pictus-lime">
+              {t('footerTradeRules')}
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

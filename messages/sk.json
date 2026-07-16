@@ -1179,7 +1179,7 @@
     },
     "about": {
       "title": "O nás a Pictusovi",
-      "text": "Dvaja obyčajní ľudia ktorých baví digitálna tvorba. A hej, Pictus je fakt člen tímu.",
+      "text": "Dvaja obyčajní ľudia ktorých baví digitálna tvorba. A naozaj, Pictus je člen tímu.",
       "cta": "Spoznaj nás"
     },
     "work": {
@@ -1250,7 +1250,7 @@
       ]
     },
     "cta": {
-      "title": "Ozvi sa, budeme sa tešiť",
+      "title": "Začnime bez záväzkov",
       "form": {
         "name": "Meno",
         "email": "Email",
@@ -1276,6 +1276,7 @@
       "brand": "Pictusweb",
       "contactLabel": "Kontakt",
       "forClients": "Pre klientov",
+      "exploreLabel": "Preskúmať",
       "portfolio": "Portfolio",
       "navAria": "Navigácia v pätičke",
       "servicesAria": "Služby v pätičke",

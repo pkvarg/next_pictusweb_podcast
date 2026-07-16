@@ -1179,7 +1179,7 @@
     },
     "about": {
       "title": "Rólunk és Pictusról",
-      "text": "Két hétköznapi ember, akiket lelkesít a digitális alkotás. És igen, Pictus tényleg a csapat tagja.",
+      "text": "Két hétköznapi ember, akik szeretik a digitális alkotást. És tényleg, Pictus a csapat tagja.",
       "cta": "Ismerj meg minket"
     },
     "work": {
@@ -1250,7 +1250,7 @@
       ]
     },
     "cta": {
-      "title": "Írj nekünk, örülni fogunk",
+      "title": "Kezdjük, kötöttségek nélkül",
       "form": {
         "name": "Név",
         "email": "Email",
@@ -1276,6 +1276,7 @@
       "brand": "Pictusweb",
       "contactLabel": "Kapcsolat",
       "forClients": "Ügyfeleknek",
+      "exploreLabel": "Fedezd fel",
       "portfolio": "Portfólió",
       "navAria": "Lábléc navigáció",
       "servicesAria": "Szolgáltatások a láblécben",

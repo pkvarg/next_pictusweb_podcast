@@ -4,6 +4,16 @@ import { useTranslations } from 'next-intl'
 
 type Testimonial = { quote: string; name: string; role: string }
 
+const avatars = [
+  '/ionuca1.webp',
+  '/tomas1.webp',
+  '/leo1.webp',
+  '/michal.webp',
+  '/sam1.webp',
+  '/vlado.webp',
+  '/jp-review.webp',
+]
+
 const PictusTestimonials = () => {
   const t = useTranslations('Landing')
   const items = t.raw('testimonials.items') as Testimonial[]
@@ -42,6 +52,15 @@ const PictusTestimonials = () => {
                 <figure className="testimonial-quote">
                   <blockquote>{`“${item.quote}”`}</blockquote>
                   <figcaption>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="testimonial-avatar"
+                      src={avatars[index]}
+                      width={72}
+                      height={72}
+                      alt={item.name}
+                      loading="lazy"
+                    />
                     <strong>{item.name}</strong>
                     <span>{item.role}</span>
                   </figcaption>

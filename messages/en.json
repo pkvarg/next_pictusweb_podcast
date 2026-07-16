@@ -1179,7 +1179,7 @@
     },
     "about": {
       "title": "About us and Pictus",
-      "text": "Two ordinary people who love digital work. And yes, Pictus really is a member of the team.",
+      "text": "Two ordinary people who love digital work. And really, Pictus is a member of the team.",
       "cta": "Get to know us"
     },
     "work": {
@@ -1250,7 +1250,7 @@
       ]
     },
     "cta": {
-      "title": "Get in touch, we'd love to hear from you",
+      "title": "Let's start, no strings attached",
       "form": {
         "name": "Name",
         "email": "Email",
@@ -1276,6 +1276,7 @@
       "brand": "Pictusweb",
       "contactLabel": "Contact",
       "forClients": "For clients",
+      "exploreLabel": "Explore",
       "portfolio": "Portfolio",
       "navAria": "Footer navigation",
       "servicesAria": "Footer services",

@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { usePathname, useRouter } from 'next/navigation'
 import { Link } from '@/i18n/routing'
 import Image from 'next/image'
+import { Menu, X } from 'lucide-react'
 
 const satoshi = { fontFamily: 'Satoshi, system-ui, sans-serif' }
 
@@ -46,7 +47,7 @@ const PagesHeader = () => {
 
   return (
     <header
-      className="sticky top-0 z-40 bg-[#0e0f10]/85 backdrop-blur-md"
+      className="sticky top-0 z-40 bg-[#0e0f10]/85 backdrop-blur-md md:bg-transparent md:bg-gradient-to-b md:from-[#0e0f10]/55 md:to-transparent md:backdrop-blur-none"
       style={satoshi}
       aria-label="Site header"
     >
@@ -104,9 +105,14 @@ const PagesHeader = () => {
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
             aria-expanded={menuOpen}
-            className="inline-flex h-11 items-center rounded-full bg-pictus-onyx900 px-4 text-[0.92rem] font-bold text-pictus-white/80 md:hidden"
+            aria-label="Menu"
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-full bg-pictus-onyx900 md:hidden ${
+              menuOpen
+                ? 'text-pictus-lime ring-1 ring-inset ring-pictus-lime/50'
+                : 'text-pictus-white/80'
+            }`}
           >
-            Menu
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
@@ -114,13 +120,13 @@ const PagesHeader = () => {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="mx-auto w-[min(100%-2rem,1296px)] pb-4 md:hidden">
-          <nav className="flex flex-col gap-1 rounded-2xl bg-pictus-onyx900 p-3">
+          <nav className="flex flex-col gap-1 rounded-2xl bg-pictus-onyx900 p-3 ring-1 ring-inset ring-pictus-lime/25">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-pictus-white/80 transition-colors hover:bg-white/5 hover:text-pictus-white"
+                className="rounded-xl px-4 py-3 text-pictus-white/80 transition-colors hover:bg-pictus-lime/10 hover:text-pictus-lime"
               >
                 {link.label}
               </Link>
