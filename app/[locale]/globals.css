@@ -3689,7 +3689,8 @@ input[type='date']::-webkit-calendar-picker-indicator {
   .pl[data-locale='en'] .hero h1,
   .pl[data-locale='hu'] .hero h1 {
     z-index: 2;
-    font-size: clamp(3.6rem, 6.5vw, 6.9rem);
+    font-size: clamp(2.9rem, 5.1vw, 5.6rem);
+    max-width: 15ch;
   }
 }
 
