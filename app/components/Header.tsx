@@ -19,6 +19,8 @@ const Header = () => {
     return cleanPath.startsWith(path)
   }
 
+  // just a comment to test the commit
+
   return (
     <nav
       id="navbar"
