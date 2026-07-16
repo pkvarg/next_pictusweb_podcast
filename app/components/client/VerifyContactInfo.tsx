@@ -51,9 +51,7 @@ export default function VerifyContactInfo() {
     setState((s) => ({ ...s, sending: true, error: '' }))
 
     const endpoint =
-      type === 'email'
-        ? '/api/user/send-email-verification'
-        : '/api/user/send-phone-verification'
+      type === 'email' ? '/api/user/send-email-verification' : '/api/user/send-phone-verification'
 
     try {
       const res = await fetch(endpoint, { method: 'POST' })
@@ -85,14 +83,20 @@ export default function VerifyContactInfo() {
       if (!res.ok) {
         const msg =
           data.attemptsRemaining !== undefined
-            ? t('verifyContactAttemptsRemaining', { error: data.error, attempts: data.attemptsRemaining })
+            ? t('verifyContactAttemptsRemaining', {
+                error: data.error,
+                attempts: data.attemptsRemaining,
+              })
             : data.error || t('verifyContactVerifyError')
         throw new Error(msg)
       }
       setState((s) => ({ ...s, verifying: false, success: true }))
       setStatus((prev) =>
         prev
-          ? { ...prev, [type === 'email' ? 'emailVerified' : 'phoneVerified']: new Date().toISOString() }
+          ? {
+              ...prev,
+              [type === 'email' ? 'emailVerified' : 'phoneVerified']: new Date().toISOString(),
+            }
           : prev,
       )
     } catch (err: any) {
@@ -207,7 +211,7 @@ function ContactRow({
               <button
                 onClick={onSend}
                 disabled={sending}
-                className="text-xs px-3 py-1 bg-pictus-lime/10 border border-pictus-lime/30 text-pictus-lime rounded-lg hover:bg-pictus-lime/20 transition-all disabled:opacity-50 flex items-center gap-1"
+                className="text-xs px-4 py-1.5 bg-pictus-lime/10 border border-pictus-lime/30 text-pictus-lime rounded-full hover:bg-pictus-lime/20 transition-all disabled:opacity-50 flex items-center gap-1"
               >
                 {sending ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
                 {sending ? t('verifyContactSending') : t('verifyContactVerifyButton')}
@@ -226,14 +230,18 @@ function ContactRow({
             value={code}
             onChange={(e) => onCodeChange(e.target.value.replace(/\D/g, ''))}
             placeholder={t('verifyContactCodePlaceholder')}
-            className="w-36 px-3 py-1.5 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-pictus-lime text-sm tracking-widest"
+            className="w-36 px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pictus-lime text-sm tracking-widest"
           />
           <button
             onClick={onVerify}
             disabled={verifying || code.length < 6}
-            className="text-xs px-3 py-1.5 bg-pictus-lime text-white rounded-lg font-normal hover:bg-pictus-lime400 transition-all disabled:opacity-50 flex items-center gap-1"
+            className="text-xs px-4 py-2 bg-pictus-lime text-pictus-black rounded-full font-semibold hover:bg-pictus-lime600 transition-all disabled:opacity-50 flex items-center gap-1"
           >
-            {verifying ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+            {verifying ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Check className="w-3 h-3" />
+            )}
             {verifying ? t('verifyContactVerifying') : t('verifyContactConfirm')}
           </button>
           <button

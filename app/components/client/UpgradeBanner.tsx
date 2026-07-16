@@ -9,7 +9,11 @@ interface UpgradeBannerProps {
   fromTier?: string | null
 }
 
-export default function UpgradeBanner({ billingInterval, nextBillingDate, fromTier }: UpgradeBannerProps) {
+export default function UpgradeBanner({
+  billingInterval,
+  nextBillingDate,
+  fromTier,
+}: UpgradeBannerProps) {
   const t = useTranslations('Client')
 
   const isFromFree = !fromTier || fromTier === 'FREE'
@@ -28,11 +32,9 @@ export default function UpgradeBanner({ billingInterval, nextBillingDate, fromTi
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4">
-      <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300">
-        <Sparkles className="w-5 h-5 text-purple-400 shrink-0" />
-        <p className="text-sm">
-          {getMessage()}
-        </p>
+      <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-pictus-lime/10 border border-pictus-lime/20 text-pictus-lime">
+        <Sparkles className="w-5 h-5 text-pictus-lime shrink-0" />
+        <p className="text-sm">{getMessage()}</p>
       </div>
     </div>
   )

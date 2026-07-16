@@ -245,9 +245,9 @@ const ClientZone = () => {
 
   if (isOrgDeleted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk flex items-center justify-center">
-        <div className="text-center max-w-lg px-6">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
+      <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk flex items-center justify-center">
+        <div className="text-center max-w-lg px-6 bg-pictus-onyx900 border border-white/[0.06] rounded-3xl py-12 sm:py-16 sm:px-10">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/15 flex items-center justify-center">
             <X className="w-10 h-10 text-red-400" />
           </div>
           <h1 className="text-3xl font-light mb-4 text-red-400">{t('accessDenied')}</h1>
@@ -258,16 +258,16 @@ const ClientZone = () => {
               info@pictusweb.sk
             </a>
           </p>
-          <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/client/upgrade"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-black font-semibold rounded-lg hover:bg-pictus-lime/80 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-pictus-black font-semibold rounded-full hover:bg-pictus-lime600 transition-all"
             >
               {t('upgradeNow')}
             </Link>
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 text-pictus-white rounded-full hover:bg-white/10 transition-all"
             >
               <LogOut size={18} />
               {t('logOutButton')}
@@ -279,14 +279,14 @@ const ClientZone = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
+    <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk">
       {/* Header */}
-      <header className="bg-pictus-white/10 backdrop-blur-xl border-b border-pictus-lime/30 sticky top-0 z-40">
+      <header className="bg-pictus-onyx900/80 backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-3 text-pictus-white">
-                <div className="w-8 h-8 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-pictus-lime to-pictus-lime600 rounded-xl flex items-center justify-center">
                   <UserCheck size={18} className="text-pictus-black" />
                 </div>
                 <div>
@@ -301,7 +301,7 @@ const ClientZone = () => {
                 organization.tierRelation.name !== 'BUSINESS' && (
                   <Link
                     href="/client/upgrade"
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium shrink-0"
+                    className="flex items-center gap-1.5 px-4 py-1.5 text-sm bg-pictus-lime text-pictus-black rounded-full hover:bg-pictus-lime600 transition-all font-semibold shrink-0"
                   >
                     <ArrowUp size={14} />
                     <span className="hidden sm:inline">{t('upgrade')}</span>
@@ -312,9 +312,9 @@ const ClientZone = () => {
                   <button
                     key={loc}
                     onClick={() => router.replace(pathname, { locale: loc })}
-                    className={`px-1 py-0.5 text-[10px] sm:text-xs sm:px-1.5 rounded transition-all ${
+                    className={`px-1.5 py-0.5 text-[10px] sm:text-xs sm:px-2 rounded-full transition-all ${
                       locale === loc
-                        ? 'bg-pictus-lime text-black font-semibold'
+                        ? 'bg-pictus-lime text-pictus-black font-semibold'
                         : 'text-gray-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
@@ -328,7 +328,7 @@ const ClientZone = () => {
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-sm sm:text-lg text-pictus-white hover:text-red-400 transition-colors px-2 sm:px-3 py-2 rounded-lg hover:bg-red-500/10 shrink-0"
+                className="flex items-center text-sm sm:text-lg text-pictus-white hover:text-red-400 transition-colors px-2 sm:px-3 py-2 rounded-full hover:bg-red-500/10 shrink-0"
               >
                 <LogOut className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">{t('logOut')}</span>
@@ -433,7 +433,7 @@ const ClientZone = () => {
         {/* Upcoming Duties Overview - Show for ALL users */}
         {organization?.name && (
           <section id="dashboard" className="mb-16">
-            <div className="md:bg-gradient-to-br md:from-pictus-onyx900/30 md:to-pictus-black/50 md:rounded-3xl p-0 md:p-8 md:backdrop-blur-sm md:border md:border-pictus-lime/30">
+            <div className="md:bg-pictus-onyx900 md:rounded-3xl p-0 md:p-8 md:border md:border-white/[0.06]">
               <SimpleDutyOverview
                 company={
                   organization.name === 'PICTUSACI'
@@ -474,7 +474,7 @@ const ClientZone = () => {
 
         {/* User Info Section */}
         <section className="py-8">
-          <div className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-xl p-6 backdrop-blur-sm border border-pictus-lime/30">
+          <div className="bg-pictus-onyx900 rounded-3xl p-6 sm:p-8 border border-white/[0.06]">
             <div className="flex items-center gap-3 mb-6">
               <User className="w-6 h-6 text-pictus-lime" />
               <h2 className="text-2xl sm:text-3xl font-light text-pictus-white">
@@ -512,7 +512,7 @@ const ClientZone = () => {
                 {!showPasswordChange ? (
                   <button
                     onClick={() => setShowPasswordChange(true)}
-                    className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white px-4 py-2 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-sm"
+                    className="bg-pictus-lime text-pictus-black px-6 py-3 rounded-full font-semibold hover:bg-pictus-lime600 transition-all text-sm"
                   >
                     {t('changePasswordButton')}
                   </button>
@@ -529,7 +529,7 @@ const ClientZone = () => {
                           value={oldPassword}
                           onChange={(e) => setOldPassword(e.target.value)}
                           required
-                          className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
+                          className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
                           placeholder={t('oldPasswordPlaceholder')}
                         />
                         <button
@@ -554,7 +554,7 @@ const ClientZone = () => {
                           onChange={(e) => setNewPassword(e.target.value)}
                           required
                           minLength={8}
-                          className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
+                          className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
                           placeholder={t('newPasswordPlaceholder')}
                         />
                         <button
@@ -579,7 +579,7 @@ const ClientZone = () => {
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           required
                           minLength={8}
-                          className="w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
+                          className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all pr-12"
                           placeholder={t('confirmPasswordPlaceholder')}
                         />
                         <button
@@ -594,7 +594,7 @@ const ClientZone = () => {
 
                     {/* Error Message */}
                     {passwordChangeError && (
-                      <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+                      <div className="bg-red-500/15 border border-red-500/30 text-red-200 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
                         <X size={16} />
                         {passwordChangeError}
                       </div>
@@ -602,18 +602,18 @@ const ClientZone = () => {
 
                     {/* Success Message */}
                     {passwordChangeSuccess && (
-                      <div className="bg-green-500/20 border border-green-500/30 text-green-200 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+                      <div className="bg-green-500/15 border border-green-500/30 text-green-200 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
                         <Check size={16} />
                         {passwordChangeSuccess}
                       </div>
                     )}
 
                     {/* Buttons */}
-                    <div className="flex gap-4">
+                    <div className="flex gap-3">
                       <button
                         type="submit"
                         disabled={isChangingPassword}
-                        className="flex-1 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white py-3 px-4 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 focus:outline-none focus:ring-2 focus:ring-pictus-lime transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-pictus-lime/50"
+                        className="flex-1 bg-pictus-lime text-pictus-black py-3 px-6 rounded-full font-semibold hover:bg-pictus-lime600 focus:outline-none focus:ring-2 focus:ring-pictus-lime transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isChangingPassword ? (
                           <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin mx-auto" />
@@ -631,7 +631,7 @@ const ClientZone = () => {
                           setPasswordChangeError('')
                           setPasswordChangeSuccess('')
                         }}
-                        className="px-6 py-3 bg-pictus-white/10 text-pictus-white rounded-lg font-light hover:bg-pictus-white/20 transition-all"
+                        className="px-6 py-3 bg-white/5 text-pictus-white rounded-full font-semibold hover:bg-white/10 transition-all"
                       >
                         {t('cancel')}
                       </button>
@@ -645,7 +645,7 @@ const ClientZone = () => {
             {organization &&
               organization.tierRelation?.name !== 'FREE' &&
               organization.billingInterval && (
-                <div className="md:col-span-2 border-t border-pictus-lime/10 pt-6">
+                <div className="md:col-span-2 border-t border-white/[0.06] pt-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Car className="w-5 h-5 text-pictus-lime" />
                     <h3 className="text-xl font-normal text-pictus-white">
@@ -687,7 +687,7 @@ const ClientZone = () => {
                             onChange={(e) =>
                               setNewVehicleCount(Math.max(1, parseInt(e.target.value) || 1))
                             }
-                            className="w-20 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
+                            className="w-20 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                           />
                           <button
                             onClick={handleVehicleUpdate}
@@ -695,7 +695,7 @@ const ClientZone = () => {
                               vehicleUpdateLoading ||
                               newVehicleCount === organization.purchasedVehicles
                             }
-                            className="px-3 py-1.5 bg-pictus-lime text-pictus-black rounded-lg text-sm font-medium disabled:opacity-50"
+                            className="px-4 py-1.5 bg-pictus-lime text-pictus-black rounded-full text-sm font-semibold hover:bg-pictus-lime600 transition-all disabled:opacity-50"
                           >
                             {vehicleUpdateLoading ? '...' : t('save')}
                           </button>
@@ -704,7 +704,7 @@ const ClientZone = () => {
                               setEditingVehicles(false)
                               setVehicleUpdateMsg(null)
                             }}
-                            className="px-3 py-1.5 bg-white/10 text-white rounded-lg text-sm"
+                            className="px-4 py-1.5 bg-white/5 text-white rounded-full text-sm hover:bg-white/10 transition-all"
                           >
                             {t('cancel')}
                           </button>
@@ -740,7 +740,7 @@ const ClientZone = () => {
                   </div>
                   {vehicleUpdateMsg && (
                     <div
-                      className={`mt-3 px-4 py-2 rounded-lg text-sm flex items-center gap-2 ${vehicleUpdateMsg.type === 'success' ? 'bg-green-500/20 border border-green-500/30 text-green-200' : 'bg-red-500/20 border border-red-500/30 text-red-200'}`}
+                      className={`mt-3 px-4 py-2 rounded-xl text-sm flex items-center gap-2 ${vehicleUpdateMsg.type === 'success' ? 'bg-green-500/15 border border-green-500/30 text-green-200' : 'bg-red-500/15 border border-red-500/30 text-red-200'}`}
                     >
                       {vehicleUpdateMsg.type === 'success' ? <Check size={16} /> : <X size={16} />}
                       {vehicleUpdateMsg.text}
@@ -750,7 +750,7 @@ const ClientZone = () => {
               )}
 
             {/* Contact Verification */}
-            <div className="md:col-span-2 border-t border-pictus-lime/10 pt-6">
+            <div className="md:col-span-2 border-t border-white/[0.06] pt-6">
               <VerifyContactInfo />
             </div>
           </div>

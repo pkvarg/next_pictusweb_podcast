@@ -13,6 +13,7 @@ const languages = [
 
 const PictusHeader = () => {
   const t = useTranslations('Landing')
+  const th = useTranslations('Home')
   const router = useRouter()
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -56,6 +57,7 @@ const PictusHeader = () => {
           }}
         >
           <Link href="/fleetsync">FleetSync</Link>
+          <Link href="/podcasts">{th('navbarPodcasts')}</Link>
           {navLinks.map((link) => (
             <a key={link.href} href={link.href}>
               {link.label}

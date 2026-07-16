@@ -196,11 +196,11 @@ const ExpensesModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black border border-pictus-lime/30 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black border border-white/[0.06] rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-pictus-lime/20 to-pictus-lime600/20 border-b border-pictus-lime/30 p-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-gradient-to-r from-pictus-lime/15 to-pictus-lime600/10 border-b border-white/[0.06] p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-pictus-lime/20 rounded-lg">
+            <div className="p-3 bg-pictus-lime/15 rounded-xl">
               <FaEuroSign className="w-8 h-8 text-pictus-lime" />
             </div>
             <div>
@@ -208,7 +208,7 @@ const ExpensesModal = ({
               <p className="text-xl text-pictus-lime">{vehicleRegistration}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition">
+          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition">
             <X className="w-8 h-8 text-pictus-white" />
           </button>
         </div>
@@ -218,7 +218,7 @@ const ExpensesModal = ({
           {/* Add Expense Form */}
           <form
             onSubmit={handleSubmit}
-            className="mb-6 bg-gray-600/20 rounded-xl p-6 border border-pictus-lime/20"
+            className="mb-6 bg-white/5 rounded-2xl p-6 border border-white/[0.06]"
           >
             <h3 className="text-2xl font-light text-pictus-white mb-6 flex items-center gap-2">
               <Plus size={28} className="text-pictus-lime" />
@@ -226,7 +226,7 @@ const ExpensesModal = ({
             </h3>
 
             {error && (
-              <div className="mb-4 bg-red-500/20 border border-red-500/30 rounded-lg p-4 text-red-200 text-lg">
+              <div className="mb-4 bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-200 text-lg">
                 {error}
               </div>
             )}
@@ -239,7 +239,7 @@ const ExpensesModal = ({
                   value={formData.item}
                   onChange={(e) => setFormData({ ...formData, item: e.target.value })}
                   placeholder="napr. Palivo, Servis..."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                   required
                 />
               </div>
@@ -253,7 +253,7 @@ const ExpensesModal = ({
                   value={formData.cost}
                   onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
                   placeholder="0.00"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                   required
                 />
               </div>
@@ -263,7 +263,7 @@ const ExpensesModal = ({
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                   required
                 />
               </div>
@@ -274,7 +274,7 @@ const ExpensesModal = ({
                   value={formData.note}
                   onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                   placeholder="voliteľná poznámka"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                 />
               </div>
               <div>
@@ -286,14 +286,14 @@ const ExpensesModal = ({
                   value={formData.link}
                   onChange={(e) => setFormData({ ...formData, link: e.target.value })}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                 />
               </div>
               <div className="md:col-span-2">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all disabled:opacity-50 text-lg font-light shadow-lg hover:shadow-pictus-lime/50"
+                  className="w-full bg-pictus-lime text-pictus-black px-6 py-3 rounded-full hover:bg-pictus-lime600 transition-all disabled:opacity-50 text-lg font-semibold"
                 >
                   {loading ? 'Ukladám...' : 'Pridať výdavok'}
                 </button>
@@ -308,7 +308,7 @@ const ExpensesModal = ({
                 História výdavkov ({expenses.length})
               </h3>
               {expenses.length > 1 && (
-                <div className="bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg px-6 py-3">
+                <div className="bg-pictus-lime/15 border border-pictus-lime/25 rounded-2xl px-6 py-3">
                   <p className="text-pictus-lime text-sm">Celkom</p>
                   <p className="text-3xl font-light text-pictus-white">
                     {formatCurrency(calculateTotal())}
@@ -319,7 +319,7 @@ const ExpensesModal = ({
 
             {loading && expenses.length === 0 ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime mx-auto"></div>
               </div>
             ) : expenses.length === 0 ? (
               <div className="text-center py-8 text-pictus-lime text-xl">Zatiaľ žiadne výdavky</div>
@@ -328,7 +328,7 @@ const ExpensesModal = ({
                 {expenses.map((expense) => (
                   <div
                     key={expense.id}
-                    className="bg-gray-600/20 border border-pictus-lime/20 rounded-lg p-5 hover:bg-pictus-lime/20 transition"
+                    className="bg-white/5 border border-white/[0.06] rounded-2xl p-5 hover:bg-white/10 transition"
                   >
                     {editingExpenseId === expense.id ? (
                       <div className="space-y-3">
@@ -339,7 +339,7 @@ const ExpensesModal = ({
                             onChange={(e) =>
                               setEditFormData({ ...editFormData, item: e.target.value })
                             }
-                            className="col-span-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                            className="col-span-2 px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                             placeholder="Položka"
                           />
                           <input
@@ -349,7 +349,7 @@ const ExpensesModal = ({
                             onChange={(e) =>
                               setEditFormData({ ...editFormData, cost: e.target.value })
                             }
-                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                            className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                             placeholder="Suma"
                           />
                         </div>
@@ -360,7 +360,7 @@ const ExpensesModal = ({
                             onChange={(e) =>
                               setEditFormData({ ...editFormData, date: e.target.value })
                             }
-                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                            className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                           />
                           <input
                             type="text"
@@ -368,7 +368,7 @@ const ExpensesModal = ({
                             onChange={(e) =>
                               setEditFormData({ ...editFormData, note: e.target.value })
                             }
-                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                            className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                             placeholder="Poznámka"
                           />
                           <input
@@ -377,20 +377,20 @@ const ExpensesModal = ({
                             onChange={(e) =>
                               setEditFormData({ ...editFormData, link: e.target.value })
                             }
-                            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+                            className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                             placeholder="https://..."
                           />
                         </div>
                         <div className="flex gap-2">
                           <button
                             onClick={handleSaveEdit}
-                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition text-sm"
+                            className="px-5 py-2 bg-pictus-lime hover:bg-pictus-lime600 text-pictus-black font-semibold rounded-full transition text-sm"
                           >
                             Uložiť
                           </button>
                           <button
                             onClick={() => setEditingExpenseId(null)}
-                            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition text-sm"
+                            className="px-5 py-2 bg-white/5 hover:bg-white/10 text-pictus-white rounded-full transition text-sm"
                           >
                             Zrušiť
                           </button>
@@ -409,13 +409,13 @@ const ExpensesModal = ({
                             </span>
                             <button
                               onClick={() => startEditExpense(expense)}
-                              className="p-3 bg-blue-600/20 hover:bg-blue-600/40 rounded-lg transition text-blue-400"
+                              className="p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-xl transition text-blue-400"
                             >
                               <Plus size={20} className="rotate-45" />
                             </button>
                             <button
                               onClick={() => handleDelete(expense.id)}
-                              className="p-3 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition text-red-400"
+                              className="p-3 bg-red-500/10 hover:bg-red-500/20 rounded-xl transition text-red-400"
                             >
                               <Trash2 size={20} />
                             </button>

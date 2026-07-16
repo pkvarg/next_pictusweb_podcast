@@ -29,7 +29,9 @@ import Image from 'next/image'
 import ExpensesModal from '@/app/components/client/ExpensesModal'
 import MileageModal from '@/app/components/client/MileageModal'
 import FleetManagerUserModal from '@/app/components/client/FleetManagerUserModal'
-import NotificationBuilder, { type NotificationBuilderTranslations } from '@/app/components/admin/NotificationBuilder'
+import NotificationBuilder, {
+  type NotificationBuilderTranslations,
+} from '@/app/components/admin/NotificationBuilder'
 import NotificationSettings from '@/app/components/admin/NotificationSettings'
 import RenewalsContent from '@/app/components/client/RenewalsContent'
 import { FaEuroSign } from 'react-icons/fa'
@@ -158,13 +160,7 @@ interface VehicleNotification {
 }
 
 type TabType =
-  | 'vehicles'
-  | 'users'
-  | 'notifications'
-  | 'renewals'
-  | 'templates'
-  | 'types'
-  | 'organizations'
+  'vehicles' | 'users' | 'notifications' | 'renewals' | 'templates' | 'types' | 'organizations'
 
 const MyFleetPage = () => {
   const { data: session, status } = useSession()
@@ -173,130 +169,133 @@ const MyFleetPage = () => {
   const params = useParams()
   const locale = (params?.locale as string) || 'sk'
 
-  const nbTranslations: NotificationBuilderTranslations = useMemo(() => ({
-    createTitle: t('nbCreateTitle'),
-    duplicateTitle: t('nbDuplicateTitle'),
-    step0Label: t('nbStep0Label'),
-    step1Label: t('nbStep1Label'),
-    step2Label: t('nbStep2Label'),
-    step3Label: t('nbStep3Label'),
-    stepOf: t('nbStepOf'),
-    selectOrg: t('nbSelectOrg'),
-    selectOrgDesc: t('nbSelectOrgDesc'),
-    selectOrgPlaceholder: t('nbSelectOrgPlaceholder'),
-    selectOrgRequired: t('nbSelectOrgRequired'),
-    continue: t('nbContinue'),
-    selectTemplate: t('nbSelectTemplate'),
-    customNotification: t('nbCustomNotification'),
-    customNotificationDesc: t('nbCustomNotificationDesc'),
-    daysBefore: t('nbDaysBefore'),
-    backToOrgSelection: t('nbBackToOrgSelection'),
-    notificationDetails: t('nbNotificationDetails'),
-    vehicleLabel: t('nbVehicleLabel'),
-    selectVehicle: t('nbSelectVehicle'),
-    notificationTypeLabel: t('nbNotificationTypeLabel'),
-    selectType: t('nbSelectType'),
-    customTypeOption: t('nbCustomTypeOption'),
-    usingDefaultOptions: t('nbUsingDefaultOptions'),
-    customTypesBusinessOnly: t('nbCustomTypesBusinessOnly'),
-    customTypePlaceholder: t('nbCustomTypePlaceholder'),
-    backToDropdown: t('nbBackToDropdown'),
-    channelLabel: t('nbChannelLabel'),
-    selectChannel: t('nbSelectChannel'),
-    pdrLabel: t('nbPdrLabel'),
-    pdrDesc: t('nbPdrDesc'),
-    aggressiveLabel: t('nbAggressiveLabel'),
-    aggressiveDesc: t('nbAggressiveDesc'),
-    aggressivePdrDeferred: t('nbAggressivePdrDeferred'),
-    dutyDateLabel: t('nbDutyDateLabel'),
-    dutyDateRequired: t('nbDutyDateRequired'),
-    reminderIntervals: t('nbReminderIntervals'),
-    editIntervals: t('nbEditIntervals'),
-    willCreate: t('nbWillCreate'),
-    notificationSingular: t('nbNotificationSingular'),
-    notificationFew: t('nbNotificationFew'),
-    notificationMany: t('nbNotificationMany'),
-    onDutyDay: t('nbOnDutyDay'),
-    daysAfter: t('nbDaysAfter'),
-    daysBefore2: t('nbDaysBefore2'),
-    pastDate: t('nbPastDate'),
-    singleIntervalHint: t('nbSingleIntervalHint'),
-    editIntervalsHint: t('nbEditIntervalsHint'),
-    selectUserOptional: t('nbSelectUserOptional'),
-    selectUserPlaceholder: t('nbSelectUserPlaceholder'),
-    selectUserPlaceholderClient: t('nbSelectUserPlaceholderClient'),
-    personNameLabel: t('nbPersonNameLabel'),
-    personNamePlaceholder: t('nbPersonNamePlaceholder'),
-    emailLabel: t('nbEmailLabel'),
-    orSelectUser: t('nbOrSelectUser'),
-    emailPlaceholder: t('nbEmailPlaceholder'),
-    emailRequired: t('nbEmailRequired'),
-    phoneLabel: t('nbPhoneLabel'),
-    phonePlaceholder: t('nbPhonePlaceholder'),
-    phoneRequired: t('nbPhoneRequired'),
-    organizationLabel: t('nbOrganizationLabel'),
-    organizationPlaceholder: t('nbOrganizationPlaceholder'),
-    selectedInStep0: t('nbSelectedInStep0'),
-    messageLabel: t('nbMessageLabel'),
-    messageHint: t('nbMessageHint'),
-    messageContainsInfo: t('nbMessageContainsInfo'),
-    requiredFieldMissing: t('nbRequiredFieldMissing'),
-    selectDutyDateToContinue: t('nbSelectDutyDateToContinue'),
-    back: t('nbBack'),
-    continueToReview: t('nbContinueToReview'),
-    reviewNotification: t('nbReviewNotification'),
-    sendTimeInfo: t('nbSendTimeInfo'),
-    notSelected: t('nbNotSelected'),
-    notSet: t('nbNotSet'),
-    pdrEnabled: t('nbPdrEnabled'),
-    pdrDisabled: t('nbPdrDisabled'),
-    pdrWillCreate: t('nbPdrWillCreate'),
-    pdrDeferredReview: t('nbPdrDeferredReview'),
-    aggressiveModeReview: t('nbAggressiveModeReview'),
-    aggressiveEnabled: t('nbAggressiveEnabled'),
-    aggressiveReviewDesc: t('nbAggressiveReviewDesc'),
-    notificationDates: t('nbNotificationDates'),
-    dateInPast: t('nbDateInPast'),
-    contactPerson: t('nbContactPerson'),
-    phoneReview: t('nbPhoneReview'),
-    emailMessage: t('nbEmailMessage'),
-    warnings: t('nbWarnings'),
-    creating: t('nbCreating'),
-    createNotification: t('nbCreateNotification'),
-    editIntervalsTitle: t('nbEditIntervalsTitle'),
-    editIntervalsDesc: t('nbEditIntervalsDesc'),
-    addInterval: t('nbAddInterval'),
-    cancel: t('nbCancel'),
-    done: t('nbDone'),
-    dayBefore: t('nbDayBefore'),
-    daysBefore3: t('nbDaysBefore3'),
-    daysBeforeMany: t('nbDaysBeforeMany'),
-    dayAfter: t('nbDayAfter'),
-    daysAfter2: t('nbDaysAfter2'),
-    daysAfterMany: t('nbDaysAfterMany'),
-    before: t('nbBefore'),
-    after: t('nbAfter'),
-    validationTypeRequired: t('nbValidationTypeRequired'),
-    validationChannelRequired: t('nbValidationChannelRequired'),
-    validationDutyDateRequired: t('nbValidationDutyDateRequired'),
-    validationIntervalsRequired: t('nbValidationIntervalsRequired'),
-    validationAllPast: t('nbValidationAllPast'),
-    validationNoNotifications: t('nbValidationNoNotifications'),
-    validationEmailRequired: t('nbValidationEmailRequired'),
-    validationPhoneRequired: t('nbValidationPhoneRequired'),
-    validationEmailRequiredEmail: t('nbValidationEmailRequiredEmail'),
-    validationPhoneRequiredSms: t('nbValidationPhoneRequiredSms'),
-    validationErrors: t('nbValidationErrors'),
-    successSingle: t('nbSuccessSingle'),
-    successMultiple: t('nbSuccessMultiple'),
-    pdrCreated: t('nbPdrCreated'),
-    aggressiveEnabled2: t('nbAggressiveEnabled2'),
-    aggressivePdrDeferred2: t('nbAggressivePdrDeferred2'),
-    intervalsPastSkipped: t('nbIntervalsPastSkipped'),
-    someFailed: t('nbSomeFailed'),
-    createError: t('nbCreateError'),
-    validationPastIntervals: t('nbValidationPastIntervals'),
-  }), [t])
+  const nbTranslations: NotificationBuilderTranslations = useMemo(
+    () => ({
+      createTitle: t('nbCreateTitle'),
+      duplicateTitle: t('nbDuplicateTitle'),
+      step0Label: t('nbStep0Label'),
+      step1Label: t('nbStep1Label'),
+      step2Label: t('nbStep2Label'),
+      step3Label: t('nbStep3Label'),
+      stepOf: t('nbStepOf'),
+      selectOrg: t('nbSelectOrg'),
+      selectOrgDesc: t('nbSelectOrgDesc'),
+      selectOrgPlaceholder: t('nbSelectOrgPlaceholder'),
+      selectOrgRequired: t('nbSelectOrgRequired'),
+      continue: t('nbContinue'),
+      selectTemplate: t('nbSelectTemplate'),
+      customNotification: t('nbCustomNotification'),
+      customNotificationDesc: t('nbCustomNotificationDesc'),
+      daysBefore: t('nbDaysBefore'),
+      backToOrgSelection: t('nbBackToOrgSelection'),
+      notificationDetails: t('nbNotificationDetails'),
+      vehicleLabel: t('nbVehicleLabel'),
+      selectVehicle: t('nbSelectVehicle'),
+      notificationTypeLabel: t('nbNotificationTypeLabel'),
+      selectType: t('nbSelectType'),
+      customTypeOption: t('nbCustomTypeOption'),
+      usingDefaultOptions: t('nbUsingDefaultOptions'),
+      customTypesBusinessOnly: t('nbCustomTypesBusinessOnly'),
+      customTypePlaceholder: t('nbCustomTypePlaceholder'),
+      backToDropdown: t('nbBackToDropdown'),
+      channelLabel: t('nbChannelLabel'),
+      selectChannel: t('nbSelectChannel'),
+      pdrLabel: t('nbPdrLabel'),
+      pdrDesc: t('nbPdrDesc'),
+      aggressiveLabel: t('nbAggressiveLabel'),
+      aggressiveDesc: t('nbAggressiveDesc'),
+      aggressivePdrDeferred: t('nbAggressivePdrDeferred'),
+      dutyDateLabel: t('nbDutyDateLabel'),
+      dutyDateRequired: t('nbDutyDateRequired'),
+      reminderIntervals: t('nbReminderIntervals'),
+      editIntervals: t('nbEditIntervals'),
+      willCreate: t('nbWillCreate'),
+      notificationSingular: t('nbNotificationSingular'),
+      notificationFew: t('nbNotificationFew'),
+      notificationMany: t('nbNotificationMany'),
+      onDutyDay: t('nbOnDutyDay'),
+      daysAfter: t('nbDaysAfter'),
+      daysBefore2: t('nbDaysBefore2'),
+      pastDate: t('nbPastDate'),
+      singleIntervalHint: t('nbSingleIntervalHint'),
+      editIntervalsHint: t('nbEditIntervalsHint'),
+      selectUserOptional: t('nbSelectUserOptional'),
+      selectUserPlaceholder: t('nbSelectUserPlaceholder'),
+      selectUserPlaceholderClient: t('nbSelectUserPlaceholderClient'),
+      personNameLabel: t('nbPersonNameLabel'),
+      personNamePlaceholder: t('nbPersonNamePlaceholder'),
+      emailLabel: t('nbEmailLabel'),
+      orSelectUser: t('nbOrSelectUser'),
+      emailPlaceholder: t('nbEmailPlaceholder'),
+      emailRequired: t('nbEmailRequired'),
+      phoneLabel: t('nbPhoneLabel'),
+      phonePlaceholder: t('nbPhonePlaceholder'),
+      phoneRequired: t('nbPhoneRequired'),
+      organizationLabel: t('nbOrganizationLabel'),
+      organizationPlaceholder: t('nbOrganizationPlaceholder'),
+      selectedInStep0: t('nbSelectedInStep0'),
+      messageLabel: t('nbMessageLabel'),
+      messageHint: t('nbMessageHint'),
+      messageContainsInfo: t('nbMessageContainsInfo'),
+      requiredFieldMissing: t('nbRequiredFieldMissing'),
+      selectDutyDateToContinue: t('nbSelectDutyDateToContinue'),
+      back: t('nbBack'),
+      continueToReview: t('nbContinueToReview'),
+      reviewNotification: t('nbReviewNotification'),
+      sendTimeInfo: t('nbSendTimeInfo'),
+      notSelected: t('nbNotSelected'),
+      notSet: t('nbNotSet'),
+      pdrEnabled: t('nbPdrEnabled'),
+      pdrDisabled: t('nbPdrDisabled'),
+      pdrWillCreate: t('nbPdrWillCreate'),
+      pdrDeferredReview: t('nbPdrDeferredReview'),
+      aggressiveModeReview: t('nbAggressiveModeReview'),
+      aggressiveEnabled: t('nbAggressiveEnabled'),
+      aggressiveReviewDesc: t('nbAggressiveReviewDesc'),
+      notificationDates: t('nbNotificationDates'),
+      dateInPast: t('nbDateInPast'),
+      contactPerson: t('nbContactPerson'),
+      phoneReview: t('nbPhoneReview'),
+      emailMessage: t('nbEmailMessage'),
+      warnings: t('nbWarnings'),
+      creating: t('nbCreating'),
+      createNotification: t('nbCreateNotification'),
+      editIntervalsTitle: t('nbEditIntervalsTitle'),
+      editIntervalsDesc: t('nbEditIntervalsDesc'),
+      addInterval: t('nbAddInterval'),
+      cancel: t('nbCancel'),
+      done: t('nbDone'),
+      dayBefore: t('nbDayBefore'),
+      daysBefore3: t('nbDaysBefore3'),
+      daysBeforeMany: t('nbDaysBeforeMany'),
+      dayAfter: t('nbDayAfter'),
+      daysAfter2: t('nbDaysAfter2'),
+      daysAfterMany: t('nbDaysAfterMany'),
+      before: t('nbBefore'),
+      after: t('nbAfter'),
+      validationTypeRequired: t('nbValidationTypeRequired'),
+      validationChannelRequired: t('nbValidationChannelRequired'),
+      validationDutyDateRequired: t('nbValidationDutyDateRequired'),
+      validationIntervalsRequired: t('nbValidationIntervalsRequired'),
+      validationAllPast: t('nbValidationAllPast'),
+      validationNoNotifications: t('nbValidationNoNotifications'),
+      validationEmailRequired: t('nbValidationEmailRequired'),
+      validationPhoneRequired: t('nbValidationPhoneRequired'),
+      validationEmailRequiredEmail: t('nbValidationEmailRequiredEmail'),
+      validationPhoneRequiredSms: t('nbValidationPhoneRequiredSms'),
+      validationErrors: t('nbValidationErrors'),
+      successSingle: t('nbSuccessSingle'),
+      successMultiple: t('nbSuccessMultiple'),
+      pdrCreated: t('nbPdrCreated'),
+      aggressiveEnabled2: t('nbAggressiveEnabled2'),
+      aggressivePdrDeferred2: t('nbAggressivePdrDeferred2'),
+      intervalsPastSkipped: t('nbIntervalsPastSkipped'),
+      someFailed: t('nbSomeFailed'),
+      createError: t('nbCreateError'),
+      validationPastIntervals: t('nbValidationPastIntervals'),
+    }),
+    [t],
+  )
 
   // Check for tab query parameter
   useEffect(() => {
@@ -389,7 +388,9 @@ const MyFleetPage = () => {
 
     try {
       setUsersLoading(true)
-      const response = await fetch(`/api/users?organizationId=${encodeURIComponent(orgId)}&excludeBenefit=true`)
+      const response = await fetch(
+        `/api/users?organizationId=${encodeURIComponent(orgId)}&excludeBenefit=true`,
+      )
       if (response.ok) {
         const data = await response.json()
         setUsers(Array.isArray(data) ? data : [])
@@ -686,9 +687,7 @@ const MyFleetPage = () => {
         <div className="text-center max-w-lg px-6">
           <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h1 className="text-3xl font-light mb-4 text-red-400">{t('accessDenied')}</h1>
-          <p className="text-lg text-gray-300 mb-6">
-            {t('orgDeactivated')}
-          </p>
+          <p className="text-lg text-gray-300 mb-6">{t('orgDeactivated')}</p>
           <p className="text-sm text-gray-500 mb-8">
             {t('orgDeactivatedHint')}{' '}
             <a href="mailto:info@pictusweb.sk" className="text-pictus-lime hover:underline">
@@ -698,13 +697,13 @@ const MyFleetPage = () => {
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <Link
               href="/client/upgrade"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-black font-semibold rounded-lg hover:bg-pictus-lime/80 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-pictus-black font-semibold rounded-full hover:bg-pictus-lime600 transition-all"
             >
               {t('upgradeNow')}
             </Link>
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 text-white rounded-full hover:bg-white/10 transition-all"
             >
               <LogOut size={18} />
               {t('logOutButton')}
@@ -726,12 +725,10 @@ const MyFleetPage = () => {
         <div className="text-center max-w-md">
           <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-3xl font-light mb-4">{t('accessDenied')}</h2>
-          <p className="text-pictus-lime mb-6">
-            {t('fleetManagerRequired')}
-          </p>
+          <p className="text-pictus-lime mb-6">{t('fleetManagerRequired')}</p>
           <Link
             href="/client"
-            className="inline-flex items-center gap-2 bg-pictus-lime600 text-pictus-white px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-6 py-3 rounded-full hover:bg-pictus-lime600 transition"
           >
             <ArrowLeft size={20} />
             {t('backToDashboard')}
@@ -846,7 +843,7 @@ const MyFleetPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-xl border-b border-pictus-lime/30 sticky top-0 z-40">
+      <header className="bg-pictus-onyx900/80 backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
@@ -881,7 +878,9 @@ const MyFleetPage = () => {
       {(organization?.tierRelation || organization?.notificationsLimit != null) && organization && (
         <NotificationLimitBanner
           currentCount={organization.currentNotificationsCount}
-          limit={organization.notificationsLimit ?? organization.tierRelation?.notificationsLimit ?? 0}
+          limit={
+            organization.notificationsLimit ?? organization.tierRelation?.notificationsLimit ?? 0
+          }
           tierName={organization.tierRelation?.name ?? 'N/A'}
           blocked={organization.notificationsBlocked}
           subscriptionStatus={organization.stripeSubscriptionStatus}
@@ -908,7 +907,9 @@ const MyFleetPage = () => {
               <Car className="w-8 h-8 sm:w-10 sm:h-10 text-pictus-lime" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-light text-pictus-white">FleetSync Manager</h1>
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-light text-pictus-white">
+                FleetSync Manager
+              </h1>
               {organization && (
                 <p className="text-lg sm:text-2xl text-pictus-lime flex items-center gap-2 flex-wrap">
                   <Building size={18} className="hidden sm:block" />
@@ -1033,28 +1034,43 @@ const MyFleetPage = () => {
             {/* Vehicle Header Actions */}
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                {organization && (organization.tierRelation || organization.vehiclesLimit != null) && (
-                  <p className="text-sm text-gray-400">
-                    {t('vehicleCount', { current: organization.currentVehiclesCount, limit: organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? '—' })}
-                    {organization.currentVehiclesCount >=
-                      (organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? Infinity) && (
-                      <span className="ml-2 text-orange-400">{t('limitReached')}</span>
-                    )}
-                  </p>
-                )}
+                {organization &&
+                  (organization.tierRelation || organization.vehiclesLimit != null) && (
+                    <p className="text-sm text-gray-400">
+                      {t('vehicleCount', {
+                        current: organization.currentVehiclesCount,
+                        limit:
+                          organization.vehiclesLimit ??
+                          organization.tierRelation?.vehiclesLimit ??
+                          '—',
+                      })}
+                      {organization.currentVehiclesCount >=
+                        (organization.vehiclesLimit ??
+                          organization.tierRelation?.vehiclesLimit ??
+                          Infinity) && (
+                        <span className="ml-2 text-orange-400">{t('limitReached')}</span>
+                      )}
+                    </p>
+                  )}
               </div>
               <Link
                 href="/client/my-fleet/new"
-                className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-light transition-all text-lg ${
+                className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all text-lg ${
                   organization &&
-                  organization.currentVehiclesCount >= (organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? Infinity)
-                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white hover:from-pictus-lime700 hover:to-pictus-black'
+                  organization.currentVehiclesCount >=
+                    (organization.vehiclesLimit ??
+                      organization.tierRelation?.vehiclesLimit ??
+                      Infinity)
+                    ? 'bg-white/5 text-gray-500 cursor-not-allowed'
+                    : 'bg-pictus-lime text-pictus-black hover:bg-pictus-lime600'
                 }`}
                 onClick={(e) => {
                   if (
                     organization &&
-                    organization.currentVehiclesCount >= (organization.vehiclesLimit ?? organization.tierRelation?.vehiclesLimit ?? Infinity)
+                    organization.currentVehiclesCount >=
+                      (organization.vehiclesLimit ??
+                        organization.tierRelation?.vehiclesLimit ??
+                        Infinity)
                   ) {
                     e.preventDefault()
                     alert(t('vehicleLimitAlert'))
@@ -1069,18 +1085,16 @@ const MyFleetPage = () => {
             {/* Vehicles Grid */}
             {vehicles.length === 0 ? (
               // Empty State
-              <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-3xl p-12 border border-pictus-lime/30 text-center">
+              <div className="bg-pictus-onyx900 rounded-3xl p-12 border border-white/[0.06] text-center">
                 <div className="max-w-2xl mx-auto">
-                  <div className="p-6 bg-pictus-lime/20 rounded-2xl inline-block mb-6">
-                    <Car className="w-16 h-16 text-pictus-black" />
+                  <div className="p-6 bg-pictus-lime/15 ring-1 ring-pictus-lime/30 rounded-3xl inline-block mb-6">
+                    <Car className="w-16 h-16 text-pictus-lime" />
                   </div>
                   <h2 className="text-4xl font-light text-pictus-white mb-4">{t('noVehicles')}</h2>
-                  <p className="text-xl text-pictus-lime mb-8">
-                    {t('noVehiclesHint')}
-                  </p>
+                  <p className="text-xl text-gray-400 mb-8">{t('noVehiclesHint')}</p>
                   <Link
                     href="/client/my-fleet/new"
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white px-8 py-4 rounded-lg font-light hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/50"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-8 py-4 rounded-full font-semibold hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-xl shadow-lg hover:shadow-pictus-lime/40"
                   >
                     <Plus size={24} />
                     {t('addFirstVehicle')}
@@ -1093,7 +1107,7 @@ const MyFleetPage = () => {
                 {vehicles.map((vehicle) => (
                   <div
                     key={vehicle.id}
-                    className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl overflow-hidden border border-pictus-lime/30 hover:border-pictus-lime/50 transition-all"
+                    className="bg-pictus-onyx900 rounded-2xl overflow-hidden border border-white/[0.06] hover:border-pictus-lime/40 transition-all"
                   >
                     {vehicle.image && (
                       <div className="relative w-full h-48 bg-pictus-black/50 overflow-hidden">
@@ -1114,7 +1128,9 @@ const MyFleetPage = () => {
                         </h3>
                         <p className="text-xl text-pictus-lime">{vehicle.type}</p>
                         {vehicle.year && (
-                          <p className="text-lg text-pictus-lime mt-1">{t('year', { year: vehicle.year })}</p>
+                          <p className="text-lg text-pictus-lime mt-1">
+                            {t('year', { year: vehicle.year })}
+                          </p>
                         )}
                       </div>
 
@@ -1127,10 +1143,12 @@ const MyFleetPage = () => {
                       {/* Stats Display */}
                       <div className="grid grid-cols-2 gap-3 mb-4">
                         {/* Latest Mileage */}
-                        <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
+                        <div className="bg-white/5 border border-white/[0.06] rounded-xl p-3">
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <Gauge size={14} className="text-blue-400" />
-                            <span className="text-xs text-pictus-white/70">{t('mileageStatus')}</span>
+                            <span className="text-xs text-pictus-white/70">
+                              {t('mileageStatus')}
+                            </span>
                           </div>
                           {vehicle.mileageRecords && vehicle.mileageRecords.length > 0 ? (
                             <>
@@ -1145,7 +1163,7 @@ const MyFleetPage = () => {
                         </div>
 
                         {/* Total Expenses */}
-                        <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
+                        <div className="bg-white/5 border border-white/[0.06] rounded-xl p-3">
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <FaEuroSign size={12} className="text-green-400" />
                             <span className="text-xs text-pictus-white/70">{t('expenses')}</span>
@@ -1179,7 +1197,7 @@ const MyFleetPage = () => {
                                 setSelectedVehicle(vehicle)
                                 setExpensesModalOpen(true)
                               }}
-                              className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                              className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-3 py-2 rounded-full hover:bg-white/10 transition text-sm"
                             >
                               <FaEuroSign size={16} />
                               {t('expensesButton')}
@@ -1189,7 +1207,7 @@ const MyFleetPage = () => {
                                 setSelectedVehicle(vehicle)
                                 setMileageModalOpen(true)
                               }}
-                              className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                              className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-3 py-2 rounded-full hover:bg-white/10 transition text-sm"
                             >
                               <Gauge size={16} />
                               {t('mileageButton')}
@@ -1199,7 +1217,7 @@ const MyFleetPage = () => {
                                 setSelectedVehicle(vehicle)
                                 setNotificationModalOpen(true)
                               }}
-                              className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-3 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                              className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-3 py-2 rounded-full hover:bg-white/10 transition text-sm"
                             >
                               <Bell size={16} />
                               {t('notificationButton')}
@@ -1210,26 +1228,29 @@ const MyFleetPage = () => {
 
                       {/* Only show Edit/Delete buttons for vehicles from user's organization */}
                       {vehicle.organizationId === organization?.id ? (
-                        <div className="flex items-center gap-2 pt-4 border-t border-pictus-lime/20">
+                        <div className="flex items-center gap-2 pt-4 border-t border-white/[0.06]">
                           <Link
                             href={`/client/my-fleet/${vehicle.id}`}
-                            className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-gray-600/50 transition text-sm"
+                            className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-4 py-2 rounded-full hover:bg-white/10 transition text-sm"
                           >
                             <Edit size={16} />
                             {t('editButton')}
                           </Link>
                           <button
                             onClick={() => handleDelete(vehicle.id)}
-                            className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600/30 text-pictus-white px-4 py-2 rounded-lg hover:bg-red-600/50 transition text-sm"
+                            className="flex-1 inline-flex items-center justify-center gap-2 bg-red-500/15 text-red-300 px-4 py-2 rounded-full hover:bg-red-500/25 transition text-sm"
                           >
                             <Trash2 size={16} />
                             {t('deleteButton')}
                           </button>
                         </div>
                       ) : (
-                        <div className="pt-4 border-t border-pictus-lime/20">
+                        <div className="pt-4 border-t border-white/[0.06]">
                           <p className="text-gray-400 text-xs text-center italic">
-                            {t('viewOnlyVehicle', { orgName: vehicle.organizationRelation?.name || vehicle.organization || '' })}
+                            {t('viewOnlyVehicle', {
+                              orgName:
+                                vehicle.organizationRelation?.name || vehicle.organization || '',
+                            })}
                           </p>
                         </div>
                       )}
@@ -1244,148 +1265,95 @@ const MyFleetPage = () => {
         {/* Users Tab */}
         {activeTab === 'users' && (
           <>
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-white">{t('userManagement')}</h2>
-                <p className="text-gray-400 mt-1">
-                  {t('organization', { name: organization?.name || t('organizationLoading') })}
-                </p>
-                {organization && (organization.tierRelation || organization.usersLimit != null) && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    {t('userCount', { current: organization.currentUsersCount, limit: organization.usersLimit ?? organization.tierRelation?.usersLimit ?? '—' })}
-                    {organization.currentUsersCount >= (organization.usersLimit ?? organization.tierRelation?.usersLimit ?? Infinity) && (
-                      <span className="ml-2 text-orange-400">{t('limitReached')}</span>
-                    )}
+            <div className="bg-pictus-onyx900 backdrop-blur-sm rounded-3xl border border-white/[0.06] p-4 sm:p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                    {t('userManagement')}
+                  </h2>
+                  <p className="text-gray-400 mt-1">
+                    {t('organization', { name: organization?.name || t('organizationLoading') })}
                   </p>
-                )}
-              </div>
-              <button
-                onClick={handleCreateUser}
-                disabled={
-                  organization
-                    ? organization.currentUsersCount >= (organization.usersLimit ?? organization.tierRelation?.usersLimit ?? Infinity)
-                    : false
-                }
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                  organization &&
-                  organization.currentUsersCount >= (organization.usersLimit ?? organization.tierRelation?.usersLimit ?? Infinity)
-                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-white'
-                }`}
-              >
-                <Plus className="h-4 w-4" />
-                {t('addUser')}
-              </button>
-            </div>
-
-            {usersLoading ? (
-              <div className="text-center py-12">
-                <p className="text-gray-400">{t('loadingUsers')}</p>
-              </div>
-            ) : users.length === 0 ? (
-              <div className="text-center py-12">
-                <Users className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400">{t('noUsers')}</p>
+                  {organization &&
+                    (organization.tierRelation || organization.usersLimit != null) && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        {t('userCount', {
+                          current: organization.currentUsersCount,
+                          limit:
+                            organization.usersLimit ?? organization.tierRelation?.usersLimit ?? '—',
+                        })}
+                        {organization.currentUsersCount >=
+                          (organization.usersLimit ??
+                            organization.tierRelation?.usersLimit ??
+                            Infinity) && (
+                          <span className="ml-2 text-orange-400">{t('limitReached')}</span>
+                        )}
+                      </p>
+                    )}
+                </div>
                 <button
                   onClick={handleCreateUser}
-                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg"
+                  disabled={
+                    organization
+                      ? organization.currentUsersCount >=
+                        (organization.usersLimit ??
+                          organization.tierRelation?.usersLimit ??
+                          Infinity)
+                      : false
+                  }
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all ${
+                    organization &&
+                    organization.currentUsersCount >=
+                      (organization.usersLimit ?? organization.tierRelation?.usersLimit ?? Infinity)
+                      ? 'bg-white/5 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black'
+                  }`}
                 >
                   <Plus className="h-4 w-4" />
-                  {t('addFirstUser')}
+                  {t('addUser')}
                 </button>
               </div>
-            ) : (
-              <>
-              {/* Mobile: Card layout */}
-              <div className="sm:hidden space-y-3">
-                {users.map((user) => (
-                  <div key={user.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <p className="text-sm font-medium text-white">{user.firstName} {user.lastName}</p>
-                        <p className="text-xs text-gray-400">{user.email}</p>
-                        {user.phoneNumber && <p className="text-xs text-gray-400">{user.phoneNumber}</p>}
-                      </div>
-                      {!isPictusaci && (
-                        <div className="flex gap-2">
-                          <button onClick={() => handleEditUser(user)} className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all" title={t('editButton')}><Edit className="h-4 w-4" /></button>
-                          {session?.user?.id !== user.id ? (
-                            <button onClick={() => handleDeleteUser(user.id)} className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all" title={t('deleteButton')}><Trash2 className="h-4 w-4" /></button>
-                          ) : (
-                            <button disabled className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-lg cursor-not-allowed" title={t('cannotDeleteSelf')}><Trash2 className="h-4 w-4" /></button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400">{user.isFleetManager ? t('fleetManager') : t('userRole')}</span>
-                      <span className={`inline-flex px-2 py-0.5 text-xs rounded-full ${user.active ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'}`}>{user.active ? t('active') : t('inactive')}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* Desktop: Table layout */}
-              <div className="hidden sm:block overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-white/5 border-b border-white/10">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('nameColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('emailColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('phoneColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('roleColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('statusColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('actionsColumn')}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
+
+              {usersLoading ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-400">{t('loadingUsers')}</p>
+                </div>
+              ) : users.length === 0 ? (
+                <div className="text-center py-12">
+                  <Users className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                  <p className="text-gray-400">{t('noUsers')}</p>
+                  <button
+                    onClick={handleCreateUser}
+                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black font-semibold rounded-full"
+                  >
+                    <Plus className="h-4 w-4" />
+                    {t('addFirstUser')}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Mobile: Card layout */}
+                  <div className="sm:hidden space-y-3">
                     {users.map((user) => (
-                      <tr key={user.id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3">
-                          <div className="text-sm font-medium text-white">
-                            {user.firstName} {user.lastName}
+                      <div
+                        key={user.id}
+                        className="bg-white/5 border border-white/[0.06] rounded-2xl p-4"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <p className="text-sm font-medium text-white">
+                              {user.firstName} {user.lastName}
+                            </p>
+                            <p className="text-xs text-gray-400">{user.email}</p>
+                            {user.phoneNumber && (
+                              <p className="text-xs text-gray-400">{user.phoneNumber}</p>
+                            )}
                           </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm text-gray-300">{user.email}</div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm text-gray-300">{user.phoneNumber || '-'}</div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm text-gray-300">
-                            {user.isFleetManager ? t('fleetManager') : t('userRole')}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                              user.active
-                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                            }`}
-                          >
-                            {user.active ? t('active') : t('inactive')}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
                           {!isPictusaci && (
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleEditUser(user)}
-                                className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-lg transition-all"
+                                className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-xl transition-all"
                                 title={t('editButton')}
                               >
                                 <Edit className="h-4 w-4" />
@@ -1393,7 +1361,7 @@ const MyFleetPage = () => {
                               {session?.user?.id !== user.id ? (
                                 <button
                                   onClick={() => handleDeleteUser(user.id)}
-                                  className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
+                                  className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-xl transition-all"
                                   title={t('deleteButton')}
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -1401,7 +1369,7 @@ const MyFleetPage = () => {
                               ) : (
                                 <button
                                   disabled
-                                  className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-lg cursor-not-allowed"
+                                  className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-xl cursor-not-allowed"
                                   title={t('cannotDeleteSelf')}
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -1409,22 +1377,120 @@ const MyFleetPage = () => {
                               )}
                             </div>
                           )}
-                        </td>
-                      </tr>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-400">
+                            {user.isFleetManager ? t('fleetManager') : t('userRole')}
+                          </span>
+                          <span
+                            className={`inline-flex px-2 py-0.5 text-xs rounded-full ${user.active ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'}`}
+                          >
+                            {user.active ? t('active') : t('inactive')}
+                          </span>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-              </>
-            )}
-          </div>
-
-          {/* Benefit Stats - shown below user table for orgs that can create benefits */}
-          {organization && organization.canCreateBenefit && !organization.isBenefitOrg && (
-            <div className="mt-6">
-              <BenefitStats key={benefitRefreshKey} organizationId={organization.id} />
+                  </div>
+                  {/* Desktop: Table layout */}
+                  <div className="hidden sm:block overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-white/5 border-b border-white/10">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            {t('nameColumn')}
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            {t('emailColumn')}
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            {t('phoneColumn')}
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            {t('roleColumn')}
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            {t('statusColumn')}
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                            {t('actionsColumn')}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/10">
+                        {users.map((user) => (
+                          <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                            <td className="px-4 py-3">
+                              <div className="text-sm font-medium text-white">
+                                {user.firstName} {user.lastName}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-sm text-gray-300">{user.email}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-sm text-gray-300">{user.phoneNumber || '-'}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-sm text-gray-300">
+                                {user.isFleetManager ? t('fleetManager') : t('userRole')}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span
+                                className={`inline-flex px-2 py-1 text-xs rounded-full ${
+                                  user.active
+                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                    : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                                }`}
+                              >
+                                {user.active ? t('active') : t('inactive')}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              {!isPictusaci && (
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => handleEditUser(user)}
+                                    className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-xl transition-all"
+                                    title={t('editButton')}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </button>
+                                  {session?.user?.id !== user.id ? (
+                                    <button
+                                      onClick={() => handleDeleteUser(user.id)}
+                                      className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-xl transition-all"
+                                      title={t('deleteButton')}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      disabled
+                                      className="p-2 bg-gray-500/20 text-gray-600 border border-gray-500/30 rounded-xl cursor-not-allowed"
+                                      title={t('cannotDeleteSelf')}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
             </div>
-          )}
+
+            {/* Benefit Stats - shown below user table for orgs that can create benefits */}
+            {organization && organization.canCreateBenefit && !organization.isBenefitOrg && (
+              <div className="mt-6">
+                <BenefitStats key={benefitRefreshKey} organizationId={organization.id} />
+              </div>
+            )}
           </>
         )}
 
@@ -1432,16 +1498,25 @@ const MyFleetPage = () => {
         {activeTab === 'notifications' && (
           <>
             {!showNotificationBuilder ? (
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-8">
+              <div className="bg-pictus-onyx900 backdrop-blur-sm rounded-3xl border border-white/[0.06] p-4 sm:p-8">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white">{t('notificationsTitle')}</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white">
+                      {t('notificationsTitle')}
+                    </h2>
                     <p className="text-gray-400 mt-1">
-                      {t('notificationsOrg', { name: organization?.name || t('organizationLoading'), filtered: filteredNotifications.length, total: notifications.length, used: organization?.currentNotificationsCount ?? 0, limit: organization?.notificationsLimit ?? organization?.tierRelation?.notificationsLimit ?? '—' })}
+                      {t('notificationsOrg', {
+                        name: organization?.name || t('organizationLoading'),
+                        filtered: filteredNotifications.length,
+                        total: notifications.length,
+                        used: organization?.currentNotificationsCount ?? 0,
+                        limit:
+                          organization?.notificationsLimit ??
+                          organization?.tierRelation?.notificationsLimit ??
+                          '—',
+                      })}
                     </p>
-                    <p className="text-white text-sm mt-1">
-                      {t('notificationsSendTime')}
-                    </p>
+                    <p className="text-white text-sm mt-1">{t('notificationsSendTime')}</p>
                   </div>
                   <button
                     onClick={() => {
@@ -1449,7 +1524,7 @@ const MyFleetPage = () => {
                       setEditingNotificationId(null)
                       setShowNotificationBuilder(true)
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-white rounded-lg transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black font-semibold rounded-full transition-all"
                   >
                     <Plus className="h-4 w-4" />
                     {t('createNotification')}
@@ -1458,7 +1533,7 @@ const MyFleetPage = () => {
 
                 {/* Filters */}
                 {notifications.length > 0 && (
-                  <div className="mb-6 bg-white/5 border border-white/10 rounded-lg p-3 sm:p-6">
+                  <div className="mb-6 bg-white/5 border border-white/[0.06] rounded-2xl p-3 sm:p-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                       {/* Vehicle Filter */}
                       <div>
@@ -1468,7 +1543,7 @@ const MyFleetPage = () => {
                         <select
                           value={filterVehicle}
                           onChange={(e) => setFilterVehicle(e.target.value)}
-                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                          className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime"
                         >
                           <option value="">{t('allVehicles')}</option>
                           {uniqueVehicles.map((vehicle) => (
@@ -1489,7 +1564,7 @@ const MyFleetPage = () => {
                           value={filterPerson}
                           onChange={(e) => setFilterPerson(e.target.value)}
                           placeholder={t('searchName')}
-                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                          className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
                         />
                       </div>
 
@@ -1501,7 +1576,7 @@ const MyFleetPage = () => {
                         <select
                           value={filterType}
                           onChange={(e) => setFilterType(e.target.value)}
-                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                          className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime"
                         >
                           <option value="">{t('allTypes')}</option>
                           {uniqueTypes.map((type) => (
@@ -1514,11 +1589,13 @@ const MyFleetPage = () => {
 
                       {/* Status Filter */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">{t('filterStatus')}</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          {t('filterStatus')}
+                        </label>
                         <select
                           value={filterStatus}
                           onChange={(e) => setFilterStatus(e.target.value)}
-                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                          className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime"
                         >
                           <option value="">{t('allStatuses')}</option>
                           {uniqueStatuses.map((status) => (
@@ -1556,7 +1633,7 @@ const MyFleetPage = () => {
                               setSortByNotificationDate('none')
                             }
                           }}
-                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                          className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime"
                         >
                           <option value="none">{t('noSort')}</option>
                           <option value="asc">{t('sortAsc')}</option>
@@ -1577,7 +1654,7 @@ const MyFleetPage = () => {
                               setSortByDutyDate('none')
                             }
                           }}
-                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                          className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime"
                         >
                           <option value="none">{t('noSort')}</option>
                           <option value="asc">{t('sortAsc')}</option>
@@ -1601,7 +1678,7 @@ const MyFleetPage = () => {
                               setFilterDateTo('')
                             }
                           }}
-                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                          className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime"
                         >
                           <option value="all">{t('allDates')}</option>
                           <option value="thisMonth">{t('thisMonth')}</option>
@@ -1621,7 +1698,7 @@ const MyFleetPage = () => {
                               type="date"
                               value={filterDateFrom}
                               onChange={(e) => setFilterDateFrom(e.target.value)}
-                              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime"
                             />
                           </div>
                           <div>
@@ -1632,7 +1709,7 @@ const MyFleetPage = () => {
                               type="date"
                               value={filterDateTo}
                               onChange={(e) => setFilterDateTo(e.target.value)}
-                              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+                              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime"
                             />
                           </div>
                         </>
@@ -1660,7 +1737,7 @@ const MyFleetPage = () => {
                             setFilterDateFrom('')
                             setFilterDateTo('')
                           }}
-                          className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all text-sm"
+                          className="px-4 py-2 bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 rounded-full transition-all text-sm"
                         >
                           {t('clearFilters')}
                         </button>
@@ -1677,16 +1754,14 @@ const MyFleetPage = () => {
                   <div className="text-center py-12">
                     <Bell className="h-16 w-16 text-gray-600 mx-auto mb-4" />
                     <h3 className="text-xl font-medium text-white mb-2">{t('noNotifications')}</h3>
-                    <p className="text-gray-400 mb-6">
-                      {t('noNotificationsHint')}
-                    </p>
+                    <p className="text-gray-400 mb-6">{t('noNotificationsHint')}</p>
                     <button
                       onClick={() => {
                         setDuplicateNotificationData(null)
                         setEditingNotificationId(null)
                         setShowNotificationBuilder(true)
                       }}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black font-semibold rounded-full"
                     >
                       <Plus className="h-5 w-5" />
                       {t('createFirstNotification')}
@@ -1694,180 +1769,264 @@ const MyFleetPage = () => {
                   </div>
                 ) : (
                   <>
-                  {/* Mobile: Card layout for notifications */}
-                  <div className="sm:hidden space-y-3">
-                    {filteredNotifications.map((notification) => (
-                      <div key={notification.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <p className="text-sm font-medium text-white">#{notification.id} — {notification.vehicleRegistration || notification.myVehicle?.registration || '-'}</p>
-                            <p className="text-xs text-gray-400">{notification.personName || '-'} {notification.email ? `(${notification.email})` : ''}</p>
+                    {/* Mobile: Card layout for notifications */}
+                    <div className="sm:hidden space-y-3">
+                      {filteredNotifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className="bg-white/5 border border-white/[0.06] rounded-2xl p-4"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <p className="text-sm font-medium text-white">
+                                #{notification.id} —{' '}
+                                {notification.vehicleRegistration ||
+                                  notification.myVehicle?.registration ||
+                                  '-'}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {notification.personName || '-'}{' '}
+                                {notification.email ? `(${notification.email})` : ''}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleDeleteNotification(notification.id)}
+                              className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-xl transition-all"
+                              title={t('deleteButton')}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
-                          <button onClick={() => handleDeleteNotification(notification.id)} className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all" title={t('deleteButton')}><Trash2 className="h-4 w-4" /></button>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span className="text-xs text-gray-400">{notification.notificationType || '-'}</span>
-                          {notification.isPdr && <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">{t('pdrBadge')}</span>}
-                          {notification.isAggressiveMode && <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">⚠️ {notification.aggressiveStart ? t('aggressiveBadgeDay', { day: notification.aggressiveDaysSent || 0 }) : t('aggressiveBadge')}</span>}
-                          <span className="text-xs text-gray-500">{notification.notificationChannel || '-'}</span>
-                          <span className={`inline-flex px-2 py-0.5 text-xs rounded-full ${notification.status === 'sent' || notification.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : notification.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : notification.status === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'}`}>
-                            {notification.status === 'sent' ? t('statusSent') : notification.status === 'confirmed' ? t('statusConfirmed') : notification.status === 'pending' ? t('statusPending') : notification.status === 'failed' ? t('statusFailed') : notification.status === 'imported' ? t('statusImported') : notification.status.startsWith('reminded') ? t('statusReminded') : notification.status === 'no_response' ? t('statusNoResponse') : notification.status}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-3 text-xs">
-                          {notification.notificationDate && <span className="text-pictus-lime">{t('notificationDateLabel', { date: new Date(notification.notificationDate).toLocaleDateString(locale) })}</span>}
-                          {notification.dutyDate && <span className="text-gray-400">{t('dutyDateLabel', { date: new Date(notification.dutyDate).toLocaleDateString(locale) })}</span>}
-                        </div>
-                      </div>
-                    ))}
-                    {filteredNotifications.length === 0 && (
-                      <div className="text-center py-8 text-gray-400">{t('noFilteredNotifications')}</div>
-                    )}
-                  </div>
-                  {/* Desktop: Table layout for notifications */}
-                  <div className="hidden sm:block overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-white/5 border-b border-white/10">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            {t('idColumn')}
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            {t('personColumn')}
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            {t('vehicleColumn')}
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            {t('typeColumn')}
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            {t('channelColumn')}
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            {t('statusColumn')}
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                            {t('dateColumn')}
-                          </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase">
-                            {t('actionsColumn')}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/10">
-                        {filteredNotifications.map((notification) => (
-                          <tr key={notification.id} className="hover:bg-white/5 transition-colors">
-                            <td className="px-4 py-3">
-                              <div className="text-sm font-medium text-white">
-                                #{notification.id}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="text-sm text-white">
-                                {notification.personName || '-'}
-                              </div>
-                              <div className="text-xs text-gray-400">{notification.email}</div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="text-sm text-white">
-                                {notification.vehicleRegistration || notification.myVehicle?.registration || '-'}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <div className="text-sm text-gray-300">
-                                  {notification.notificationType || '-'}
-                                </div>
-                                {notification.isPdr && (
-                                  <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
-                                    🔄 {t('pdrBadge')}
-                                  </span>
-                                )}
-                                {notification.isAggressiveMode && (
-                                  <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">
-                                    ⚠️ {notification.aggressiveStart ? t('aggressiveBadgeDay', { day: notification.aggressiveDaysSent || 0 }) : t('aggressiveBadge')}
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="text-sm text-gray-300">
-                                {notification.notificationChannel || '-'}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span
-                                className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                                  notification.status === 'sent' ||
-                                  notification.status === 'confirmed'
-                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                    : notification.status === 'pending'
-                                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                                      : notification.status === 'failed'
-                                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                        : notification.status === 'imported'
-                                          ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                                          : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                                }`}
-                              >
-                                {notification.status === 'sent'
-                                  ? t('statusSent')
-                                  : notification.status === 'confirmed'
-                                    ? t('statusConfirmed')
-                                    : notification.status === 'pending'
-                                      ? t('statusPending')
-                                      : notification.status === 'failed'
-                                        ? t('statusFailed')
-                                        : notification.status === 'imported'
-                                          ? t('statusImported')
-                                          : notification.status.startsWith('reminded')
-                                            ? t('statusReminded')
-                                            : notification.status === 'no_response'
-                                              ? t('statusNoResponse')
-                                              : notification.status}
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="text-xs text-gray-400">
+                              {notification.notificationType || '-'}
+                            </span>
+                            {notification.isPdr && (
+                              <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
+                                {t('pdrBadge')}
                               </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="space-y-1">
-                                {notification.notificationDate && (
-                                  <div className="text-sm text-pictus-lime font-medium">
-                                    {t('notificationDateLabel', { date: new Date(notification.notificationDate).toLocaleDateString(locale) })}
-                                  </div>
-                                )}
-                                {notification.dutyDate && (
-                                  <div className="text-sm text-gray-300">
-                                    {t('dutyDateLabel', { date: new Date(notification.dutyDate).toLocaleDateString(locale) })}
-                                  </div>
-                                )}
-                                {!notification.notificationDate && !notification.dutyDate && (
-                                  <div className="text-sm text-gray-500">-</div>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center justify-center gap-2">
-                                <button
-                                  onClick={() => handleDeleteNotification(notification.id)}
-                                  className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
-                                  title={t('deleteButton')}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </td>
+                            )}
+                            {notification.isAggressiveMode && (
+                              <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">
+                                ⚠️{' '}
+                                {notification.aggressiveStart
+                                  ? t('aggressiveBadgeDay', {
+                                      day: notification.aggressiveDaysSent || 0,
+                                    })
+                                  : t('aggressiveBadge')}
+                              </span>
+                            )}
+                            <span className="text-xs text-gray-500">
+                              {notification.notificationChannel || '-'}
+                            </span>
+                            <span
+                              className={`inline-flex px-2 py-0.5 text-xs rounded-full ${notification.status === 'sent' || notification.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : notification.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : notification.status === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'}`}
+                            >
+                              {notification.status === 'sent'
+                                ? t('statusSent')
+                                : notification.status === 'confirmed'
+                                  ? t('statusConfirmed')
+                                  : notification.status === 'pending'
+                                    ? t('statusPending')
+                                    : notification.status === 'failed'
+                                      ? t('statusFailed')
+                                      : notification.status === 'imported'
+                                        ? t('statusImported')
+                                        : notification.status.startsWith('reminded')
+                                          ? t('statusReminded')
+                                          : notification.status === 'no_response'
+                                            ? t('statusNoResponse')
+                                            : notification.status}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-3 text-xs">
+                            {notification.notificationDate && (
+                              <span className="text-pictus-lime">
+                                {t('notificationDateLabel', {
+                                  date: new Date(notification.notificationDate).toLocaleDateString(
+                                    locale,
+                                  ),
+                                })}
+                              </span>
+                            )}
+                            {notification.dutyDate && (
+                              <span className="text-gray-400">
+                                {t('dutyDateLabel', {
+                                  date: new Date(notification.dutyDate).toLocaleDateString(locale),
+                                })}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {filteredNotifications.length === 0 && (
+                        <div className="text-center py-8 text-gray-400">
+                          {t('noFilteredNotifications')}
+                        </div>
+                      )}
+                    </div>
+                    {/* Desktop: Table layout for notifications */}
+                    <div className="hidden sm:block overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-white/5 border-b border-white/10">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                              {t('idColumn')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                              {t('personColumn')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                              {t('vehicleColumn')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                              {t('typeColumn')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                              {t('channelColumn')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                              {t('statusColumn')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                              {t('dateColumn')}
+                            </th>
+                            <th className="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase">
+                              {t('actionsColumn')}
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/10">
+                          {filteredNotifications.map((notification) => (
+                            <tr
+                              key={notification.id}
+                              className="hover:bg-white/5 transition-colors"
+                            >
+                              <td className="px-4 py-3">
+                                <div className="text-sm font-medium text-white">
+                                  #{notification.id}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="text-sm text-white">
+                                  {notification.personName || '-'}
+                                </div>
+                                <div className="text-xs text-gray-400">{notification.email}</div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="text-sm text-white">
+                                  {notification.vehicleRegistration ||
+                                    notification.myVehicle?.registration ||
+                                    '-'}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  <div className="text-sm text-gray-300">
+                                    {notification.notificationType || '-'}
+                                  </div>
+                                  {notification.isPdr && (
+                                    <span className="inline-flex items-center px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
+                                      🔄 {t('pdrBadge')}
+                                    </span>
+                                  )}
+                                  {notification.isAggressiveMode && (
+                                    <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">
+                                      ⚠️{' '}
+                                      {notification.aggressiveStart
+                                        ? t('aggressiveBadgeDay', {
+                                            day: notification.aggressiveDaysSent || 0,
+                                          })
+                                        : t('aggressiveBadge')}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="text-sm text-gray-300">
+                                  {notification.notificationChannel || '-'}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <span
+                                  className={`inline-flex px-2 py-1 text-xs rounded-full ${
+                                    notification.status === 'sent' ||
+                                    notification.status === 'confirmed'
+                                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                      : notification.status === 'pending'
+                                        ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                        : notification.status === 'failed'
+                                          ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                          : notification.status === 'imported'
+                                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                                            : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                                  }`}
+                                >
+                                  {notification.status === 'sent'
+                                    ? t('statusSent')
+                                    : notification.status === 'confirmed'
+                                      ? t('statusConfirmed')
+                                      : notification.status === 'pending'
+                                        ? t('statusPending')
+                                        : notification.status === 'failed'
+                                          ? t('statusFailed')
+                                          : notification.status === 'imported'
+                                            ? t('statusImported')
+                                            : notification.status.startsWith('reminded')
+                                              ? t('statusReminded')
+                                              : notification.status === 'no_response'
+                                                ? t('statusNoResponse')
+                                                : notification.status}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="space-y-1">
+                                  {notification.notificationDate && (
+                                    <div className="text-sm text-pictus-lime font-medium">
+                                      {t('notificationDateLabel', {
+                                        date: new Date(
+                                          notification.notificationDate,
+                                        ).toLocaleDateString(locale),
+                                      })}
+                                    </div>
+                                  )}
+                                  {notification.dutyDate && (
+                                    <div className="text-sm text-gray-300">
+                                      {t('dutyDateLabel', {
+                                        date: new Date(notification.dutyDate).toLocaleDateString(
+                                          locale,
+                                        ),
+                                      })}
+                                    </div>
+                                  )}
+                                  {!notification.notificationDate && !notification.dutyDate && (
+                                    <div className="text-sm text-gray-500">-</div>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center justify-center gap-2">
+                                  <button
+                                    onClick={() => handleDeleteNotification(notification.id)}
+                                    className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-xl transition-all"
+                                    title={t('deleteButton')}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
 
-                    {/* No results message */}
-                    {filteredNotifications.length === 0 && (
-                      <div className="text-center py-8 text-gray-400">
-                        {t('noFilteredNotifications')}
-                      </div>
-                    )}
-                  </div>
+                      {/* No results message */}
+                      {filteredNotifications.length === 0 && (
+                        <div className="text-center py-8 text-gray-400">
+                          {t('noFilteredNotifications')}
+                        </div>
+                      )}
+                    </div>
                   </>
                 )}
               </div>
@@ -1879,7 +2038,7 @@ const MyFleetPage = () => {
                     setDuplicateNotificationData(null)
                     setEditingNotificationId(null)
                   }}
-                  className="mb-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
+                  className="mb-4 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-full transition-all"
                 >
                   ← {t('backToList')}
                 </button>
@@ -1927,7 +2086,7 @@ const MyFleetPage = () => {
         {/* Templates Tab (Business tier only) */}
         {activeTab === 'templates' && organization?.tierRelation?.name === 'BUSINESS' && (
           <div className="space-y-6">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+            <div className="bg-pictus-onyx900 backdrop-blur-sm rounded-3xl border border-white/[0.06] p-6">
               <h2 className="text-2xl font-bold text-white mb-2">{t('notificationTemplates')}</h2>
               <p className="text-gray-400">{t('manageTemplates')}</p>
             </div>
@@ -1940,7 +2099,7 @@ const MyFleetPage = () => {
                 hideOrganizationSelector={true}
               />
             ) : (
-              <div className="mt-6 p-8 bg-white/5 rounded-xl border border-white/10 text-center">
+              <div className="mt-6 p-8 bg-white/5 rounded-2xl border border-white/[0.06] text-center">
                 <p className="text-gray-400">{t('loadingOrganization')}</p>
               </div>
             )}
@@ -1950,23 +2109,28 @@ const MyFleetPage = () => {
         {/* Types Tab (Business tier only) */}
         {activeTab === 'types' && organization?.tierRelation?.name === 'BUSINESS' && (
           <div className="space-y-6">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+            <div className="bg-pictus-onyx900 backdrop-blur-sm rounded-3xl border border-white/[0.06] p-6">
               <h2 className="text-2xl font-bold text-white mb-2">{t('notificationTypesTitle')}</h2>
               <p className="text-gray-400">{t('manageNotificationTypes')}</p>
               {organization && organization.currentNotificationTypesCount === 0 && (
-                <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                  <p className="text-blue-300 text-sm">
-                    {t('noCustomTypesHint')}
-                  </p>
+                <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4">
+                  <p className="text-blue-300 text-sm">{t('noCustomTypesHint')}</p>
                 </div>
               )}
-              {organization && (organization.tierRelation || organization.notificationTypesLimit != null) && (
-                <div className="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
-                  <p className="text-orange-300 text-sm">
-                    {t('notificationTypesLimit', { current: organization.currentNotificationTypesCount, limit: organization.notificationTypesLimit ?? organization.tierRelation?.notificationTypesLimit ?? '—' })}
-                  </p>
-                </div>
-              )}
+              {organization &&
+                (organization.tierRelation || organization.notificationTypesLimit != null) && (
+                  <div className="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-2xl p-4">
+                    <p className="text-orange-300 text-sm">
+                      {t('notificationTypesLimit', {
+                        current: organization.currentNotificationTypesCount,
+                        limit:
+                          organization.notificationTypesLimit ??
+                          organization.tierRelation?.notificationTypesLimit ??
+                          '—',
+                      })}
+                    </p>
+                  </div>
+                )}
             </div>
             {organization?.id && organization.id.trim() !== '' ? (
               <NotificationSettings
@@ -1977,7 +2141,7 @@ const MyFleetPage = () => {
                 hideOrganizationSelector={true}
               />
             ) : (
-              <div className="mt-6 p-8 bg-white/5 rounded-xl border border-white/10 text-center">
+              <div className="mt-6 p-8 bg-white/5 rounded-2xl border border-white/[0.06] text-center">
                 <p className="text-gray-400">{t('loadingOrganization')}</p>
               </div>
             )}
@@ -1986,7 +2150,7 @@ const MyFleetPage = () => {
 
         {/* Renewals Tab */}
         {activeTab === 'renewals' && (
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-8">
+          <div className="bg-pictus-onyx900 backdrop-blur-sm rounded-3xl border border-white/[0.06] p-4 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-white">{t('renewalsTitle')}</h2>
@@ -2000,7 +2164,7 @@ const MyFleetPage = () => {
 
         {/* Organizations Tab (PICTUSACI only) */}
         {activeTab === 'organizations' && isPictusaciUser && (
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-8">
+          <div className="bg-pictus-onyx900 backdrop-blur-sm rounded-3xl border border-white/[0.06] p-4 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-white">{t('onboardingTitle')}</h2>
@@ -2008,7 +2172,7 @@ const MyFleetPage = () => {
               </div>
               <Link
                 href="/client/my-fleet/onboard"
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-white rounded-lg transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black font-semibold rounded-full transition-all"
               >
                 <Plus className="h-4 w-4" />
                 {t('onboardNewClient')}
@@ -2026,7 +2190,7 @@ const MyFleetPage = () => {
                 <p className="text-gray-400 mb-6">{t('noOrganizationsHint')}</p>
                 <Link
                   href="/client/my-fleet/onboard"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black font-semibold rounded-full"
                 >
                   <Plus className="h-5 w-5" />
                   {t('onboardFirstClient')}
@@ -2034,128 +2198,152 @@ const MyFleetPage = () => {
               </div>
             ) : (
               <>
-              {/* Mobile: Card layout for organizations */}
-              <div className="sm:hidden space-y-3">
-                {organizations.map((org) => (
-                  <div key={org.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <p className="text-sm font-medium text-white">{org.name}</p>
-                        {org.mainContact && <p className="text-xs text-gray-400">{t('contactLabel', { contact: org.mainContact })}</p>}
-                      </div>
-                      {org.tierRelation ? (
-                        <span className="inline-flex px-2 py-0.5 text-xs rounded-full bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">{org.tierRelation.name}</span>
-                      ) : null}
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 text-xs text-gray-400">
-                      <div>
-                        <span className="text-gray-500">{t('usersColumn')}</span>
-                        <p className="text-gray-300">{org.currentUsersCount ?? '-'} / {org.usersLimit ?? org.tierRelation?.usersLimit ?? '—'}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">{t('vehiclesColumn')}</span>
-                        <p className="text-gray-300">{org.currentVehiclesCount ?? '-'} / {org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? '—'}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">{t('notificationsColumn')}</span>
-                        <p className="text-gray-300">{org.currentNotificationsCount ?? '-'} / {org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}</p>
-                      </div>
-                    </div>
-                    {org.createdAt && <p className="text-xs text-gray-500 mt-2">{new Date(org.createdAt).toLocaleDateString(locale)}</p>}
-                  </div>
-                ))}
-              </div>
-              {/* Desktop: Table layout for organizations */}
-              <div className="hidden sm:block overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-white/5 border-b border-white/10">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('orgNameColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('tierColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('usersColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('vehiclesColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('notificationsColumn')}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
-                        {t('createdColumn')}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {organizations.map((org) => (
-                      <tr key={org.id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3">
-                          <div className="text-sm font-medium text-white">{org.name}</div>
+                {/* Mobile: Card layout for organizations */}
+                <div className="sm:hidden space-y-3">
+                  {organizations.map((org) => (
+                    <div
+                      key={org.id}
+                      className="bg-white/5 border border-white/[0.06] rounded-2xl p-4"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="text-sm font-medium text-white">{org.name}</p>
                           {org.mainContact && (
-                            <div className="text-xs text-gray-400">{t('contactLabel', { contact: org.mainContact })}</div>
+                            <p className="text-xs text-gray-400">
+                              {t('contactLabel', { contact: org.mainContact })}
+                            </p>
                           )}
-                        </td>
-                        <td className="px-4 py-3">
-                          {org.tierRelation ? (
-                            <span className="inline-flex px-2 py-1 text-xs rounded-full bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
-                              {org.tierRelation.name}
-                            </span>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm text-gray-300">
-                            {org.currentUsersCount !== undefined ? (
-                              <>
-                                {org.currentUsersCount}
-                                {` / ${org.usersLimit ?? org.tierRelation?.usersLimit ?? '—'}`}
-                              </>
-                            ) : (
-                              '-'
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm text-gray-300">
-                            {org.currentVehiclesCount !== undefined ? (
-                              <>
-                                {org.currentVehiclesCount}
-                                {` / ${org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? '—'}`}
-                              </>
-                            ) : (
-                              '-'
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm text-gray-300">
-                            {org.currentNotificationsCount !== undefined ? (
-                              <>
-                                {org.currentNotificationsCount}
-                                {` / ${org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}`}
-                              </>
-                            ) : (
-                              '-'
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm text-gray-300">
-                            {org.createdAt
-                              ? new Date(org.createdAt).toLocaleDateString(locale)
-                              : '-'}
-                          </div>
-                        </td>
+                        </div>
+                        {org.tierRelation ? (
+                          <span className="inline-flex px-2 py-0.5 text-xs rounded-full bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
+                            {org.tierRelation.name}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-xs text-gray-400">
+                        <div>
+                          <span className="text-gray-500">{t('usersColumn')}</span>
+                          <p className="text-gray-300">
+                            {org.currentUsersCount ?? '-'} /{' '}
+                            {org.usersLimit ?? org.tierRelation?.usersLimit ?? '—'}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">{t('vehiclesColumn')}</span>
+                          <p className="text-gray-300">
+                            {org.currentVehiclesCount ?? '-'} /{' '}
+                            {org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? '—'}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">{t('notificationsColumn')}</span>
+                          <p className="text-gray-300">
+                            {org.currentNotificationsCount ?? '-'} /{' '}
+                            {org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}
+                          </p>
+                        </div>
+                      </div>
+                      {org.createdAt && (
+                        <p className="text-xs text-gray-500 mt-2">
+                          {new Date(org.createdAt).toLocaleDateString(locale)}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {/* Desktop: Table layout for organizations */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-white/5 border-b border-white/10">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                          {t('orgNameColumn')}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                          {t('tierColumn')}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                          {t('usersColumn')}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                          {t('vehiclesColumn')}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                          {t('notificationsColumn')}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">
+                          {t('createdColumn')}
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-white/10">
+                      {organizations.map((org) => (
+                        <tr key={org.id} className="hover:bg-white/5 transition-colors">
+                          <td className="px-4 py-3">
+                            <div className="text-sm font-medium text-white">{org.name}</div>
+                            {org.mainContact && (
+                              <div className="text-xs text-gray-400">
+                                {t('contactLabel', { contact: org.mainContact })}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            {org.tierRelation ? (
+                              <span className="inline-flex px-2 py-1 text-xs rounded-full bg-pictus-lime/20 text-pictus-lime border border-pictus-lime/30">
+                                {org.tierRelation.name}
+                              </span>
+                            ) : (
+                              <span className="text-gray-500">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="text-sm text-gray-300">
+                              {org.currentUsersCount !== undefined ? (
+                                <>
+                                  {org.currentUsersCount}
+                                  {` / ${org.usersLimit ?? org.tierRelation?.usersLimit ?? '—'}`}
+                                </>
+                              ) : (
+                                '-'
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="text-sm text-gray-300">
+                              {org.currentVehiclesCount !== undefined ? (
+                                <>
+                                  {org.currentVehiclesCount}
+                                  {` / ${org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? '—'}`}
+                                </>
+                              ) : (
+                                '-'
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="text-sm text-gray-300">
+                              {org.currentNotificationsCount !== undefined ? (
+                                <>
+                                  {org.currentNotificationsCount}
+                                  {` / ${org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}`}
+                                </>
+                              ) : (
+                                '-'
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="text-sm text-gray-300">
+                              {org.createdAt
+                                ? new Date(org.createdAt).toLocaleDateString(locale)
+                                : '-'}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </>
             )}
           </div>
@@ -2195,7 +2383,7 @@ const MyFleetPage = () => {
               }}
             >
               <div
-                className="relative w-full max-w-3xl my-8 bg-gradient-to-br from-pictus-onyx900 to-pictus-black rounded-2xl border border-pictus-lime/30 shadow-2xl p-4 sm:p-8"
+                className="relative w-full max-w-3xl my-8 bg-gradient-to-br from-pictus-onyx900 to-pictus-black rounded-3xl border border-white/[0.06] shadow-2xl p-4 sm:p-8"
                 onClick={(e) => e.stopPropagation()}
               >
                 <NotificationBuilder

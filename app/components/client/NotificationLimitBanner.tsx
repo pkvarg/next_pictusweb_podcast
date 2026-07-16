@@ -13,9 +13,12 @@ interface NotificationLimitBannerProps {
 
 const i18n: Record<string, Record<string, string>> = {
   sk: {
-    canceled: 'Vaše predplatné bolo zrušené. Notifikácie sú zablokované. Obnovte predplatné pre pokračovanie.',
-    paymentIssue: 'Máte neuhradenú platbu. Notifikácie sú dočasne zablokované. Aktualizujte platobnú metódu.',
-    limitBlocked: 'Dosiahli ste limit {limit} notifikácií pre {tier} tier. Vytváranie notifikácií je zablokované do ďalšieho fakturačného obdobia.',
+    canceled:
+      'Vaše predplatné bolo zrušené. Notifikácie sú zablokované. Obnovte predplatné pre pokračovanie.',
+    paymentIssue:
+      'Máte neuhradenú platbu. Notifikácie sú dočasne zablokované. Aktualizujte platobnú metódu.',
+    limitBlocked:
+      'Dosiahli ste limit {limit} notifikácií pre {tier} tier. Vytváranie notifikácií je zablokované do ďalšieho fakturačného obdobia.',
     usage: 'Využili ste {current} z {limit} notifikácií ({percent}%).',
     remaining: 'Zostáva {remaining} notifikácií.',
     limitReached: 'Limit bol dosiahnutý.',
@@ -24,9 +27,12 @@ const i18n: Record<string, Record<string, string>> = {
     upgrade: 'Upgradovať',
   },
   en: {
-    canceled: 'Your subscription has been canceled. Notifications are blocked. Renew your subscription to continue.',
-    paymentIssue: 'You have an unpaid invoice. Notifications are temporarily blocked. Update your payment method.',
-    limitBlocked: 'You have reached the limit of {limit} notifications for the {tier} tier. Notification creation is blocked until the next billing period.',
+    canceled:
+      'Your subscription has been canceled. Notifications are blocked. Renew your subscription to continue.',
+    paymentIssue:
+      'You have an unpaid invoice. Notifications are temporarily blocked. Update your payment method.',
+    limitBlocked:
+      'You have reached the limit of {limit} notifications for the {tier} tier. Notification creation is blocked until the next billing period.',
     usage: 'You have used {current} of {limit} notifications ({percent}%).',
     remaining: '{remaining} notifications remaining.',
     limitReached: 'Limit has been reached.',
@@ -35,9 +41,12 @@ const i18n: Record<string, Record<string, string>> = {
     upgrade: 'Upgrade',
   },
   hu: {
-    canceled: 'Az előfizetése megszűnt. Az értesítések le vannak tiltva. Újítsa meg az előfizetését a folytatáshoz.',
-    paymentIssue: 'Kifizetetlen számlája van. Az értesítések ideiglenesen le vannak tiltva. Frissítse a fizetési módját.',
-    limitBlocked: 'Elérte a(z) {tier} szint {limit} értesítési limitjét. Az értesítések létrehozása a következő számlázási időszakig le van tiltva.',
+    canceled:
+      'Az előfizetése megszűnt. Az értesítések le vannak tiltva. Újítsa meg az előfizetését a folytatáshoz.',
+    paymentIssue:
+      'Kifizetetlen számlája van. Az értesítések ideiglenesen le vannak tiltva. Frissítse a fizetési módját.',
+    limitBlocked:
+      'Elérte a(z) {tier} szint {limit} értesítési limitjét. Az értesítések létrehozása a következő számlázási időszakig le van tiltva.',
     usage: '{current}/{limit} értesítést használt fel ({percent}%).',
     remaining: '{remaining} értesítés maradt.',
     limitReached: 'A limit elérve.',
@@ -78,7 +87,7 @@ export default function NotificationLimitBanner({
   const upgradeButton = isFree && (
     <Link
       href="/client/upgrade"
-      className="ml-3 inline-flex items-center gap-1 whitespace-nowrap rounded-lg bg-pictus-lime px-3 py-1 text-sm font-semibold text-black hover:bg-pictus-lime/80 transition"
+      className="ml-3 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-pictus-lime px-4 py-2 text-sm font-semibold text-pictus-black hover:bg-pictus-lime600 transition"
     >
       {t(locale, 'upgrade')}
       <ArrowUpRight size={14} />
@@ -91,7 +100,7 @@ export default function NotificationLimitBanner({
 
     return (
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4">
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300">
+        <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-300">
           <XCircle size={20} className="flex-shrink-0" />
           <p className="text-sm flex-1">
             {isCanceled
@@ -111,13 +120,11 @@ export default function NotificationLimitBanner({
   const percent = Math.round(usage * 100)
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4">
-      <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300">
+      <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300">
         <AlertTriangle size={20} className="flex-shrink-0" />
         <p className="text-sm flex-1">
           {t(locale, 'usage', { current: currentCount, limit, percent })}{' '}
-          {remaining > 0
-            ? t(locale, 'remaining', { remaining })
-            : t(locale, 'limitReached')}{' '}
+          {remaining > 0 ? t(locale, 'remaining', { remaining }) : t(locale, 'limitReached')}{' '}
           {isFree ? t(locale, 'freeWarning') : t(locale, 'paidWarning')}
         </p>
         {upgradeButton}

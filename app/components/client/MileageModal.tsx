@@ -18,7 +18,13 @@ interface MileageModalProps {
   onSuccess?: () => void
 }
 
-const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSuccess }: MileageModalProps) => {
+const MileageModal = ({
+  isOpen,
+  onClose,
+  vehicleId,
+  vehicleRegistration,
+  onSuccess,
+}: MileageModalProps) => {
   const [mileageRecords, setMileageRecords] = useState<MileageRecord[]>([])
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -133,11 +139,11 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucce
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black border border-pictus-lime/30 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black border border-white/[0.06] rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-pictus-lime/20 to-pictus-lime600/20 border-b border-pictus-lime/30 p-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-gradient-to-r from-pictus-lime/15 to-pictus-lime600/10 border-b border-white/[0.06] p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-pictus-lime/20 rounded-lg">
+            <div className="p-3 bg-pictus-lime/15 rounded-xl">
               <Gauge className="w-8 h-8 text-pictus-lime" />
             </div>
             <div>
@@ -145,10 +151,7 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucce
               <p className="text-xl text-pictus-lime">{vehicleRegistration}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-white/10 rounded-lg transition"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition">
             <X className="w-8 h-8 text-pictus-white" />
           </button>
         </div>
@@ -156,14 +159,17 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucce
         {/* Content */}
         <div className="p-6">
           {/* Add Mileage Form */}
-          <form onSubmit={handleSubmit} className="mb-6 bg-gray-600/20 rounded-xl p-6 border border-pictus-lime/20">
+          <form
+            onSubmit={handleSubmit}
+            className="mb-6 bg-white/5 rounded-2xl p-6 border border-white/[0.06]"
+          >
             <h3 className="text-2xl font-light text-pictus-white mb-6 flex items-center gap-2">
               <Plus size={28} className="text-pictus-lime" />
               Pridať záznam
             </h3>
 
             {error && (
-              <div className="mb-4 bg-red-500/20 border border-red-500/30 rounded-lg p-4 text-red-200 text-lg">
+              <div className="mb-4 bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-200 text-lg">
                 {error}
               </div>
             )}
@@ -178,39 +184,35 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucce
                   value={formData.kilometers}
                   onChange={(e) => setFormData({ ...formData, kilometers: e.target.value })}
                   placeholder="napr. 150000"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                   required
                 />
               </div>
               <div>
-                <label className="block text-pictus-white text-lg font-light mb-2">
-                  Dátum *
-                </label>
+                <label className="block text-pictus-white text-lg font-light mb-2">Dátum *</label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                   required
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-pictus-white text-lg font-light mb-2">
-                  Poznámka
-                </label>
+                <label className="block text-pictus-white text-lg font-light mb-2">Poznámka</label>
                 <input
                   type="text"
                   value={formData.note}
                   onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                   placeholder="Voliteľná poznámka..."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                 />
               </div>
               <div className="md:col-span-2">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-3 rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all disabled:opacity-50 text-lg font-light shadow-lg hover:shadow-pictus-lime/50"
+                  className="w-full bg-pictus-lime text-pictus-black px-6 py-3 rounded-full hover:bg-pictus-lime600 transition-all disabled:opacity-50 text-lg font-semibold"
                 >
                   {loading ? 'Ukladám...' : 'Pridať záznam'}
                 </button>
@@ -226,18 +228,16 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucce
 
             {loading && mileageRecords.length === 0 ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime mx-auto"></div>
               </div>
             ) : mileageRecords.length === 0 ? (
-              <div className="text-center py-8 text-pictus-lime text-xl">
-                Zatiaľ žiadne záznamy
-              </div>
+              <div className="text-center py-8 text-pictus-lime text-xl">Zatiaľ žiadne záznamy</div>
             ) : (
               <div className="space-y-4">
                 {mileageRecords.map((record) => (
                   <div
                     key={record.id}
-                    className="bg-gray-600/20 border border-pictus-lime/20 rounded-lg p-5 flex items-center justify-between hover:bg-pictus-lime/20 transition"
+                    className="bg-white/5 border border-white/[0.06] rounded-2xl p-5 flex items-center justify-between hover:bg-white/10 transition"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
@@ -245,7 +245,9 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucce
                           {formatKilometers(record.kilometers)}
                         </span>
                         <span className="text-pictus-lime text-lg">•</span>
-                        <span className="text-pictus-lime text-base">{formatDate(record.date)}</span>
+                        <span className="text-pictus-lime text-base">
+                          {formatDate(record.date)}
+                        </span>
                       </div>
                       {record.note && (
                         <p className="text-pictus-lime text-base mt-1">{record.note}</p>
@@ -253,7 +255,7 @@ const MileageModal = ({ isOpen, onClose, vehicleId, vehicleRegistration, onSucce
                     </div>
                     <button
                       onClick={() => handleDelete(record.id)}
-                      className="p-3 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition text-red-400"
+                      className="p-3 bg-red-500/10 hover:bg-red-500/20 rounded-xl transition text-red-400"
                     >
                       <Trash2 size={20} />
                     </button>

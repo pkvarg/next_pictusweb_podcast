@@ -11,13 +11,15 @@ const subjectTranslations: Record<string, string> = {
 
 const PictusCta = () => {
   const t = useTranslations('Landing')
+  const th = useTranslations('Home')
   const { locale } = useParams()
-  const options = t.raw('cta.form.options') as string[]
+  const currentLocale = (locale as string) || 'sk'
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [projectType, setProjectType] = useState('')
+  const [phone, setPhone] = useState('')
   const [message, setMessage] = useState('')
+  const [honeypot, setHoneypot] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const [formStartTime, setFormStartTime] = useState(0)
 
@@ -27,11 +29,20 @@ const PictusCta = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    // Anti-spam honeypot: silently accept without sending if filled.
+    if (honeypot !== '') {
+      setStatus('success')
+      setName('')
+      setEmail('')
+      setPhone('')
+      setMessage('')
+      return
+    }
+
     setStatus('sending')
 
-    const currentLocale = (locale as string) || 'sk'
     const subject = subjectTranslations[currentLocale] || subjectTranslations.sk
-    const mailMessage = projectType ? `${projectType}\n\n${message}` : message
 
     try {
       const response = await fetch('/api/contact', {
@@ -40,8 +51,8 @@ const PictusCta = () => {
         body: JSON.stringify({
           name,
           email,
-          phone: '',
-          mailMessage,
+          phone,
+          mailMessage: message,
           locale: currentLocale,
           origin: 'PICTUSWEB.SK',
           subject,
@@ -59,7 +70,7 @@ const PictusCta = () => {
         setStatus('success')
         setName('')
         setEmail('')
-        setProjectType('')
+        setPhone('')
         setMessage('')
       } else {
         setStatus('error')
@@ -77,10 +88,6 @@ const PictusCta = () => {
       id="contact"
       aria-labelledby="contact-title"
     >
-      <video className="cta-video" autoPlay muted loop playsInline aria-hidden="true">
-        <source src="/pictus/backgrounds/stardust.mp4" type="video/mp4" />
-      </video>
-      <div className="cta-video-fill" aria-hidden="true"></div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="cta-background"
@@ -94,60 +101,80 @@ const PictusCta = () => {
       <div className="layout-container cta-content">
         <form className="contact-card" ref={formRef} onSubmit={handleSubmit}>
           <div className="contact-field">
-            <label htmlFor="contact-name">{t('cta.form.name')}</label>
+            <label htmlFor="contact-name">{th('contactName')}</label>
             <input
               id="contact-name"
               name="name"
               type="text"
               autoComplete="name"
-              placeholder={t('cta.form.name')}
+              placeholder={th('contactName')}
               value={name}
               onChange={(event) => setName(event.target.value)}
               required
             />
           </div>
           <div className="contact-field">
-            <label htmlFor="contact-email">{t('cta.form.email')}</label>
+            <label htmlFor="contact-email">{th('contactEmail')}</label>
             <input
               id="contact-email"
               name="email"
               type="email"
               autoComplete="email"
-              placeholder={t('cta.form.emailPlaceholder')}
+              placeholder={th('contactEmail')}
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
             />
           </div>
           <div className="contact-field">
-            <label htmlFor="contact-project-type">{t('cta.form.projectType')}</label>
-            <select
-              id="contact-project-type"
-              name="project-type"
-              value={projectType}
-              onChange={(event) => setProjectType(event.target.value)}
-              required
-            >
-              <option value="" disabled>
-                {t('cta.form.projectType')}
-              </option>
-              {options.map((option) => (
-                <option key={option}>{option}</option>
-              ))}
-            </select>
+            <label htmlFor="contact-phone">{th('contactPhone')}</label>
+            <input
+              id="contact-phone"
+              name="phone"
+              type="tel"
+              autoComplete="tel"
+              placeholder={th('contactPhone')}
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+            />
           </div>
           <div className="contact-field">
-            <label htmlFor="contact-message">{t('cta.form.message')}</label>
+            <label htmlFor="contact-message">{th('contactMessage')}</label>
             <textarea
               id="contact-message"
               name="message"
               rows={5}
-              placeholder={t('cta.form.message')}
+              placeholder={th('contactMessage')}
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               required
             ></textarea>
           </div>
+
+          {/* Anti-spam honeypot — visually hidden */}
+          <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }} aria-hidden="true">
+            <label htmlFor="website_url">Website</label>
+            <input
+              id="website_url"
+              name="website_url"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(event) => setHoneypot(event.target.value)}
+            />
+          </div>
+
+          <label className="contact-consent">
+            <input type="checkbox" required />
+            <span>
+              {th('contactAgree')}{' '}
+              <a href={`/${currentLocale}/gdpr`} target="_blank" rel="noopener noreferrer">
+                {th('contactGdpr')}
+              </a>
+            </span>
+          </label>
+
           <button className="button button-primary" type="submit" disabled={status === 'sending'}>
             {status === 'sending' ? t('cta.form.sending') : t('cta.form.send')}{' '}
             <span aria-hidden="true">→</span>

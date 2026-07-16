@@ -105,82 +105,75 @@ const PodcastPlayer = () => {
       })}
     >
       {/* change the color for indicator inside the Progress component in ui folder */}
-      <Progress
-        value={(currentTime / duration) * 100}
-        className='w-full'
-        max={duration}
-      />
-      <section className='glassmorphism-black flex h-[130px] w-full items-center justify-between px-4 max-md:justify-center max-md:gap-5 md:px-12 bg-black'>
-        <p
+      <Progress value={(currentTime / duration) * 100} className="w-full" max={duration} />
+      <section className="glassmorphism-black flex h-[130px] w-full items-center justify-between rounded-t-3xl border-t border-white/[0.06] bg-pictus-onyx900 px-4 max-md:justify-center max-md:gap-5 md:px-12">
+        <button
           onClick={hide}
-          className='absolute top-2 right-[0.5%] text-red-500 cursor-pointer'
+          aria-label="Close player"
+          className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/5 text-pictus-white/70 transition-colors hover:bg-white/10 hover:text-pictus-white cursor-pointer"
         >
           x
-        </p>
+        </button>
         <audio
           ref={audioRef}
           src={audio?.audioPath}
-          className='hidden'
+          className="hidden"
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={handleAudioEnded}
         />
-        <div className='flex items-center gap-4 max-md:hidden'>
+        <div className="flex items-center gap-4 max-md:hidden">
           <Link href={`/podcast/${audio?.id}`}>
             <Image
               src={audio?.imagePath || '/icons/player1.png'}
               width={64}
               height={64}
-              alt='player1'
-              className='aspect-square rounded-xl'
+              alt="player1"
+              className="aspect-square rounded-2xl"
             />
           </Link>
-          <div className='flex w-[160px] flex-col'>
-            <h2 className='text-14 truncate font-semibold text-white-1'>
-              {audio?.title}
-            </h2>
+          <div className="flex w-[160px] flex-col">
+            <h2 className="text-14 truncate font-semibold text-white-1">{audio?.title}</h2>
           </div>
         </div>
-        <div className='flex flex-row cursor-pointer gap-3 md:gap-6'>
-          <div className='flex items-center gap-1.5'>
+        <div className="flex flex-row cursor-pointer gap-3 md:gap-6">
+          <div className="flex items-center gap-1.5">
             <Image
               src={'/icons/reverse.svg'}
               width={24}
               height={24}
-              alt='rewind'
+              alt="rewind"
               onClick={rewind}
             />
-            <h2 className='text-12 font-bold text-white-4'>-5</h2>
+            <h2 className="text-12 font-bold text-white-4">-5</h2>
           </div>
           <Image
             src={isPlaying ? '/icons/Pause.svg' : '/icons/Play.svg'}
             width={30}
             height={30}
-            alt='play'
+            alt="play"
             onClick={togglePlayPause}
           />
-          <div className='flex items-center gap-1.5'>
-            <h2 className='text-12 font-bold text-white-4'>+5</h2>
+          <div className="flex items-center gap-1.5">
+            <h2 className="text-12 font-bold text-white-4">+5</h2>
             <Image
               src={'/icons/forward.svg'}
               width={24}
               height={24}
-              alt='forward'
+              alt="forward"
               onClick={forward}
             />
           </div>
         </div>
-        <div className='flex items-center gap-6'>
-          <h2 className='text-16 font-normal text-white-2 max-md:hidden'>
-            {formatTime(duration)}
-          </h2>
-          <div className='flex w-full gap-2'>
+        <div className="flex items-center gap-6">
+          <h2 className="text-16 font-normal text-white-2 max-md:hidden">{formatTime(duration)}</h2>
+          <div className="flex w-full gap-2">
             <Image
               src={isMuted ? '/icons/unmute.svg' : '/icons/mute.svg'}
               width={24}
               height={24}
-              alt='mute unmute'
+              alt="mute unmute"
               onClick={toggleMute}
-              className='cursor-pointer'
+              className="cursor-pointer"
             />
           </div>
         </div>

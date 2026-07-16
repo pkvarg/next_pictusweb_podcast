@@ -286,7 +286,11 @@ const OnboardClientPage = () => {
       setError('Zadajte počet zakúpených vozidiel (min. 1)')
       return false
     }
-    if (isPaid && selectedTier.vehiclesLimit && Number(purchasedVehicles) > selectedTier.vehiclesLimit) {
+    if (
+      isPaid &&
+      selectedTier.vehiclesLimit &&
+      Number(purchasedVehicles) > selectedTier.vehiclesLimit
+    ) {
       setError(`Maximálny počet vozidiel pre tento tier je ${selectedTier.vehiclesLimit}`)
       return false
     }
@@ -503,7 +507,7 @@ const OnboardClientPage = () => {
           <p className="text-xl text-pictus-white/70">
             Vytvorte novú organizáciu a priraďte používateľa
           </p>
-          <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg max-w-2xl mx-auto">
+          <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-2xl max-w-2xl mx-auto">
             <p className="text-blue-300 text-base">
               📄 Pošli klientovi súhlas s GDPR tu:{' '}
               <a
@@ -517,15 +521,16 @@ const OnboardClientPage = () => {
             </p>
           </div>
 
-
           {/* Invoice payment warning + skip option */}
-          <div className="mt-6 max-w-2xl mx-auto p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg space-y-3">
+          <div className="mt-6 max-w-2xl mx-auto p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-2xl space-y-3">
             <p className="text-yellow-300 text-sm font-medium">⚠️ Platba kartou vs. faktúra</p>
             <p className="text-gray-300 text-sm leading-relaxed">
               Štandardne prebieha platba kartou cez Stripe. Ak klient preferuje platbu na základe
               faktúry, vyplňte <strong className="text-pictus-white">Fakturačné údaje</strong>{' '}
               nižšie a zaškrtnite možnosť{' '}
-              <strong className="text-pictus-white">&bdquo;Preskočiť platbu &ndash; fakturácia ručne&ldquo;</strong>
+              <strong className="text-pictus-white">
+                &bdquo;Preskočiť platbu &ndash; fakturácia ručne&ldquo;
+              </strong>
               . Klientovi bude vytvorený účet bez online platby a faktúru vystavíme manuálne.
             </p>
             <div className="flex items-center gap-2 pt-1">
@@ -539,7 +544,10 @@ const OnboardClientPage = () => {
                 }}
                 className="w-4 h-4 accent-pictus-lime bg-white/5 border-white/10 rounded"
               />
-              <label htmlFor="skipPaymentInvoice" className="text-sm text-yellow-200 cursor-pointer">
+              <label
+                htmlFor="skipPaymentInvoice"
+                className="text-sm text-yellow-200 cursor-pointer"
+              >
                 Preskočiť platbu – fakturácia ručne
               </label>
             </div>
@@ -549,12 +557,14 @@ const OnboardClientPage = () => {
           <div className="mt-6 max-w-2xl mx-auto">
             <button
               onClick={() => setShowInvoicingForm(!showInvoicingForm)}
-              className={`w-full flex items-center justify-between p-4 bg-white/5 border rounded-lg hover:bg-white/10 transition-all ${
-                skipPayment && !invoicingSuccess ? 'border-yellow-500/50' : 'border-white/10'
+              className={`w-full flex items-center justify-between p-4 bg-white/5 border rounded-2xl hover:bg-white/10 transition-all ${
+                skipPayment && !invoicingSuccess ? 'border-yellow-500/50' : 'border-white/[0.06]'
               }`}
             >
               <div className="flex items-center gap-3">
-                <FileText className={`w-6 h-6 ${skipPayment && !invoicingSuccess ? 'text-yellow-400' : 'text-pictus-lime'}`} />
+                <FileText
+                  className={`w-6 h-6 ${skipPayment && !invoicingSuccess ? 'text-yellow-400' : 'text-pictus-lime'}`}
+                />
                 <span className="text-lg text-pictus-white">Fakturačné údaje</span>
                 {skipPayment && !invoicingSuccess && (
                   <span className="text-yellow-400 text-sm font-medium">* povinné</span>
@@ -573,7 +583,7 @@ const OnboardClientPage = () => {
             </button>
 
             {showInvoicingForm && (
-              <div className="mt-2 p-6 bg-white/5 border border-white/10 rounded-lg space-y-4">
+              <div className="mt-2 p-6 bg-white/5 border border-white/[0.06] rounded-2xl space-y-4">
                 {invoicingSuccess ? (
                   <div className="text-center py-6">
                     <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-3" />
@@ -608,7 +618,7 @@ const OnboardClientPage = () => {
                         value={invoicingData.contactPerson}
                         onChange={(e) => handleInvoicingChange('contactPerson', e.target.value)}
                         placeholder="napr. Ján Novák"
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                       />
                     </div>
 
@@ -621,7 +631,7 @@ const OnboardClientPage = () => {
                         value={invoicingData.companyName}
                         onChange={(e) => handleInvoicingChange('companyName', e.target.value)}
                         placeholder="napr. ABC Company s.r.o."
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                       />
                     </div>
 
@@ -633,7 +643,7 @@ const OnboardClientPage = () => {
                           value={invoicingData.ico}
                           onChange={(e) => handleInvoicingChange('ico', e.target.value)}
                           placeholder="12345678"
-                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                          className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                         />
                       </div>
                       <div>
@@ -643,7 +653,7 @@ const OnboardClientPage = () => {
                           value={invoicingData.dic}
                           onChange={(e) => handleInvoicingChange('dic', e.target.value)}
                           placeholder="2012345678"
-                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                          className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                         />
                       </div>
                     </div>
@@ -657,7 +667,7 @@ const OnboardClientPage = () => {
                         value={invoicingData.street}
                         onChange={(e) => handleInvoicingChange('street', e.target.value)}
                         placeholder="napr. Hlavná 123"
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                       />
                     </div>
 
@@ -671,7 +681,7 @@ const OnboardClientPage = () => {
                           value={invoicingData.city}
                           onChange={(e) => handleInvoicingChange('city', e.target.value)}
                           placeholder="Bratislava"
-                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                          className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                         />
                       </div>
                       <div>
@@ -683,7 +693,7 @@ const OnboardClientPage = () => {
                           value={invoicingData.postalCode}
                           onChange={(e) => handleInvoicingChange('postalCode', e.target.value)}
                           placeholder="81101"
-                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                          className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                         />
                       </div>
                       <div>
@@ -694,7 +704,7 @@ const OnboardClientPage = () => {
                           type="text"
                           value={invoicingData.country}
                           onChange={(e) => handleInvoicingChange('country', e.target.value)}
-                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                          className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                         />
                       </div>
                     </div>
@@ -711,7 +721,7 @@ const OnboardClientPage = () => {
                             value={invoicingData.contactEmail}
                             onChange={(e) => handleInvoicingChange('contactEmail', e.target.value)}
                             placeholder="fakturacia@firma.sk"
-                            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                           />
                         </div>
                       </div>
@@ -720,7 +730,7 @@ const OnboardClientPage = () => {
                           Kontaktný telefón
                         </label>
                         <div className="flex gap-2">
-                          <span className="flex items-center px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-400 font-light text-sm select-none">
+                          <span className="flex items-center px-3 py-2.5 bg-black/40 border border-white/10 rounded-xl text-gray-400 font-light text-sm select-none">
                             +421
                           </span>
                           <input
@@ -733,7 +743,7 @@ const OnboardClientPage = () => {
                               )
                             }
                             placeholder="9XX XXX XXX"
-                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                            className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                           />
                         </div>
                       </div>
@@ -752,13 +762,18 @@ const OnboardClientPage = () => {
                           onChange={(e) => {
                             const max = getSelectedTier()?.vehiclesLimit
                             const val = parseInt(e.target.value) || 1
-                            handleInvoicingChange('numberOfVehicles', String(max ? Math.min(max, Math.max(1, val)) : Math.max(1, val)))
+                            handleInvoicingChange(
+                              'numberOfVehicles',
+                              String(max ? Math.min(max, Math.max(1, val)) : Math.max(1, val)),
+                            )
                           }}
                           placeholder="napr. 10"
-                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                          className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                         />
                         {getSelectedTier()?.vehiclesLimit && (
-                          <p className="mt-1 text-xs text-gray-400">Max. {getSelectedTier()?.vehiclesLimit}</p>
+                          <p className="mt-1 text-xs text-gray-400">
+                            Max. {getSelectedTier()?.vehiclesLimit}
+                          </p>
                         )}
                       </div>
                       <div>
@@ -766,7 +781,7 @@ const OnboardClientPage = () => {
                         <select
                           value={invoicingData.tierName}
                           onChange={(e) => handleInvoicingChange('tierName', e.target.value)}
-                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                          className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime transition-all"
                         >
                           <option value="">Vyberte tier</option>
                           {tiers.map((tier) => (
@@ -783,13 +798,13 @@ const OnboardClientPage = () => {
                         <label className="block text-sm font-medium text-gray-300 mb-1">
                           Fakturácia
                         </label>
-                        <div className="flex rounded-lg overflow-hidden border border-white/10 h-[42px]">
+                        <div className="flex rounded-xl overflow-hidden border border-white/10 h-[42px]">
                           <button
                             type="button"
                             onClick={() => setBillingInterval('monthly')}
                             className={`flex-1 text-sm font-light transition-all ${
                               billingInterval === 'monthly'
-                                ? 'bg-pictus-lime text-white font-normal'
+                                ? 'bg-pictus-lime text-pictus-black font-semibold'
                                 : 'bg-white/5 text-gray-300 hover:bg-white/10'
                             }`}
                           >
@@ -800,7 +815,7 @@ const OnboardClientPage = () => {
                             onClick={() => setBillingInterval('yearly')}
                             className={`flex-1 text-sm font-light transition-all border-l border-white/10 ${
                               billingInterval === 'yearly'
-                                ? 'bg-pictus-lime text-white font-normal'
+                                ? 'bg-pictus-lime text-pictus-black font-semibold'
                                 : 'bg-white/5 text-gray-300 hover:bg-white/10'
                             }`}
                           >
@@ -819,14 +834,14 @@ const OnboardClientPage = () => {
                         onChange={(e) => handleInvoicingChange('note', e.target.value)}
                         rows={3}
                         placeholder="Info k fakturácii..."
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all resize-none"
+                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all resize-none"
                       />
                     </div>
 
                     <button
                       onClick={handleInvoicingSubmit}
                       disabled={invoicingSubmitting}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-full hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {invoicingSubmitting ? (
                         <>
@@ -855,7 +870,7 @@ const OnboardClientPage = () => {
                 <div
                   className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all ${
                     currentStep >= step
-                      ? 'bg-pictus-lime border-pictus-lime text-white'
+                      ? 'bg-pictus-lime border-pictus-lime text-pictus-black'
                       : 'bg-transparent border-gray-500 text-gray-500'
                   }`}
                 >
@@ -897,7 +912,7 @@ const OnboardClientPage = () => {
         )}
 
         {/* Step Content */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-8">
+        <div className="bg-pictus-onyx900 backdrop-blur-sm rounded-3xl border border-white/[0.06] p-8">
           {/* Step 1: Organization Details */}
           {currentStep === 1 && (
             <div className="space-y-6">
@@ -915,7 +930,7 @@ const OnboardClientPage = () => {
                   value={organizationName}
                   onChange={(e) => setOrganizationName(e.target.value)}
                   placeholder="napr. ABC Company s.r.o."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                 />
               </div>
 
@@ -928,12 +943,12 @@ const OnboardClientPage = () => {
                   value={organizationMainContact}
                   onChange={(e) => setOrganizationMainContact(e.target.value)}
                   placeholder="napr. jozef@icloud.com"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                 />
               </div>
 
               {/* Address / Invoicing fields */}
-              <div className="bg-white/5 rounded-lg border border-white/10 p-6 space-y-4">
+              <div className="bg-white/5 rounded-2xl border border-white/[0.06] p-6 space-y-4">
                 <h3 className="text-lg font-medium text-gray-200 mb-2">Fakturačná adresa</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -946,7 +961,7 @@ const OnboardClientPage = () => {
                         setInvoicingData((prev) => ({ ...prev, ico: e.target.value }))
                       }}
                       placeholder="12345678"
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                   <div>
@@ -959,7 +974,7 @@ const OnboardClientPage = () => {
                         setInvoicingData((prev) => ({ ...prev, dic: e.target.value }))
                       }}
                       placeholder="2012345678"
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                 </div>
@@ -973,7 +988,7 @@ const OnboardClientPage = () => {
                       setInvoicingData((prev) => ({ ...prev, street: e.target.value }))
                     }}
                     placeholder="Hlavná 1"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -987,7 +1002,7 @@ const OnboardClientPage = () => {
                         setInvoicingData((prev) => ({ ...prev, city: e.target.value }))
                       }}
                       placeholder="Bratislava"
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                   <div>
@@ -1000,7 +1015,7 @@ const OnboardClientPage = () => {
                         setInvoicingData((prev) => ({ ...prev, postalCode: e.target.value }))
                       }}
                       placeholder="81101"
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                   <div>
@@ -1014,7 +1029,7 @@ const OnboardClientPage = () => {
                         setCountry(e.target.value)
                         setInvoicingData((prev) => ({ ...prev, country: e.target.value }))
                       }}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                 </div>
@@ -1027,7 +1042,7 @@ const OnboardClientPage = () => {
                     <button
                       key={tier.id}
                       onClick={() => setSelectedTierId(tier.id)}
-                      className={`p-4 rounded-lg border-2 transition-all text-left ${
+                      className={`p-4 rounded-2xl border-2 transition-all text-left ${
                         selectedTierId === tier.id
                           ? 'border-pictus-lime bg-pictus-lime/10'
                           : 'border-white/10 bg-white/5 hover:border-white/30'
@@ -1061,7 +1076,7 @@ const OnboardClientPage = () => {
 
               {/* Purchased Vehicles - show for paid tiers */}
               {getSelectedTier() && getSelectedTier()?.name !== 'FREE' && (
-                <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                <div className="bg-white/5 rounded-2xl border border-white/[0.06] p-6">
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Počet zakúpených vozidiel *
                   </label>
@@ -1073,13 +1088,17 @@ const OnboardClientPage = () => {
                     onChange={(e) => {
                       const max = getSelectedTier()?.vehiclesLimit
                       const val = parseInt(e.target.value) || 1
-                      setPurchasedVehicles(String(max ? Math.min(max, Math.max(1, val)) : Math.max(1, val)))
+                      setPurchasedVehicles(
+                        String(max ? Math.min(max, Math.max(1, val)) : Math.max(1, val)),
+                      )
                     }}
                     placeholder="napr. 10"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                   />
                   {getSelectedTier()?.vehiclesLimit && (
-                    <p className="mt-1 text-sm text-gray-400">Max. {getSelectedTier()?.vehiclesLimit} vozidiel pre tento tier</p>
+                    <p className="mt-1 text-sm text-gray-400">
+                      Max. {getSelectedTier()?.vehiclesLimit} vozidiel pre tento tier
+                    </p>
                   )}
                   {purchasedVehicles &&
                     getSelectedTier()?.pricePerVehicle != null &&
@@ -1121,7 +1140,7 @@ const OnboardClientPage = () => {
 
               {/* Billing Interval - show for paid tiers */}
               {getSelectedTier() && getSelectedTier()?.name !== 'FREE' && (
-                <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                <div className="bg-white/5 rounded-2xl border border-white/[0.06] p-6">
                   <label className="block text-sm font-medium text-gray-300 mb-3">
                     Fakturačný interval
                   </label>
@@ -1129,7 +1148,7 @@ const OnboardClientPage = () => {
                     <button
                       type="button"
                       onClick={() => setBillingInterval('monthly')}
-                      className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all text-center ${
+                      className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all text-center ${
                         billingInterval === 'monthly'
                           ? 'border-pictus-lime bg-pictus-lime/10 text-pictus-white'
                           : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
@@ -1140,7 +1159,7 @@ const OnboardClientPage = () => {
                     <button
                       type="button"
                       onClick={() => setBillingInterval('yearly')}
-                      className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all text-center ${
+                      className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all text-center ${
                         billingInterval === 'yearly'
                           ? 'border-pictus-lime bg-pictus-lime/10 text-pictus-white'
                           : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
@@ -1163,7 +1182,7 @@ const OnboardClientPage = () => {
                   Vlastné limity (voliteľné)
                 </button>
                 {showCustomLimits && (
-                  <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-4 bg-white/5 rounded-lg border border-white/10 p-4">
+                  <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-4 bg-white/5 rounded-2xl border border-white/[0.06] p-4">
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">Používatelia</label>
                       <input
@@ -1171,7 +1190,7 @@ const OnboardClientPage = () => {
                         value={customUsersLimit}
                         onChange={(e) => setCustomUsersLimit(e.target.value)}
                         placeholder={getSelectedTier()?.usersLimit?.toString() || '—'}
-                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                        className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
                       />
                     </div>
                     <div>
@@ -1181,7 +1200,7 @@ const OnboardClientPage = () => {
                         value={customVehiclesLimit}
                         onChange={(e) => setCustomVehiclesLimit(e.target.value)}
                         placeholder={getSelectedTier()?.vehiclesLimit?.toString() || '—'}
-                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                        className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
                       />
                     </div>
                     <div>
@@ -1191,7 +1210,7 @@ const OnboardClientPage = () => {
                         value={customNotificationsLimit}
                         onChange={(e) => setCustomNotificationsLimit(e.target.value)}
                         placeholder={getSelectedTier()?.notificationsLimit?.toString() || '—'}
-                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                        className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
                       />
                     </div>
                     <div>
@@ -1201,7 +1220,7 @@ const OnboardClientPage = () => {
                         value={customTemplatesLimit}
                         onChange={(e) => setCustomTemplatesLimit(e.target.value)}
                         placeholder={getSelectedTier()?.templatesLimit?.toString() || '—'}
-                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                        className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
                       />
                     </div>
                     <div>
@@ -1211,7 +1230,7 @@ const OnboardClientPage = () => {
                         value={customNotificationTypesLimit}
                         onChange={(e) => setCustomNotificationTypesLimit(e.target.value)}
                         placeholder={getSelectedTier()?.notificationTypesLimit?.toString() || '—'}
-                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
+                        className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:border-pictus-lime"
                       />
                     </div>
                   </div>
@@ -1236,7 +1255,7 @@ const OnboardClientPage = () => {
                       type="text"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                   <div>
@@ -1247,7 +1266,7 @@ const OnboardClientPage = () => {
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                 </div>
@@ -1264,7 +1283,7 @@ const OnboardClientPage = () => {
                         setEmailAvailable(null)
                       }}
                       onBlur={(e) => checkEmail(e.target.value)}
-                      className={`w-full pl-12 pr-4 py-3 bg-white/5 border rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all ${
+                      className={`w-full pl-12 pr-4 py-3 bg-black/40 border rounded-xl text-white focus:outline-none focus:border-pictus-lime transition-all ${
                         emailAvailable === false
                           ? 'border-red-500/60'
                           : emailAvailable === true
@@ -1294,7 +1313,7 @@ const OnboardClientPage = () => {
                     Telefónne číslo
                   </label>
                   <div className="flex gap-2">
-                    <span className="flex items-center px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-gray-400 font-light text-sm select-none">
+                    <span className="flex items-center px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-gray-400 font-light text-sm select-none">
                       +421
                     </span>
                     <input
@@ -1302,7 +1321,7 @@ const OnboardClientPage = () => {
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value.replace(/[^\d\s]/g, ''))}
                       placeholder="9XX XXX XXX"
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pictus-lime transition-all"
                     />
                   </div>
                 </div>
@@ -1317,7 +1336,7 @@ const OnboardClientPage = () => {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full pl-12 pr-12 py-3 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime transition-all"
                     />
                     <button
                       type="button"
@@ -1339,7 +1358,7 @@ const OnboardClientPage = () => {
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime transition-all"
+                      className="w-full pl-12 pr-12 py-3 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-pictus-lime transition-all"
                     />
                     <button
                       type="button"
@@ -1377,7 +1396,7 @@ const OnboardClientPage = () => {
 
               <div className="space-y-6">
                 {/* Organization Summary */}
-                <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                <div className="bg-white/5 rounded-2xl border border-white/[0.06] p-6">
                   <h3 className="text-xl font-medium text-pictus-lime mb-4">Organizácia</h3>
                   <div className="space-y-2 text-gray-300">
                     <p>
@@ -1479,7 +1498,7 @@ const OnboardClientPage = () => {
                 </div>
 
                 {/* User Summary */}
-                <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                <div className="bg-white/5 rounded-2xl border border-white/[0.06] p-6">
                   <h3 className="text-xl font-medium text-pictus-lime mb-4">Používateľ</h3>
                   <div className="space-y-2 text-gray-300">
                     <p>
@@ -1505,7 +1524,7 @@ const OnboardClientPage = () => {
 
           {/* Agent attestation — visible only on final step */}
           {currentStep === 3 && (
-            <div className="mt-6 max-w-2xl mx-auto p-4 bg-pictus-lime/5 border border-pictus-lime/20 rounded-lg">
+            <div className="mt-6 max-w-2xl mx-auto p-4 bg-pictus-lime/5 border border-pictus-lime/20 rounded-2xl">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -1515,14 +1534,25 @@ const OnboardClientPage = () => {
                 />
                 <span className="text-sm text-gray-300 leading-relaxed">
                   Potvrdzujem, že som klienta oboznámil s{' '}
-                  <a href="https://www.pictusweb.sk/obchodne-podmienky" target="_blank" rel="noreferrer" className="text-pictus-lime underline">
+                  <a
+                    href="https://www.pictusweb.sk/obchodne-podmienky"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-pictus-lime underline"
+                  >
                     obchodnými podmienkami
                   </a>{' '}
                   a{' '}
-                  <a href="https://www.pictusweb.sk/gdpr" target="_blank" rel="noreferrer" className="text-pictus-lime underline">
+                  <a
+                    href="https://www.pictusweb.sk/gdpr"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-pictus-lime underline"
+                  >
                     zásadami ochrany osobných údajov (GDPR)
                   </a>{' '}
-                  a že klient pred registráciou udelil svoj súhlas. Klientovi bude zaslaný informačný email s prihlasovacím odkazom a odkazmi na tieto dokumenty.
+                  a že klient pred registráciou udelil svoj súhlas. Klientovi bude zaslaný
+                  informačný email s prihlasovacím odkazom a odkazmi na tieto dokumenty.
                 </span>
               </label>
             </div>
@@ -1533,10 +1563,10 @@ const OnboardClientPage = () => {
             <button
               onClick={handlePrevStep}
               disabled={currentStep === 1}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all ${
+              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all ${
                 currentStep === 1
                   ? 'bg-white/5 text-gray-500 cursor-not-allowed'
-                  : 'bg-white/10 text-white hover:bg-white/20'
+                  : 'bg-white/5 text-white hover:bg-white/10'
               }`}
             >
               <ArrowLeft size={20} />
@@ -1546,7 +1576,7 @@ const OnboardClientPage = () => {
             {currentStep < 3 ? (
               <button
                 onClick={handleNextStep}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white rounded-lg hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-medium"
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black rounded-full hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all font-semibold"
               >
                 Ďalej
                 <ArrowRight size={20} />
@@ -1555,7 +1585,7 @@ const OnboardClientPage = () => {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full hover:from-green-600 hover:to-green-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>

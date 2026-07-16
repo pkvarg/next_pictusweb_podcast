@@ -61,7 +61,7 @@ interface VehicleNotification {
 
 interface VehicleGroup {
   vehicleRegistration: string | null
-  vehicleType: string | null  // Keep for display, derived from myVehicle.type
+  vehicleType: string | null // Keep for display, derived from myVehicle.type
   vehicleImage: string | null
   notifications: VehicleNotification[]
 }
@@ -99,7 +99,11 @@ const defaultTranslations: Translations = {
   pdrBadge: 'PDR',
 }
 
-const VehicleNotificationsDashboard = ({ company, organizationName, translations }: VehicleNotificationsDashboardProps) => {
+const VehicleNotificationsDashboard = ({
+  company,
+  organizationName,
+  translations,
+}: VehicleNotificationsDashboardProps) => {
   const t = translations || defaultTranslations
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -155,7 +159,7 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
             if (!vehicleMap.has(key)) {
               vehicleMap.set(key, {
                 vehicleRegistration: notification.vehicleRegistration,
-                vehicleType: notification.myVehicle?.type || null,  // Get from myVehicle relation
+                vehicleType: notification.myVehicle?.type || null, // Get from myVehicle relation
                 vehicleImage: notification.myVehicle?.image || null,
                 notifications: [],
               })
@@ -459,7 +463,7 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
       </div>
 
       {/* Vehicle Cards Dashboard */}
-      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-2 lg:p-6 border border-pictus-lime/30">
+      <div className="bg-pictus-onyx900 rounded-2xl p-2 lg:p-6 border border-white/[0.06]">
         <VehicleCardsDashboard company={company} organizationName={organizationName} />
       </div>
 
@@ -499,7 +503,9 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-300 text-xl font-light">Potvrdené</p>
-              <p className="text-5xl font-light text-pictus-white">{stats.confirmedNotifications}</p>
+              <p className="text-5xl font-light text-pictus-white">
+                {stats.confirmedNotifications}
+              </p>
             </div>
             <CheckCircle className="w-8 h-8 text-green-400" />
           </div>
@@ -517,7 +523,7 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
       </div>
 
       {/* Notification Types Chart */}
-      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-6 border border-pictus-lime/30">
+      <div className="bg-pictus-onyx900 rounded-2xl p-6 border border-white/[0.06]">
         <h3 className="text-4xl font-light text-pictus-white mb-6 flex items-center gap-2">
           <Activity className="w-8 h-8" />
           Distribúcia typov notifikácií
@@ -541,7 +547,7 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
       </div>
 
       {/* Time Filter Controls */}
-      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-3 md:p-6 border border-pictus-lime/30">
+      <div className="bg-pictus-onyx900 rounded-2xl p-3 md:p-6 border border-white/[0.06]">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0 mb-6">
           <h3 className="text-2xl md:text-4xl font-light text-pictus-white flex items-center gap-2">
             <Filter className="w-6 h-6 md:w-8 md:h-8" />
@@ -552,10 +558,10 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
               <button
                 key={filter}
                 onClick={() => setTimeFilter(filter)}
-                className={`px-3 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-xl font-light transition-all flex-1 md:flex-none ${
+                className={`px-3 md:px-6 py-2 md:py-3 rounded-full text-sm md:text-xl font-light transition-all flex-1 md:flex-none ${
                   timeFilter === filter
                     ? 'bg-pictus-lime text-pictus-black'
-                    : 'bg-gray-700 text-pictus-white hover:bg-gray-600'
+                    : 'bg-white/5 text-white/70 hover:bg-white/10'
                 }`}
               >
                 {filter === 'all' ? 'Všetky' : filter === 'week' ? 'Tento týždeň' : 'Tento mesiac'}
@@ -566,7 +572,7 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
       </div>
 
       {/* Vehicle Notifications by Registration */}
-      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-xl p-2 lg:p-6 border border-pictus-lime/30">
+      <div className="bg-pictus-onyx900 rounded-2xl p-2 lg:p-6 border border-white/[0.06]">
         <h3 className="text-4xl font-light text-pictus-white mb-6 flex items-center gap-2">
           <Car className="w-8 h-8" />
           Notifikácie podľa vozidla
@@ -587,7 +593,10 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
               const styles = getUrgencyStyles(urgencyLevel)
 
               return (
-                <div key={vehicleKey} className={`bg-black/30 rounded-lg border ${styles.border}`}>
+                <div
+                  key={vehicleKey}
+                  className={`bg-white/[0.03] rounded-xl border ${styles.border}`}
+                >
                   <div
                     className={`flex items-center justify-between p-4 cursor-pointer hover:opacity-80 transition-all bg-gradient-to-r ${styles.bg}`}
                     onClick={() => toggleVehicleExpanded(vehicleKey)}
@@ -654,7 +663,9 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
                                   >
                                     {notification.status}
                                   </span>
-                                  <span className="text-pictus-white text-lg">#{notification.id}</span>
+                                  <span className="text-pictus-white text-lg">
+                                    #{notification.id}
+                                  </span>
                                 </div>
                                 <div className="text-right text-sm">
                                   {notification.notificationDate && (
@@ -690,7 +701,13 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
                                     )}
                                     {notification.isAggressiveMode && (
                                       <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">
-                                        ⚠️ {notification.aggressiveStart ? t.aggressiveBadgeDay.replace('{day}', String(notification.aggressiveDaysSent)) : t.aggressiveBadge}
+                                        ⚠️{' '}
+                                        {notification.aggressiveStart
+                                          ? t.aggressiveBadgeDay.replace(
+                                              '{day}',
+                                              String(notification.aggressiveDaysSent),
+                                            )
+                                          : t.aggressiveBadge}
                                       </span>
                                     )}
                                   </div>
@@ -792,7 +809,9 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
                         <p className="text-pictus-white font-light text-3xl">
                           {notification.vehicleRegistration || 'Nedostupné'}
                         </p>
-                        <p className="text-pictus-white text-lg">{notification.myVehicle?.type || 'N/A'}</p>
+                        <p className="text-pictus-white text-lg">
+                          {notification.myVehicle?.type || 'N/A'}
+                        </p>
                       </div>
                       <div>
                         <p className="text-pictus-lime text-lg">Oznámenie</p>
@@ -807,11 +826,15 @@ const VehicleNotificationsDashboard = ({ company, organizationName, translations
                           )}
                           {notification.isAggressiveMode && (
                             <span className="inline-flex items-center px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30">
-                              ⚠️ Aggressive{notification.aggressiveStart && ` (${notification.aggressiveDaysSent}/30)`}
+                              ⚠️ Aggressive
+                              {notification.aggressiveStart &&
+                                ` (${notification.aggressiveDaysSent}/30)`}
                             </span>
                           )}
                         </div>
-                        <p className="text-pictus-white text-lg">{notification.notificationChannel}</p>
+                        <p className="text-pictus-white text-lg">
+                          {notification.notificationChannel}
+                        </p>
                       </div>
                       <div>
                         <p className="text-pictus-lime text-lg">Kontakt</p>

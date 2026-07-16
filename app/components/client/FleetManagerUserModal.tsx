@@ -149,21 +149,21 @@ export default function FleetManagerUserModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-pictus-onyx900 border border-pictus-lime/30 rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-pictus-onyx900 border border-white/[0.06] rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-white">
             {user ? t('modalEditUser') : t('modalAddUser')}
           </h3>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/10 rounded-full transition-colors"
           >
             <X className="h-5 w-5 text-gray-400" />
           </button>
         </div>
 
         {error && (
-          <div className="mb-4 bg-red-500/20 border border-red-500/30 rounded-lg p-3">
+          <div className="mb-4 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
             <p className="text-red-200 text-sm">{error}</p>
           </div>
         )}
@@ -177,7 +177,7 @@ export default function FleetManagerUserModal({
               type="text"
               value={organization}
               disabled
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 cursor-not-allowed"
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 cursor-not-allowed"
             />
           </div>
 
@@ -189,7 +189,7 @@ export default function FleetManagerUserModal({
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
               required
             />
           </div>
@@ -202,7 +202,7 @@ export default function FleetManagerUserModal({
               type="text"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
               required
             />
           </div>
@@ -215,7 +215,7 @@ export default function FleetManagerUserModal({
               type="text"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
               required
             />
           </div>
@@ -228,7 +228,7 @@ export default function FleetManagerUserModal({
               type="tel"
               value={formData.phoneNumber}
               onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
+              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
             />
           </div>
 
@@ -240,8 +240,10 @@ export default function FleetManagerUserModal({
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-              placeholder={user ? t('modalPasswordEditPlaceholder') : t('modalPasswordNewPlaceholder')}
+              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+              placeholder={
+                user ? t('modalPasswordEditPlaceholder') : t('modalPasswordNewPlaceholder')
+              }
             />
           </div>
 
@@ -283,11 +285,9 @@ export default function FleetManagerUserModal({
                 />
               </div>
               {formData.isBenefit && (
-                <div className="flex items-start gap-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <div className="flex items-start gap-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                   <Info className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-blue-300">
-                    {t('modalBenefitInfo')}
-                  </p>
+                  <p className="text-xs text-blue-300">{t('modalBenefitInfo')}</p>
                 </div>
               )}
             </div>
@@ -298,14 +298,14 @@ export default function FleetManagerUserModal({
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 text-white rounded-lg transition-all"
+              className="flex-1 px-6 py-3 bg-white/5 hover:bg-white/10 disabled:opacity-50 text-pictus-white rounded-full transition-all"
             >
               {t('modalCancel')}
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 disabled:opacity-50 text-pictus-black rounded-lg transition-all"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-pictus-lime hover:bg-pictus-lime600 disabled:opacity-50 text-pictus-black font-semibold rounded-full transition-all"
             >
               <Save className="h-4 w-4" />
               {saving ? t('modalSaving') : user ? t('modalSave') : t('modalCreate')}

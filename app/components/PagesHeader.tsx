@@ -1,161 +1,134 @@
 'use client'
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useParams } from 'next/navigation'
-import { Link } from '@/i18n/routing'
-import LanguageBar from './LanguageBar'
+import React, { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { usePathname, useRouter } from 'next/navigation'
+import { Link } from '@/i18n/routing'
 import Image from 'next/image'
-import { Menu, X } from 'lucide-react'
+
+const satoshi = { fontFamily: 'Satoshi, system-ui, sans-serif' }
+
+const languages = [
+  { code: 'sk', label: 'SK', flag: '🇸🇰' },
+  { code: 'en', label: 'EN', flag: '🇬🇧' },
+  { code: 'hu', label: 'HU', flag: '🇭🇺' },
+]
 
 const PagesHeader = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const t = useTranslations('Home')
-  const { locale } = useParams()
   const pathname = usePathname()
   const router = useRouter()
+  const [menuOpen, setMenuOpen] = useState(false)
+
   const currentLang = pathname.slice(1, 3)
   const langPath = pathname.slice(4)
+  const cleanPath = pathname.replace(/^\/(en|sk|hu)/, '')
 
-  const languages = [
-    { code: 'en', label: 'EN' },
-    { code: 'sk', label: 'SK' },
-    { code: 'hu', label: 'HU' },
-  ]
-
-  const isActive = (path: string) => {
-    // Remove locale prefix from pathname for comparison
-    const cleanPath = pathname.replace(/^\/(en|sk|hu)/, '')
-
-    return cleanPath.startsWith(path)
+  const switchLanguage = (code: string) => {
+    router.replace(`/${code}/${langPath}`)
   }
 
-  return (
-    <>
-      {/* Mobile hamburger - fixed position for z-index */}
-      <button
-        className="md:hidden text-white fixed top-6 right-6 z-50 p-2"
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-      >
-        {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-      </button>
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOpen(false)
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
 
-      {/* Mobile menu overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-[#161616]/95 backdrop-blur-md flex flex-col items-center justify-center gap-8 md:hidden"
-            style={{
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            }}
-          >
-            <nav className="flex flex-col items-center gap-6">
-              <Link
-                href="/fleetsync"
-                className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {t('navbarAutomatizations')}
-              </Link>
-              <Link
-                href="/projects"
-                className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {t('navbarProjects')}
-              </Link>
-              <Link
-                href="/podcasts"
-                className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {t('navbarPodcasts')}
-              </Link>
-              <Link
-                href="/contact"
-                className="text-[#F8F8F8] text-xl tracking-widest uppercase font-light"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {t('navbarContact')}
-              </Link>
-            </nav>
-            <div className="flex items-center gap-4 mt-4">
-              {languages.map((lang) => (
+  const navLinks = [
+    { href: '/', label: t('navbarHome') },
+    { href: '/fleetsync', label: t('navbarAutomatizations') },
+    { href: '/projects', label: t('navbarProjects') },
+    { href: '/podcasts', label: t('navbarPodcasts') },
+    { href: '/contact', label: t('navbarContact') },
+  ]
+
+  const isActive = (href: string) =>
+    href === '/' ? cleanPath === '' || cleanPath === '/' : cleanPath.startsWith(href)
+
+  return (
+    <header
+      className="sticky top-0 z-40 bg-[#0e0f10]/85 backdrop-blur-md"
+      style={satoshi}
+      aria-label="Site header"
+    >
+      <div className="mx-auto flex min-h-[76px] w-[min(100%-2rem,1296px)] items-center justify-between gap-6 md:min-h-[90px]">
+        {/* Brand */}
+        <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Pictus home">
+          <Image src="/pictus/PictusMOSS.svg" width={32} height={32} alt="" />
+          <span className="text-[1.6rem] font-bold leading-none text-pictus-white md:text-[2rem]">
+            Pictusweb
+          </span>
+        </Link>
+
+        {/* Desktop nav */}
+        <nav className="hidden items-center gap-7 md:flex">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`inline-flex min-h-[44px] items-center text-[0.92rem] transition-colors hover:text-pictus-white ${
+                isActive(link.href) ? 'text-pictus-white' : 'text-pictus-white/75'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Controls */}
+        <div className="flex items-center gap-2.5">
+          <div className="inline-flex h-11 items-center gap-0.5 rounded-full bg-pictus-onyx900 px-1.5">
+            {languages.map((lang) => {
+              const active = currentLang === lang.code
+              return (
                 <button
                   key={lang.code}
-                  className={`text-lg font-medium transition-colors ${
-                    currentLang === lang.code
-                      ? 'text-pictus-lime'
-                      : 'text-[#F8F8F8]/50 hover:text-white'
+                  type="button"
+                  onClick={() => switchLanguage(lang.code)}
+                  aria-pressed={active}
+                  className={`inline-flex h-[34px] items-center gap-1.5 rounded-full px-2.5 text-[0.92rem] font-bold leading-none transition-colors ${
+                    active
+                      ? 'text-pictus-white ring-1 ring-inset ring-pictus-lime'
+                      : 'text-pictus-white/70 hover:bg-white/5 hover:text-pictus-white'
                   }`}
-                  onClick={() => {
-                    router.replace(`/${lang.code}/${langPath}`)
-                    setMobileMenuOpen(false)
-                  }}
                 >
-                  {lang.label}
+                  <span className="hidden sm:inline" aria-hidden="true">
+                    {lang.flag}
+                  </span>
+                  <span>{lang.label}</span>
                 </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              )
+            })}
+          </div>
 
-      <nav id="navbar" className="w-full text-white bg-transparent px-6 md:px-12 pt-7 md:pt-1">
-        <div className="flex w-full items-center justify-between"
-          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
-        >
-          <div className="flex items-center gap-6 md:gap-10">
-            <Link href="/">
-              <Image src="/logo-pictusweb.svg" alt="Pictusweb" width={50} height={50} className="hidden md:block" />
-              <Image src="/logo-pictusweb.svg" alt="Pictusweb" width={36} height={36} className="md:hidden" />
-            </Link>
-            <div className="hidden md:flex items-center gap-10">
-              <Link
-                href={`/fleetsync`}
-                className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
-                  isActive('/fleetsync') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
-                }`}
-              >
-                {t('navbarAutomatizations')}
-              </Link>
-              <Link
-                href={`/projects`}
-                className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
-                  isActive('/projects') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
-                }`}
-              >
-                {t('navbarProjects')}
-              </Link>
-              <Link
-                href={`/podcasts`}
-                className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
-                  isActive('/podcasts') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
-                }`}
-              >
-                {t('navbarPodcasts')}
-              </Link>
-              <Link
-                href={`/contact`}
-                className={`text-[14px] tracking-widest uppercase font-light hover:text-[#F8F8F8] transition-colors ${
-                  isActive('/contact') ? 'text-[#F8F8F8] font-medium' : 'text-[#F8F8F8]/70'
-                }`}
-              >
-                {t('navbarContact')}
-              </Link>
-            </div>
-          </div>
-          <div className="hidden md:block">
-            <LanguageBar />
-          </div>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-expanded={menuOpen}
+            className="inline-flex h-11 items-center rounded-full bg-pictus-onyx900 px-4 text-[0.92rem] font-bold text-pictus-white/80 md:hidden"
+          >
+            Menu
+          </button>
         </div>
-      </nav>
-    </>
+      </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="mx-auto w-[min(100%-2rem,1296px)] pb-4 md:hidden">
+          <nav className="flex flex-col gap-1 rounded-2xl bg-pictus-onyx900 p-3">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="rounded-xl px-4 py-3 text-pictus-white/80 transition-colors hover:bg-white/5 hover:text-pictus-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
+    </header>
   )
 }
 

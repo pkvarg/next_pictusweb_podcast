@@ -1,28 +1,22 @@
 import React from 'react'
 import ContactWrapper from '../../components/contact/ContactWrapper'
-import PagesHeader from '../../components/PagesHeader'
+import PictusPagesHeader from '@/app/components/home/pictus/PictusPagesHeader'
+import PictusFooter from '@/app/components/home/pictus/PictusFooter'
 import About from '../../components/contact/About'
-import Footer from '@/app/components/Footer'
 import { setRequestLocale } from 'next-intl/server'
 
 const ContactPage = async ({ params }: { params: Promise<{ locale: string }> }) => {
-  const { locale: paramLocale } = await params
+  const { locale } = await params
+  setRequestLocale(locale)
 
-  // Enable static rendering for next-intl
-  setRequestLocale(paramLocale)
   return (
-    <div className="min-h-screen bg-[#161616] text-white relative">
-      {/* Starfield */}
-      <div className="fixed inset-0 z-0 pointer-events-none stars-small" />
-      <div className="fixed inset-0 z-0 pointer-events-none stars-medium" />
-      <div className="fixed inset-0 z-0 pointer-events-none stars-large" />
-
-      <div className="relative z-10">
-        <PagesHeader />
+    <div className="pl" data-locale={locale}>
+      <PictusPagesHeader />
+      <main id="main">
         <ContactWrapper />
         <About />
-        <Footer />
-      </div>
+      </main>
+      <PictusFooter homeBase={`/${locale}`} />
     </div>
   )
 }

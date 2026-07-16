@@ -6,6 +6,7 @@ import NeedPodcast from '@/app/components/NeedPodcast'
 import Footer from '@/app/components/Footer'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
+import { ArrowLeft } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import StructuredData from '@/app/components/StructuredData'
@@ -32,7 +33,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { podcastId, locale } = await params
-  
+
   // Enable static rendering for next-intl
   setRequestLocale(locale)
 
@@ -89,10 +90,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const SinglePodcast = async ({ params }: PageProps) => {
   const { podcastId, locale } = await params
-  
+
   // Enable static rendering for next-intl
   setRequestLocale(locale)
-  
+
   const t = await getTranslations('Home')
 
   const podcast = await db.podcast.findUnique({
@@ -133,7 +134,11 @@ const SinglePodcast = async ({ params }: PageProps) => {
       <PagesHeader />
 
       <section className="flex flex-col mx-4 lg:mx-[10%] py-4 font-light">
-        <Link href={`/podcasts`} className="hover:text-[#0388f4] py-2 w-auto">
+        <Link
+          href={`/podcasts`}
+          className="inline-flex w-auto items-center gap-2 self-start rounded-full bg-white/5 px-4 py-2 text-pictus-white transition-colors hover:bg-white/10"
+        >
+          <ArrowLeft className="h-4 w-4" />
           {t('podcastsBack')}
         </Link>
 
@@ -157,15 +162,15 @@ const SinglePodcast = async ({ params }: PageProps) => {
           {t('podcastVoice')} {podcast.voiceType}
         </p>
 
-        <div className="flex flex-col gap-8 mt-4">
+        <div className="mt-4 flex flex-col gap-8 rounded-3xl border border-white/[0.06] bg-pictus-onyx900 p-6 md:p-8">
           <div className="flex flex-col gap-4">
-            <h1 className="text-18 text-white-1">Transcript:</h1>
+            <h1 className="font-brutal-milk text-18 text-white-1">Transcript:</h1>
             <p className="text-16 text-[#a7a7a8] text-justify">{podcast.textPrompt}</p>
           </div>
           <div className="flex flex-col gap-4">
             {podcast.imagePrompt && (
               <>
-                <h1 className="text-18 text-white-1">Image Prompt</h1>
+                <h1 className="font-brutal-milk text-18 text-white-1">Image Prompt</h1>
                 <p className="text-16 text-[#a7a7a8]">{podcast.imagePrompt}</p>
               </>
             )}

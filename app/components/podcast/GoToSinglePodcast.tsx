@@ -14,7 +14,7 @@ const PodcastImage: React.FC<PodcastImageProps> = ({ imagePath, title, id }) => 
       <Image
         src={imagePath || '/icons/headphones.svg'}
         alt={title}
-        className="w-[300px] h-[300px] object-cover rounded-xl"
+        className="w-[300px] h-[300px] object-cover rounded-2xl"
         width={250}
         height={250}
         priority

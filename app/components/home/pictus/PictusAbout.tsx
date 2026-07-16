@@ -7,10 +7,6 @@ const PictusAbout = () => {
 
   return (
     <section className="section-shell section-muted" id="about" aria-labelledby="about-title">
-      <video className="about-video" autoPlay muted loop playsInline aria-hidden="true">
-        <source src="/pictus/backgrounds/stardust.mp4" type="video/mp4" />
-      </video>
-      <div className="about-video-fill" aria-hidden="true"></div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="about-background"

@@ -1,11 +1,8 @@
 'use client'
 import React, { useRef, useState, useEffect } from 'react'
-import Message from './Message'
 import axios from 'axios'
 import { useTranslations } from 'next-intl'
 import { useParams, useSearchParams } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { fadeIn } from '@/lib/motion'
 import { Send } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 
@@ -43,7 +40,6 @@ const Contact = () => {
       console.error('Error reading search params:', error)
     }
   }, [searchParams])
-
 
   const handleCheckBox = () => {
     setCheckBox((current) => !current)
@@ -320,178 +316,129 @@ const Contact = () => {
     }
   }
 
-  const inputStyles =
-    'w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[#F8F8F8] text-base font-light placeholder:text-[#F8F8F8]/25 focus:outline-none focus:border-pictus-lime/40 focus:bg-white/[0.06] transition-all duration-300'
-
-  const labelStyles =
-    'block text-sm font-medium text-[#F8F8F8]/50 mb-2 tracking-wider uppercase'
-
-  const fontSystem = {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  }
-
   return (
-    <>
-      <div className="h-8 lg:scroll-mt-14" id="contact"></div>
-      <div className="pt-12 lg:pt-20 pb-16 max-w-4xl mx-auto px-6">
-        <motion.div
-          variants={fadeIn('up', 'tween', 0.1, 0.6)}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
-          className="text-center mb-12"
+    <section className="section-shell" id="contact" aria-labelledby="contact-title">
+      <div className="layout-container">
+        <header className="section-heading fs-heading">
+          <p className="section-kicker">{t('navbarContact')}</p>
+          <h2 id="contact-title">{t('contactTitle')}</h2>
+        </header>
+
+        <form
+          ref={form}
+          onSubmit={sendEmail}
+          className="contact-card"
+          style={{ width: 'min(100%, 560px)', marginInline: 'auto' }}
         >
-          <h1 className="font-brutal-milk text-4xl md:text-5xl lg:text-6xl mb-4">
-            {t('contactTitle')}
-          </h1>
-          <div className="h-px w-16 bg-pictus-lime/40 mx-auto" />
-        </motion.div>
+          {messageSuccess && (
+            <p className="contact-status contact-status-success">{messageSuccess}</p>
+          )}
+          {message && <p className="contact-status contact-status-error">{message}</p>}
 
-        <motion.div
-          variants={fadeIn('up', 'tween', 0.2, 0.6)}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          className="max-w-lg mx-auto"
-        >
-          {messageSuccess && <Message variant="success">{messageSuccess}</Message>}
-          {message && <Message variant="danger">{message}</Message>}
-
-          <form
-            ref={form}
-            onSubmit={sendEmail}
-            className="flex flex-col gap-5"
-            style={fontSystem}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className={labelStyles} style={fontSystem}>
-                  {t('contactName')}
-                </label>
-                <input
-                  className={inputStyles}
-                  style={fontSystem}
-                  type="text"
-                  name="user_name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className={labelStyles} style={fontSystem}>
-                  {t('contactEmail')}
-                </label>
-                <input
-                  className={inputStyles}
-                  style={fontSystem}
-                  type="email"
-                  name="user_email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className={labelStyles} style={fontSystem}>
-                {t('contactPhone')}
-              </label>
-              <input
-                className={inputStyles}
-                style={fontSystem}
-                type="text"
-                name="user_phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
-
-            {/* Anti-spam: Honeypot field - hidden with CSS, bots will fill it */}
-            <div
-              style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
-              aria-hidden="true"
-            >
-              <label htmlFor="website_url">Website</label>
-              <input
-                type="text"
-                id="website_url"
-                name="website_url"
-                tabIndex={-1}
-                autoComplete="off"
-                value={honeypot}
-                onChange={(e) => setHoneypot(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className={labelStyles} style={fontSystem}>
-                {t('contactMessage')}
-              </label>
-              <textarea
-                className={`${inputStyles} resize-none`}
-                style={fontSystem}
-                rows={5}
-                name="message"
-                value={mailMessage}
-                onChange={(e) => setMailMessage(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="flex items-start gap-3 mt-2">
-              <input
-                id="flexCheckDefault"
-                type="checkbox"
-                defaultChecked={false}
-                onChange={handleCheckBox}
-                required
-                className="mt-1 w-5 h-5 rounded border-white/20 bg-white/5 accent-pictus-lime cursor-pointer flex-shrink-0"
-              />
-              <label
-                className="text-[#F8F8F8]/50 text-sm font-light leading-relaxed cursor-pointer"
-                htmlFor="flexCheckDefault"
-                style={fontSystem}
-              >
-                {t('contactAgree')}{' '}
-                <Link
-                  href="/gdpr"
-                  className="text-pictus-lime/70 hover:text-pictus-lime underline underline-offset-2 transition-colors"
-                  target="_blank"
-                >
-                  {t('contactGdpr')}
-                </Link>
-              </label>
-            </div>
-
+          <div className="contact-field">
+            <label htmlFor="contact-name">{t('contactName')}</label>
             <input
-              className="form-control hidden"
+              id="contact-name"
               type="text"
-              defaultValue={passwordGroupOne}
-              onChange={(e) => setPasswordGroupOne(e.target.value)}
+              name="user_name"
+              autoComplete="name"
+              placeholder={t('contactName')}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
             />
-            <input
-              className="form-control hidden"
-              type="text"
-              defaultValue={passwordGroupTwo}
-              onChange={(e) => setPasswordGroupTwo(e.target.value)}
-            />
+          </div>
 
-            <button
-              className="mt-4 w-full flex items-center justify-center gap-3 bg-gradient-to-r from-pictus-lime to-pictus-lime600 px-8 py-3.5 rounded-full text-base font-medium text-pictus-black hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-pictus-lime/30"
-              type="submit"
-              value="Send"
-              style={fontSystem}
-            >
-              <Send className="w-4 h-4" />
-              {t('contactSend')}
-            </button>
-          </form>
-        </motion.div>
+          <div className="contact-field">
+            <label htmlFor="contact-email">{t('contactEmail')}</label>
+            <input
+              id="contact-email"
+              type="email"
+              name="user_email"
+              autoComplete="email"
+              placeholder={t('contactEmail')}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="contact-field">
+            <label htmlFor="contact-phone">{t('contactPhone')}</label>
+            <input
+              id="contact-phone"
+              type="tel"
+              name="user_phone"
+              autoComplete="tel"
+              placeholder={t('contactPhone')}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
+          <div className="contact-field">
+            <label htmlFor="contact-message">{t('contactMessage')}</label>
+            <textarea
+              id="contact-message"
+              name="message"
+              rows={5}
+              placeholder={t('contactMessage')}
+              value={mailMessage}
+              onChange={(e) => setMailMessage(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Anti-spam: Honeypot field - hidden with CSS, bots will fill it */}
+          <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }} aria-hidden="true">
+            <label htmlFor="website_url">Website</label>
+            <input
+              type="text"
+              id="website_url"
+              name="website_url"
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+            />
+          </div>
+
+          <label className="contact-consent" htmlFor="flexCheckDefault">
+            <input
+              id="flexCheckDefault"
+              type="checkbox"
+              defaultChecked={false}
+              onChange={handleCheckBox}
+              required
+            />
+            <span>
+              {t('contactAgree')}{' '}
+              <Link href="/gdpr" target="_blank">
+                {t('contactGdpr')}
+              </Link>
+            </span>
+          </label>
+
+          <input
+            className="form-control hidden"
+            type="text"
+            defaultValue={passwordGroupOne}
+            onChange={(e) => setPasswordGroupOne(e.target.value)}
+          />
+          <input
+            className="form-control hidden"
+            type="text"
+            defaultValue={passwordGroupTwo}
+            onChange={(e) => setPasswordGroupTwo(e.target.value)}
+          />
+
+          <button className="button button-primary" type="submit">
+            <Send className="w-4 h-4" />
+            {t('contactSend')}
+          </button>
+        </form>
       </div>
-    </>
+    </section>
   )
 }
 

@@ -253,9 +253,7 @@ const EditVehiclePage = () => {
         <div className="text-center max-w-lg px-6">
           <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h1 className="text-3xl font-light mb-4 text-red-400">Prístup zamietnutý</h1>
-          <p className="text-lg text-gray-300 mb-6">
-            Vaša organizácia bola deaktivovaná.
-          </p>
+          <p className="text-lg text-gray-300 mb-6">Vaša organizácia bola deaktivovaná.</p>
           <p className="text-sm text-gray-500 mb-8">
             Ak si myslíte, že ide o chybu, napíšte na{' '}
             <a href="mailto:info@pictusweb.sk" className="text-pictus-lime hover:underline">
@@ -265,13 +263,13 @@ const EditVehiclePage = () => {
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <Link
               href="/client/upgrade"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-black font-semibold rounded-lg hover:bg-pictus-lime/80 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-pictus-black font-semibold rounded-full hover:bg-pictus-lime600 transition-all"
             >
               Upgradovať teraz
             </Link>
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 text-white rounded-full hover:bg-white/10 transition-all"
             >
               <LogOut size={18} />
               Odhlásiť sa
@@ -294,7 +292,7 @@ const EditVehiclePage = () => {
           </p>
           <Link
             href="/client"
-            className="inline-flex items-center gap-2 bg-pictus-lime600 text-white px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-6 py-3 rounded-full hover:bg-pictus-lime600 transition"
           >
             <ArrowLeft size={20} />
             Späť na dashboard
@@ -314,7 +312,7 @@ const EditVehiclePage = () => {
           <p className="text-pictus-lime mb-6">{error}</p>
           <Link
             href="/client/my-fleet"
-            className="inline-flex items-center gap-2 bg-pictus-lime600 text-white px-6 py-3 rounded-lg hover:bg-pictus-lime700 transition"
+            className="inline-flex items-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-6 py-3 rounded-full hover:bg-pictus-lime600 transition"
           >
             <ArrowLeft size={20} />
             Späť na flotilu
@@ -327,7 +325,7 @@ const EditVehiclePage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-black text-pictus-white font-brutal-milk">
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-xl border-b border-pictus-lime/30 sticky top-0 z-40">
+      <header className="bg-pictus-onyx900/80 backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
@@ -386,10 +384,10 @@ const EditVehiclePage = () => {
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-3xl p-8 border border-pictus-lime/30"
+          className="bg-pictus-onyx900 rounded-3xl p-8 border border-white/[0.06]"
         >
           {error && (
-            <div className="mb-6 bg-red-500/20 border border-red-500/30 rounded-xl p-4 text-red-200">
+            <div className="mb-6 bg-red-500/20 border border-red-500/30 rounded-2xl p-4 text-red-200">
               {error}
             </div>
           )}
@@ -407,7 +405,7 @@ const EditVehiclePage = () => {
                 onChange={handleChange}
                 required
                 placeholder="napr. Mercedes..."
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
               />
             </div>
 
@@ -423,7 +421,7 @@ const EditVehiclePage = () => {
                 onChange={handleChange}
                 required
                 placeholder="napr. BA-123-XY"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
               />
             </div>
 
@@ -438,7 +436,7 @@ const EditVehiclePage = () => {
                 min="1900"
                 max={new Date().getFullYear() + 1}
                 placeholder="napr. 2020"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
               />
             </div>
 
@@ -449,7 +447,7 @@ const EditVehiclePage = () => {
               </label>
 
               {!filePreview ? (
-                <div className="border-2 border-dashed border-pictus-lime/30 rounded-lg p-6 text-center hover:border-pictus-lime/50 transition">
+                <div className="border-2 border-dashed border-white/15 rounded-xl p-6 text-center hover:border-pictus-lime/50 transition">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -473,7 +471,7 @@ const EditVehiclePage = () => {
                 </div>
               ) : (
                 <div className="relative">
-                  <div className="relative h-48 w-full border border-pictus-lime/30 rounded-lg overflow-hidden">
+                  <div className="relative h-48 w-full border border-white/10 rounded-xl overflow-hidden">
                     <Image
                       src={filePreview}
                       alt="Náhľad"
@@ -485,7 +483,7 @@ const EditVehiclePage = () => {
                   <button
                     type="button"
                     onClick={removeFile}
-                    className="absolute top-2 right-2 p-2 bg-red-600/80 hover:bg-red-600 rounded-lg transition"
+                    className="absolute top-2 right-2 p-2 bg-red-600/80 hover:bg-red-600 rounded-full transition"
                   >
                     <X size={20} />
                   </button>
@@ -502,16 +500,17 @@ const EditVehiclePage = () => {
                 onChange={handleChange}
                 rows={4}
                 placeholder="Doplňujúce informácie o vozidle..."
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all resize-none"
               />
             </div>
 
             {/* Organization Info */}
-            <div className="bg-pictus-lime/20 border border-pictus-lime/30 rounded-xl p-4">
-              <p className="text-pictus-lime text-sm">
-                <strong>Organizácia:</strong> {vehicle?.organizationRelation?.name || 'Načítavam...'}
+            <div className="bg-white/5 border border-white/[0.06] rounded-2xl p-4">
+              <p className="text-gray-300 text-sm">
+                <strong className="text-pictus-white">Organizácia:</strong>{' '}
+                {vehicle?.organizationRelation?.name || 'Načítavam...'}
               </p>
-              <p className="text-pictus-lime text-xs mt-1">Organizácia nemôže byť zmenená</p>
+              <p className="text-gray-400 text-xs mt-1">Organizácia nemôže byť zmenená</p>
             </div>
           </div>
 
@@ -520,7 +519,7 @@ const EditVehiclePage = () => {
             <button
               type="submit"
               disabled={loading || uploading}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white px-6 py-4 rounded-lg font-light hover:from-pictus-lime600 hover:to-pictus-lime700 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black px-6 py-4 rounded-full font-semibold hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading || uploading ? (
                 <>
@@ -536,7 +535,7 @@ const EditVehiclePage = () => {
             </button>
             <Link
               href="/client/my-fleet"
-              className="px-6 py-4 bg-white/10 text-pictus-white rounded-lg font-light hover:bg-white/20 transition-all text-lg"
+              className="px-6 py-4 bg-white/5 text-pictus-white rounded-full font-light hover:bg-white/10 transition-all text-lg"
             >
               Zrušiť
             </Link>

@@ -70,7 +70,7 @@ const RenewalsContent = ({ embedded = false }: RenewalsContentProps) => {
 
     try {
       const response = await fetch(
-        `/api/duty-renewals?organizationId=${organizationId}&status=${statusFilter}`
+        `/api/duty-renewals?organizationId=${organizationId}&status=${statusFilter}`,
       )
 
       if (!response.ok) {
@@ -123,7 +123,7 @@ const RenewalsContent = ({ embedded = false }: RenewalsContentProps) => {
             }`}
           >
             <AlertCircle size={16} className="sm:w-5 sm:h-5" />
-            Čakajúce ({dutyBatches.filter(b => b.status === 'pending').length})
+            Čakajúce ({dutyBatches.filter((b) => b.status === 'pending').length})
           </button>
           <button
             onClick={() => setStatusFilter('completed')}
@@ -152,7 +152,7 @@ const RenewalsContent = ({ embedded = false }: RenewalsContentProps) => {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-6 bg-red-500/20 border border-red-500/30 rounded-xl p-4 flex items-center gap-3">
+        <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-2xl p-4 flex items-center gap-3">
           <AlertCircle className="w-6 h-6 text-red-400" />
           <p className="text-red-200">{error}</p>
         </div>
@@ -160,14 +160,14 @@ const RenewalsContent = ({ embedded = false }: RenewalsContentProps) => {
 
       {/* Renewals List */}
       {dutyBatches.length === 0 ? (
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6 sm:p-12 text-center">
+        <div className="bg-white/5 border border-white/[0.06] rounded-2xl p-6 sm:p-12 text-center">
           <RotateCcw className="w-12 h-12 sm:w-16 sm:h-16 text-gray-500 mx-auto mb-4" />
           <h3 className="text-lg sm:text-xl font-light text-gray-400 mb-2">
             {statusFilter === 'pending'
               ? 'Žiadne čakajúce obnovy'
               : statusFilter === 'completed'
-              ? 'Žiadne dokončené obnovy'
-              : 'Žiadne obnovy'}
+                ? 'Žiadne dokončené obnovy'
+                : 'Žiadne obnovy'}
           </h3>
           <p className="text-gray-500">
             {statusFilter === 'pending'

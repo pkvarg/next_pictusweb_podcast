@@ -88,15 +88,18 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
   // Clean the data once and list every year that has expenses (most recent first).
   const base = useMemo(() => {
     const withExpenses = vehicles
-      .map((v) => ({ ...v, expenses: (v.expenses || []).map((e) => ({ ...e, cost: Number(e.cost) })) }))
+      .map((v) => ({
+        ...v,
+        expenses: (v.expenses || []).map((e) => ({ ...e, cost: Number(e.cost) })),
+      }))
       .filter((v) => v.expenses.length > 0)
 
     const allExpenses = withExpenses.flatMap((v) => v.expenses)
     if (allExpenses.length === 0) return null
 
-    const years = Array.from(
-      new Set(allExpenses.map((e) => new Date(e.date).getFullYear())),
-    ).sort((a, b) => b - a)
+    const years = Array.from(new Set(allExpenses.map((e) => new Date(e.date).getFullYear()))).sort(
+      (a, b) => b - a,
+    )
 
     return { withExpenses, years }
   }, [vehicles])
@@ -132,9 +135,12 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
 
     // Monthly fleet totals (12)
     const monthly = Array.from({ length: 12 }, () => 0)
-    withExpenses.flatMap((v) => v.expenses).filter(inYear).forEach((e) => {
-      monthly[new Date(e.date).getMonth()] += e.cost
-    })
+    withExpenses
+      .flatMap((v) => v.expenses)
+      .filter(inYear)
+      .forEach((e) => {
+        monthly[new Date(e.date).getMonth()] += e.cost
+      })
 
     return {
       activeYear,
@@ -150,7 +156,10 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
   // Default the per-vehicle line chart to the most expensive vehicle; reset when the
   // current selection has no data in the chosen year.
   useEffect(() => {
-    if (stats && (!selectedVehicleId || !stats.vehicleTotals.some((v) => v.id === selectedVehicleId))) {
+    if (
+      stats &&
+      (!selectedVehicleId || !stats.vehicleTotals.some((v) => v.id === selectedVehicleId))
+    ) {
       setSelectedVehicleId(stats.top.id)
     }
   }, [stats, selectedVehicleId])
@@ -167,7 +176,10 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
       .forEach((e) => {
         const key = normalizeItem(e.item)
         if (!groups.has(key)) {
-          groups.set(key, { label: e.item.trim() || '—', monthly: Array.from({ length: 12 }, () => 0) })
+          groups.set(key, {
+            label: e.item.trim() || '—',
+            monthly: Array.from({ length: 12 }, () => 0),
+          })
         }
         groups.get(key)!.monthly[new Date(e.date).getMonth()] += e.cost
       })
@@ -201,24 +213,26 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
   const yAt = (val: number, max: number) => padT + plotH - (plotH * val) / max
 
   return (
-    <div className="bg-gradient-to-br from-pictus-onyx900/40 to-pictus-black/60 rounded-3xl p-6 sm:p-8 border border-pictus-lime/30">
+    <div className="bg-pictus-onyx900 rounded-3xl p-6 sm:p-8 border border-white/[0.06]">
       <div className="flex items-center justify-between gap-3 mb-8 flex-wrap">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-pictus-lime/20 rounded-lg">
+          <div className="p-2.5 bg-pictus-lime/20 rounded-xl">
             <BarChart3 className="w-6 h-6 text-pictus-lime" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-light text-pictus-white">{t('analyticsTitle')}</h2>
+          <h2 className="text-2xl sm:text-3xl font-light text-pictus-white">
+            {t('analyticsTitle')}
+          </h2>
         </div>
         {base && base.years.length > 1 && (
-          <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1 border border-pictus-lime/10">
+          <div className="flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/[0.06]">
             {base.years.map((y) => (
               <button
                 key={y}
                 onClick={() => setSelectedYear(y)}
-                className={`px-3 py-1.5 text-sm rounded-md transition-all ${
+                className={`px-3 py-1.5 text-sm rounded-full transition-all ${
                   y === stats.activeYear
                     ? 'bg-pictus-lime text-pictus-black font-medium'
-                    : 'text-gray-400 hover:text-pictus-white hover:bg-white/10'
+                    : 'text-white/70 hover:text-pictus-white hover:bg-white/10'
                 }`}
               >
                 {y}
@@ -230,18 +244,22 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
 
       {/* KPI strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-        <div className="bg-white/5 rounded-xl p-5 border border-pictus-lime/10">
+        <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06]">
           <p className="text-sm text-gray-400 mb-1">{t('analyticsTotal', { year })}</p>
-          <p className="text-3xl font-light text-pictus-white">{formatCurrency(stats.fleetTotal)}</p>
+          <p className="text-3xl font-light text-pictus-white">
+            {formatCurrency(stats.fleetTotal)}
+          </p>
         </div>
-        <div className="bg-white/5 rounded-xl p-5 border border-pictus-lime/10">
+        <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06]">
           <p className="text-sm text-gray-400 mb-1">{t('analyticsAvgPerVehicle')}</p>
-          <p className="text-3xl font-light text-pictus-white">{formatCurrency(stats.avgPerVehicle)}</p>
+          <p className="text-3xl font-light text-pictus-white">
+            {formatCurrency(stats.avgPerVehicle)}
+          </p>
           <p className="text-xs text-gray-500 mt-1">
             {t('analyticsVehicleCount', { count: stats.vehicleTotals.length })}
           </p>
         </div>
-        <div className="bg-white/5 rounded-xl p-5 border border-pictus-lime/10">
+        <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06]">
           <p className="text-sm text-gray-400 mb-1">{t('analyticsTopVehicle')}</p>
           <p className="text-2xl font-light text-pictus-white">{stats.top.registration}</p>
           <p className="text-sm text-red-400 mt-1">{formatCurrency(stats.top.total)}</p>
@@ -250,7 +268,9 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
 
       {/* Monthly fleet spend */}
       <div className="mb-10">
-        <h3 className="text-lg font-normal text-pictus-white mb-4">{t('analyticsMonthly', { year })}</h3>
+        <h3 className="text-lg font-normal text-pictus-white mb-4">
+          {t('analyticsMonthly', { year })}
+        </h3>
         <div className="flex items-end justify-between gap-1.5 h-44">
           {stats.monthly.map((val, i) => (
             <div key={i} className="flex-1 flex flex-col items-center justify-end h-full group">
@@ -274,7 +294,9 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
 
       {/* Cost per vehicle ranking */}
       <div className="mb-10">
-        <h3 className="text-lg font-normal text-pictus-white mb-4">{t('analyticsByVehicle', { year })}</h3>
+        <h3 className="text-lg font-normal text-pictus-white mb-4">
+          {t('analyticsByVehicle', { year })}
+        </h3>
         <div className="space-y-3">
           {stats.vehicleTotals.map((v) => {
             const aboveAvg = v.total >= stats.avgPerVehicle
@@ -297,8 +319,10 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
           })}
         </div>
         <p className="text-xs text-gray-500 mt-3 flex items-center gap-2">
-          <span className="inline-block w-3 h-3 rounded-sm bg-red-500/70" /> {t('analyticsAboveAvg')}
-          <span className="inline-block w-3 h-3 rounded-sm bg-pictus-lime/70 ml-3" /> {t('analyticsBelowAvg')}
+          <span className="inline-block w-3 h-3 rounded-sm bg-red-500/70" />{' '}
+          {t('analyticsAboveAvg')}
+          <span className="inline-block w-3 h-3 rounded-sm bg-pictus-lime/70 ml-3" />{' '}
+          {t('analyticsBelowAvg')}
         </p>
       </div>
 
@@ -312,7 +336,7 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
           <select
             value={selectedVehicleId || ''}
             onChange={(e) => setSelectedVehicleId(e.target.value)}
-            className="px-3 py-2 bg-white/5 border border-pictus-lime/20 rounded-lg text-pictus-white text-sm focus:outline-none focus:ring-2 focus:ring-pictus-lime min-w-[150px]"
+            className="px-3 py-2 bg-white/5 border border-white/[0.06] rounded-full text-pictus-white text-sm focus:outline-none focus:ring-2 focus:ring-pictus-lime min-w-[150px]"
           >
             {stats.vehicleTotals.map((v) => (
               <option key={v.id} value={v.id} className="bg-pictus-black">

@@ -59,7 +59,7 @@ interface TaskGroup {
 
 interface VehicleCard {
   vehicleRegistration: string
-  vehicleType: string | null  // Keep for display, derived from myVehicle.type
+  vehicleType: string | null // Keep for display, derived from myVehicle.type
   vehicleImage: string | null
   organizationName: string | null
   nextTask: VehicleNotification | null
@@ -188,9 +188,12 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
 
             cards.push({
               vehicleRegistration,
-              vehicleType: notifications[0]?.myVehicle?.type || null,  // Get from myVehicle relation
+              vehicleType: notifications[0]?.myVehicle?.type || null, // Get from myVehicle relation
               vehicleImage: notifications[0]?.myVehicle?.image || null,
-              organizationName: notifications[0]?.myVehicle?.organizationRelation?.name || notifications[0]?.organization?.name || null,
+              organizationName:
+                notifications[0]?.myVehicle?.organizationRelation?.name ||
+                notifications[0]?.organization?.name ||
+                null,
               nextTask,
               allTasks: notifications,
               taskGroups,
@@ -332,7 +335,9 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
     return (
       <div className="text-center p-8">
         <Car className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-pictus-white text-xl font-light">Žiadne vozidlá neboli nájdené pre {company}</p>
+        <p className="text-pictus-white text-xl font-light">
+          Žiadne vozidlá neboli nájdené pre {company}
+        </p>
       </div>
     )
   }
@@ -359,9 +364,9 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
           const isExpanded = expandedVehicles.has(vehicleKey)
 
           return (
-            <div key={vehicleKey} className="bg-black/30 rounded-lg border border-pictus-lime/20">
+            <div key={vehicleKey} className="bg-white/[0.03] rounded-xl border border-white/[0.06]">
               <div
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-pictus-lime/10 transition-colors"
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/[0.06] transition-colors"
                 onClick={() => toggleVehicleExpanded(vehicleKey)}
               >
                 <div className="flex items-center gap-4">
@@ -380,8 +385,12 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
                     </div>
                   )}
                   <div>
-                    <h4 className="text-4xl font-light text-pictus-white">{vehicle.vehicleRegistration}</h4>
-                    <p className="text-pictus-white text-lg">{vehicle.vehicleType || 'Neznámy typ'}</p>
+                    <h4 className="text-4xl font-light text-pictus-white">
+                      {vehicle.vehicleRegistration}
+                    </h4>
+                    <p className="text-pictus-white text-lg">
+                      {vehicle.vehicleType || 'Neznámy typ'}
+                    </p>
                     {isPictusaciUser && vehicle.organizationName && (
                       <p className="text-sm text-pictus-white/60">{vehicle.organizationName}</p>
                     )}
@@ -389,7 +398,9 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <p className="text-pictus-white font-light text-2xl">{vehicle.taskGroups.length}</p>
+                    <p className="text-pictus-white font-light text-2xl">
+                      {vehicle.taskGroups.length}
+                    </p>
                     <p className="text-pictus-white text-lg">úloh</p>
                   </div>
                   {isExpanded ? (
@@ -401,7 +412,7 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
               </div>
 
               {isExpanded && (
-                <div className="border-t border-pictus-lime/20 p-4">
+                <div className="border-t border-white/[0.06] p-4">
                   {/* Vehicle Task Details */}
                   <div className="space-y-6">
                     {/* Vehicle Header - Responsive */}
@@ -416,7 +427,9 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
                             {vehicle.vehicleType || 'Neznámy typ'}
                           </p>
                           {isPictusaciUser && vehicle.organizationName && (
-                            <p className="text-sm md:text-base text-pictus-white/60">{vehicle.organizationName}</p>
+                            <p className="text-sm md:text-base text-pictus-white/60">
+                              {vehicle.organizationName}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -427,7 +440,9 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
                               Nasledujúca úloha
                             </p>
                             <p className="text-5xl md:text-8xl font-light text-pictus-white">
-                              <span className="text-xl md:text-3xl font-medium text-pictus-white">o</span>{' '}
+                              <span className="text-xl md:text-3xl font-medium text-pictus-white">
+                                o
+                              </span>{' '}
                               {vehicle.daysToNextTask}{' '}
                               <span className="text-xl md:text-2xl font-medium text-pictus-white">
                                 dní
@@ -453,14 +468,17 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
                         <div className="w-full space-y-1 md:space-y-6">
                           {(() => {
                             // Group task groups by notification type for display
-                            const groupsByType = vehicle.taskGroups.reduce((acc, group) => {
-                              const type = group.notificationType || 'Neznámy typ'
-                              if (!acc[type]) {
-                                acc[type] = []
-                              }
-                              acc[type].push(group)
-                              return acc
-                            }, {} as Record<string, TaskGroup[]>)
+                            const groupsByType = vehicle.taskGroups.reduce(
+                              (acc, group) => {
+                                const type = group.notificationType || 'Neznámy typ'
+                                if (!acc[type]) {
+                                  acc[type] = []
+                                }
+                                acc[type].push(group)
+                                return acc
+                              },
+                              {} as Record<string, TaskGroup[]>,
+                            )
 
                             return Object.entries(groupsByType).map(([taskType, groups]) => {
                               const taskTypeKey = `${vehicle.vehicleRegistration}-${taskType}`
@@ -470,10 +488,10 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
                               return (
                                 <div
                                   key={taskType}
-                                  className="w-full md:rounded-xl md:border border-gray-600/50"
+                                  className="w-full md:rounded-2xl md:border border-white/[0.06]"
                                 >
                                   {/* Task Type Header */}
-                                  <div className="p-3 md:p-6 md:border-b border-gray-600/50">
+                                  <div className="p-3 md:p-6 md:border-b border-white/[0.06]">
                                     <div className="flex items-center justify-between">
                                       <div>
                                         <h5 className="text-pictus-white font-light text-lg md:text-3xl">
@@ -558,8 +576,8 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
                                                       group.daysRemaining <= 10
                                                         ? 'text-red-300 bg-red-400/30'
                                                         : group.daysRemaining <= 30
-                                                        ? 'text-orange-300 bg-orange-400/30'
-                                                        : 'text-green-400 font-normal bg-gray-600/20'
+                                                          ? 'text-orange-300 bg-orange-400/30'
+                                                          : 'text-green-400 font-normal bg-gray-600/20'
                                                     }`}
                                                   >
                                                     {daysText}
@@ -634,7 +652,7 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
                                                   .map((task) => (
                                                     <span
                                                       key={task.id}
-                                                      className="text-pictus-white text-lg md:text-lg px-2 md:px-2 py-1 bg-white/10 rounded"
+                                                      className="text-pictus-white text-lg md:text-lg px-2 md:px-2 py-1 bg-white/5 rounded-full"
                                                     >
                                                       {task.notificationDate
                                                         ? formatDate(task.notificationDate)

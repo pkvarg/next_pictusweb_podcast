@@ -91,7 +91,12 @@ interface FleetOverviewProps {
   isFleetManager?: boolean
 }
 
-const FleetOverview = ({ userId, organization, organizationName, isFleetManager = false }: FleetOverviewProps) => {
+const FleetOverview = ({
+  userId,
+  organization,
+  organizationName,
+  isFleetManager = false,
+}: FleetOverviewProps) => {
   const t = useTranslations('Client')
   const isPictusaciUser = organizationName === 'PICTUSACI'
   const [vehicles, setVehicles] = useState<MyVehicle[]>([])
@@ -124,7 +129,9 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
         }
 
         const vehiclesData = await vehiclesResponse.json()
-        console.log(`Fetched ${vehiclesData.vehicles?.length || 0} vehicles for organization: ${organization || 'current user'}`)
+        console.log(
+          `Fetched ${vehiclesData.vehicles?.length || 0} vehicles for organization: ${organization || 'current user'}`,
+        )
         setVehicles(vehiclesData.vehicles || [])
 
         // Fetch notifications - pass organization to get relevant notifications
@@ -141,11 +148,16 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
 
             // Check for the specific vehicle
             const vehicle2029Notifs = fetchedNotifications.filter(
-              (n: VehicleNotification) => n.myVehicleId === 'd6382b41-1455-4441-92e7-775c63bbecc6'
+              (n: VehicleNotification) => n.myVehicleId === 'd6382b41-1455-4441-92e7-775c63bbecc6',
             )
             if (vehicle2029Notifs.length > 0) {
-              console.log(`🔍 Found ${vehicle2029Notifs.length} notifications for vehicle d6382b41-1455-4441-92e7-775c63bbecc6`)
-              console.log('Duty dates:', vehicle2029Notifs.map((n: VehicleNotification) => n.dutyDate).sort())
+              console.log(
+                `🔍 Found ${vehicle2029Notifs.length} notifications for vehicle d6382b41-1455-4441-92e7-775c63bbecc6`,
+              )
+              console.log(
+                'Duty dates:',
+                vehicle2029Notifs.map((n: VehicleNotification) => n.dutyDate).sort(),
+              )
             }
 
             setNotifications(fetchedNotifications)
@@ -195,8 +207,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
         return expenses.filter((expense) => {
           const expenseDate = new Date(expense.date)
           return (
-            expenseDate.getFullYear() === currentYear &&
-            expenseDate.getMonth() === currentMonth
+            expenseDate.getFullYear() === currentYear && expenseDate.getMonth() === currentMonth
           )
         })
       case 'thisYear':
@@ -215,7 +226,11 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
     return filtered.reduce((sum, expense) => sum + Number(expense.cost), 0)
   }
 
-  const getRecentExpenses = (expenses: MyVehicleExpense[], filter: ExpenseFilter, count: number = 3) => {
+  const getRecentExpenses = (
+    expenses: MyVehicleExpense[],
+    filter: ExpenseFilter,
+    count: number = 3,
+  ) => {
     const filtered = filterExpenses(expenses, filter)
     return filtered.slice(0, count)
   }
@@ -244,10 +259,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
         return duties.filter((duty) => {
           if (!duty.dutyDate) return false
           const dutyDate = new Date(duty.dutyDate)
-          return (
-            dutyDate.getFullYear() === currentYear &&
-            dutyDate.getMonth() === currentMonth
-          )
+          return dutyDate.getFullYear() === currentYear && dutyDate.getMonth() === currentMonth
         })
       case 'thisYear':
         return duties.filter((duty) => {
@@ -268,32 +280,40 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
     latestStatus: string
   }
 
-  const getVehicleDuties = (vehicleId: string, vehicleRegistration: string, filter: DutyFilter = 'all'): GroupedDuty[] => {
+  const getVehicleDuties = (
+    vehicleId: string,
+    vehicleRegistration: string,
+    filter: DutyFilter = 'all',
+  ): GroupedDuty[] => {
     // Filter by myVehicleId first, or fall back to matching by vehicleRegistration
     // Don't filter by status here - we want to show all duties even if they only have "imported" notifications
-    const vehicleDuties = notifications.filter(
-      (notification) => {
-        const hasValidDutyDate = notification.dutyDate
-        const matchesById = notification.myVehicleId === vehicleId
-        const matchesByRegistration = notification.vehicleRegistration?.toLowerCase() === vehicleRegistration.toLowerCase()
+    const vehicleDuties = notifications.filter((notification) => {
+      const hasValidDutyDate = notification.dutyDate
+      const matchesById = notification.myVehicleId === vehicleId
+      const matchesByRegistration =
+        notification.vehicleRegistration?.toLowerCase() === vehicleRegistration.toLowerCase()
 
-        return hasValidDutyDate && (matchesById || matchesByRegistration)
-      }
-    )
+      return hasValidDutyDate && (matchesById || matchesByRegistration)
+    })
 
     if (vehicleDuties.length > 0) {
-      console.log(`Found ${vehicleDuties.length} raw duties for vehicle ${vehicleRegistration} (ID: ${vehicleId})`)
-      console.log('Duty dates:', vehicleDuties.map(d => d.dutyDate).sort())
+      console.log(
+        `Found ${vehicleDuties.length} raw duties for vehicle ${vehicleRegistration} (ID: ${vehicleId})`,
+      )
+      console.log('Duty dates:', vehicleDuties.map((d) => d.dutyDate).sort())
 
       // Check if vehicle ID matches the one mentioned
       if (vehicleId === 'd6382b41-1455-4441-92e7-775c63bbecc6') {
         console.log('🔍 Found special vehicle d6382b41-1455-4441-92e7-775c63bbecc6')
-        console.log('All duty dates for this vehicle:', vehicleDuties.map(d => ({
-          id: d.id,
-          dutyDate: d.dutyDate,
-          type: d.notificationType,
-          status: d.status
-        })))
+        console.log(
+          'All duty dates for this vehicle:',
+          vehicleDuties.map((d) => ({
+            id: d.id,
+            dutyDate: d.dutyDate,
+            type: d.notificationType,
+            status: d.status,
+          })),
+        )
       }
     }
 
@@ -342,7 +362,10 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
 
     console.log(`After grouping and filtering (${filter}): ${sortedGrouped.length} grouped duties`)
     if (sortedGrouped.length > 0) {
-      console.log('Grouped duty dates:', sortedGrouped.map(d => d.dutyDate))
+      console.log(
+        'Grouped duty dates:',
+        sortedGrouped.map((d) => d.dutyDate),
+      )
     }
 
     return sortedGrouped
@@ -436,22 +459,19 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
 
   if (vehicles.length === 0) {
     return (
-      <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-2xl p-8 border border-pictus-lime/30 text-center">
+      <div className="bg-pictus-onyx900 rounded-3xl p-8 border border-white/[0.06] text-center">
         <div className="max-w-xl mx-auto">
-          <div className="p-4 bg-pictus-lime/20 rounded-xl inline-block mb-4">
+          <div className="p-4 bg-pictus-lime/20 rounded-2xl inline-block mb-4">
             <Car className="w-12 h-12 text-pictus-lime" />
           </div>
           <h2 className="text-3xl font-light text-pictus-white mb-3">{t('fleetEmpty')}</h2>
           <p className="text-lg text-pictus-lime mb-6">
-            {isFleetManager
-              ? t('fleetEmptyManagerHint')
-              : t('fleetEmptyUserHint')
-            }
+            {isFleetManager ? t('fleetEmptyManagerHint') : t('fleetEmptyUserHint')}
           </p>
           {isFleetManager && (
             <Link
               href="/client/my-fleet"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-white px-6 py-3 rounded-lg font-normal hover:from-pictus-lime400 hover:to-pictus-lime700 transition-all text-lg shadow-lg hover:shadow-pictus-lime/50"
+              className="inline-flex items-center gap-2 bg-pictus-lime text-pictus-black px-6 py-3 rounded-full font-normal hover:bg-pictus-lime400 transition-all text-lg"
             >
               <Plus size={20} />
               {t('fleetManage')}
@@ -480,7 +500,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
         {isFleetManager && (
           <Link
             href="/client/my-fleet"
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pictus-lime600 to-pictus-lime600 text-pictus-white px-5 py-2.5 rounded-lg font-normal hover:from-pictus-lime700 hover:to-pictus-black transition-all text-base shadow-lg"
+            className="inline-flex items-center justify-center gap-2 bg-white/5 text-white/80 px-5 py-2.5 rounded-full font-normal hover:bg-white/10 transition-all text-base"
           >
             <Car size={18} />
             {t('fleetManageButton')}
@@ -490,7 +510,9 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
       </div>
 
       {/* Vehicle Cards Grid */}
-      <div className={`grid gap-6 ${vehicles.length <= 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'}`}>
+      <div
+        className={`grid gap-6 ${vehicles.length <= 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'}`}
+      >
         {vehicles.map((vehicle) => {
           const expenseFilter = expenseFilters[vehicle.id] || 'all'
           const dutyFilter = dutyFilters[vehicle.id] || 'all'
@@ -500,12 +522,14 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
           const vehicleDuties = getVehicleDuties(vehicle.id, vehicle.registration, dutyFilter)
           const nextDuty = getNextDuty(vehicle.id, vehicle.registration)
 
-          console.log(`Vehicle: ${vehicle.registration}, ID: ${vehicle.id}, Grouped duties: ${vehicleDuties.length}`)
+          console.log(
+            `Vehicle: ${vehicle.registration}, ID: ${vehicle.id}, Grouped duties: ${vehicleDuties.length}`,
+          )
 
           return (
             <div
               key={vehicle.id}
-              className="bg-gradient-to-br from-pictus-onyx900/50 to-pictus-black/80 rounded-2xl overflow-hidden border border-pictus-lime/30 hover:border-pictus-lime/50 transition-all shadow-xl"
+              className="bg-pictus-onyx900 rounded-3xl overflow-hidden border border-white/[0.06] hover:border-white/[0.1] transition-all"
             >
               {/* Vehicle Image */}
               {vehicle.image ? (
@@ -521,7 +545,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
 
                   {/* Registration Badge on Image */}
                   <div className="absolute bottom-3 left-3">
-                    <h3 className="text-2xl font-light text-pictus-white bg-pictus-black/70 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+                    <h3 className="text-2xl font-light text-pictus-white bg-pictus-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
                       {vehicle.registration}
                     </h3>
                   </div>
@@ -530,7 +554,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                 <div className="relative w-full h-48 bg-gradient-to-br from-pictus-lime/20 to-pictus-lime600/20 flex items-center justify-center">
                   <Car className="w-16 h-16 text-pictus-lime/50" />
                   <div className="absolute bottom-3 left-3">
-                    <h3 className="text-2xl font-light text-pictus-white bg-pictus-black/70 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+                    <h3 className="text-2xl font-light text-pictus-white bg-pictus-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
                       {vehicle.registration}
                     </h3>
                   </div>
@@ -549,17 +573,21 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                     </div>
                   )}
                   {isPictusaciUser && vehicle.organizationRelation?.name && (
-                    <p className="text-sm text-pictus-white/60 mt-1">{vehicle.organizationRelation.name}</p>
+                    <p className="text-sm text-pictus-white/60 mt-1">
+                      {vehicle.organizationRelation.name}
+                    </p>
                   )}
                 </div>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   {/* Latest Mileage */}
-                  <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
+                  <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <Gauge size={16} className="text-blue-400" />
-                      <span className="text-xs text-pictus-white/70">{t('fleetLatestMileage')}</span>
+                      <span className="text-xs text-pictus-white/70">
+                        {t('fleetLatestMileage')}
+                      </span>
                     </div>
                     {latestMileage ? (
                       <>
@@ -577,7 +605,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   </div>
 
                   {/* Total Expenses */}
-                  <div className="bg-pictus-white/5 border border-pictus-white/10 rounded-lg p-3">
+                  <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <FaEuroSign size={14} className="text-green-400" />
                       <span className="text-xs text-pictus-white/70">{t('fleetExpenses')}</span>
@@ -586,7 +614,9 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                       {formatCurrency(totalExpenses)}
                     </p>
                     <p className="text-xs text-pictus-white/50">
-                      {t('fleetRecords', { count: filterExpenses(vehicle.expenses, expenseFilter).length })}
+                      {t('fleetRecords', {
+                        count: filterExpenses(vehicle.expenses, expenseFilter).length,
+                      })}
                     </p>
                   </div>
                 </div>
@@ -595,10 +625,10 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                 <div className="flex gap-2">
                   <button
                     onClick={() => setVehicleExpenseFilter(vehicle.id, 'all')}
-                    className={`flex-1 px-2 py-1.5 rounded text-xs transition-all flex items-center justify-center gap-1 ${
+                    className={`flex-1 px-2 py-1.5 rounded-full text-xs transition-all flex items-center justify-center gap-1 ${
                       expenseFilter === 'all'
                         ? 'bg-pictus-lime text-pictus-black font-medium'
-                        : 'bg-pictus-white/5 text-pictus-white/70 hover:bg-pictus-white/10'
+                        : 'bg-white/5 text-white/70 hover:bg-white/10'
                     }`}
                   >
                     <FaEuroSign size={10} />
@@ -606,10 +636,10 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   </button>
                   <button
                     onClick={() => setVehicleExpenseFilter(vehicle.id, 'thisYear')}
-                    className={`flex-1 px-2 py-1.5 rounded text-xs transition-all flex items-center justify-center gap-1 ${
+                    className={`flex-1 px-2 py-1.5 rounded-full text-xs transition-all flex items-center justify-center gap-1 ${
                       expenseFilter === 'thisYear'
                         ? 'bg-pictus-lime text-pictus-black font-medium'
-                        : 'bg-pictus-white/5 text-pictus-white/70 hover:bg-pictus-white/10'
+                        : 'bg-white/5 text-white/70 hover:bg-white/10'
                     }`}
                   >
                     <FaEuroSign size={10} />
@@ -617,10 +647,10 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   </button>
                   <button
                     onClick={() => setVehicleExpenseFilter(vehicle.id, 'thisMonth')}
-                    className={`flex-1 px-2 py-1.5 rounded text-xs transition-all flex items-center justify-center gap-1 ${
+                    className={`flex-1 px-2 py-1.5 rounded-full text-xs transition-all flex items-center justify-center gap-1 ${
                       expenseFilter === 'thisMonth'
                         ? 'bg-pictus-lime text-pictus-black font-medium'
-                        : 'bg-pictus-white/5 text-pictus-white/70 hover:bg-pictus-white/10'
+                        : 'bg-white/5 text-white/70 hover:bg-white/10'
                     }`}
                   >
                     <FaEuroSign size={10} />
@@ -633,18 +663,19 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   <div>
                     <div className="flex items-center gap-1.5 mb-2">
                       <FaEuroSign size={12} className="text-pictus-lime" />
-                      <h4 className="text-sm font-normal text-pictus-white">{t('fleetRecentExpenses')}</h4>
+                      <h4 className="text-sm font-normal text-pictus-white">
+                        {t('fleetRecentExpenses')}
+                      </h4>
                     </div>
                     <div className="space-y-1.5">
                       {recentExpenses.map((expense) => (
-                        <div
-                          key={expense.id}
-                          className="bg-pictus-white/5 rounded-lg p-2"
-                        >
+                        <div key={expense.id} className="bg-white/[0.03] rounded-xl p-2">
                           <div className="flex items-center justify-between">
                             <div className="flex-1 min-w-0">
                               <p className="text-xs text-pictus-white truncate">{expense.item}</p>
-                              <p className="text-xs text-pictus-white/50">{formatDate(expense.date)}</p>
+                              <p className="text-xs text-pictus-white/50">
+                                {formatDate(expense.date)}
+                              </p>
                             </div>
                             <p className="text-xs font-normal text-pictus-lime ml-2">
                               {formatCurrency(Number(expense.cost))}
@@ -653,7 +684,9 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                           {(expense.note || expense.link) && (
                             <div className="mt-1 flex gap-2">
                               {expense.note && (
-                                <p className="text-xs text-pictus-white/40 italic truncate">{expense.note}</p>
+                                <p className="text-xs text-pictus-white/40 italic truncate">
+                                  {expense.note}
+                                </p>
                               )}
                               {expense.link && (
                                 <a
@@ -674,7 +707,7 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                 )}
 
                 {/* Duties Section */}
-                <div className="pt-4 border-t border-pictus-white/10">
+                <div className="pt-4 border-t border-white/[0.06]">
                   <div className="flex items-center gap-1.5 mb-2">
                     <Bell size={12} className="text-orange-400" />
                     <h4 className="text-sm font-normal text-pictus-white">{t('fleetDuties')}</h4>
@@ -684,30 +717,30 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                   <div className="flex gap-2 mb-3">
                     <button
                       onClick={() => setVehicleDutyFilter(vehicle.id, 'all')}
-                      className={`flex-1 px-2 py-1.5 rounded text-xs transition-all ${
+                      className={`flex-1 px-2 py-1.5 rounded-full text-xs transition-all ${
                         dutyFilter === 'all'
-                          ? 'bg-orange-400 text-pictus-black font-medium'
-                          : 'bg-pictus-white/5 text-pictus-white/70 hover:bg-pictus-white/10'
+                          ? 'bg-pictus-lime text-pictus-black font-medium'
+                          : 'bg-white/5 text-white/70 hover:bg-white/10'
                       }`}
                     >
                       {t('fleetFilterAllDuties')}
                     </button>
                     <button
                       onClick={() => setVehicleDutyFilter(vehicle.id, 'thisYear')}
-                      className={`flex-1 px-2 py-1.5 rounded text-xs transition-all ${
+                      className={`flex-1 px-2 py-1.5 rounded-full text-xs transition-all ${
                         dutyFilter === 'thisYear'
-                          ? 'bg-orange-400 text-pictus-black font-medium'
-                          : 'bg-pictus-white/5 text-pictus-white/70 hover:bg-pictus-white/10'
+                          ? 'bg-pictus-lime text-pictus-black font-medium'
+                          : 'bg-white/5 text-white/70 hover:bg-white/10'
                       }`}
                     >
                       {t('fleetFilterThisYear')}
                     </button>
                     <button
                       onClick={() => setVehicleDutyFilter(vehicle.id, 'thisMonth')}
-                      className={`flex-1 px-2 py-1.5 rounded text-xs transition-all ${
+                      className={`flex-1 px-2 py-1.5 rounded-full text-xs transition-all ${
                         dutyFilter === 'thisMonth'
-                          ? 'bg-orange-400 text-pictus-black font-medium'
-                          : 'bg-pictus-white/5 text-pictus-white/70 hover:bg-pictus-white/10'
+                          ? 'bg-pictus-lime text-pictus-black font-medium'
+                          : 'bg-white/5 text-white/70 hover:bg-white/10'
                       }`}
                     >
                       {t('fleetFilterThisMonth')}
@@ -716,18 +749,29 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
 
                   {/* Next Duty Highlight */}
                   {nextDuty && (
-                    <div className="mb-2 bg-orange-500/10 border border-orange-500/30 rounded-lg p-3">
+                    <div className="mb-2 bg-orange-500/10 border border-orange-500/30 rounded-xl p-3">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-orange-400 font-medium mb-1">{t('fleetNextDuty')}</p>
-                          <p className="text-base font-medium text-pictus-white truncate">{nextDuty.notificationType || t('fleetNoTitle')}</p>
-                          <p className="text-sm text-pictus-white mb-1.5">{t('fleetDeadline')} <span className="font-medium">{formatDate(nextDuty.dutyDate)}</span></p>
+                          <p className="text-xs text-orange-400 font-medium mb-1">
+                            {t('fleetNextDuty')}
+                          </p>
+                          <p className="text-base font-medium text-pictus-white truncate">
+                            {nextDuty.notificationType || t('fleetNoTitle')}
+                          </p>
+                          <p className="text-sm text-pictus-white mb-1.5">
+                            {t('fleetDeadline')}{' '}
+                            <span className="font-medium">{formatDate(nextDuty.dutyDate)}</span>
+                          </p>
                           {/* Notification dates */}
                           <div className="flex flex-wrap gap-1">
                             {nextDuty.notifications
                               .sort((a, b) => {
-                                const dateA = a.notificationDate ? new Date(a.notificationDate) : new Date(0)
-                                const dateB = b.notificationDate ? new Date(b.notificationDate) : new Date(0)
+                                const dateA = a.notificationDate
+                                  ? new Date(a.notificationDate)
+                                  : new Date(0)
+                                const dateB = b.notificationDate
+                                  ? new Date(b.notificationDate)
+                                  : new Date(0)
                                 return dateA.getTime() - dateB.getTime()
                               })
                               .map((notif, idx) => (
@@ -735,7 +779,9 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                                   key={idx}
                                   className={`text-xs px-1.5 py-0.5 rounded ${getDutyStatusColor(notif.status)}`}
                                 >
-                                  {notif.notificationDate ? formatDate(notif.notificationDate) : 'N/A'}
+                                  {notif.notificationDate
+                                    ? formatDate(notif.notificationDate)
+                                    : 'N/A'}
                                 </span>
                               ))}
                           </div>
@@ -745,10 +791,18 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                             const days = getDaysUntilDuty(nextDuty.dutyDate)
                             const isUrgent = days <= 7
                             return (
-                              <div className={`text-base font-bold px-3 py-1.5 rounded whitespace-nowrap ${
-                                isUrgent ? 'bg-red-700/40 text-red-400 border border-red-600/50' : 'bg-orange-500/20 text-orange-400'
-                              }`}>
-                                {days === 0 ? t('fleetTodayExcl') : days < 0 ? t('fleetDaysAgo', { days: Math.abs(days) }) : t('fleetDaysLeft', { days })}
+                              <div
+                                className={`text-base font-bold px-3 py-1.5 rounded whitespace-nowrap ${
+                                  isUrgent
+                                    ? 'bg-red-700/40 text-red-400 border border-red-600/50'
+                                    : 'bg-orange-500/20 text-orange-400'
+                                }`}
+                              >
+                                {days === 0
+                                  ? t('fleetTodayExcl')
+                                  : days < 0
+                                    ? t('fleetDaysAgo', { days: Math.abs(days) })
+                                    : t('fleetDaysLeft', { days })}
                               </div>
                             )
                           })()}
@@ -765,23 +819,36 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                         return (
                           <div
                             key={idx}
-                            className="bg-pictus-white/5 rounded-lg p-3"
+                            className="bg-white/[0.03] rounded-xl p-3 hover:bg-white/[0.06] transition-all"
                           >
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex-1 min-w-0">
-                                <p className="text-base font-medium text-pictus-white truncate">{duty.notificationType || t('fleetNoTitle')}</p>
-                                <p className="text-sm text-pictus-white mt-1">{t('fleetDeadline')} <span className="font-medium">{formatDate(duty.dutyDate)}</span></p>
+                                <p className="text-base font-medium text-pictus-white truncate">
+                                  {duty.notificationType || t('fleetNoTitle')}
+                                </p>
+                                <p className="text-sm text-pictus-white mt-1">
+                                  {t('fleetDeadline')}{' '}
+                                  <span className="font-medium">{formatDate(duty.dutyDate)}</span>
+                                </p>
                               </div>
                               <div className="text-base font-bold text-pictus-white ml-3 whitespace-nowrap">
-                                {days === 0 ? t('fleetToday') : days < 0 ? t('fleetDaysAgo', { days: Math.abs(days) }) : t('fleetDaysLeft', { days })}
+                                {days === 0
+                                  ? t('fleetToday')
+                                  : days < 0
+                                    ? t('fleetDaysAgo', { days: Math.abs(days) })
+                                    : t('fleetDaysLeft', { days })}
                               </div>
                             </div>
                             {/* Notification dates with statuses */}
                             <div className="flex flex-wrap gap-1">
                               {duty.notifications
                                 .sort((a, b) => {
-                                  const dateA = a.notificationDate ? new Date(a.notificationDate) : new Date(0)
-                                  const dateB = b.notificationDate ? new Date(b.notificationDate) : new Date(0)
+                                  const dateA = a.notificationDate
+                                    ? new Date(a.notificationDate)
+                                    : new Date(0)
+                                  const dateB = b.notificationDate
+                                    ? new Date(b.notificationDate)
+                                    : new Date(0)
                                   return dateA.getTime() - dateB.getTime()
                                 })
                                 .map((notif, notifIdx) => (
@@ -790,7 +857,9 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
                                     className={`text-xs px-1.5 py-0.5 rounded ${getDutyStatusColor(notif.status)}`}
                                     title={translateStatus(notif.status)}
                                   >
-                                    {notif.notificationDate ? formatDate(notif.notificationDate) : 'N/A'}
+                                    {notif.notificationDate
+                                      ? formatDate(notif.notificationDate)
+                                      : 'N/A'}
                                   </span>
                                 ))}
                             </div>
@@ -817,8 +886,10 @@ const FleetOverview = ({ userId, organization, organizationName, isFleetManager 
 
                 {/* Note */}
                 {vehicle.note && (
-                  <div className="pt-3 border-t border-pictus-white/10">
-                    <p className="text-xs text-pictus-white/70 italic line-clamp-2">{vehicle.note}</p>
+                  <div className="pt-3 border-t border-white/[0.06]">
+                    <p className="text-xs text-pictus-white/70 italic line-clamp-2">
+                      {vehicle.note}
+                    </p>
                   </div>
                 )}
               </div>

@@ -73,7 +73,7 @@ const RenewalModal = ({ dutyBatch, onClose, onSuccess }: RenewalModalProps) => {
       if (!orgId) return
 
       const response = await fetch(
-        `/api/duty-renewal-presets?organizationId=${orgId}&notificationType=${encodeURIComponent(dutyBatch.notificationType)}`
+        `/api/duty-renewal-presets?organizationId=${orgId}&notificationType=${encodeURIComponent(dutyBatch.notificationType)}`,
       )
 
       if (response.ok) {
@@ -166,8 +166,8 @@ const RenewalModal = ({ dutyBatch, onClose, onSuccess }: RenewalModalProps) => {
     if (presets.length === 0) return []
 
     const preset = presets[0]
-    const months = preset.presetMonths.split(',').map(m => parseInt(m.trim()))
-    const labels = preset.presetLabels.split(',').map(l => l.trim())
+    const months = preset.presetMonths.split(',').map((m) => parseInt(m.trim()))
+    const labels = preset.presetLabels.split(',').map((l) => l.trim())
 
     return months.map((month, index) => ({
       months: month,
@@ -182,7 +182,7 @@ const RenewalModal = ({ dutyBatch, onClose, onSuccess }: RenewalModalProps) => {
     if (!newDutyDate) return []
 
     const newDate = new Date(newDutyDate)
-    return customIntervals.map(interval => {
+    return customIntervals.map((interval) => {
       const notifDate = new Date(newDate)
       notifDate.setDate(notifDate.getDate() + interval)
       return {
@@ -198,283 +198,283 @@ const RenewalModal = ({ dutyBatch, onClose, onSuccess }: RenewalModalProps) => {
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 overflow-y-auto">
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-pictus-darkest border border-white/10 rounded-2xl max-w-3xl w-full my-8">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <div>
-            <h2 className="text-2xl font-light text-pictus-white">Upraviť a obnoviť úlohu</h2>
-            <p className="text-gray-400 mt-1">
-              {dutyBatch.vehicleRegistration} - {dutyBatch.notificationType}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-          >
-            <X className="w-6 h-6 text-gray-400" />
-          </button>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6">
-          {/* Date Selection */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-400 mb-3">
-              Nový dátum úlohy
-            </label>
-
-            {/* Preset Buttons */}
-            {!loadingPresets && presetButtons.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                {presetButtons.map((preset, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => handlePresetClick(preset.months)}
-                    className="p-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg transition-all"
-                  >
-                    <div className="text-left">
-                      <div className="text-pictus-white font-light text-sm mb-1">
-                        {preset.label}
-                      </div>
-                      <div className="text-xs text-blue-400">
-                        {calculateNewDate(preset.months)}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Date Picker */}
-            <input
-              type="date"
-              value={newDutyDate}
-              onChange={(e) => setNewDutyDate(e.target.value)}
-              required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-pictus-white focus:outline-none focus:border-pictus-lime"
-            />
-          </div>
-
-          {/* Intervals Editor */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-400">
-                Intervaly notifikácií ({customIntervals.length})
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowIntervalsEditor(!showIntervalsEditor)}
-                className="text-xs text-pictus-lime hover:text-pictus-lime400 transition-colors"
-              >
-                {showIntervalsEditor ? '✓ Hotovo' : '✏️ Upraviť intervaly'}
-              </button>
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div>
+              <h2 className="text-2xl font-light text-pictus-white">Upraviť a obnoviť úlohu</h2>
+              <p className="text-gray-400 mt-1">
+                {dutyBatch.vehicleRegistration} - {dutyBatch.notificationType}
+              </p>
             </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/5 rounded-full transition-colors"
+            >
+              <X className="w-6 h-6 text-gray-400" />
+            </button>
+          </div>
 
-            {!showIntervalsEditor ? (
-              <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                <div className="flex flex-wrap gap-2">
-                  {customIntervals.sort((a, b) => a - b).map((interval, index) => (
-                    <div
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="p-6">
+            {/* Date Selection */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-400 mb-3">
+                Nový dátum úlohy
+              </label>
+
+              {/* Preset Buttons */}
+              {!loadingPresets && presetButtons.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                  {presetButtons.map((preset, index) => (
+                    <button
                       key={index}
-                      className="px-3 py-2 bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg text-pictus-lime text-sm"
+                      type="button"
+                      onClick={() => handlePresetClick(preset.months)}
+                      className="p-3 bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 rounded-xl transition-all"
                     >
-                      {interval === 0
-                        ? 'V deň úlohy'
-                        : interval > 0
-                        ? `+${interval} dní`
-                        : `${interval} dní`}
-                    </div>
+                      <div className="text-left">
+                        <div className="text-pictus-white font-light text-sm mb-1">
+                          {preset.label}
+                        </div>
+                        <div className="text-xs text-blue-400">
+                          {calculateNewDate(preset.months)}
+                        </div>
+                      </div>
+                    </button>
                   ))}
                 </div>
-              </div>
-            ) : (
-              <div className="p-4 bg-white/5 border border-white/10 rounded-lg space-y-3">
-                {customIntervals.map((interval, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <select
-                      value={interval}
-                      onChange={(e) => {
-                        const newIntervals = [...customIntervals]
-                        newIntervals[index] = parseInt(e.target.value)
-                        setCustomIntervals(newIntervals)
-                      }}
-                      className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
-                    >
-                      {Array.from({ length: 33 }, (_, i) => -30 + i).map((day) => (
-                        <option key={day} value={day}>
-                          {day === 0
-                            ? 'V deň úlohy'
-                            : day < 0
-                            ? `${Math.abs(day)} ${Math.abs(day) === 1 ? 'deň' : Math.abs(day) < 5 ? 'dni' : 'dní'} pred`
-                            : `${day} ${day === 1 ? 'deň' : day < 5 ? 'dni' : 'dní'} po`}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCustomIntervals(customIntervals.filter((_, i) => i !== index))
-                      }}
-                      className="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+              )}
+
+              {/* Date Picker */}
+              <input
+                type="date"
+                value={newDutyDate}
+                onChange={(e) => setNewDutyDate(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+              />
+            </div>
+
+            {/* Intervals Editor */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-gray-400">
+                  Intervaly notifikácií ({customIntervals.length})
+                </h3>
                 <button
                   type="button"
-                  onClick={() => setCustomIntervals([...customIntervals, 0])}
-                  className="w-full py-2 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
+                  onClick={() => setShowIntervalsEditor(!showIntervalsEditor)}
+                  className="text-xs text-pictus-lime hover:text-pictus-lime400 transition-colors"
                 >
-                  + Pridať interval
+                  {showIntervalsEditor ? '✓ Hotovo' : '✏️ Upraviť intervaly'}
                 </button>
               </div>
-            )}
-          </div>
 
-          {/* Editable Fields */}
-          <div className="mb-6 space-y-4">
-            <h3 className="text-sm font-medium text-gray-400 mb-3">Upraviť detaily</h3>
-
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">Evidenčné číslo</label>
-              <input
-                type="text"
-                value={editedData.vehicleRegistration}
-                onChange={(e) =>
-                  setEditedData({ ...editedData, vehicleRegistration: e.target.value })
-                }
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-pictus-white focus:outline-none focus:border-pictus-lime"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">Typ notifikácie</label>
-              <input
-                type="text"
-                value={editedData.notificationType}
-                onChange={(e) =>
-                  setEditedData({ ...editedData, notificationType: e.target.value })
-                }
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-pictus-white focus:outline-none focus:border-pictus-lime"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">Meno osoby</label>
-              <input
-                type="text"
-                value={editedData.personName}
-                onChange={(e) => setEditedData({ ...editedData, personName: e.target.value })}
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-pictus-white focus:outline-none focus:border-pictus-lime"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={editedData.email}
-                  onChange={(e) => setEditedData({ ...editedData, email: e.target.value })}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-pictus-white focus:outline-none focus:border-pictus-lime"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Telefón</label>
-                <input
-                  type="tel"
-                  value={editedData.phoneNumber}
-                  onChange={(e) =>
-                    setEditedData({ ...editedData, phoneNumber: e.target.value })
-                  }
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-pictus-white focus:outline-none focus:border-pictus-lime"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">Správa</label>
-              <textarea
-                value={editedData.emailMessage}
-                onChange={(e) => setEditedData({ ...editedData, emailMessage: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-pictus-white focus:outline-none focus:border-pictus-lime resize-none"
-              />
-            </div>
-          </div>
-
-          {/* Preview */}
-          {newDutyDate && previewDates.length > 0 && (
-            <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-              <h4 className="text-sm font-medium text-blue-400 mb-3">
-                Náhľad: {previewDates.length} notifikácií + 1 PDR pripomienka
-              </h4>
-              <div className="space-y-2">
-                {previewDates.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2 text-sm text-gray-400">
-                    <Calendar size={14} />
-                    <span>
-                      {item.date} -{' '}
-                      {item.interval === 0
-                        ? 'V deň úlohy'
-                        : item.interval > 0
-                        ? `${item.interval} dni po`
-                        : `${Math.abs(item.interval)} dni pred`}
-                    </span>
+              {!showIntervalsEditor ? (
+                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                  <div className="flex flex-wrap gap-2">
+                    {customIntervals
+                      .sort((a, b) => a - b)
+                      .map((interval, index) => (
+                        <div
+                          key={index}
+                          className="px-3 py-2 bg-pictus-lime/15 border border-pictus-lime/25 rounded-full text-pictus-lime text-sm"
+                        >
+                          {interval === 0
+                            ? 'V deň úlohy'
+                            : interval > 0
+                              ? `+${interval} dní`
+                              : `${interval} dní`}
+                        </div>
+                      ))}
                   </div>
-                ))}
-                <div className="flex items-center gap-2 text-sm text-blue-400 border-t border-blue-500/20 pt-2 mt-2">
-                  <Calendar size={14} />
-                  <span>
-                    {formatDate(
-                      new Date(new Date(newDutyDate).getTime() + 86400000).toISOString()
-                    )}{' '}
-                    - PDR pripomienka (1 deň po)
-                  </span>
+                </div>
+              ) : (
+                <div className="p-4 bg-white/5 border border-white/[0.06] rounded-xl space-y-3">
+                  {customIntervals.map((interval, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <select
+                        value={interval}
+                        onChange={(e) => {
+                          const newIntervals = [...customIntervals]
+                          newIntervals[index] = parseInt(e.target.value)
+                          setCustomIntervals(newIntervals)
+                        }}
+                        className="flex-1 px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+                      >
+                        {Array.from({ length: 33 }, (_, i) => -30 + i).map((day) => (
+                          <option key={day} value={day}>
+                            {day === 0
+                              ? 'V deň úlohy'
+                              : day < 0
+                                ? `${Math.abs(day)} ${Math.abs(day) === 1 ? 'deň' : Math.abs(day) < 5 ? 'dni' : 'dní'} pred`
+                                : `${day} ${day === 1 ? 'deň' : day < 5 ? 'dni' : 'dní'} po`}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCustomIntervals(customIntervals.filter((_, i) => i !== index))
+                        }}
+                        className="px-3 py-2 bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/20 rounded-xl transition-all"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setCustomIntervals([...customIntervals, 0])}
+                    className="w-full py-2 bg-pictus-lime/15 hover:bg-pictus-lime/25 text-pictus-lime border border-pictus-lime/25 rounded-full transition-all text-sm"
+                  >
+                    + Pridať interval
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Editable Fields */}
+            <div className="mb-6 space-y-4">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">Upraviť detaily</h3>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Evidenčné číslo</label>
+                <input
+                  type="text"
+                  value={editedData.vehicleRegistration}
+                  onChange={(e) =>
+                    setEditedData({ ...editedData, vehicleRegistration: e.target.value })
+                  }
+                  className="w-full px-4 py-2 bg-black/40 border border-white/10 rounded-xl text-pictus-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Typ notifikácie</label>
+                <input
+                  type="text"
+                  value={editedData.notificationType}
+                  onChange={(e) =>
+                    setEditedData({ ...editedData, notificationType: e.target.value })
+                  }
+                  className="w-full px-4 py-2 bg-black/40 border border-white/10 rounded-xl text-pictus-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Meno osoby</label>
+                <input
+                  type="text"
+                  value={editedData.personName}
+                  onChange={(e) => setEditedData({ ...editedData, personName: e.target.value })}
+                  className="w-full px-4 py-2 bg-black/40 border border-white/10 rounded-xl text-pictus-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={editedData.email}
+                    onChange={(e) => setEditedData({ ...editedData, email: e.target.value })}
+                    className="w-full px-4 py-2 bg-black/40 border border-white/10 rounded-xl text-pictus-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Telefón</label>
+                  <input
+                    type="tel"
+                    value={editedData.phoneNumber}
+                    onChange={(e) => setEditedData({ ...editedData, phoneNumber: e.target.value })}
+                    className="w-full px-4 py-2 bg-black/40 border border-white/10 rounded-xl text-pictus-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+                  />
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* Error */}
-          {error && (
-            <div className="mb-6 bg-red-500/20 border border-red-500/30 rounded-lg p-3 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-400" />
-              <p className="text-red-200 text-sm">{error}</p>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Správa</label>
+                <textarea
+                  value={editedData.emailMessage}
+                  onChange={(e) => setEditedData({ ...editedData, emailMessage: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 bg-black/40 border border-white/10 rounded-xl text-pictus-white focus:outline-none focus:ring-2 focus:ring-pictus-lime resize-none"
+                />
+              </div>
             </div>
-          )}
 
-          {/* Actions */}
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={creating}
-              className="flex-1 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-pictus-white rounded-lg transition-all disabled:opacity-50"
-            >
-              Zrušiť
-            </button>
-            <button
-              type="submit"
-              disabled={creating || !newDutyDate}
-              className="flex-1 px-6 py-3 bg-pictus-lime hover:bg-pictus-lime600 text-pictus-darkest font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {creating ? (
-                <>
-                  <Loader className="w-5 h-5 animate-spin" />
-                  Vytváram...
-                </>
-              ) : (
-                <>
-                  <Check size={20} />
-                  Vytvoriť ďalšiu úlohu
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+            {/* Preview */}
+            {newDutyDate && previewDates.length > 0 && (
+              <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                <h4 className="text-sm font-medium text-blue-400 mb-3">
+                  Náhľad: {previewDates.length} notifikácií + 1 PDR pripomienka
+                </h4>
+                <div className="space-y-2">
+                  {previewDates.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2 text-sm text-gray-400">
+                      <Calendar size={14} />
+                      <span>
+                        {item.date} -{' '}
+                        {item.interval === 0
+                          ? 'V deň úlohy'
+                          : item.interval > 0
+                            ? `${item.interval} dni po`
+                            : `${Math.abs(item.interval)} dni pred`}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2 text-sm text-blue-400 border-t border-blue-500/20 pt-2 mt-2">
+                    <Calendar size={14} />
+                    <span>
+                      {formatDate(
+                        new Date(new Date(newDutyDate).getTime() + 86400000).toISOString(),
+                      )}{' '}
+                      - PDR pripomienka (1 deň po)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Error */}
+            {error && (
+              <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-xl p-3 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-400" />
+                <p className="text-red-200 text-sm">{error}</p>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={creating}
+                className="flex-1 px-6 py-3 bg-white/5 hover:bg-white/10 text-pictus-white rounded-full transition-all disabled:opacity-50"
+              >
+                Zrušiť
+              </button>
+              <button
+                type="submit"
+                disabled={creating || !newDutyDate}
+                className="flex-1 px-6 py-3 bg-pictus-lime hover:bg-pictus-lime600 text-pictus-black font-semibold rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {creating ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin" />
+                    Vytváram...
+                  </>
+                ) : (
+                  <>
+                    <Check size={20} />
+                    Vytvoriť ďalšiu úlohu
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

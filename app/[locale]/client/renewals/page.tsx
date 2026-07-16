@@ -18,7 +18,7 @@ const RenewalsPage = () => {
 
   if (sessionStatus === 'loading') {
     return (
-      <div className="min-h-screen bg-pictus-darkest flex items-center justify-center">
+      <div className="min-h-screen bg-pictus-black flex items-center justify-center">
         <div className="text-center">
           <Loader className="w-12 h-12 text-pictus-lime animate-spin mx-auto mb-4" />
           <p className="text-gray-400">Načítavam obnovy...</p>
@@ -34,13 +34,11 @@ const RenewalsPage = () => {
   const isOrgDeleted = (session?.user as any)?.organizationDeleted === true
   if (isOrgDeleted) {
     return (
-      <div className="min-h-screen bg-pictus-darkest flex items-center justify-center">
+      <div className="min-h-screen bg-pictus-black flex items-center justify-center">
         <div className="text-center max-w-lg px-6">
           <ShieldAlert className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h1 className="text-3xl font-light mb-4 text-red-400">Prístup zamietnutý</h1>
-          <p className="text-lg text-gray-300 mb-6">
-            Vaša organizácia bola deaktivovaná.
-          </p>
+          <p className="text-lg text-gray-300 mb-6">Vaša organizácia bola deaktivovaná.</p>
           <p className="text-sm text-gray-500 mb-8">
             Ak si myslíte, že ide o chybu, napíšte na{' '}
             <a href="mailto:info@pictusweb.sk" className="text-pictus-lime hover:underline">
@@ -50,13 +48,13 @@ const RenewalsPage = () => {
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <Link
               href="/client/upgrade"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-black font-semibold rounded-lg hover:bg-pictus-lime/80 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-pictus-lime text-pictus-black font-semibold rounded-full hover:bg-pictus-lime600 transition-all"
             >
               Upgradovať teraz
             </Link>
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 text-white rounded-full hover:bg-white/10 transition-all"
             >
               <LogOut size={18} />
               Odhlásiť sa
@@ -68,19 +66,17 @@ const RenewalsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-pictus-darkest py-12 px-4">
+    <div className="min-h-screen bg-pictus-black py-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <div className="p-4 bg-gradient-to-r from-blue-500/20 to-blue-500/20 rounded-xl">
-              <RotateCcw className="w-10 h-10 text-blue-400" />
+            <div className="p-4 bg-white/5 ring-1 ring-white/[0.06] rounded-2xl">
+              <RotateCcw className="w-10 h-10 text-pictus-lime" />
             </div>
             <div>
               <h1 className="text-5xl font-light text-pictus-white">Obnova úloh</h1>
-              <p className="text-xl text-gray-400 mt-2">
-                Rýchle obnovenie pravidelných povinností
-              </p>
+              <p className="text-xl text-gray-400 mt-2">Rýchle obnovenie pravidelných povinností</p>
             </div>
           </div>
         </div>

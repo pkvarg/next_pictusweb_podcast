@@ -1,6 +1,16 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { Calendar, Check, Edit, X, Loader, AlertCircle, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react'
+import {
+  Calendar,
+  Check,
+  Edit,
+  X,
+  Loader,
+  AlertCircle,
+  RotateCcw,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'
 import RenewalModal from './RenewalModal'
 
 interface VehicleNotification {
@@ -67,7 +77,7 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
       if (!orgId) return
 
       const response = await fetch(
-        `/api/duty-renewal-presets?organizationId=${orgId}&notificationType=${encodeURIComponent(dutyBatch.notificationType)}`
+        `/api/duty-renewal-presets?organizationId=${orgId}&notificationType=${encodeURIComponent(dutyBatch.notificationType)}`,
       )
 
       if (response.ok) {
@@ -198,8 +208,8 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
     if (presets.length === 0) return []
 
     const preset = presets[0]
-    const months = preset.presetMonths.split(',').map(m => parseInt(m.trim()))
-    const labels = preset.presetLabels.split(',').map(l => l.trim())
+    const months = preset.presetMonths.split(',').map((m) => parseInt(m.trim()))
+    const labels = preset.presetLabels.split(',').map((l) => l.trim())
 
     return months.map((month, index) => ({
       months: month,
@@ -212,8 +222,8 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
   return (
     <div
       className={`bg-white/5 border ${
-        dutyBatch.status === 'pending' ? 'border-blue-500/30' : 'border-white/10'
-      } rounded-xl overflow-hidden transition-all ${success ? 'animate-pulse' : ''}`}
+        dutyBatch.status === 'pending' ? 'border-pictus-lime/30' : 'border-white/[0.06]'
+      } rounded-2xl overflow-hidden transition-all ${success ? 'animate-pulse' : ''}`}
     >
       {/* Header */}
       <div className="p-4 sm:p-6 border-b border-white/10">
@@ -226,8 +236,8 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
               <span
                 className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm ${
                   dutyBatch.status === 'pending'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                    : 'bg-green-500/20 text-green-400 border border-green-500/30'
+                    ? 'bg-pictus-lime/15 text-pictus-lime border border-pictus-lime/25'
+                    : 'bg-green-500/15 text-green-400 border border-green-500/20'
                 }`}
               >
                 {dutyBatch.status === 'pending' ? '⏰ Čakajúce' : '✅ Dokončené'}
@@ -240,7 +250,7 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
           </div>
           <button
             onClick={() => setExpanded(!expanded)}
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/5 rounded-full transition-colors"
           >
             {expanded ? (
               <ChevronUp className="w-5 h-5 text-gray-400" />
@@ -263,8 +273,8 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
                   {interval === 0
                     ? 'V deň úlohy'
                     : interval > 0
-                    ? `${interval} dni po úlohe`
-                    : `${Math.abs(interval)} dni pred úlohou`}
+                      ? `${interval} dni po úlohe`
+                      : `${Math.abs(interval)} dni pred úlohou`}
                 </span>
               </div>
             ))}
@@ -278,36 +288,44 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
           {loadingPresets ? (
             <div className="flex items-center justify-center py-4">
               <Loader className="w-5 h-5 text-gray-400 animate-spin" />
-              <span className="ml-2 text-gray-400 text-sm sm:text-base">Načítavam predvoľby...</span>
+              <span className="ml-2 text-gray-400 text-sm sm:text-base">
+                Načítavam predvoľby...
+              </span>
             </div>
           ) : (
             <>
               {/* Intervals Information */}
-              <div className="mb-4 p-3 sm:p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <div className="mb-4 p-3 sm:p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                 <h4 className="text-xs sm:text-sm font-medium text-blue-400 mb-2 flex items-center gap-2">
                   <Calendar size={14} className="sm:w-4 sm:h-4 shrink-0" />
-                  <span>Obnova vytvorí {dutyBatch.intervalsUsed.length} notifikácií s týmito intervalmi:</span>
+                  <span>
+                    Obnova vytvorí {dutyBatch.intervalsUsed.length} notifikácií s týmito intervalmi:
+                  </span>
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {dutyBatch.intervalsUsed.sort((a, b) => a - b).map((interval, index) => (
-                    <div
-                      key={index}
-                      className="px-3 py-1 bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg text-pictus-lime text-sm"
-                    >
-                      {interval === 0
-                        ? 'V deň úlohy'
-                        : interval > 0
-                        ? `+${interval} dní`
-                        : `${interval} dní`}
-                    </div>
-                  ))}
+                  {dutyBatch.intervalsUsed
+                    .sort((a, b) => a - b)
+                    .map((interval, index) => (
+                      <div
+                        key={index}
+                        className="px-3 py-1 bg-pictus-lime/15 border border-pictus-lime/25 rounded-full text-pictus-lime text-sm"
+                      >
+                        {interval === 0
+                          ? 'V deň úlohy'
+                          : interval > 0
+                            ? `+${interval} dní`
+                            : `${interval} dní`}
+                      </div>
+                    ))}
                 </div>
                 <p className="text-xs text-gray-400 mt-2">
                   Môžete zmeniť intervaly pomocou tlačidla &quot;Upraviť detaily&quot; nižšie
                 </p>
               </div>
 
-              <h4 className="text-xs sm:text-sm font-medium text-gray-400 mb-3 sm:mb-4">Rýchla obnova:</h4>
+              <h4 className="text-xs sm:text-sm font-medium text-gray-400 mb-3 sm:mb-4">
+                Rýchla obnova:
+              </h4>
 
               {/* Preset Buttons */}
               {presetButtons.length > 0 && (
@@ -317,7 +335,7 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
                       key={index}
                       onClick={() => handleQuickRenew(preset.months)}
                       disabled={creating}
-                      className="p-3 sm:p-4 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                      className="p-3 sm:p-4 bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
                       <div className="text-left">
                         <div className="text-pictus-white font-light mb-1">{preset.label}</div>
@@ -341,12 +359,12 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
                     value={customDate}
                     onChange={(e) => setCustomDate(e.target.value)}
                     disabled={creating}
-                    className="flex-1 px-3 sm:px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-pictus-white focus:outline-none focus:border-pictus-lime disabled:opacity-50"
+                    className="flex-1 px-3 sm:px-4 py-2 bg-black/40 border border-white/10 rounded-xl text-pictus-white focus:outline-none focus:ring-2 focus:ring-pictus-lime disabled:opacity-50"
                   />
                   <button
                     onClick={handleCustomRenew}
                     disabled={creating || !customDate}
-                    className="px-4 sm:px-6 py-2 bg-pictus-lime hover:bg-pictus-lime600 text-pictus-darkest font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="px-6 py-3 bg-pictus-lime hover:bg-pictus-lime600 text-pictus-black font-semibold rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {creating ? (
                       <>
@@ -368,7 +386,7 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
                 <button
                   onClick={() => setShowModal(true)}
                   disabled={creating}
-                  className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-pictus-white hover:bg-white/5 rounded-lg transition-all disabled:opacity-50"
+                  className="flex items-center gap-2 px-6 py-3 text-gray-400 hover:text-pictus-white bg-white/5 hover:bg-white/10 rounded-full transition-all disabled:opacity-50"
                 >
                   <Edit size={16} />
                   Upraviť detaily
@@ -379,7 +397,7 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 bg-red-500/20 border border-red-500/30 rounded-lg p-3 flex items-center gap-2">
+            <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-xl p-3 flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-red-400" />
               <p className="text-red-200 text-sm">{error}</p>
             </div>
@@ -389,7 +407,7 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
 
       {/* Success Message */}
       {success && (
-        <div className="p-4 sm:p-6 bg-green-500/20 border-t border-green-500/30">
+        <div className="p-4 sm:p-6 bg-green-500/10 border-t border-green-500/20">
           <div className="flex items-center gap-3 text-green-400">
             <Check className="w-5 h-5 sm:w-6 sm:h-6" />
             <p className="text-base sm:text-lg font-light">Obnova úspešne vytvorená!</p>
