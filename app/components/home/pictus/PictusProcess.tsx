@@ -5,10 +5,10 @@ import { useTranslations } from 'next-intl'
 type ProcessRow = { title: string; summary: string }
 
 const images = [
-  '/pictus/process/step-1.png',
-  '/pictus/process/step-2.png',
-  '/pictus/process/step-3.png',
-  '/pictus/process/step-4.png',
+  '/pictus/process/step-1.jpg',
+  '/pictus/process/step-2.jpg',
+  '/pictus/process/step-3.jpg',
+  '/pictus/process/step-4.jpg',
 ]
 
 const PictusProcess = () => {
@@ -49,7 +49,7 @@ const PictusProcess = () => {
           <div className="process-visual-frame" aria-live="polite">
             <div className="process-visual is-active">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={images[active]} width={1300} height={950} alt="" loading="lazy" />
+              <img src={images[active]} width={1800} height={1800} alt="" loading="lazy" />
               <a className="button button-primary process-visual-button" href="#selected-work">
                 {t('process.visualButton')}
               </a>

@@ -10,9 +10,9 @@ const PictusHero = () => {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="hero-background"
-        src="/pictus/backgrounds/hero.png"
-        width={3415}
-        height={2084}
+        src="/pictus/backgrounds/hero-room.jpg"
+        width={2200}
+        height={1522}
         alt=""
         fetchPriority="high"
         aria-hidden="true"

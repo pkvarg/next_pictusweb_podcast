@@ -11,11 +11,11 @@ const FLEETSYNC_INDEX = 3
 const SUPPORT_INDEX = 4
 
 const images = [
-  '/pictus/services/web.png',
-  '/pictus/services/web-redesign.png',
-  '/pictus/services/podcasts.png',
-  '/pictus/services/fleetsync.png',
-  '/pictus/services/support.png',
+  '/pictus/services/web.jpg',
+  '/pictus/services/web-redesign.jpg',
+  '/pictus/services/podcasts.jpg',
+  '/pictus/services/fleetsync.jpg',
+  '/pictus/services/support.jpg',
 ]
 
 const PictusServices = () => {
@@ -73,8 +73,8 @@ const PictusServices = () => {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={images[active]}
-                width={960}
-                height={1092}
+                width={1800}
+                height={1800}
                 alt={rows[active]?.alt ?? ''}
                 loading="lazy"
               />
