@@ -50,20 +50,39 @@ const PictusServices = () => {
           <div className="services-content">
             <div className="service-selector" role="tablist" aria-label={t('services.kicker')}>
               {rows.map((row, index) => (
-                <button
-                  key={row.title}
-                  className={`service-row${index === active ? ' is-active' : ''}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={index === active}
-                  onClick={() => setActive(index)}
-                >
-                  <span className="row-index">{String(index + 1).padStart(2, '0')}</span>
-                  <span className="service-row-copy">
-                    <span className="service-row-title">{row.title}</span>
-                    <span className="service-row-summary">{row.summary}</span>
-                  </span>
-                </button>
+                <React.Fragment key={row.title}>
+                  <button
+                    className={`service-row${index === active ? ' is-active' : ''}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={index === active}
+                    onClick={() => setActive(index)}
+                  >
+                    <span className="row-index">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="service-row-copy">
+                      <span className="service-row-title">{row.title}</span>
+                      <span className="service-row-summary">{row.summary}</span>
+                    </span>
+                  </button>
+                  {index === active && (
+                    <div className="service-visual-inline">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={images[active]}
+                        width={1800}
+                        height={1800}
+                        alt={rows[active]?.alt ?? ''}
+                        loading="lazy"
+                      />
+                      <a className="service-visual-link" href={ctaHref}>
+                        {ctaLabel}
+                        <span className="service-link-arrow" aria-hidden="true">
+                          →
+                        </span>
+                      </a>
+                    </div>
+                  )}
+                </React.Fragment>
               ))}
             </div>
           </div>
@@ -78,8 +97,11 @@ const PictusServices = () => {
                 alt={rows[active]?.alt ?? ''}
                 loading="lazy"
               />
-              <a className="button button-primary service-visual-button" href={ctaHref}>
+              <a className="service-visual-link" href={ctaHref}>
                 {ctaLabel}
+                <span className="service-link-arrow" aria-hidden="true">
+                  →
+                </span>
               </a>
             </div>
           </div>

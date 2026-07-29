@@ -1188,7 +1188,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
 .pl .service-visual img {
   display: block;
   width: 100%;
-  height: clamp(300px, 27vw, 345px);
+  height: 100%;
   max-width: 100%;
   max-height: none;
   border-radius: 24px;
@@ -1196,14 +1196,50 @@ input[type='date']::-webkit-calendar-picker-indicator {
   object-position: center center;
 }
 
-.pl .service-visual-button {
+.pl .service-visual::after {
+  content: '';
   position: absolute;
-  left: 34px;
-  bottom: 32px;
+  left: clamp(24px, 2.5vw, 34px);
+  right: clamp(24px, 2.5vw, 34px);
+  bottom: clamp(24px, 2.5vw, 34px);
+  height: 44%;
+  border-radius: 0 0 24px 24px;
+  background: linear-gradient(
+    to top,
+    rgba(8, 9, 8, 0.82),
+    rgba(8, 9, 8, 0.3) 55%,
+    rgba(8, 9, 8, 0)
+  );
   z-index: 2;
-  min-height: 57px;
-  padding-inline: 27px;
-  font-size: 1.08rem;
+  pointer-events: none;
+}
+
+.pl .service-visual-link {
+  position: absolute;
+  left: clamp(44px, 4.2vw, 60px);
+  bottom: clamp(42px, 4.2vw, 56px);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #f4f2ee;
+  font-family: var(--font-display);
+  font-size: clamp(1.08rem, 1.25vw, 1.3rem);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+}
+
+.pl .service-link-arrow {
+  display: inline-block;
+  color: var(--moss-signal);
+  font-size: 1.24em;
+  line-height: 1;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pl .service-visual-link:hover .service-link-arrow {
+  transform: translateX(5px);
 }
 
 .pl .services-content {
@@ -1289,6 +1325,11 @@ input[type='date']::-webkit-calendar-picker-indicator {
   display: block;
 }
 
+.pl .service-visual-inline,
+.pl .process-visual-inline {
+  display: none;
+}
+
 .pl .process-module {
   max-width: 1296px;
   margin-inline: auto;
@@ -1323,20 +1364,10 @@ input[type='date']::-webkit-calendar-picker-indicator {
 .pl .process-visual img {
   display: block;
   width: 100%;
-  height: clamp(300px, 27vw, 345px);
+  height: 100%;
   border-radius: 24px;
   object-fit: cover;
   object-position: center center;
-}
-
-.pl .process-visual-button {
-  position: absolute;
-  left: 34px;
-  bottom: 32px;
-  z-index: 2;
-  min-height: 57px;
-  padding-inline: 27px;
-  font-size: 1.08rem;
 }
 
 .pl .process-content {
@@ -2047,13 +2078,66 @@ input[type='date']::-webkit-calendar-picker-indicator {
     gap: 36px;
   }
 
-  .pl .services-visual-frame {
+  /* Mobile: the right-hand image frame doesn't make sense when the tap target
+     is far above it. Hide it and reveal the active image inline, directly
+     under the row that was tapped (accordion). */
+  .pl .services-visual-frame,
+  .pl .process-visual-frame {
+    display: none;
+  }
+
+  .pl .service-visual-inline,
+  .pl .process-visual-inline {
     position: relative;
-    top: auto;
-    min-height: clamp(360px, 72vw, 520px);
-    aspect-ratio: 4 / 3.2;
-    max-width: 520px;
+    display: block;
+    margin-top: -2px;
+    margin-bottom: 10px;
+    border-radius: 24px;
+    overflow: hidden;
+    animation: pl-accordion-in 260ms ease;
+  }
+
+  .pl .service-visual-inline img,
+  .pl .process-visual-inline img {
+    display: block;
     width: 100%;
+    height: clamp(240px, 58vw, 360px);
+    object-fit: cover;
+    object-position: center center;
+    border-radius: 24px;
+  }
+
+  /* Services only: elegant text + arrow overlaid on the image */
+  .pl .service-visual-inline::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 48%;
+    border-radius: 0 0 24px 24px;
+    background: linear-gradient(
+      to top,
+      rgba(8, 9, 8, 0.85),
+      rgba(8, 9, 8, 0.32) 55%,
+      rgba(8, 9, 8, 0)
+    );
+    pointer-events: none;
+  }
+
+  .pl .service-visual-inline .service-visual-link {
+    left: 20px;
+    bottom: 18px;
+    font-size: 1.08rem;
+  }
+
+  @keyframes pl-accordion-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .pl #services .section-heading {
@@ -2078,11 +2162,12 @@ input[type='date']::-webkit-calendar-picker-indicator {
   }
 
   .pl .hero {
-    min-height: clamp(600px, 90svh, 760px);
+    min-height: clamp(560px, 88svh, 760px);
   }
 
   .pl .hero-content {
-    min-height: clamp(600px, 90svh, 760px);
+    align-items: stretch;
+    min-height: clamp(560px, 88svh, 760px);
   }
 
   .pl .hero-background {
@@ -2091,34 +2176,38 @@ input[type='date']::-webkit-calendar-picker-indicator {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 68% center;
+    object-position: 74% 42%;
     transform: none;
   }
 
   .pl .hero-scrim {
     background: linear-gradient(
       180deg,
-      rgba(14, 15, 16, 0.62) 0%,
-      rgba(14, 15, 16, 0.28) 40%,
-      rgba(14, 15, 16, 0.68) 100%
+      rgba(14, 15, 16, 0.84) 0%,
+      rgba(14, 15, 16, 0.52) 32%,
+      rgba(14, 15, 16, 0.14) 58%,
+      rgba(14, 15, 16, 0.78) 100%
     );
   }
 
   .pl .hero-copy,
   .pl .section-copy.hero-copy {
     max-width: none;
-    gap: clamp(24px, 6vw, 40px);
-    padding-block: clamp(88px, 16vw, 128px);
+    align-content: start;
+    justify-content: flex-start;
+    gap: clamp(22px, 6vw, 34px);
+    padding-block: clamp(28px, 8vw, 48px) clamp(40px, 12vw, 72px);
   }
 
   .pl .hero h1 {
-    max-width: 16ch;
+    max-width: 14ch;
     text-wrap: balance;
     white-space: normal;
   }
 
   .pl .hero-action-copy {
     max-width: 460px;
+    gap: clamp(20px, 5vw, 30px);
     transform: none;
   }
 
@@ -2238,21 +2327,21 @@ input[type='date']::-webkit-calendar-picker-indicator {
   }
 
   .pl .hero h1 {
-    font-size: clamp(3rem, 13vw, 5rem);
+    font-size: clamp(2.9rem, 12.5vw, 4.6rem);
     line-height: 1.04;
   }
 
   .pl .hero,
   .pl .hero-content {
-    min-height: 620px;
+    min-height: clamp(560px, 86svh, 700px);
   }
 
   .pl .section-copy.hero-copy {
-    padding-block: clamp(80px, 20vw, 116px);
+    padding-block: clamp(24px, 7vw, 40px) clamp(36px, 11vw, 64px);
   }
 
   .pl .hero-background {
-    object-position: 66% center;
+    object-position: 72% 44%;
   }
 
   .pl .hero .section-lede {
@@ -2313,15 +2402,6 @@ input[type='date']::-webkit-calendar-picker-indicator {
 
   .pl .button {
     width: 100%;
-  }
-
-  /* Visual-overlay CTAs are absolutely positioned; keep them inset within the
-     frame instead of stretching 100% from a left offset (which overflowed). */
-  .pl .service-visual-button,
-  .pl .process-visual-button {
-    left: 20px;
-    right: 20px;
-    width: auto;
   }
 
   .pl .testimonial-card {

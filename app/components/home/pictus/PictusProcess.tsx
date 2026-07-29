@@ -28,20 +28,27 @@ const PictusProcess = () => {
           <div className="process-content">
             <div className="process-selector" role="tablist" aria-label={t('process.kicker')}>
               {rows.map((row, index) => (
-                <button
-                  key={row.title}
-                  className={`process-row${index === active ? ' is-active' : ''}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={index === active}
-                  onClick={() => setActive(index)}
-                >
-                  <span className="row-index">{String(index + 1).padStart(2, '0')}</span>
-                  <span className="process-row-copy">
-                    <span className="process-row-title">{row.title}</span>
-                    <span className="process-row-summary">{row.summary}</span>
-                  </span>
-                </button>
+                <React.Fragment key={row.title}>
+                  <button
+                    className={`process-row${index === active ? ' is-active' : ''}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={index === active}
+                    onClick={() => setActive(index)}
+                  >
+                    <span className="row-index">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="process-row-copy">
+                      <span className="process-row-title">{row.title}</span>
+                      <span className="process-row-summary">{row.summary}</span>
+                    </span>
+                  </button>
+                  {index === active && (
+                    <div className="process-visual-inline">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={images[active]} width={1800} height={1800} alt="" loading="lazy" />
+                    </div>
+                  )}
+                </React.Fragment>
               ))}
             </div>
           </div>
@@ -50,9 +57,6 @@ const PictusProcess = () => {
             <div className="process-visual is-active">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={images[active]} width={1800} height={1800} alt="" loading="lazy" />
-              <a className="button button-primary process-visual-button" href="#selected-work">
-                {t('process.visualButton')}
-              </a>
             </div>
           </div>
         </div>
