@@ -84,17 +84,17 @@ const PictusCta = () => {
 
   return (
     <section className="section-shell section-muted cta" aria-labelledby="contact-title">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="cta-background"
-        src="/pictus/backgrounds/cta.png"
-        width={1127}
-        height={716}
-        alt=""
-        loading="lazy"
-        aria-hidden="true"
-      />
       <div className="layout-container cta-content">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="cta-background"
+          src="/pictus/backgrounds/cta1.webp"
+          width={1200}
+          height={1500}
+          alt=""
+          loading="lazy"
+          aria-hidden="true"
+        />
         <form className="contact-card" id="contact" ref={formRef} onSubmit={handleSubmit}>
           <div className="contact-field">
             <label htmlFor="contact-name">{th('contactName')}</label>

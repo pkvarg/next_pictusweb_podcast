@@ -986,10 +986,10 @@ input[type='date']::-webkit-calendar-picker-indicator {
 
 .pl #about h2 {
   max-width: none;
-  font-size: clamp(4.6rem, 8.8vw, 8.55rem);
-  line-height: 0.86;
+  font-size: clamp(1.82rem, 3.75vw, 3.55rem);
+  line-height: 1.1;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .pl .about-copy {
@@ -1619,8 +1619,8 @@ input[type='date']::-webkit-calendar-picker-indicator {
 
 .pl #testimonials h2 {
   max-width: none;
-  font-size: clamp(3.1rem, 5.2vw, 4.9rem);
-  line-height: 0.98;
+  font-size: clamp(1.82rem, 3.75vw, 3.55rem);
+  line-height: 1.12;
 }
 
 .pl .testimonial-slides {
@@ -1726,7 +1726,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
   position: relative;
   isolation: isolate;
   padding-block: 0;
-  min-height: clamp(900px, 100vw, 1276px);
+  min-height: clamp(560px, 58vw, 760px);
   overflow: hidden;
   background: var(--graphite-0);
 }
@@ -1735,14 +1735,14 @@ input[type='date']::-webkit-calendar-picker-indicator {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(420px, 638px);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
   grid-template-areas:
     'copy copy'
     'art form';
   align-items: start;
-  gap: clamp(32px, 4.8vw, 72px) clamp(44px, 5vw, 86px);
-  min-height: clamp(900px, 100vw, 1276px);
-  padding-block: clamp(68px, 7vw, 96px) clamp(88px, 8vw, 128px);
+  gap: clamp(28px, 3.4vw, 52px) clamp(40px, 4.6vw, 76px);
+  min-height: clamp(560px, 58vw, 760px);
+  padding-block: clamp(56px, 5.2vw, 80px) clamp(64px, 6vw, 96px);
 }
 
 .pl .cta-video,
@@ -1766,11 +1766,20 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .pl .cta-background {
-  z-index: -1;
-  inset: auto auto 0 max(-195px, calc((100vw - 1296px) / 2 - 195px));
-  width: min(980px, 72vw);
-  height: auto;
-  opacity: 0.95;
+  position: relative;
+  grid-area: art;
+  inset: auto;
+  z-index: 1;
+  justify-self: end;
+  align-self: stretch;
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  min-height: clamp(420px, 42vw, 560px);
+  object-fit: cover;
+  object-position: center 26%;
+  border-radius: 24px;
+  opacity: 1;
 }
 
 .pl .cta-content .section-heading {
@@ -1787,21 +1796,21 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .pl .cta-copy h2 {
-  max-width: 1000px;
-  font-size: clamp(4.8rem, 7.4vw, 8rem);
-  line-height: 0.82;
+  max-width: 22ch;
+  font-size: clamp(1.82rem, 3.75vw, 3.55rem);
+  line-height: 1.08;
   text-align: center;
 }
 
 .pl .contact-card {
   grid-area: form;
   display: grid;
-  gap: clamp(24px, 3vw, 40px);
-  width: min(100%, 638px);
+  gap: clamp(14px, 1.5vw, 20px);
+  width: min(100%, 520px);
   min-height: auto;
-  padding: clamp(32px, 4.4vw, 64px);
+  padding: clamp(24px, 2.6vw, 38px);
   border: 0;
-  border-radius: 28px;
+  border-radius: 24px;
   background: #2a2b27;
   box-shadow: inset 0 0 0 1px rgba(244, 242, 238, 0.08);
 }
@@ -1840,13 +1849,13 @@ input[type='date']::-webkit-calendar-picker-indicator {
 
 .pl .contact-field input,
 .pl .contact-field select {
-  min-height: 64px;
-  padding-inline: 23px;
+  min-height: 52px;
+  padding-inline: 18px;
 }
 
 .pl .contact-field textarea {
-  min-height: 193px;
-  padding: 22px 24px;
+  min-height: 120px;
+  padding: 15px 18px;
   resize: vertical;
 }
 
@@ -1864,10 +1873,10 @@ input[type='date']::-webkit-calendar-picker-indicator {
 
 .pl .contact-card .button {
   justify-self: start;
-  margin-top: 6px;
-  min-height: 57px;
-  padding-inline: 21px;
-  font-size: 1.05rem;
+  margin-top: 4px;
+  min-height: 50px;
+  padding-inline: 20px;
+  font-size: 1rem;
 }
 
 .pl .site-footer {
@@ -2059,7 +2068,11 @@ input[type='date']::-webkit-calendar-picker-indicator {
       'copy'
       'form';
     min-height: auto;
-    padding-block: clamp(72px, 11vw, 112px);
+    padding-block: clamp(56px, 9vw, 88px);
+  }
+
+  .pl .cta-background {
+    display: none;
   }
 
   .pl .testimonial-card {
@@ -2231,11 +2244,11 @@ input[type='date']::-webkit-calendar-picker-indicator {
   }
 
   .pl #about h2 {
-    max-width: 11ch;
+    max-width: 16ch;
     text-align: left;
     white-space: normal;
-    font-size: clamp(3rem, 12vw, 5.2rem);
-    line-height: 0.9;
+    font-size: clamp(1.9rem, 8vw, 2.7rem);
+    line-height: 1.12;
   }
 
   .pl .about-copy {
@@ -2369,18 +2382,15 @@ input[type='date']::-webkit-calendar-picker-indicator {
   }
 
   .pl .cta-copy h2 {
-    font-size: clamp(3rem, 15vw, 5.6rem);
-  }
-
-  .pl .cta-background {
-    display: none;
+    font-size: clamp(1.9rem, 8vw, 2.7rem);
+    line-height: 1.14;
   }
 
   .pl .contact-card {
     width: 100%;
     min-height: auto;
-    padding: 28px;
-    gap: 22px;
+    padding: 22px;
+    gap: 15px;
   }
 
   .pl .work-carousel {
@@ -2393,11 +2403,11 @@ input[type='date']::-webkit-calendar-picker-indicator {
 
   .pl .contact-field input,
   .pl .contact-field select {
-    min-height: 56px;
+    min-height: 50px;
   }
 
   .pl .contact-field textarea {
-    min-height: 150px;
+    min-height: 118px;
   }
 
   .pl .button {
@@ -2477,8 +2487,8 @@ input[type='date']::-webkit-calendar-picker-indicator {
   }
 
   .pl #about h2 {
-    font-size: clamp(2.9rem, 14vw, 4.6rem);
-    line-height: 0.92;
+    font-size: clamp(1.9rem, 8vw, 2.6rem);
+    line-height: 1.12;
   }
 
   .pl .about-copy {

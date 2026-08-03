@@ -10,7 +10,7 @@ const PictusAbout = () => {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="about-background"
-        src="/pictus/backgrounds/about.png"
+        src="/pictus/backgrounds/about1.webp"
         width={1600}
         height={1054}
         alt=""

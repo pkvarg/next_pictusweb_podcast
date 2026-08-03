@@ -5,10 +5,10 @@ import { useTranslations } from 'next-intl'
 type ProcessRow = { title: string; summary: string }
 
 const images = [
-  '/pictus/process/step-1.jpg',
-  '/pictus/process/step-2.jpg',
-  '/pictus/process/step-3.jpg',
-  '/pictus/process/step-4.jpg',
+  '/pictus/process/step-1.webp',
+  '/pictus/process/step-2.webp',
+  '/pictus/process/step-3.webp',
+  '/pictus/process/step-4.webp',
 ]
 
 const PictusProcess = () => {

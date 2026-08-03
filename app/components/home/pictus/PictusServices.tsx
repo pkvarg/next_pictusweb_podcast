@@ -11,11 +11,11 @@ const FLEETSYNC_INDEX = 3
 const SUPPORT_INDEX = 4
 
 const images = [
-  '/pictus/services/web.jpg',
-  '/pictus/services/web-redesign.jpg',
-  '/pictus/services/podcasts.jpg',
-  '/pictus/services/fleetsync.jpg',
-  '/pictus/services/support.jpg',
+  '/pictus/services/web.webp',
+  '/pictus/services/web-redesign.webp',
+  '/pictus/services/podcasts.webp',
+  '/pictus/services/fleetsync.webp',
+  '/pictus/services/support.webp',
 ]
 
 const PictusServices = () => {
