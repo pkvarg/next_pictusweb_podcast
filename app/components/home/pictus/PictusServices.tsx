@@ -88,7 +88,7 @@ const PictusServices = () => {
           </div>
 
           <div className="services-visual-frame" aria-live="polite">
-            <div className="service-visual is-active">
+            <div className="service-visual is-active" key={active}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={images[active]}

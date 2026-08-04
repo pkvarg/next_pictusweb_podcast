@@ -776,8 +776,8 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .pl #testimonials {
-  --section-min: clamp(660px, 72vw, 807px);
-  padding-block: clamp(76px, 8vw, 126px);
+  --section-min: auto;
+  padding-block: clamp(28px, 3vw, 48px);
 }
 
 .pl #services .section-heading {
@@ -908,112 +908,77 @@ input[type='date']::-webkit-calendar-picker-indicator {
   margin-top: clamp(6px, 0.85vw, 12px);
 }
 
-.pl #about .section-heading {
-  max-width: none;
-  align-self: start;
-}
-
 .pl #about {
   position: relative;
   isolation: isolate;
-  display: grid;
-  align-items: start;
-  min-height: 1011px;
-  padding-block: 0;
+  padding-block: clamp(72px, 7.6vw, 116px) clamp(86px, 9vw, 132px);
   overflow: hidden;
-  background: var(--graphite-0);
+  background: transparent;
 }
 
-.pl .about-video,
-.pl .about-video-fill,
-.pl .about-background {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.pl .about-video {
-  z-index: -4;
-  object-fit: cover;
-  object-position: center center;
-}
-
-.pl .about-video-fill {
-  z-index: -3;
-  background: rgba(14, 15, 16, 0.85);
-}
-
-.pl #about::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(14, 15, 16, 0.2) 0%,
-      rgba(14, 15, 16, 0.02) 40%,
-      rgba(14, 15, 16, 0.08) 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(14, 15, 16, 0.02) 0%,
-      rgba(14, 15, 16, 0) 64%,
-      rgba(14, 15, 16, 0.2) 100%
-    );
-}
-
-.pl .about-background {
-  z-index: -2;
-  object-fit: contain;
-  object-position: right bottom;
-  opacity: 1;
-  transform: translate(28px, 18px) scale(1.04);
-  transform-origin: right bottom;
-}
-
-.pl .about-shell {
-  position: relative;
-  min-height: 1011px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto 1fr;
-  align-items: start;
-  gap: 0;
-  padding-top: clamp(92px, 8vw, 122px);
+.pl #about .section-heading {
+  max-width: none;
+  margin-bottom: clamp(44px, 5.6vw, 76px);
 }
 
 .pl #about h2 {
   max-width: none;
   font-size: clamp(1.82rem, 3.75vw, 3.55rem);
   line-height: 1.1;
-  text-align: center;
+  text-align: left;
   white-space: normal;
 }
 
+.pl .about-module {
+  max-width: 1320px;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 586px) minmax(420px, 586px);
+  grid-template-areas: 'content visual';
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(40px, 5vw, 92px);
+}
+
+.pl .about-visual-frame {
+  grid-area: visual;
+  position: relative;
+  display: grid;
+  border-radius: 32px;
+  background: #2a2b27;
+  padding: clamp(24px, 2.5vw, 34px);
+  min-height: clamp(380px, 36vw, 480px);
+  overflow: hidden;
+}
+
+.pl .about-visual {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 24px;
+}
+
 .pl .about-copy {
-  justify-self: start;
-  align-self: start;
-  max-width: 430px;
-  margin-top: 52px;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+  grid-area: content;
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: clamp(22px, 2.2vw, 32px);
+  max-width: none;
+  margin: 0;
 }
 
 .pl .about-copy p {
-  max-width: 20ch;
-  color: rgba(244, 242, 238, 0.92);
-  font-size: clamp(1.55rem, 2.15vw, 2rem);
-  line-height: 1.34;
+  max-width: 34ch;
+  color: rgba(244, 242, 238, 0.9);
+  font-size: clamp(1.12rem, 1.5vw, 1.4rem);
+  line-height: 1.5;
 }
 
 .pl .about-copy .button {
-  justify-self: start;
   min-height: 58px;
-  margin-top: 12px;
   padding-inline: 27px;
   font-size: 1.08rem;
 }
@@ -1142,6 +1107,44 @@ input[type='date']::-webkit-calendar-picker-indicator {
   align-items: center;
   justify-content: space-between;
   gap: clamp(40px, 5vw, 92px);
+}
+
+/* Desktop only: match the image height to the button column so the picture on
+   the left aligns with the buttons on the right, and ease the image in on each
+   selection change. */
+@media (min-width: 981px) {
+  .pl #services .services-module,
+  .pl #process .process-module {
+    align-items: stretch;
+  }
+
+  .pl .services-module .services-visual-frame,
+  .pl .process-module .process-visual-frame {
+    min-height: auto;
+  }
+
+  .pl .services-visual-frame .service-visual,
+  .pl .process-visual-frame .process-visual {
+    animation: pl-service-swap 620ms cubic-bezier(0.33, 1, 0.68, 1);
+  }
+}
+
+@keyframes pl-service-swap {
+  from {
+    opacity: 0;
+    transform: translate3d(-44px, 0, 0) scale(0.955);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl .services-visual-frame .service-visual,
+  .pl .process-visual-frame .process-visual {
+    animation: none;
+  }
 }
 
 .pl .services-visual-frame {
@@ -1453,35 +1456,47 @@ input[type='date']::-webkit-calendar-picker-indicator {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px;
+  gap: 4px;
 }
 
 .pl .work-carousel-dot {
-  width: 18px;
-  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pl .work-carousel-dot::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
   background: rgba(244, 242, 238, 0.78);
-  cursor: pointer;
   transition:
     width 220ms ease,
     background 220ms ease,
     opacity 220ms ease;
 }
 
-.pl .work-carousel-dot:hover,
-.pl .work-carousel-dot:focus-visible {
+.pl .work-carousel-dot:hover::before,
+.pl .work-carousel-dot:focus-visible::before {
   background: rgba(244, 242, 238, 0.92);
 }
 
-.pl .work-carousel-dot.is-active {
+.pl .work-carousel-dot.is-active::before {
   width: 52px;
   background: rgba(244, 242, 238, 0.82);
 }
 
 .pl .work-slides {
   position: relative;
+  touch-action: pan-y;
 }
 
 .pl .work-slide[hidden] {
@@ -1625,6 +1640,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
 
 .pl .testimonial-slides {
   position: relative;
+  touch-action: pan-y;
 }
 
 .pl .testimonial-card[hidden] {
@@ -1693,17 +1709,28 @@ input[type='date']::-webkit-calendar-picker-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 30px;
+  gap: 4px;
 }
 
 .pl .testimonial-dot {
-  width: 18px;
-  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pl .testimonial-dot::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
   background: rgba(244, 242, 238, 0.78);
-  cursor: pointer;
   opacity: 0.9;
   transition:
     width 220ms ease,
@@ -1711,13 +1738,13 @@ input[type='date']::-webkit-calendar-picker-indicator {
     opacity 220ms ease;
 }
 
-.pl .testimonial-dot:hover,
-.pl .testimonial-dot:focus-visible {
+.pl .testimonial-dot:hover::before,
+.pl .testimonial-dot:focus-visible::before {
   background: rgba(244, 242, 238, 0.92);
   opacity: 1;
 }
 
-.pl .testimonial-dot.is-active {
+.pl .testimonial-dot.is-active::before {
   width: 52px;
   background: rgba(244, 242, 238, 0.82);
 }
@@ -1735,12 +1762,14 @@ input[type='date']::-webkit-calendar-picker-indicator {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
+  grid-template-columns: clamp(300px, 32vw, 420px) clamp(340px, 40vw, 500px);
   grid-template-areas:
     'copy copy'
     'art form';
-  align-items: start;
-  gap: clamp(28px, 3.4vw, 52px) clamp(40px, 4.6vw, 76px);
+  justify-content: center;
+  align-items: stretch;
+  column-gap: clamp(56px, 6.5vw, 120px);
+  row-gap: clamp(28px, 3.4vw, 52px);
   min-height: clamp(560px, 58vw, 760px);
   padding-block: clamp(56px, 5.2vw, 80px) clamp(64px, 6vw, 96px);
 }
@@ -1765,21 +1794,24 @@ input[type='date']::-webkit-calendar-picker-indicator {
   background: rgba(14, 15, 16, 0.85);
 }
 
-.pl .cta-background {
-  position: relative;
+.pl .cta-visual {
   grid-area: art;
-  inset: auto;
-  z-index: 1;
-  justify-self: end;
+  position: relative;
   align-self: stretch;
   width: 100%;
-  max-width: 440px;
+  min-height: clamp(340px, 34vw, 460px);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.pl .cta-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
-  min-height: clamp(420px, 42vw, 560px);
   object-fit: cover;
   object-position: center 26%;
   border-radius: 24px;
-  opacity: 1;
 }
 
 .pl .cta-content .section-heading {
@@ -1804,9 +1836,11 @@ input[type='date']::-webkit-calendar-picker-indicator {
 
 .pl .contact-card {
   grid-area: form;
+  align-self: stretch;
   display: grid;
+  align-content: center;
   gap: clamp(14px, 1.5vw, 20px);
-  width: min(100%, 520px);
+  width: 100%;
   min-height: auto;
   padding: clamp(24px, 2.6vw, 38px);
   border: 0;
@@ -2071,7 +2105,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
     padding-block: clamp(56px, 9vw, 88px);
   }
 
-  .pl .cta-background {
+  .pl .cta-visual {
     display: none;
   }
 
@@ -2225,22 +2259,20 @@ input[type='date']::-webkit-calendar-picker-indicator {
   }
 
   .pl #about {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    min-height: auto;
-    padding-bottom: clamp(48px, 12vw, 80px);
+    padding-block: clamp(56px, 12vw, 88px);
   }
 
-  .pl .about-shell {
-    order: 1;
+  .pl .about-module {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    align-items: start;
-    gap: 24px;
-    min-height: auto;
-    padding-top: clamp(72px, 12vw, 104px);
-    padding-bottom: 0;
+    grid-template-areas:
+      'visual'
+      'content';
+    gap: clamp(26px, 6vw, 40px);
+  }
+
+  .pl .about-visual-frame {
+    min-height: clamp(280px, 62vw, 420px);
+    padding: clamp(16px, 4vw, 24px);
   }
 
   .pl #about h2 {
@@ -2252,20 +2284,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
   }
 
   .pl .about-copy {
-    justify-self: start;
-    max-width: 430px;
-    margin-top: 0;
-  }
-
-  .pl .about-background {
-    position: static;
-    order: 2;
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    object-position: center;
-    transform: none;
-    margin-top: clamp(20px, 6vw, 40px);
+    max-width: none;
   }
 
   .pl .editorial-visual {
@@ -2424,15 +2443,15 @@ input[type='date']::-webkit-calendar-picker-indicator {
   }
 
   .pl .testimonial-dots {
-    gap: 14px;
+    gap: 2px;
   }
 
-  .pl .testimonial-dot {
+  .pl .testimonial-dot::before {
     width: 11px;
     height: 11px;
   }
 
-  .pl .testimonial-dot.is-active {
+  .pl .testimonial-dot.is-active::before {
     width: 38px;
   }
 
@@ -2482,23 +2501,15 @@ input[type='date']::-webkit-calendar-picker-indicator {
     min-height: 340px;
   }
 
-  .pl #about {
-    min-height: 760px;
-  }
-
   .pl #about h2 {
     font-size: clamp(1.9rem, 8vw, 2.6rem);
     line-height: 1.12;
   }
 
-  .pl .about-copy {
-    max-width: 310px;
-  }
-
   .pl .about-copy p {
-    max-width: 18ch;
-    font-size: clamp(1.14rem, 5.6vw, 1.45rem);
-    line-height: 1.36;
+    max-width: 40ch;
+    font-size: clamp(1.08rem, 4.6vw, 1.24rem);
+    line-height: 1.5;
   }
 
   .pl .footer-shell {
@@ -3703,7 +3714,14 @@ input[type='date']::-webkit-calendar-picker-indicator {
   background: rgba(21, 22, 24, 0.55);
 }
 .pl #testimonials {
-  background: rgba(23, 25, 27, 0.55);
+  background: rgba(21, 22, 24, 0.55);
+}
+/* Blend the testimonials seamlessly into the surrounding muted sections:
+   match their background and drop the section overlap so no translucent
+   seam/stripe forms at the edges. */
+.pl #testimonials,
+.pl #testimonials + .section-shell {
+  margin-top: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

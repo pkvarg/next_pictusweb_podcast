@@ -1181,8 +1181,9 @@
       ]
     },
     "about": {
+      "kicker": "Kto sme",
       "title": "O nás a Pictusovi",
-      "text": "Dvaja obyčajní ľudia ktorých baví digitálna tvorba. A naozaj, Pictus je člen tímu.",
+      "text": "Dvaja obyčajní ľudia ktorých baví digitálna tvorba. A naozaj, Pictus je člen tímu.",
       "cta": "Spoznaj nás"
     },
     "work": {

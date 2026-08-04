@@ -98,6 +98,8 @@ const PictusWork = () => {
   const [switching, setSwitching] = useState<number | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
+
   const showSlide = (next: number) => {
     if (next === active) return
     setSwitching(active)
@@ -106,6 +108,25 @@ const PictusWork = () => {
       setActive(next)
       setSwitching(null)
     }, 180)
+  }
+
+  const handleTouchStart = (event: React.TouchEvent) => {
+    const touch = event.touches[0]
+    touchStart.current = { x: touch.clientX, y: touch.clientY }
+  }
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    const start = touchStart.current
+    touchStart.current = null
+    if (!start) return
+    const touch = event.changedTouches[0]
+    const deltaX = touch.clientX - start.x
+    const deltaY = touch.clientY - start.y
+    // Ignore taps and vertical scrolls; require a clear horizontal swipe.
+    if (Math.abs(deltaX) < 45 || Math.abs(deltaX) <= Math.abs(deltaY)) return
+    const next = deltaX < 0 ? active + 1 : active - 1
+    if (next < 0 || next >= slides.length) return
+    showSlide(next)
   }
 
   return (
@@ -117,7 +138,12 @@ const PictusWork = () => {
         </header>
 
         <div className="work-carousel">
-          <div className="work-slides" aria-live="polite">
+          <div
+            className="work-slides"
+            aria-live="polite"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             {slides.map((slide, index) => {
               const isActive = index === active
               const cls = [

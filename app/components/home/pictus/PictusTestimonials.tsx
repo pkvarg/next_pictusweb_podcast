@@ -21,6 +21,8 @@ const PictusTestimonials = () => {
   const [switching, setSwitching] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
+
   const showSlide = (next: number) => {
     if (next === active) return
     setSwitching(true)
@@ -31,6 +33,24 @@ const PictusTestimonials = () => {
     }, 180)
   }
 
+  const handleTouchStart = (event: React.TouchEvent) => {
+    const touch = event.touches[0]
+    touchStart.current = { x: touch.clientX, y: touch.clientY }
+  }
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    const start = touchStart.current
+    touchStart.current = null
+    if (!start) return
+    const touch = event.changedTouches[0]
+    const deltaX = touch.clientX - start.x
+    const deltaY = touch.clientY - start.y
+    if (Math.abs(deltaX) < 45 || Math.abs(deltaX) <= Math.abs(deltaY)) return
+    const next = deltaX < 0 ? active + 1 : active - 1
+    if (next < 0 || next >= items.length) return
+    showSlide(next)
+  }
+
   return (
     <section className="section-shell" id="testimonials" aria-labelledby="testimonial-title">
       <div className="layout-container testimonial-carousel">
@@ -38,7 +58,12 @@ const PictusTestimonials = () => {
           <h2 id="testimonial-title">{t('testimonials.title')}</h2>
         </header>
 
-        <div className="testimonial-slides" aria-live="polite">
+        <div
+          className="testimonial-slides"
+          aria-live="polite"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           {items.map((item, index) => {
             const isActive = index === active
             return (

@@ -54,7 +54,7 @@ const PictusProcess = () => {
           </div>
 
           <div className="process-visual-frame" aria-live="polite">
-            <div className="process-visual is-active">
+            <div className="process-visual is-active" key={active}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={images[active]} width={1800} height={1800} alt="" loading="lazy" />
             </div>
