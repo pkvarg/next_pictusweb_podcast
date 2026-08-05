@@ -10,8 +10,7 @@ const PictusFooter = ({ homeBase = '' }: { homeBase?: string }) => {
 
   const explore = [
     { href: `${homeBase}#services`, label: t('nav.services') },
-    { href: `${homeBase}#about`, label: t('nav.about') },
-    { href: `${homeBase}#selected-work`, label: t('footer.portfolio') },
+    { href: `${homeBase}/projects`, label: t('footer.portfolio') },
     { href: `${homeBase}#process`, label: t('nav.process') },
     { href: `${homeBase}#contact`, label: t('nav.contact') },
   ]
@@ -64,6 +63,7 @@ const PictusFooter = ({ homeBase = '' }: { homeBase?: string }) => {
         <div className="footer-bottom">
           <p className="footer-credit">© {new Date().getFullYear()} Pictusweb</p>
           <nav className="footer-legal" aria-label={t('footer.legalAria')}>
+            <a href={`${homeBase}/contact`}>{t('footer.contact')}</a>
             <a href={`${homeBase}/gdpr`}>GDPR</a>
             <a href={`${homeBase}/trade-rules`}>{t('footer.terms')}</a>
           </nav>

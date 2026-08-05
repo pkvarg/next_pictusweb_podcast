@@ -317,19 +317,28 @@ const Contact = () => {
   }
 
   return (
-    <section className="section-shell" id="contact" aria-labelledby="contact-title">
-      <div className="layout-container">
-        <header className="section-heading fs-heading">
-          <p className="section-kicker">{t('navbarContact')}</p>
-          <h2 id="contact-title">{t('contactTitle')}</h2>
-        </header>
+    <section className="section-shell cta" id="contact" aria-labelledby="contact-title">
+      <div className="layout-container cta-content">
+        <div className="cta-copy">
+          <header className="section-heading">
+            <p className="section-kicker">{t('navbarContact')}</p>
+            <h2 id="contact-title">{t('contactTitle')}</h2>
+          </header>
+        </div>
 
-        <form
-          ref={form}
-          onSubmit={sendEmail}
-          className="contact-card"
-          style={{ width: 'min(100%, 560px)', marginInline: 'auto' }}
-        >
+        <div className="cta-visual" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="cta-background"
+            src="/pictus/backgrounds/cta1.webp"
+            width={1200}
+            height={1500}
+            alt=""
+            loading="lazy"
+          />
+        </div>
+
+        <form ref={form} onSubmit={sendEmail} className="contact-card">
           {messageSuccess && (
             <p className="contact-status contact-status-success">{messageSuccess}</p>
           )}

@@ -34,14 +34,6 @@ const PictusHeader = () => {
     return () => document.removeEventListener('keydown', onKey)
   }, [])
 
-  const navLinks = [
-    { href: '#services', label: t('nav.services') },
-    { href: '#about', label: t('nav.about') },
-    { href: '#selected-work', label: t('nav.work') },
-    { href: '#process', label: t('nav.process') },
-    { href: '#contact', label: t('nav.contact') },
-  ]
-
   return (
     <header className="site-header" aria-label="Site header">
       <div className="layout-container nav-shell">
@@ -59,11 +51,8 @@ const PictusHeader = () => {
         >
           <Link href="/fleetsync">FleetSync</Link>
           <Link href="/podcasts">{th('navbarPodcasts')}</Link>
-          {navLinks.map((link) => (
-            <a key={link.href} href={link.href}>
-              {link.label}
-            </a>
-          ))}
+          <Link href="/projects">{t('nav.work')}</Link>
+          <Link href="/contact">{t('nav.contact')}</Link>
         </nav>
 
         <div className="nav-controls">

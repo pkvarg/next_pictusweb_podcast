@@ -1827,6 +1827,14 @@ input[type='date']::-webkit-calendar-picker-indicator {
   gap: 0;
 }
 
+.pl .cta-copy .section-heading {
+  justify-items: center;
+}
+
+.pl .cta-copy .section-kicker {
+  text-align: center;
+}
+
 .pl .cta-copy h2 {
   max-width: 22ch;
   font-size: clamp(1.82rem, 3.75vw, 3.55rem);

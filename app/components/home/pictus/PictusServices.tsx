@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation'
 
 type ServiceRow = { title: string; summary: string; alt: string }
 
-// Service rows whose CTA links to a dedicated page instead of "#selected-work".
+// Service rows whose CTA overrides the default "/projects" link with a more
+// specific destination.
 const PODCASTS_INDEX = 2
 const FLEETSYNC_INDEX = 3
 const SUPPORT_INDEX = 4
@@ -24,7 +25,7 @@ const PictusServices = () => {
   const rows = t.raw('services.rows') as ServiceRow[]
   const [active, setActive] = useState(0)
 
-  let ctaHref = '#selected-work'
+  let ctaHref = `/${locale as string}/projects`
   let ctaLabel = t('services.visualButton')
   if (active === PODCASTS_INDEX) {
     ctaHref = `/${locale as string}/podcasts`
