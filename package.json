@@ -16,9 +16,9 @@
     ]
   },
   "scripts": {
-    "dev": "next dev -p 4012",
+    "dev": "next dev -p 4010",
     "build": "prisma generate && next build",
-    "start": "next start -p 4012",
+    "start": "next start -p 4010",
     "lint": "next lint"
   },
   "dependencies": {
