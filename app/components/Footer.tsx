@@ -19,7 +19,7 @@ const Footer = () => {
               className="flex items-center gap-2.5 text-[1.2rem] font-bold text-pictus-white"
               aria-label="Pictus home"
             >
-              <Image src="/pictus/PictusMOSS.svg" width={30} height={30} alt="" />
+              <Image src="/pictus/pictus-icon.png" width={30} height={30} alt="" />
               Pictusweb
             </Link>
             <div className="grid gap-2.5 text-[0.95rem] leading-tight text-pictus-white/70">

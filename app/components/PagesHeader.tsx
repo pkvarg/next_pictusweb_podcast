@@ -54,7 +54,7 @@ const PagesHeader = () => {
       <div className="mx-auto flex min-h-[76px] w-[min(100%-2rem,1296px)] items-center justify-between gap-6 md:min-h-[90px]">
         {/* Brand */}
         <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Pictus home">
-          <Image src="/pictus/PictusMOSS.svg" width={32} height={32} alt="" />
+          <Image src="/pictus/pictus-icon.png" width={32} height={32} alt="" />
           <span className="text-[1.6rem] font-bold leading-none text-pictus-white md:text-[2rem]">
             Pictusweb
           </span>

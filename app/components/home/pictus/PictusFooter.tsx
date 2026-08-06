@@ -28,7 +28,7 @@ const PictusFooter = ({ homeBase = '' }: { homeBase?: string }) => {
         <div className="footer-top">
           <div className="footer-brand-col">
             <a className="brand footer-brand" href={homeBase || '#top'} aria-label="Pictus home">
-              <Image src="/pictus/PictusMOSS.svg" width={30} height={30} alt="" />
+              <Image src="/pictus/pictus-icon.png" width={30} height={30} alt="" />
               <span>{t('footer.brand')}</span>
             </a>
             <address className="footer-contact">

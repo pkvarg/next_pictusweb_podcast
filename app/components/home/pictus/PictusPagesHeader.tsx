@@ -47,7 +47,7 @@ const PictusPagesHeader = () => {
     <header className="site-header" aria-label="Site header">
       <div className="layout-container nav-shell">
         <Link className="brand site-brand" href="/" aria-label="Pictus home">
-          <Image src="/pictus/PictusMOSS.svg" width={32} height={32} alt="" />
+          <Image src="/pictus/pictus-icon.png" width={32} height={32} alt="" />
         </Link>
 
         <nav
