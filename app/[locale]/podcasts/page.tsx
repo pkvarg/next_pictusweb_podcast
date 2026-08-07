@@ -4,6 +4,11 @@ import React from 'react'
 import { getTranslations } from 'next-intl/server'
 import { setRequestLocale } from 'next-intl/server'
 
+// Always render from the DB (no build-time/CDN caching), like the detail page.
+// Caching this route froze stale image paths for a year after the podcast
+// images were migrated to hono storage.
+export const dynamic = 'force-dynamic'
+
 const Podcast = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params
   setRequestLocale(locale)

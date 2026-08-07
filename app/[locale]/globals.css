@@ -3595,6 +3595,14 @@ input[type='date']::-webkit-calendar-picker-indicator {
   overflow: hidden;
   background: var(--graphite-2);
 }
+/* Whole card is one link so clicking anywhere opens the podcast. */
+.pl .podcast-card-link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
 .pl .podcast-card-media {
   position: relative;
   aspect-ratio: 16 / 9;

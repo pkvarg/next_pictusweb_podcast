@@ -151,29 +151,31 @@ const PodcastPage = ({ podcasts }: PodcastPageProps) => {
                   <article className="podcast-card" key={podcast.id}>
                     <Link
                       href={`/podcasts/${podcast.id}`}
-                      className="podcast-card-media"
+                      className="podcast-card-link"
                       aria-label={podcast.title}
                     >
-                      <span className="podcast-badge podcast-badge-lang">
-                        {podcast.english
-                          ? t('languageIndicatorEnglish')
-                          : t('languageIndicatorSlovak')}
-                      </span>
-                      <span className="podcast-badge podcast-badge-cat">{podcast.category}</span>
-                      <Image
-                        src={podcast.imagePath || '/icons/headphones.svg'}
-                        alt={podcast.title}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 980px) 50vw, 33vw"
-                      />
+                      <div className="podcast-card-media">
+                        <span className="podcast-badge podcast-badge-lang">
+                          {podcast.english
+                            ? t('languageIndicatorEnglish')
+                            : t('languageIndicatorSlovak')}
+                        </span>
+                        <span className="podcast-badge podcast-badge-cat">{podcast.category}</span>
+                        <Image
+                          src={podcast.imagePath || '/icons/headphones.svg'}
+                          alt={podcast.title}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 980px) 50vw, 33vw"
+                        />
+                      </div>
+                      <div className="podcast-card-body">
+                        <h3>{podcast.title}</h3>
+                        <p>{podcast.description || podcast.textPrompt.substring(0, 100) + '...'}</p>
+                        <span className="podcast-card-meta">
+                          {t('podcastCategoryLabel')} {podcast.category}
+                        </span>
+                      </div>
                     </Link>
-                    <div className="podcast-card-body">
-                      <h3>{podcast.title}</h3>
-                      <p>{podcast.description || podcast.textPrompt.substring(0, 100) + '...'}</p>
-                      <span className="podcast-card-meta">
-                        {t('podcastCategoryLabel')} {podcast.category}
-                      </span>
-                    </div>
                   </article>
                 ))}
               </div>
