@@ -32,9 +32,9 @@ const projects = [
     href: 'https://kvalitnamontaz.sk',
   },
   {
-    title: 'katolickaviera.sk',
-    image: '/projects/katolickaviera.webp',
-    href: 'https://katolickaviera.sk',
+    title: 'cestazivota.sk',
+    image: '/projects/cestazivota.webp',
+    href: 'https://cestazivota.sk',
   },
   {
     title: 'prud.sk',

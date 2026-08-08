@@ -154,7 +154,7 @@ const Projects: React.FC = () => {
       website: 'https://bible-blog.pictusweb.sk/',
     },
     {
-      name: 'katolickaviera.sk',
+      name: 'cestazivota.sk',
       description: t('ourProjectsKatol'),
       tags: [
         {
@@ -171,7 +171,7 @@ const Projects: React.FC = () => {
         },
       ],
       image: 'katol.webp',
-      website: 'https://katolickaviera.sk/',
+      website: 'https://cestazivota.sk/',
     },
     {
       name: 'michaldovala.sk',

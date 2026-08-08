@@ -37,10 +37,10 @@ const projects = [
     descriptionKey: 'projectKvalitnamontazDesc',
   },
   {
-    title: 'katolickaviera.sk',
-    image: '/projects/katolickaviera.webp',
-    href: 'https://katolickaviera.sk',
-    descriptionKey: 'projectKatolickavieraDesc',
+    title: 'cestazivota.sk',
+    image: '/projects/cestazivota.webp',
+    href: 'https://cestazivota.sk',
+    descriptionKey: 'projectCestazivotaDesc',
   },
   {
     title: 'prud.sk',

@@ -60,9 +60,9 @@ const slides: { variant: 'a' | 'b'; primary: Project; supporting: [Project, Proj
         position: 'center top',
       },
       {
-        title: 'katolickaviera.sk',
-        href: 'https://katolickaviera.sk',
-        image: '/projects/katolickaviera.webp',
+        title: 'cestazivota.sk',
+        href: 'https://cestazivota.sk',
+        image: '/projects/cestazivota.webp',
         position: 'center top',
       },
     ],
