@@ -1,0 +1,4 @@
+Contact: mailto:info@pictusweb.sk
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: sk, en
+Canonical: https://pictusweb.sk/.well-known/security.txt

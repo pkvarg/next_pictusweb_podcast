@@ -70,6 +70,9 @@ export interface NotificationBuilderTranslations {
   // Headers/Steps
   createTitle: string
   duplicateTitle: string
+  editTitle?: string
+  editBatchTitle?: string
+  saveChanges?: string
   step0Label: string
   step1Label: string
   step2Label: string
@@ -107,6 +110,7 @@ export interface NotificationBuilderTranslations {
   aggressivePdrDeferred: string
   dutyDateLabel: string
   dutyDateRequired: string
+  dutyDateBatchLocked?: string
   reminderIntervals: string
   editIntervals: string
   willCreate: string
@@ -119,6 +123,7 @@ export interface NotificationBuilderTranslations {
   pastDate: string
   singleIntervalHint: string
   editIntervalsHint: string
+  pdrOverlapWarning?: string
   selectUserOptional: string
   selectUserPlaceholder: string
   selectUserPlaceholderClient: string
@@ -235,10 +240,13 @@ const defaultTranslations: NotificationBuilderTranslations = {
   pdrLabel: '🔄 Post-Duty Renewal (PDR)',
   pdrDesc: 'Automaticky vytvorí pripomienku deň po termíne úlohy pre plánovanie ďalšej úlohy',
   aggressiveLabel: '⚠️ Aggressive Mode (30-dňové denné pripomienky)',
-  aggressiveDesc: 'Po vyčerpaní štandardných pripomienok systém bude odosielať denné pripomienky po dobu 30 dní, kým klient nepotvrdí.',
-  aggressivePdrDeferred: '🔄 PDR pripomienka bude odložená — vytvorí sa až po ukončení agresívneho cyklu.',
+  aggressiveDesc:
+    'Po vyčerpaní štandardných pripomienok systém bude odosielať denné pripomienky po dobu 30 dní, kým klient nepotvrdí.',
+  aggressivePdrDeferred:
+    '🔄 PDR pripomienka bude odložená — vytvorí sa až po ukončení agresívneho cyklu.',
   dutyDateLabel: 'Dátum úlohy *',
   dutyDateRequired: 'Dátum úlohy je povinný pre vytvorenie notifikácie',
+  dutyDateBatchLocked: 'Termín je spoločný pre celú dávku — zmeňte ho cez „Upraviť dávku".',
   reminderIntervals: 'Intervaly pripomienok',
   editIntervals: '✏️ Upraviť intervaly',
   willCreate: 'Vytvorí sa',
@@ -251,6 +259,8 @@ const defaultTranslations: NotificationBuilderTranslations = {
   pastDate: '(minulosť)',
   singleIntervalHint: 'Pre jednorázovú notifikáciu nastavte len jeden interval.',
   editIntervalsHint: 'Upravte intervaly alebo pridajte vlastné dni pred/po dátume úlohy.',
+  pdrOverlapWarning:
+    'Pripomienka deň po termíne (+1) sa prekrýva s PDR pripomienkou — v ten istý deň sa odošlú dve správy.',
   selectUserOptional: 'Vybrať používateľa (voliteľné - vyplní meno, email a telefón)',
   selectUserPlaceholder: 'Vyberte používateľa alebo zadajte manuálne...',
   selectUserPlaceholderClient: 'Vyberte používateľa...',
@@ -275,7 +285,8 @@ const defaultTranslations: NotificationBuilderTranslations = {
   continueToReview: 'Pokračovať na kontrolu',
   // Step 3 - Review
   reviewNotification: 'Skontrolovať notifikáciu',
-  sendTimeInfo: 'Notifikácie sa odosielajú denne medzi 8:00 – 9:00. Ak potrebujete iný čas, kontaktujte info@pictusweb.sk.',
+  sendTimeInfo:
+    'Notifikácie sa odosielajú denne medzi 8:00 – 9:00. Ak potrebujete iný čas, kontaktujte info@pictusweb.sk.',
   notSelected: 'Nevybrané',
   notSet: 'Nenastavené',
   pdrEnabled: '🔄 Zapnuté',
@@ -322,8 +333,10 @@ const defaultTranslations: NotificationBuilderTranslations = {
   successSingle: 'Notifikácia bola úspešne vytvorená!',
   successMultiple: '__count__ notifikácií bolo úspešne vytvorených!',
   pdrCreated: '🔄 PDR pripomienka bola tiež vytvorená pre deň po úlohe.',
-  aggressiveEnabled2: '⚠️ Agresívny režim je zapnutý — po vyčerpaní pripomienok bude systém odosielať denné pripomienky 30 dní.',
-  aggressivePdrDeferred2: '🔄 PDR pripomienka bude vytvorená automaticky po ukončení agresívneho cyklu.',
+  aggressiveEnabled2:
+    '⚠️ Agresívny režim je zapnutý — po vyčerpaní pripomienok bude systém odosielať denné pripomienky 30 dní.',
+  aggressivePdrDeferred2:
+    '🔄 PDR pripomienka bude vytvorená automaticky po ukončení agresívneho cyklu.',
   intervalsPastSkipped: '__skipped__ intervalov v minulosti bolo preskočených.',
   someFailed: 'Niektoré notifikácie sa nepodarilo vytvoriť',
   createError: 'Chyba pri vytváraní notifikácie',
@@ -340,6 +353,10 @@ interface NotificationBuilderProps {
   onCancel?: () => void
   hideChannelDropdown?: boolean
   translations?: NotificationBuilderTranslations
+  editMode?: 'single' | 'batch'
+  editingId?: number | null
+  editBatchId?: string | null
+  originalConfig?: { intervals: number[]; pdr: boolean; aggressive: boolean } | null
 }
 
 export default function NotificationBuilder({
@@ -352,6 +369,10 @@ export default function NotificationBuilder({
   onCancel,
   hideChannelDropdown = false,
   translations,
+  editMode,
+  editingId,
+  editBatchId,
+  originalConfig,
 }: NotificationBuilderProps) {
   const tr = translations || defaultTranslations
   // If organization is provided, skip Step 0 (organization selection)
@@ -372,14 +393,18 @@ export default function NotificationBuilder({
   const [useCustomType, setUseCustomType] = useState(false)
   const [reminderIntervals, setReminderIntervals] = useState<number[]>([-30, -14, -3, 0])
   const [showIntervalsModal, setShowIntervalsModal] = useState(false)
-  const [enablePdr, setEnablePdr] = useState(false)
+  const [enablePdr, setEnablePdr] = useState(true)
   const [enableAggressive, setEnableAggressive] = useState(false)
 
   const [formData, setFormData] = useState({
     templateId: '',
     vehicleId: prefillVehicleId || '',
     notificationType: '',
-    notificationChannel: hideChannelDropdown ? (organizationTier === 'FREE' ? 'Email' : 'Email/Sms') : '',
+    notificationChannel: hideChannelDropdown
+      ? organizationTier === 'FREE'
+        ? 'Email'
+        : 'Email/Sms'
+      : '',
     dutyDate: '',
     notificationDate: '',
     personName: '',
@@ -504,9 +529,10 @@ export default function NotificationBuilder({
   }, [organizationId, organizations])
 
   // FREE tier can only use the Email channel
-  const filteredChannelOptions = organizationTier === 'FREE'
-    ? channelOptions.filter((ch) => ch.label.toLowerCase() === 'email')
-    : channelOptions
+  const filteredChannelOptions =
+    organizationTier === 'FREE'
+      ? channelOptions.filter((ch) => ch.label.toLowerCase() === 'email')
+      : channelOptions
 
   const fetchVehicles = useCallback(async () => {
     if (!organizationId) return
@@ -676,7 +702,9 @@ export default function NotificationBuilder({
         vehicleId: duplicateData.myVehicleId || '',
         notificationType: duplicateData.notificationType || '',
         notificationChannel: hideChannelDropdown
-          ? (organizationTier === 'FREE' ? 'Email' : 'Email/Sms')
+          ? organizationTier === 'FREE'
+            ? 'Email'
+            : 'Email/Sms'
           : duplicateData.notificationChannel || '',
         dutyDate: formatDate(duplicateData.dutyDate),
         notificationDate: formatDate(duplicateData.notificationDate),
@@ -694,9 +722,28 @@ export default function NotificationBuilder({
         setUseCustomType(!typeExists)
       }
 
-      setStep(dupOrgId ? 1 : 0) // Skip to Step 1 (template selection)
+      // Editing an existing notification skips the template step (2 = details).
+      setStep(dupOrgId ? (editMode ? 2 : 1) : 0)
     }
-  }, [duplicateData, initialOrganization, organizations, typeOptions, hideChannelDropdown, organizationTier])
+  }, [
+    duplicateData,
+    initialOrganization,
+    organizations,
+    typeOptions,
+    hideChannelDropdown,
+    organizationTier,
+    editMode,
+  ])
+
+  useEffect(() => {
+    if (editMode === 'batch' && originalConfig) {
+      if (originalConfig.intervals.length > 0) {
+        setReminderIntervals([...originalConfig.intervals].sort((a, b) => a - b))
+      }
+      setEnablePdr(originalConfig.pdr)
+      setEnableAggressive(originalConfig.aggressive)
+    }
+  }, [editMode, originalConfig])
 
   const handleTemplateSelect = (templateId: string) => {
     const template = templates.find((t) => t.id === templateId)
@@ -705,7 +752,11 @@ export default function NotificationBuilder({
         ...formData,
         templateId,
         notificationType: template.notificationType,
-        notificationChannel: hideChannelDropdown ? (organizationTier === 'FREE' ? 'Email' : 'Email/Sms') : template.notificationChannel,
+        notificationChannel: hideChannelDropdown
+          ? organizationTier === 'FREE'
+            ? 'Email'
+            : 'Email/Sms'
+          : template.notificationChannel,
         emailMessage: template.emailMessage || '',
       })
       // Set reminder intervals from template
@@ -826,8 +877,9 @@ export default function NotificationBuilder({
       errors.push(tr.validationIntervalsRequired)
     }
 
-    // Check for past intervals (not today - today is allowed)
-    if (formData.dutyDate && reminderIntervals.length > 0) {
+    // Check for past intervals (not today - today is allowed).
+    // Skipped for single edit, which updates one row and ignores intervals.
+    if (editMode !== 'single' && formData.dutyDate && reminderIntervals.length > 0) {
       const today = new Date()
       today.setHours(0, 0, 0, 0) // Reset time to start of day for comparison
 
@@ -889,6 +941,94 @@ export default function NotificationBuilder({
 
     setLoading(true)
     try {
+      // Edit a single (future) notification in place.
+      if (editMode === 'single' && editingId) {
+        // Preserve the send offset: if the duty date changed, shift the
+        // notification (send) date by the same number of days it had before.
+        let notificationDateOut = formData.notificationDate || null
+        if (formData.dutyDate && duplicateData?.dutyDate && duplicateData?.notificationDate) {
+          const DAY = 24 * 60 * 60 * 1000
+          const offset = Math.round(
+            (new Date(duplicateData.notificationDate).getTime() -
+              new Date(duplicateData.dutyDate).getTime()) /
+              DAY,
+          )
+          notificationDateOut = new Date(new Date(formData.dutyDate).getTime() + offset * DAY)
+            .toISOString()
+            .split('T')[0]
+        }
+
+        const response = await fetch(`/api/vehicle-notifications/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            organizationId: formData.organizationId || organizationId,
+            personName: formData.personName,
+            email: formData.email,
+            phoneNumber: formData.phoneNumber,
+            vehicleId: formData.vehicleId || undefined,
+            notificationType: formData.notificationType,
+            notificationChannel: formData.notificationChannel,
+            dutyDate: formData.dutyDate || null,
+            notificationDate: notificationDateOut,
+            emailMessage: formData.emailMessage,
+          }),
+        })
+        if (response.ok) {
+          alert(tr.successSingle)
+          if (onSuccess) onSuccess()
+        } else {
+          const err = await response.json().catch(() => null)
+          alert(err?.error || tr.someFailed)
+        }
+        return
+      }
+
+      // Smart-hybrid batch edit: keep the batch id, and decide whether the
+      // structure changed (intervals/PDR/aggressive) or only the details/dates.
+      let forcedBatchId: string | null = null
+      if (editMode === 'batch' && editBatchId) {
+        forcedBatchId = editBatchId
+        const orig = originalConfig || { intervals: [], pdr: false, aggressive: false }
+        const sameIntervals =
+          orig.intervals.length === reminderIntervals.length &&
+          [...orig.intervals].sort((a, b) => a - b).join(',') ===
+            [...reminderIntervals].sort((a, b) => a - b).join(',')
+        const structuralChange =
+          !sameIntervals || orig.pdr !== enablePdr || orig.aggressive !== enableAggressive
+
+        if (!structuralChange) {
+          // Details/dates only → update the future rows in place.
+          const response = await fetch(`/api/vehicle-notifications/batch/${editBatchId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              organizationId: formData.organizationId || organizationId,
+              personName: formData.personName,
+              email: formData.email,
+              phoneNumber: formData.phoneNumber,
+              vehicleId: formData.vehicleId || undefined,
+              notificationType: formData.notificationType,
+              notificationChannel: formData.notificationChannel,
+              dutyDate: formData.dutyDate || null,
+              emailMessage: formData.emailMessage,
+            }),
+          })
+          if (response.ok) {
+            alert(tr.successSingle)
+            if (onSuccess) onSuccess()
+          } else {
+            const err = await response.json().catch(() => null)
+            alert(err?.error || tr.someFailed)
+          }
+          return
+        }
+
+        // Structure changed → drop the future rows and recreate them under the
+        // same batch id. Already-sent rows are left untouched by the endpoint.
+        await fetch(`/api/vehicle-notifications/batch/${editBatchId}`, { method: 'DELETE' })
+      }
+
       // Always use reminderIntervals to create notifications (even if just one)
       if (formData.dutyDate && reminderIntervals.length > 0) {
         const today = new Date()
@@ -905,9 +1045,10 @@ export default function NotificationBuilder({
 
         // Generate a batch ID if there are multiple valid intervals OR if PDR/Aggressive is enabled
         const dutyBatchId =
-          validIntervals.length > 1 || enablePdr || enableAggressive
+          forcedBatchId ||
+          (validIntervals.length > 1 || enablePdr || enableAggressive
             ? `batch_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
-            : null
+            : null)
 
         console.log('[NotificationBuilder] Creating notifications with formData:', formData)
         console.log('[NotificationBuilder] Valid intervals:', validIntervals)
@@ -1001,9 +1142,7 @@ export default function NotificationBuilder({
           }
 
           let message =
-            count === 1
-              ? tr.successSingle
-              : tr.successMultiple.replace('__count__', String(count))
+            count === 1 ? tr.successSingle : tr.successMultiple.replace('__count__', String(count))
 
           if (enablePdr && !enableAggressive) {
             message += '\n\n' + tr.pdrCreated
@@ -1044,7 +1183,13 @@ export default function NotificationBuilder({
           </div>
           <div>
             <h2 className="text-3xl font-light text-pictus-white">
-              {duplicateData ? tr.duplicateTitle : tr.createTitle}
+              {editMode === 'batch'
+                ? (tr.editBatchTitle ?? 'Upraviť dávku notifikácií')
+                : editMode === 'single'
+                  ? (tr.editTitle ?? 'Upraviť notifikáciu')
+                  : duplicateData
+                    ? tr.duplicateTitle
+                    : tr.createTitle}
             </h2>
             <p className="text-gray-400 text-lg">
               {step === 0
@@ -1082,9 +1227,7 @@ export default function NotificationBuilder({
               <Building className="w-5 h-5 text-pictus-lime" />
               <h3 className="text-2xl font-light text-pictus-white">{tr.selectOrg}</h3>
             </div>
-            <p className="text-gray-400 mb-4">
-              {tr.selectOrgDesc}
-            </p>
+            <p className="text-gray-400 mb-4">{tr.selectOrgDesc}</p>
             <select
               value={organization}
               onChange={(e) => {
@@ -1137,10 +1280,10 @@ export default function NotificationBuilder({
                 className="p-6 bg-gradient-to-br from-gray-600/20 to-gray-800/20 rounded-xl border border-gray-500/30 hover:border-pictus-lime/50 transition-all text-left"
               >
                 <Copy className="w-8 h-8 text-gray-400 mb-2" />
-                <h4 className="text-xl font-light text-pictus-white mb-1">{tr.customNotification}</h4>
-                <p className="text-gray-400 text-sm">
-                  {tr.customNotificationDesc}
-                </p>
+                <h4 className="text-xl font-light text-pictus-white mb-1">
+                  {tr.customNotification}
+                </h4>
+                <p className="text-gray-400 text-sm">{tr.customNotificationDesc}</p>
               </button>
 
               {templates.map((template) => (
@@ -1238,14 +1381,11 @@ export default function NotificationBuilder({
                     </select>
                     {usingDefaultTypeOptions && (
                       <p className="text-yellow-400 text-xs mt-1">
-                        {tr.usingDefaultOptions}{' '}
-                        {organization})
+                        {tr.usingDefaultOptions} {organization})
                       </p>
                     )}
                     {organizationTier && organizationTier !== 'BUSINESS' && (
-                      <p className="text-blue-400 text-xs mt-1">
-                        {tr.customTypesBusinessOnly}
-                      </p>
+                      <p className="text-blue-400 text-xs mt-1">{tr.customTypesBusinessOnly}</p>
                     )}
                   </>
                 ) : (
@@ -1312,8 +1452,7 @@ export default function NotificationBuilder({
                     </select>
                     {usingDefaultChannelOptions && (
                       <p className="text-yellow-400 text-xs mt-1">
-                        {tr.usingDefaultOptions}{' '}
-                        {organization})
+                        {tr.usingDefaultOptions} {organization})
                       </p>
                     )}
                   </>
@@ -1321,33 +1460,35 @@ export default function NotificationBuilder({
               </div>
 
               {/* Post-Duty Renewal (PDR) Toggle */}
-              <div className="md:col-span-2">
-                <div className="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                  <input
-                    type="checkbox"
-                    id="enablePdr"
-                    checked={enablePdr}
-                    onChange={(e) => setEnablePdr(e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-300 text-pictus-lime focus:ring-pictus-lime focus:ring-offset-gray-900"
-                  />
-                  <div className="flex-1">
-                    <label
-                      htmlFor="enablePdr"
-                      className="text-white font-light text-base cursor-pointer"
-                    >
-                      {tr.pdrLabel}
-                    </label>
-                    <p className="text-blue-300 text-sm mt-1">
-                      {tr.pdrDesc}
-                    </p>
+              {editMode !== 'single' && (
+                <div className="md:col-span-2">
+                  <div className="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <input
+                      type="checkbox"
+                      id="enablePdr"
+                      checked={enablePdr}
+                      onChange={(e) => setEnablePdr(e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-300 text-pictus-lime focus:ring-pictus-lime focus:ring-offset-gray-900"
+                    />
+                    <div className="flex-1">
+                      <label
+                        htmlFor="enablePdr"
+                        className="text-white font-light text-base cursor-pointer"
+                      >
+                        {tr.pdrLabel}
+                      </label>
+                      <p className="text-blue-300 text-sm mt-1">{tr.pdrDesc}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Aggressive Mode Toggle — BUSINESS tier only */}
-              {organizationTier === 'BUSINESS' && (
+              {editMode !== 'single' && organizationTier === 'BUSINESS' && (
                 <div className="md:col-span-2">
-                  <div className={`flex items-center gap-3 p-4 rounded-lg ${enableAggressive ? 'bg-orange-500/15 border border-orange-500/40' : 'bg-orange-500/10 border border-orange-500/30'}`}>
+                  <div
+                    className={`flex items-center gap-3 p-4 rounded-lg ${enableAggressive ? 'bg-orange-500/15 border border-orange-500/40' : 'bg-orange-500/10 border border-orange-500/30'}`}
+                  >
                     <input
                       type="checkbox"
                       id="enableAggressive"
@@ -1362,9 +1503,7 @@ export default function NotificationBuilder({
                       >
                         {tr.aggressiveLabel}
                       </label>
-                      <p className="text-orange-300 text-sm mt-1">
-                        {tr.aggressiveDesc}
-                      </p>
+                      <p className="text-orange-300 text-sm mt-1">{tr.aggressiveDesc}</p>
                       {enableAggressive && enablePdr && (
                         <p className="text-orange-200 text-xs mt-2 bg-orange-500/10 px-2 py-1 rounded">
                           {tr.aggressivePdrDeferred}
@@ -1385,11 +1524,19 @@ export default function NotificationBuilder({
                   type="date"
                   value={formData.dutyDate}
                   onChange={(e) => handleDutyDateChange(e.target.value)}
-                  className={`w-full px-4 py-2 bg-white/5 border rounded-lg text-white focus:outline-none focus:border-pictus-lime ${
+                  disabled={editMode === 'single' && !!duplicateData?.dutyBatchId}
+                  className={`w-full px-4 py-2 bg-white/5 border rounded-lg text-white focus:outline-none focus:border-pictus-lime disabled:opacity-60 disabled:cursor-not-allowed ${
                     !formData.dutyDate ? 'border-red-500/50' : 'border-white/10'
                   }`}
                   required
                 />
+                {editMode === 'single' && !!duplicateData?.dutyBatchId && (
+                  <p className="text-gray-400 text-xs mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {tr.dutyDateBatchLocked ??
+                      'Termín je spoločný pre celú dávku — zmeňte ho cez „Upraviť dávku".'}
+                  </p>
+                )}
                 {!formData.dutyDate && (
                   <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
                     <AlertCircle className="h-3 w-3" />
@@ -1399,99 +1546,110 @@ export default function NotificationBuilder({
               </div>
 
               {/* Reminder Intervals */}
-              <div className="md:col-span-2">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-pictus-lime text-sm">
-                    <Bell className="w-4 h-4 inline mr-1" />
-                    {tr.reminderIntervals}
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setShowIntervalsModal(true)}
-                    className="text-xs text-pictus-lime hover:text-pictus-lime400 transition-colors"
-                  >
-                    {tr.editIntervals}
-                  </button>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                  <p className="text-gray-400 text-base mb-3">
-                    {tr.willCreate} {reminderIntervals.length}{' '}
-                    {reminderIntervals.length === 1
-                      ? tr.notificationSingular
-                      : reminderIntervals.length < 5
-                        ? tr.notificationFew
-                        : tr.notificationMany}
-                    :
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {reminderIntervals
-                      .sort((a, b) => a - b)
-                      .map((interval, index) => {
-                        if (!formData.dutyDate) {
+              {editMode !== 'single' && (
+                <div className="md:col-span-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-pictus-lime text-sm">
+                      <Bell className="w-4 h-4 inline mr-1" />
+                      {tr.reminderIntervals}
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowIntervalsModal(true)}
+                      className="text-xs text-pictus-lime hover:text-pictus-lime400 transition-colors"
+                    >
+                      {tr.editIntervals}
+                    </button>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                    <p className="text-gray-400 text-base mb-3">
+                      {tr.willCreate} {reminderIntervals.length}{' '}
+                      {reminderIntervals.length === 1
+                        ? tr.notificationSingular
+                        : reminderIntervals.length < 5
+                          ? tr.notificationFew
+                          : tr.notificationMany}
+                      :
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {reminderIntervals
+                        .sort((a, b) => a - b)
+                        .map((interval, index) => {
+                          if (!formData.dutyDate) {
+                            return (
+                              <div
+                                key={index}
+                                className="px-3 py-2 bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg text-pictus-lime text-sm"
+                              >
+                                {interval === 0
+                                  ? tr.onDutyDay
+                                  : interval > 0
+                                    ? tr.daysAfter.replace('__days__', String(interval))
+                                    : tr.daysBefore2.replace('__days__', String(interval))}
+                              </div>
+                            )
+                          }
+
+                          const dutyDate = new Date(formData.dutyDate)
+                          const notifDate = new Date(dutyDate)
+                          notifDate.setDate(notifDate.getDate() + interval)
+
+                          const today = new Date()
+                          today.setHours(0, 0, 0, 0)
+                          const notifDateNoTime = new Date(notifDate)
+                          notifDateNoTime.setHours(0, 0, 0, 0)
+                          const isPast = notifDateNoTime < today
+
+                          const dateStr = notifDate.toLocaleDateString('sk-SK', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })
+
                           return (
                             <div
                               key={index}
-                              className="px-3 py-2 bg-pictus-lime/20 border border-pictus-lime/30 rounded-lg text-pictus-lime text-sm"
+                              className={`px-3 py-2 rounded-lg text-sm ${
+                                isPast
+                                  ? 'bg-red-500/20 border border-red-500/30 text-red-400'
+                                  : 'bg-pictus-lime/20 border border-pictus-lime/30 text-pictus-lime'
+                              }`}
                             >
-                              {interval === 0
-                                ? tr.onDutyDay
-                                : interval > 0
-                                  ? tr.daysAfter.replace('__days__', String(interval))
-                                  : tr.daysBefore2.replace('__days__', String(interval))}
+                              <div className="font-medium">
+                                {isPast && '⚠️ '}
+                                {dateStr}
+                              </div>
+                              <div
+                                className={`text-xs ${isPast ? 'text-red-400/70' : 'text-pictus-lime/70'}`}
+                              >
+                                {interval === 0
+                                  ? tr.onDutyDay
+                                  : interval > 0
+                                    ? tr.daysAfter.replace('__days__', String(interval))
+                                    : tr.daysBefore2.replace('__days__', String(interval))}
+                                {isPast && ` ${tr.pastDate}`}
+                              </div>
                             </div>
                           )
-                        }
-
-                        const dutyDate = new Date(formData.dutyDate)
-                        const notifDate = new Date(dutyDate)
-                        notifDate.setDate(notifDate.getDate() + interval)
-
-                        const today = new Date()
-                        today.setHours(0, 0, 0, 0)
-                        const notifDateNoTime = new Date(notifDate)
-                        notifDateNoTime.setHours(0, 0, 0, 0)
-                        const isPast = notifDateNoTime < today
-
-                        const dateStr = notifDate.toLocaleDateString('sk-SK', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })
-
-                        return (
-                          <div
-                            key={index}
-                            className={`px-3 py-2 rounded-lg text-sm ${
-                              isPast
-                                ? 'bg-red-500/20 border border-red-500/30 text-red-400'
-                                : 'bg-pictus-lime/20 border border-pictus-lime/30 text-pictus-lime'
-                            }`}
-                          >
-                            <div className="font-medium">
-                              {isPast && '⚠️ '}
-                              {dateStr}
-                            </div>
-                            <div
-                              className={`text-xs ${isPast ? 'text-red-400/70' : 'text-pictus-lime/70'}`}
-                            >
-                              {interval === 0
-                                ? tr.onDutyDay
-                                : interval > 0
-                                  ? tr.daysAfter.replace('__days__', String(interval))
-                                  : tr.daysBefore2.replace('__days__', String(interval))}
-                              {isPast && ` ${tr.pastDate}`}
-                            </div>
-                          </div>
-                        )
-                      })}
+                        })}
+                    </div>
+                    <p className="text-gray-400 text-base mt-3">
+                      {reminderIntervals.length === 1
+                        ? tr.singleIntervalHint
+                        : tr.editIntervalsHint}
+                    </p>
+                    {enablePdr && !enableAggressive && reminderIntervals.includes(1) && (
+                      <div className="mt-3 flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/40 rounded-lg">
+                        <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                        <p className="text-amber-300 text-sm">
+                          {tr.pdrOverlapWarning ??
+                            'Pripomienka deň po termíne (+1) sa prekrýva s PDR pripomienkou — v ten istý deň sa odošlú dve správy.'}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-gray-400 text-base mt-3">
-                    {reminderIntervals.length === 1
-                      ? tr.singleIntervalHint
-                      : tr.editIntervalsHint}
-                  </p>
                 </div>
-              </div>
+              )}
 
               {!hideChannelDropdown && <input type="hidden" value={notificationDaysOffset} />}
 
@@ -1506,7 +1664,9 @@ export default function NotificationBuilder({
                   onChange={(e) => handleUserSelect(e.target.value)}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                 >
-                  <option value="">{clientMode ? tr.selectUserPlaceholderClient : tr.selectUserPlaceholder}</option>
+                  <option value="">
+                    {clientMode ? tr.selectUserPlaceholderClient : tr.selectUserPlaceholder}
+                  </option>
                   {users.map((user) => (
                     <option key={user.id} value={user.id}>
                       {`${user.firstName || ''} ${user.lastName || ''}`.trim()} - {user.email}
@@ -1562,11 +1722,7 @@ export default function NotificationBuilder({
                   const channel = formData.notificationChannel.toLowerCase()
                   const isRequired = channel.includes('email')
                   if (isRequired && (!formData.email || formData.email.trim() === '')) {
-                    return (
-                      <p className="text-red-400 text-xs mt-1">
-                        {tr.emailRequired}
-                      </p>
-                    )
+                    return <p className="text-red-400 text-xs mt-1">{tr.emailRequired}</p>
                   }
                   return null
                 })()}
@@ -1601,11 +1757,7 @@ export default function NotificationBuilder({
                   const channel = formData.notificationChannel.toLowerCase()
                   const isRequired = channel.includes('sms')
                   if (isRequired && (!formData.phoneNumber || formData.phoneNumber.trim() === '')) {
-                    return (
-                      <p className="text-red-400 text-xs mt-1">
-                        {tr.phoneRequired}
-                      </p>
-                    )
+                    return <p className="text-red-400 text-xs mt-1">{tr.phoneRequired}</p>
                   }
                   return null
                 })()}
@@ -1632,8 +1784,7 @@ export default function NotificationBuilder({
             <div className="mt-4">
               <label className="block text-pictus-lime text-sm mb-2">
                 <Mail className="w-4 h-4 inline mr-1" />
-                {tr.messageLabel}{' '}
-                <span>{tr.messageHint}</span>
+                {tr.messageLabel} <span>{tr.messageHint}</span>
               </label>
               <textarea
                 value={formData.emailMessage}
@@ -1688,7 +1839,8 @@ export default function NotificationBuilder({
               <div>
                 <p className="text-gray-400 text-sm">{tr.vehicleLabel}</p>
                 <p className="text-white text-lg">
-                  {vehicles.find((v) => v.id === formData.vehicleId)?.registration || tr.notSelected}
+                  {vehicles.find((v) => v.id === formData.vehicleId)?.registration ||
+                    tr.notSelected}
                 </p>
               </div>
               <div>
@@ -1697,51 +1849,49 @@ export default function NotificationBuilder({
               </div>
               <div>
                 <p className="text-gray-400 text-sm">{tr.channelLabel}</p>
-                <p className="text-white text-lg">
-                  {formData.notificationChannel || tr.notSet}
-                </p>
+                <p className="text-white text-lg">{formData.notificationChannel || tr.notSet}</p>
               </div>
               <div>
                 <p className="text-gray-400 text-sm">{tr.dutyDateLabel}</p>
                 <p className="text-white text-lg">{formData.dutyDate || tr.notSet}</p>
               </div>
-              <div className="md:col-span-2">
-                <p className="text-gray-400 text-sm">Post-Duty Renewal (PDR)</p>
-                <div
-                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-base ${
-                    enablePdr
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                  }`}
-                >
-                  {enablePdr ? tr.pdrEnabled : tr.pdrDisabled}
+              {editMode !== 'single' && (
+                <div className="md:col-span-2">
+                  <p className="text-gray-400 text-sm">Post-Duty Renewal (PDR)</p>
+                  <div
+                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-base ${
+                      enablePdr
+                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                        : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                    }`}
+                  >
+                    {enablePdr ? tr.pdrEnabled : tr.pdrDisabled}
+                  </div>
+                  {enablePdr && !enableAggressive && (
+                    <p className="text-blue-300 text-sm mt-2">{tr.pdrWillCreate}</p>
+                  )}
+                  {enablePdr && enableAggressive && (
+                    <p className="text-orange-300 text-sm mt-2">{tr.pdrDeferredReview}</p>
+                  )}
                 </div>
-                {enablePdr && !enableAggressive && (
-                  <p className="text-blue-300 text-sm mt-2">
-                    {tr.pdrWillCreate}
-                  </p>
-                )}
-                {enablePdr && enableAggressive && (
-                  <p className="text-orange-300 text-sm mt-2">
-                    {tr.pdrDeferredReview}
-                  </p>
-                )}
-              </div>
-              {enableAggressive && (
+              )}
+              {editMode !== 'single' && enableAggressive && (
                 <div className="md:col-span-2">
                   <p className="text-gray-400 text-sm">{tr.aggressiveModeReview}</p>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-base bg-orange-500/20 text-orange-400 border border-orange-500/30">
                     {tr.aggressiveEnabled}
                   </div>
-                  <p className="text-orange-300 text-sm mt-2">
-                    {tr.aggressiveReviewDesc}
-                  </p>
+                  <p className="text-orange-300 text-sm mt-2">{tr.aggressiveReviewDesc}</p>
                 </div>
               )}
               <div className="md:col-span-2">
                 <p className="text-gray-400 text-sm mb-2">{tr.notificationDates}</p>
                 <div className="text-white text-lg">
-                  {formData.dutyDate && reminderIntervals.length > 0 ? (
+                  {editMode === 'single' ? (
+                    <div className="text-sm px-3 py-2 rounded-lg bg-pictus-lime/10 text-pictus-lime inline-block">
+                      {formData.notificationDate || formData.dutyDate || tr.notSet}
+                    </div>
+                  ) : formData.dutyDate && reminderIntervals.length > 0 ? (
                     <div className="space-y-1">
                       {reminderIntervals
                         .sort((a, b) => a - b)
@@ -1829,8 +1979,8 @@ export default function NotificationBuilder({
                 }
               }
 
-              // Check for past intervals
-              if (formData.dutyDate && reminderIntervals.length > 0) {
+              // Check for past intervals (not relevant for single-row edit)
+              if (editMode !== 'single' && formData.dutyDate && reminderIntervals.length > 0) {
                 const today = new Date()
                 today.setHours(0, 0, 0, 0)
 
@@ -1843,10 +1993,15 @@ export default function NotificationBuilder({
                 }).length
 
                 if (pastCount > 0) {
-                  warnings.push(
-                    `${pastCount} ${tr.validationPastIntervals}`,
-                  )
+                  warnings.push(`${pastCount} ${tr.validationPastIntervals}`)
                 }
+              }
+
+              if (enablePdr && !enableAggressive && reminderIntervals.includes(1)) {
+                warnings.push(
+                  tr.pdrOverlapWarning ??
+                    'Pripomienka deň po termíne (+1) sa prekrýva s PDR pripomienkou — v ten istý deň sa odošlú dve správy.',
+                )
               }
 
               if (warnings.length > 0) {
@@ -1881,7 +2036,7 @@ export default function NotificationBuilder({
                 ) : (
                   <>
                     <Save className="w-5 h-5" />
-                    {tr.createNotification}
+                    {editMode ? (tr.saveChanges ?? 'Uložiť zmeny') : tr.createNotification}
                   </>
                 )}
               </button>
@@ -1904,9 +2059,7 @@ export default function NotificationBuilder({
               </button>
             </div>
 
-            <p className="text-gray-400 text-sm mb-4 shrink-0">
-              {tr.editIntervalsDesc}
-            </p>
+            <p className="text-gray-400 text-sm mb-4 shrink-0">{tr.editIntervalsDesc}</p>
 
             <div className="space-y-2 overflow-y-auto max-h-[40vh] mb-4 pr-1">
               {reminderIntervals.map((interval, index) => (
@@ -1954,6 +2107,16 @@ export default function NotificationBuilder({
               <Plus className="h-4 w-4" />
               {tr.addInterval}
             </button>
+
+            {enablePdr && !enableAggressive && reminderIntervals.includes(1) && (
+              <div className="mb-4 shrink-0 flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/40 rounded-lg">
+                <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                <p className="text-amber-300 text-sm">
+                  {tr.pdrOverlapWarning ??
+                    'Pripomienka deň po termíne (+1) sa prekrýva s PDR pripomienkou — v ten istý deň sa odošlú dve správy.'}
+                </p>
+              </div>
+            )}
 
             <div className="flex gap-3 shrink-0 pt-4 border-t border-white/10">
               <button

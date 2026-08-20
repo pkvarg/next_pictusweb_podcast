@@ -7,6 +7,11 @@ import { getToken } from 'next-auth/jwt'
 const intlMiddleware = createIntlMiddleware({
   locales: ['en', 'sk', 'hu'],
   defaultLocale: 'sk',
+  // Harden the NEXT_LOCALE cookie (was set without Secure) — the audit flagged it.
+  localeCookie: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  },
 })
 
 // Routes that require authentication

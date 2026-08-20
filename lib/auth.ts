@@ -33,9 +33,11 @@ declare module 'next-auth' {
   }
 }
 
-
-// Export auth options for use in other files  
+// Export auth options for use in other files
 export const authOptions = {
+  // Force Secure session cookies in production (origin sits behind the Cloudflare
+  // proxy, so NextAuth may not auto-detect HTTPS). Keep off in dev (http://localhost).
+  useSecureCookies: process.env.NODE_ENV === 'production',
   session: {
     strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -47,26 +49,26 @@ export const authOptions = {
   callbacks: {
     async signIn({ user, account }: any) {
       console.log('JWT SignIn attempt:', user.email, 'Provider:', account?.provider)
-      
+
       // Check if user exists in database for JWT mode
       if (account?.provider !== 'credentials') {
         const dbUser = await prisma.user.findUnique({
-          where: { 
+          where: {
             email: user.email,
             deletedAt: null,
-            active: true
-          }
+            active: true,
+          },
         })
 
         if (!dbUser) {
           console.log('ACCESS DENIED - User not found:', user.email)
           return false
         }
-        
+
         console.log('ACCESS GRANTED - User found:', user.email)
         return true
       }
-      
+
       return true
     },
     async jwt({ token, user, account }: any) {
@@ -74,9 +76,9 @@ export const authOptions = {
         if (user && account) {
           // Get user data from database for JWT
           const dbUser = await prisma.user.findUnique({
-            where: { email: user.email }
+            where: { email: user.email },
           })
-          
+
           if (dbUser) {
             token.id = dbUser.id
             token.role = dbUser.role
@@ -90,7 +92,7 @@ export const authOptions = {
             if (dbUser.organizationId) {
               const org = await prisma.organization.findUnique({
                 where: { id: dbUser.organizationId },
-                select: { deletedAt: true }
+                select: { deletedAt: true },
               })
               token.organizationDeleted = org?.deletedAt ? true : false
             } else {
@@ -102,15 +104,15 @@ export const authOptions = {
               where: { id: dbUser.id },
               data: {
                 lastLoggedIn: new Date(),
-                loginCount: { increment: 1 }
-              }
+                loginCount: { increment: 1 },
+              },
             })
           } else {
           }
         } else if (token.email && !token.organization) {
           // For existing tokens, ensure we have organization data
           const dbUser = await prisma.user.findUnique({
-            where: { email: token.email }
+            where: { email: token.email },
           })
 
           if (dbUser) {
@@ -122,17 +124,16 @@ export const authOptions = {
             if (dbUser.organizationId) {
               const org = await prisma.organization.findUnique({
                 where: { id: dbUser.organizationId },
-                select: { deletedAt: true }
+                select: { deletedAt: true },
               })
               token.organizationDeleted = org?.deletedAt ? true : false
             }
-
           }
         } else if (token.organizationId) {
           // Always refresh organizationDeleted status from DB
           const org = await prisma.organization.findUnique({
             where: { id: token.organizationId as string },
-            select: { deletedAt: true }
+            select: { deletedAt: true },
           })
           token.organizationDeleted = org?.deletedAt ? true : false
         }
@@ -149,7 +150,8 @@ export const authOptions = {
           session.user.id = token.id
           session.user.role = token.role?.toLowerCase() || 'client'
           session.user.email = token.email
-          session.user.name = token.name || `${token.firstName || ''} ${token.lastName || ''}`.trim()
+          session.user.name =
+            token.name || `${token.firstName || ''} ${token.lastName || ''}`.trim()
           session.user.organizationId = token.organizationId
           session.user.organization = token.organization
           session.user.isFleetManager = token.isFleetManager || false
@@ -188,7 +190,12 @@ export const authOptions = {
 
         // Rate limit: 5 failed attempts per email per 15 min
         const emailKey = `login_fail:${credentials.username.toLowerCase()}`
-        const emailLimit = rateLimit({ key: emailKey, maxAttempts: 5, windowMs: 15 * 60 * 1000, checkOnly: true })
+        const emailLimit = rateLimit({
+          key: emailKey,
+          maxAttempts: 5,
+          windowMs: 15 * 60 * 1000,
+          checkOnly: true,
+        })
         if (!emailLimit.success) {
           console.log('Rate limit exceeded for email:', credentials.username)
           return null
@@ -200,24 +207,37 @@ export const authOptions = {
             where: {
               email: credentials.username,
               deletedAt: null,
-              active: true
-            }
+              active: true,
+            },
           })
 
           if (!user) {
-            console.log('Credentials login FAILED for:', credentials.username, '- User not found or inactive')
+            console.log(
+              'Credentials login FAILED for:',
+              credentials.username,
+              '- User not found or inactive',
+            )
             return null
           }
 
           // Check if user has a password (credentials login)
           if (!user.password) {
-            console.log('Credentials login FAILED for:', credentials.username, '- No password set (OAuth user)')
+            console.log(
+              'Credentials login FAILED for:',
+              credentials.username,
+              '- No password set (OAuth user)',
+            )
             return null
           }
 
           // Check if user is allowed to use credentials login
           if (user.loginProvider && user.loginProvider !== 'credentials') {
-            console.log('Credentials login FAILED for:', credentials.username, '- User must use:', user.loginProvider)
+            console.log(
+              'Credentials login FAILED for:',
+              credentials.username,
+              '- User must use:',
+              user.loginProvider,
+            )
             return null
           }
 
@@ -226,7 +246,7 @@ export const authOptions = {
           if (user.password) {
             isValidPwd = await isValidPassword(credentials.password, user.password)
           }
-          
+
           if (!isValidPwd) {
             // Record the failed attempt for rate limiting
             rateLimit({ key: emailKey, maxAttempts: 5, windowMs: 15 * 60 * 1000 })
@@ -237,10 +257,10 @@ export const authOptions = {
           // Update last login info
           await prisma.user.update({
             where: { id: user.id },
-            data: { 
+            data: {
               lastLoggedIn: new Date(),
-              loginCount: { increment: 1 }
-            }
+              loginCount: { increment: 1 },
+            },
           })
 
           console.log('Credentials login SUCCESS for:', credentials.username)

@@ -23,6 +23,7 @@ import {
   Copy,
   Sparkles,
   RotateCcw,
+  Layers,
 } from 'lucide-react'
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
@@ -127,6 +128,7 @@ interface User {
 interface VehicleNotification {
   id: number
   dutyBatchId: string | null
+  pdrReminderFor?: string | null
   isPdr?: boolean
   isAggressiveMode?: boolean
   aggressiveStart?: string | null
@@ -173,6 +175,9 @@ const MyFleetPage = () => {
     () => ({
       createTitle: t('nbCreateTitle'),
       duplicateTitle: t('nbDuplicateTitle'),
+      editTitle: t('nbEditTitle'),
+      editBatchTitle: t('nbEditBatchTitle'),
+      saveChanges: t('nbSaveChanges'),
       step0Label: t('nbStep0Label'),
       step1Label: t('nbStep1Label'),
       step2Label: t('nbStep2Label'),
@@ -219,6 +224,8 @@ const MyFleetPage = () => {
       pastDate: t('nbPastDate'),
       singleIntervalHint: t('nbSingleIntervalHint'),
       editIntervalsHint: t('nbEditIntervalsHint'),
+      pdrOverlapWarning: t('nbPdrOverlapWarning'),
+      dutyDateBatchLocked: t('nbDutyDateBatchLocked'),
       selectUserOptional: t('nbSelectUserOptional'),
       selectUserPlaceholder: t('nbSelectUserPlaceholder'),
       selectUserPlaceholderClient: t('nbSelectUserPlaceholderClient'),
@@ -359,6 +366,13 @@ const MyFleetPage = () => {
   const [duplicateNotificationData, setDuplicateNotificationData] =
     useState<VehicleNotification | null>(null)
   const [editingNotificationId, setEditingNotificationId] = useState<number | null>(null)
+  const [notificationEditMode, setNotificationEditMode] = useState<'single' | 'batch' | null>(null)
+  const [editingBatchId, setEditingBatchId] = useState<string | null>(null)
+  const [editBatchConfig, setEditBatchConfig] = useState<{
+    intervals: number[]
+    pdr: boolean
+    aggressive: boolean
+  } | null>(null)
 
   // Renewals state
   const [pendingRenewalsCount, setPendingRenewalsCount] = useState(0)
@@ -618,6 +632,64 @@ const MyFleetPage = () => {
       console.error('Error deleting notification:', err)
       alert(t('deleteNotificationFailed'))
     }
+  }
+
+  const isFutureNotification = (n: VehicleNotification) => {
+    if (n.status !== 'imported') return false
+    if (!n.notificationDate) return true
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    return new Date(n.notificationDate) >= startOfToday
+  }
+
+  const batchHasFutureRows = (batchId: string) =>
+    notifications.some(
+      (n) => (n.dutyBatchId === batchId || n.pdrReminderFor === batchId) && isFutureNotification(n),
+    )
+
+  const handleEditNotification = (n: VehicleNotification) => {
+    setNotificationEditMode('single')
+    setEditingNotificationId(n.id)
+    setEditingBatchId(null)
+    setEditBatchConfig(null)
+    setDuplicateNotificationData(n)
+    setShowNotificationBuilder(true)
+  }
+
+  const handleEditBatch = (batchId: string) => {
+    const DAY = 24 * 60 * 60 * 1000
+    const rows = notifications.filter(
+      (n) => n.dutyBatchId === batchId && isFutureNotification(n) && !n.isPdr,
+    )
+    if (rows.length === 0) return
+
+    const intervals = rows
+      .filter((n) => n.notificationDate && n.dutyDate)
+      .map((n) =>
+        Math.round(
+          (new Date(n.notificationDate as string).getTime() -
+            new Date(n.dutyDate as string).getTime()) /
+            DAY,
+        ),
+      )
+    const pdr = notifications.some((n) => n.pdrReminderFor === batchId && isFutureNotification(n))
+    const aggressive = rows.some((n) => n.isAggressiveMode)
+
+    setNotificationEditMode('batch')
+    setEditingBatchId(batchId)
+    setEditingNotificationId(null)
+    setEditBatchConfig({ intervals, pdr, aggressive })
+    setDuplicateNotificationData(rows[0])
+    setShowNotificationBuilder(true)
+  }
+
+  const resetNotificationBuilder = () => {
+    setShowNotificationBuilder(false)
+    setDuplicateNotificationData(null)
+    setEditingNotificationId(null)
+    setNotificationEditMode(null)
+    setEditingBatchId(null)
+    setEditBatchConfig(null)
   }
 
   const handleDeleteUser = async (userId: string) => {
@@ -1522,6 +1594,9 @@ const MyFleetPage = () => {
                     onClick={() => {
                       setDuplicateNotificationData(null)
                       setEditingNotificationId(null)
+                      setNotificationEditMode(null)
+                      setEditingBatchId(null)
+                      setEditBatchConfig(null)
                       setShowNotificationBuilder(true)
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black font-semibold rounded-full transition-all"
@@ -1789,13 +1864,36 @@ const MyFleetPage = () => {
                                 {notification.email ? `(${notification.email})` : ''}
                               </p>
                             </div>
-                            <button
-                              onClick={() => handleDeleteNotification(notification.id)}
-                              className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-xl transition-all"
-                              title={t('deleteButton')}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                              {isFutureNotification(notification) && (
+                                <button
+                                  onClick={() => handleEditNotification(notification)}
+                                  className="p-2 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-xl transition-all"
+                                  title={t('editButton')}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </button>
+                              )}
+                              {notification.dutyBatchId &&
+                                batchHasFutureRows(notification.dutyBatchId) && (
+                                  <button
+                                    onClick={() =>
+                                      handleEditBatch(notification.dutyBatchId as string)
+                                    }
+                                    className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-xl transition-all"
+                                    title={t('editBatchButton')}
+                                  >
+                                    <Layers className="h-4 w-4" />
+                                  </button>
+                                )}
+                              <button
+                                onClick={() => handleDeleteNotification(notification.id)}
+                                className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-xl transition-all"
+                                title={t('deleteButton')}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
                           <div className="flex flex-wrap items-center gap-2 mb-2">
                             <span className="text-xs text-gray-400">
@@ -2006,6 +2104,27 @@ const MyFleetPage = () => {
                               </td>
                               <td className="px-4 py-3">
                                 <div className="flex items-center justify-center gap-2">
+                                  {isFutureNotification(notification) && (
+                                    <button
+                                      onClick={() => handleEditNotification(notification)}
+                                      className="p-2 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-xl transition-all"
+                                      title={t('editButton')}
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                    </button>
+                                  )}
+                                  {notification.dutyBatchId &&
+                                    batchHasFutureRows(notification.dutyBatchId) && (
+                                      <button
+                                        onClick={() =>
+                                          handleEditBatch(notification.dutyBatchId as string)
+                                        }
+                                        className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-xl transition-all"
+                                        title={t('editBatchButton')}
+                                      >
+                                        <Layers className="h-4 w-4" />
+                                      </button>
+                                    )}
                                   <button
                                     onClick={() => handleDeleteNotification(notification.id)}
                                     className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-xl transition-all"
@@ -2033,11 +2152,7 @@ const MyFleetPage = () => {
             ) : (
               <div>
                 <button
-                  onClick={() => {
-                    setShowNotificationBuilder(false)
-                    setDuplicateNotificationData(null)
-                    setEditingNotificationId(null)
-                  }}
+                  onClick={resetNotificationBuilder}
                   className="mb-4 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-full transition-all"
                 >
                   ← {t('backToList')}
@@ -2050,27 +2165,15 @@ const MyFleetPage = () => {
                     clientMode={true}
                     duplicateData={duplicateNotificationData}
                     translations={nbTranslations}
+                    editMode={notificationEditMode || undefined}
+                    editingId={editingNotificationId}
+                    editBatchId={editingBatchId}
+                    originalConfig={editBatchConfig}
                     onSuccess={async () => {
-                      // If we're editing, delete the original notification
-                      if (editingNotificationId) {
-                        try {
-                          await fetch(`/api/vehicle-notifications/${editingNotificationId}`, {
-                            method: 'DELETE',
-                          })
-                        } catch (err) {
-                          console.error('Error deleting original notification:', err)
-                        }
-                      }
-                      setShowNotificationBuilder(false)
-                      setDuplicateNotificationData(null)
-                      setEditingNotificationId(null)
+                      resetNotificationBuilder()
                       fetchNotifications()
                     }}
-                    onCancel={() => {
-                      setShowNotificationBuilder(false)
-                      setDuplicateNotificationData(null)
-                      setEditingNotificationId(null)
-                    }}
+                    onCancel={resetNotificationBuilder}
                   />
                 ) : (
                   <div className="text-center py-8">
