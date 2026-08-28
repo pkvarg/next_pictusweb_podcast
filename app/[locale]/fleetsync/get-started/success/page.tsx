@@ -17,6 +17,26 @@ function SuccessContent() {
   const [invoiceSent, setInvoiceSent] = useState(false)
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null)
   const invoiceGenerated = useRef(false)
+  const [accountIssue, setAccountIssue] = useState(false)
+  const accountReconciled = useRef(false)
+
+  // Fallback account creation: if the Stripe webhook was delayed or failed,
+  // ensure the paid account is created so the customer can actually log in.
+  useEffect(() => {
+    if (isFree || !sessionId || accountReconciled.current) return
+    accountReconciled.current = true
+
+    fetch('/api/fleetsync/reconcile-onboarding', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    })
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok || data.status === 'error') setAccountIssue(true)
+      })
+      .catch(() => setAccountIssue(true))
+  }, [isFree, sessionId])
 
   useEffect(() => {
     if (isFree || !sessionId || invoiceGenerated.current) return
@@ -116,19 +136,31 @@ function SuccessContent() {
           {isFree ? t('successDescriptionFree') : t('successDescriptionPaid')}
         </p>
 
+        {accountIssue && (
+          <div className="mb-8 p-4 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-200 text-sm font-light">
+            {t('accountSetupIssue')}
+          </div>
+        )}
+
         <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-2xl p-6 mb-8 text-left border border-pictus-lime/30 backdrop-blur-sm">
           <h3 className="font-normal text-lg mb-4 text-pictus-white">{t('successNextSteps')}</h3>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <span className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-sm w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 font-normal">1</span>
+              <span className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-sm w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 font-normal">
+                1
+              </span>
               <p className="text-gray-300 font-light">{t('successStep1')}</p>
             </div>
             <div className="flex items-start gap-3">
-              <span className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-sm w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 font-normal">2</span>
+              <span className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-sm w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 font-normal">
+                2
+              </span>
               <p className="text-gray-300 font-light">{t('successStep2')}</p>
             </div>
             <div className="flex items-start gap-3">
-              <span className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-sm w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 font-normal">3</span>
+              <span className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-sm w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 font-normal">
+                3
+              </span>
               <p className="text-gray-300 font-light">{t('successStep3')}</p>
             </div>
           </div>
@@ -149,9 +181,7 @@ function SuccessContent() {
               <Download className="w-5 h-5" />
               {t('downloadInvoice')}
             </button>
-            {invoiceError && (
-              <p className="text-red-400 text-sm mt-2 font-light">{invoiceError}</p>
-            )}
+            {invoiceError && <p className="text-red-400 text-sm mt-2 font-light">{invoiceError}</p>}
           </div>
         )}
 

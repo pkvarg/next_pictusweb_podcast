@@ -174,58 +174,31 @@ const ClientZone = () => {
     setIsChangingPassword(true)
 
     try {
-      // First, verify old password by trying to get user from database
-      const verifyResponse = await fetch('/api/user/verify-password', {
+      // Session-authenticated change: the server verifies the current password
+      // against the logged-in user and sends the confirmation email.
+      const changeResponse = await fetch('/api/user/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: session?.user?.email,
-          password: oldPassword,
+          currentPassword: oldPassword,
+          newPassword: newPassword,
+          locale: locale,
         }),
       })
 
-      if (!verifyResponse.ok) {
+      if (changeResponse.status === 401) {
         setPasswordChangeError(t('oldPasswordWrong'))
         setIsChangingPassword(false)
         return
       }
 
-      // Update password in database
-      const updateResponse = await fetch('/api/user/update-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: session?.user?.email,
-          newPassword: newPassword,
-        }),
-      })
-
-      if (!updateResponse.ok) {
+      if (!changeResponse.ok) {
         setPasswordChangeError(t('passwordChangeError'))
         setIsChangingPassword(false)
         return
       }
-
-      // Send confirmation email
-      await fetch(
-        `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/email-reset-password`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: session?.user?.name,
-            email: session?.user?.email,
-            loginUrl: `${window.location.origin}/${locale}/auth/login`,
-            origin: 'PICTUSWEB.SK',
-          }),
-        },
-      )
 
       setPasswordChangeSuccess(t('passwordChangeSuccess'))
       setOldPassword('')

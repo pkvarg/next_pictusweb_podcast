@@ -584,6 +584,7 @@
     "successTitle": "Fiók sikeresen létrehozva!",
     "successDescriptionFree": "Ingyenes FleetSync fiókja létrejött. Most bejelentkezhet és elkezdheti járművei kezelését.",
     "successDescriptionPaid": "Sikeres fizetés! FleetSync fiókja létrejött. Most bejelentkezhet és elkezdheti járművei kezelését.",
+    "accountSetupIssue": "A fizetés sikeres volt, de a fiók létrehozását még véglegesítjük. Kérjük, próbáljon meg néhány perc múlva bejelentkezni — ha továbbra sem sikerül, írjon nekünk az info@pictusweb.sk címre, és azonnal aktiváljuk.",
     "successNextSteps": "Következő lépések",
     "successStep1": "Jelentkezzen be email címével és jelszavával",
     "successStep2": "Adja hozzá járműveit az irányítópulthoz",

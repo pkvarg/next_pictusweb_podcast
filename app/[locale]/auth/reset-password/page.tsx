@@ -17,6 +17,7 @@ function ResetPasswordContent() {
   const [errorType, setErrorType] = useState<'expired' | 'invalid' | 'form' | ''>('')
   const [success, setSuccess] = useState(false)
   const [email, setEmail] = useState('')
+  const [token, setToken] = useState('')
   const t = useTranslations('Auth')
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -25,31 +26,39 @@ function ResetPasswordContent() {
   const locale = pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
 
   useEffect(() => {
-    const token = searchParams.get('token')
-    if (!token) {
+    const tk = searchParams.get('token')
+    if (!tk) {
       setError(t('invalidOrMissingToken'))
       setErrorType('invalid')
       return
     }
+    setToken(tk)
 
-    try {
-      const decoded = atob(token)
-      const [emailFromToken, timestamp] = decoded.split(':')
-
-      const tokenAge = Date.now() - parseInt(timestamp)
-      const oneHour = 60 * 60 * 1000
-
-      if (tokenAge > oneHour) {
-        setError(t('linkExpired'))
-        setErrorType('expired')
-        return
+    // Validate the token server-side (signature, expiry, single-use).
+    ;(async () => {
+      try {
+        const res = await fetch('/api/auth/verify-reset-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: tk }),
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok || !data.valid) {
+          if (data.reason === 'expired') {
+            setError(t('linkExpired'))
+            setErrorType('expired')
+          } else {
+            setError(t('invalidToken'))
+            setErrorType('invalid')
+          }
+          return
+        }
+        setEmail(data.emailMasked || '')
+      } catch {
+        setError(t('invalidToken'))
+        setErrorType('invalid')
       }
-
-      setEmail(emailFromToken)
-    } catch {
-      setError(t('invalidToken'))
-      setErrorType('invalid')
-    }
+    })()
   }, [searchParams, t])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,38 +82,24 @@ function ResetPasswordContent() {
     }
 
     try {
+      // The token is the sole authority; the server verifies it, updates the
+      // password, and sends the confirmation email.
       const updateResponse = await fetch('/api/user/update-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, newPassword: newPassword }),
+        body: JSON.stringify({ token, newPassword, locale }),
       })
 
       if (!updateResponse.ok) {
+        const data = await updateResponse.json().catch(() => ({}))
+        if (data.code === 'INVALID_TOKEN') {
+          setError(t('linkExpired'))
+          setErrorType('expired')
+          setIsLoading(false)
+          return
+        }
         throw new Error('Failed to update password')
       }
-
-      const checkResponse = await fetch('/api/user/check-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
-
-      const checkData = await checkResponse.json()
-
-      await fetch(
-        `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/email-reset-password`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: checkData.name || 'Vážený zákazník',
-            email: email,
-            loginUrl: `${window.location.origin}/${locale}/auth/login`,
-            origin: 'PICTUSWEB.SK',
-            locale: locale,
-          }),
-        },
-      )
 
       setSuccess(true)
 

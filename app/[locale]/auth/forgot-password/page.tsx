@@ -24,42 +24,26 @@ export default function ForgotPasswordPage() {
     setSuccess(false)
 
     try {
-      const checkResponse = await fetch('/api/user/check-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
-
-      const checkData = await checkResponse.json()
-
-      if (!checkResponse.ok || !checkData.exists) {
-        setError(t('emailNotFoundMessage'))
-        setIsLoading(false)
-        setSuccess(true)
-        return
-      }
-
-      const resetToken = btoa(`${email}:${Date.now()}`)
-      const resetUrl = `${window.location.origin}/${locale}/auth/reset-password?token=${resetToken}`
-
+      // The server decides existence, mints the token, and sends the email.
+      // The response is intentionally identical whether or not the account
+      // exists, so we always show the same confirmation screen.
       const emailResponse = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: checkData.name || 'Vážený zákazník',
-          email: email,
-          resetUrl: resetUrl,
-          origin: 'PICTUSWEB.SK',
-          locale: locale,
-        }),
+        body: JSON.stringify({ email, locale }),
       })
 
-      if (!emailResponse.ok) {
-        const errorData = await emailResponse.json()
+      if (emailResponse.status === 403) {
+        const errorData = await emailResponse.json().catch(() => ({}))
         if (errorData.code === 'IP_BANNED') {
           throw new Error(`Access Denied: ${errorData.message}`)
         }
-        throw new Error('Failed to send email')
+      }
+
+      if (emailResponse.status === 429) {
+        setError(t('genericError'))
+        setIsLoading(false)
+        return
       }
 
       setSuccess(true)

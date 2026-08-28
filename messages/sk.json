@@ -584,6 +584,7 @@
     "successTitle": "Účet úspešne vytvorený!",
     "successDescriptionFree": "Váš bezplatný FleetSync účet bol vytvorený. Teraz sa môžete prihlásiť a začať spravovať vaše vozidlá.",
     "successDescriptionPaid": "Platba úspešná! Váš FleetSync účet bol vytvorený. Teraz sa môžete prihlásiť a začať spravovať vaše vozidlá.",
+    "accountSetupIssue": "Vaša platba prebehla úspešne, ale vytvorenie účtu ešte dokončujeme. Skúste sa o pár minút prihlásiť — ak sa to nepodarí, kontaktujte nás na info@pictusweb.sk a účet obratom aktivujeme.",
     "successNextSteps": "Ďalšie kroky",
     "successStep1": "Prihláste sa pomocou emailu a hesla",
     "successStep2": "Pridajte vaše vozidlá na dashboard",

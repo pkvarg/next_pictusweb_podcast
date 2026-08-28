@@ -3,6 +3,8 @@ import prisma from '@/db/db'
 import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
 import { generateAndSendInvoice } from '@/lib/generateInvoice'
+import { completePaidOnboarding } from '@/lib/completeOnboarding'
+import { prodLogger } from '@/lib/prodLogger'
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -27,7 +29,10 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        console.log(`[Stripe Webhook] checkout.session.completed | session: ${session.id} | metadata:`, JSON.stringify(session.metadata))
+        console.log(
+          `[Stripe Webhook] checkout.session.completed | session: ${session.id} | metadata:`,
+          JSON.stringify(session.metadata),
+        )
 
         // Handle upgrade from FREE -> paid
         const upgradeOrgId = session.metadata?.upgradeOrganizationId
@@ -75,9 +80,10 @@ export async function POST(request: NextRequest) {
             })
             if (upgradeUser?.email) {
               // Generate invoice first, then send upgrade email after a delay to avoid SMTP timeout
-              const upgradePricePerVehicle = billingInterval === 'yearly'
-                ? Number(targetTier.pricePerVehicleYearly || 0)
-                : Number(targetTier.pricePerVehicle || 0)
+              const upgradePricePerVehicle =
+                billingInterval === 'yearly'
+                  ? Number(targetTier.pricePerVehicleYearly || 0)
+                  : Number(targetTier.pricePerVehicle || 0)
               generateAndSendInvoice({
                 organizationName: upgradeOrg?.name || '',
                 street: upgradeOrg?.street || '',
@@ -138,7 +144,10 @@ export async function POST(request: NextRequest) {
               deletedAt: null,
               freeTrialEndDate: null,
               freeTrialTierId: null,
-              ...(activateVehicles && { purchasedVehicles: activateVehicles, vehiclesLimit: activateVehicles }),
+              ...(activateVehicles && {
+                purchasedVehicles: activateVehicles,
+                vehiclesLimit: activateVehicles,
+              }),
             },
           })
           console.log('Successfully activated subscription for org:', activateOrgId)
@@ -175,9 +184,10 @@ export async function POST(request: NextRequest) {
 
             // Generate invoice (fire-and-forget)
             const activateTier = activateOrg?.tierRelation
-            const activatePricePerVehicle = billingInterval === 'yearly'
-              ? Number(activateTier?.pricePerVehicleYearly || 0)
-              : Number(activateTier?.pricePerVehicle || 0)
+            const activatePricePerVehicle =
+              billingInterval === 'yearly'
+                ? Number(activateTier?.pricePerVehicleYearly || 0)
+                : Number(activateTier?.pricePerVehicle || 0)
             generateAndSendInvoice({
               organizationName: activateOrg?.name || '',
               street: activateOrg?.street || '',
@@ -204,127 +214,33 @@ export async function POST(request: NextRequest) {
         const pendingId = session.metadata?.pendingOnboardingId
 
         if (!pendingId) {
-          console.error('No pendingOnboardingId in checkout session metadata')
-          break
-        }
-
-        // Fetch pending record
-        const pending = await prisma.pendingOnboarding.findUnique({
-          where: { id: pendingId },
-          include: { tier: true },
-        })
-
-        if (!pending) {
-          console.error('PendingOnboarding not found:', pendingId)
-          break
-        }
-
-        // Check if org already created (idempotency)
-        const existingUser = await prisma.user.findUnique({
-          where: { email: pending.email },
-          select: { id: true },
-        })
-
-        if (existingUser) {
-          console.log('User already exists, skipping org creation:', pending.email)
-          // Clean up pending record
-          await prisma.pendingOnboarding.delete({ where: { id: pendingId } })
-          break
-        }
-
-        const tier = pending.tier
-
-        // Read parentOrganizationId from session metadata (set by admin onboarding)
-        const parentOrganizationId = session.metadata?.parentOrganizationId || null
-        const onboardedBy = session.metadata?.onboardedBy || pending.email
-
-        // Create organization + user in transaction
-        await prisma.$transaction(async (tx) => {
-          const organization = await tx.organization.create({
-            data: {
-              name: pending.organizationName,
-              mainContact: pending.organizationContact,
-              ico: pending.ico,
-              dic: pending.dic,
-              street: pending.street,
-              city: pending.city,
-              postalCode: pending.postalCode,
-              country: pending.country,
-              tierId: pending.tierId,
-              parentOrganizationId: parentOrganizationId || null,
-              onboardedBy,
-              notificationPeriodStart: new Date(),
-              purchasedVehicles: pending.purchasedVehicles,
-              usersLimit: tier.usersLimit,
-              vehiclesLimit: pending.purchasedVehicles,
-              notificationsLimit: tier.notificationsLimit,
-              templatesLimit: tier.templatesLimit,
-              notificationTypesLimit: tier.notificationTypesLimit,
-              stripeCustomerId: session.customer as string,
-              stripeSubscriptionId: session.subscription as string,
-              stripeSubscriptionStatus: 'active',
-              billingInterval: pending.billingInterval,
-              subscriptionStartDate: new Date(),
+          prodLogger.error(
+            '[ONBOARDING_ALERT] checkout.session.completed has no pendingOnboardingId — a paid customer may have no account',
+            {
+              sessionId: session.id,
+              customer: session.customer,
+              email: session.customer_details?.email || session.customer_email,
+              source: 'webhook',
             },
-          })
+          )
+          break
+        }
 
-          await tx.user.create({
-            data: {
-              firstName: pending.firstName,
-              lastName: pending.lastName,
-              email: pending.email,
-              password: pending.password, // Already hashed
-              phoneNumber: pending.phoneNumber,
-              role: 'CLIENT',
-              active: true,
-              organizationId: organization.id,
-              isFleetManager: true,
-              loginProvider: 'credentials',
-              emailVerified: new Date(),
-              phoneVerified: new Date(),
-            },
-          })
+        const result = await completePaidOnboarding({
+          pendingId,
+          stripeCustomerId: session.customer as string,
+          stripeSubscriptionId: session.subscription as string,
+          parentOrganizationId: session.metadata?.parentOrganizationId || null,
+          onboardedBy: session.metadata?.onboardedBy || null,
+          locale: session.metadata?.locale || 'sk',
+          source: 'webhook',
         })
 
-        // Delete pending record
-        await prisma.pendingOnboarding.delete({ where: { id: pendingId } })
-        console.log('Successfully onboarded paid user:', pending.email)
+        console.log(`[Stripe Webhook] onboarding result: ${result.status} | session: ${session.id}`)
 
-        // Send welcome email (fire-and-forget)
-        const honoApi = process.env.NEXT_PUBLIC_HONO_API_URL
-        const appUrl = process.env.NEXTAUTH_URL || 'https://www.pictusweb.sk'
-        const locale = session.metadata?.locale || 'sk'
-        const isSelfSignup = onboardedBy === pending.email
-
-        if (isSelfSignup) {
-          // Self-signup: send welcome email with their tier
-          fetch(`${honoApi}/api/pictusweb/client/send-free-welcome-email`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: pending.email,
-              firstName: pending.firstName,
-              loginUrl: `${appUrl}/${locale}/client`,
-              tierName: tier.name,
-              locale,
-            }),
-          }).catch((err) => console.error('Welcome email (webhook) failed:', err))
-        } else {
-          // Agent-onboarded: use the agent welcome email
-          fetch(`${honoApi}/api/pictusweb/client/send-welcome-email`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: pending.email,
-              firstName: pending.firstName,
-              agentName: onboardedBy,
-              agentEmail: onboardedBy,
-              loginUrl: `${appUrl}/${locale}/auth/login`,
-              gdprUrl: `${appUrl}/gdpr`,
-              termsUrl: `${appUrl}/obchodne-podmienky`,
-              locale,
-            }),
-          }).catch((err) => console.error('Welcome email (webhook) failed:', err))
+        // Return non-2xx so Stripe retries delivery until the account exists.
+        if (result.status === 'error') {
+          return NextResponse.json({ error: 'Onboarding failed, will retry' }, { status: 500 })
         }
 
         break
@@ -333,7 +249,9 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
         const status = subscription.status
-        console.log(`[Stripe Webhook] customer.subscription.updated | sub: ${subscription.id} | status: ${status}`)
+        console.log(
+          `[Stripe Webhook] customer.subscription.updated | sub: ${subscription.id} | status: ${status}`,
+        )
 
         const org = await prisma.organization.findUnique({
           where: { stripeSubscriptionId: subscription.id },
@@ -375,15 +293,21 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice
-        console.log(`[Stripe Webhook] invoice.paid | invoice: ${invoice.id} | billing_reason: ${invoice.billing_reason} | customer: ${typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id} | amount: ${invoice.amount_paid}`)
+        console.log(
+          `[Stripe Webhook] invoice.paid | invoice: ${invoice.id} | billing_reason: ${invoice.billing_reason} | customer: ${typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id} | amount: ${invoice.amount_paid}`,
+        )
 
         // Skip the first invoice from checkout — those are handled in checkout.session.completed
         if (invoice.billing_reason === 'subscription_create') {
-          console.log('Skipping invoice.paid for subscription_create (handled in checkout):', invoice.id)
+          console.log(
+            'Skipping invoice.paid for subscription_create (handled in checkout):',
+            invoice.id,
+          )
           break
         }
 
-        const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
+        const customerId =
+          typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
         if (!customerId) break
 
         const invoiceOrg = await prisma.organization.findFirst({
@@ -403,9 +327,10 @@ export async function POST(request: NextRequest) {
 
         if (invoiceUser?.email && invoiceOrg.tierRelation) {
           const invBillingInterval = invoiceOrg.billingInterval || 'monthly'
-          const invPricePerVehicle = invBillingInterval === 'yearly'
-            ? Number(invoiceOrg.tierRelation.pricePerVehicleYearly || 0)
-            : Number(invoiceOrg.tierRelation.pricePerVehicle || 0)
+          const invPricePerVehicle =
+            invBillingInterval === 'yearly'
+              ? Number(invoiceOrg.tierRelation.pricePerVehicleYearly || 0)
+              : Number(invoiceOrg.tierRelation.pricePerVehicle || 0)
           const invVehicleCount = invoiceOrg.purchasedVehicles || 1
 
           generateAndSendInvoice({
@@ -436,14 +361,21 @@ export async function POST(request: NextRequest) {
             },
           })
 
-          console.log('Recurring invoice generated for org:', invoiceOrg.name, '| invoice:', invoice.id)
+          console.log(
+            'Recurring invoice generated for org:',
+            invoiceOrg.name,
+            '| invoice:',
+            invoice.id,
+          )
         }
         break
       }
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
-        console.error(`[Stripe Webhook] invoice.payment_failed | invoice: ${invoice.id} | customer: ${invoice.customer}`)
+        console.error(
+          `[Stripe Webhook] invoice.payment_failed | invoice: ${invoice.id} | customer: ${invoice.customer}`,
+        )
         break
       }
 

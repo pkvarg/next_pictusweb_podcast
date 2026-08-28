@@ -584,6 +584,7 @@
     "successTitle": "Account Created Successfully!",
     "successDescriptionFree": "Your free FleetSync account has been created. You can now log in and start managing your vehicles.",
     "successDescriptionPaid": "Payment successful! Your FleetSync account has been created. You can now log in and start managing your vehicles.",
+    "accountSetupIssue": "Your payment went through, but we're still finishing setting up your account. Please try logging in again in a few minutes — if it still doesn't work, contact us at info@pictusweb.sk and we'll activate it right away.",
     "successNextSteps": "Next Steps",
     "successStep1": "Log in with your email and password",
     "successStep2": "Add your vehicles to the dashboard",
