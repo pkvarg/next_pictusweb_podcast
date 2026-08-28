@@ -75,6 +75,6 @@ export const config = {
      * - sitemap.xml, robots.txt, etc. (SEO files)
      * - files with extensions (static assets)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.svg$|.*\\.ico$|.*\\.webp$|.*\\.css$|.*\\.js$|.*\\.json$|.*\\.mp3$|.*\\.mp4$|.*\\.webm$|.*\\.mov$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.svg$|.*\\.ico$|.*\\.webp$|.*\\.css$|.*\\.js$|.*\\.json$|.*\\.webmanifest$|.*\\.mp3$|.*\\.mp4$|.*\\.webm$|.*\\.mov$).*)',
   ],
 }

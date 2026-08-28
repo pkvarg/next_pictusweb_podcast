@@ -77,6 +77,8 @@ const nextConfig = {
       "style-src 'self' 'unsafe-inline' https:",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
       "connect-src 'self' https: wss:",
+      // Allow embedding the Metabase analytics dashboard (admin + client pages).
+      "frame-src 'self' https://metabase.pictusweb.com",
     ].join('; ')
 
     const securityHeaders = [
