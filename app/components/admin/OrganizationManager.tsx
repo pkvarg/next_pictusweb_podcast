@@ -33,6 +33,7 @@ interface Organization {
   purchasedVehicles: number | null
   hiddenFromPictusaci: boolean
   canCreateBenefit: boolean
+  bonusBusinessDashboards: boolean
   freeTrialEndDate: string | null
   freeTrialTierId: string | null
   stripeSubscriptionStatus: string | null
@@ -134,7 +135,10 @@ export default function OrganizationManager() {
       purchasedVehicles: organization.purchasedVehicles ?? '',
       hiddenFromPictusaci: organization.hiddenFromPictusaci || false,
       canCreateBenefit: organization.canCreateBenefit || false,
-      freeTrialEndDate: organization.freeTrialEndDate ? organization.freeTrialEndDate.split('T')[0] : '',
+      bonusBusinessDashboards: organization.bonusBusinessDashboards || false,
+      freeTrialEndDate: organization.freeTrialEndDate
+        ? organization.freeTrialEndDate.split('T')[0]
+        : '',
       freeTrialTierId: organization.freeTrialTierId || '',
     })
   }
@@ -152,12 +156,16 @@ export default function OrganizationManager() {
           tierId: editingItem.tierId || null,
           usersLimit: editingItem.usersLimit === '' ? null : editingItem.usersLimit,
           vehiclesLimit: editingItem.vehiclesLimit === '' ? null : editingItem.vehiclesLimit,
-          notificationsLimit: editingItem.notificationsLimit === '' ? null : editingItem.notificationsLimit,
+          notificationsLimit:
+            editingItem.notificationsLimit === '' ? null : editingItem.notificationsLimit,
           templatesLimit: editingItem.templatesLimit === '' ? null : editingItem.templatesLimit,
-          notificationTypesLimit: editingItem.notificationTypesLimit === '' ? null : editingItem.notificationTypesLimit,
-          purchasedVehicles: editingItem.purchasedVehicles === '' ? null : editingItem.purchasedVehicles,
+          notificationTypesLimit:
+            editingItem.notificationTypesLimit === '' ? null : editingItem.notificationTypesLimit,
+          purchasedVehicles:
+            editingItem.purchasedVehicles === '' ? null : editingItem.purchasedVehicles,
           hiddenFromPictusaci: editingItem.hiddenFromPictusaci,
           canCreateBenefit: editingItem.canCreateBenefit,
+          bonusBusinessDashboards: editingItem.bonusBusinessDashboards,
           freeTrialEndDate: editingItem.freeTrialEndDate || null,
           freeTrialTierId: editingItem.freeTrialTierId || null,
         }),
@@ -256,7 +264,9 @@ export default function OrganizationManager() {
                   </select>
                   <select
                     value={newItem.parentOrganizationId}
-                    onChange={(e) => setNewItem({ ...newItem, parentOrganizationId: e.target.value })}
+                    onChange={(e) =>
+                      setNewItem({ ...newItem, parentOrganizationId: e.target.value })
+                    }
                     className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
                   >
                     <option value="">No Parent Organization</option>
@@ -306,7 +316,9 @@ export default function OrganizationManager() {
                       <input
                         type="text"
                         value={editingItem.mainContact}
-                        onChange={(e) => setEditingItem({ ...editingItem, mainContact: e.target.value })}
+                        onChange={(e) =>
+                          setEditingItem({ ...editingItem, mainContact: e.target.value })
+                        }
                         className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
                         placeholder="Main Contact"
                       />
@@ -346,7 +358,9 @@ export default function OrganizationManager() {
                         <input
                           type="number"
                           value={editingItem.usersLimit}
-                          onChange={(e) => setEditingItem({ ...editingItem, usersLimit: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, usersLimit: e.target.value })
+                          }
                           placeholder={org.tierRelation?.usersLimit?.toString() || '—'}
                           className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
                         />
@@ -356,7 +370,9 @@ export default function OrganizationManager() {
                         <input
                           type="number"
                           value={editingItem.vehiclesLimit}
-                          onChange={(e) => setEditingItem({ ...editingItem, vehiclesLimit: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, vehiclesLimit: e.target.value })
+                          }
                           placeholder={org.tierRelation?.vehiclesLimit?.toString() || '—'}
                           className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
                         />
@@ -366,7 +382,9 @@ export default function OrganizationManager() {
                         <input
                           type="number"
                           value={editingItem.notificationsLimit}
-                          onChange={(e) => setEditingItem({ ...editingItem, notificationsLimit: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, notificationsLimit: e.target.value })
+                          }
                           placeholder={org.tierRelation?.notificationsLimit?.toString() || '—'}
                           className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
                         />
@@ -376,7 +394,9 @@ export default function OrganizationManager() {
                         <input
                           type="number"
                           value={editingItem.templatesLimit}
-                          onChange={(e) => setEditingItem({ ...editingItem, templatesLimit: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, templatesLimit: e.target.value })
+                          }
                           placeholder={org.tierRelation?.templatesLimit?.toString() || '—'}
                           className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
                         />
@@ -386,7 +406,12 @@ export default function OrganizationManager() {
                         <input
                           type="number"
                           value={editingItem.notificationTypesLimit}
-                          onChange={(e) => setEditingItem({ ...editingItem, notificationTypesLimit: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({
+                              ...editingItem,
+                              notificationTypesLimit: e.target.value,
+                            })
+                          }
                           placeholder={org.tierRelation?.notificationTypesLimit?.toString() || '—'}
                           className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
                         />
@@ -396,7 +421,9 @@ export default function OrganizationManager() {
                         <input
                           type="number"
                           value={editingItem.purchasedVehicles}
-                          onChange={(e) => setEditingItem({ ...editingItem, purchasedVehicles: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, purchasedVehicles: e.target.value })
+                          }
                           placeholder="—"
                           className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
                         />
@@ -409,7 +436,9 @@ export default function OrganizationManager() {
                         <input
                           type="date"
                           value={editingItem.freeTrialEndDate}
-                          onChange={(e) => setEditingItem({ ...editingItem, freeTrialEndDate: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, freeTrialEndDate: e.target.value })
+                          }
                           className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
                         />
                       </div>
@@ -417,21 +446,27 @@ export default function OrganizationManager() {
                         <label className="text-xs text-gray-400">Gifted Tier</label>
                         <select
                           value={editingItem.freeTrialTierId}
-                          onChange={(e) => setEditingItem({ ...editingItem, freeTrialTierId: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, freeTrialTierId: e.target.value })
+                          }
                           className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
                         >
                           <option value="">None</option>
-                          {tiers.filter(t => t.name !== 'FREE').map((tier) => (
-                            <option key={tier.id} value={tier.id}>
-                              {tier.name}
-                            </option>
-                          ))}
+                          {tiers
+                            .filter((t) => t.name !== 'FREE')
+                            .map((tier) => (
+                              <option key={tier.id} value={tier.id}>
+                                {tier.name}
+                              </option>
+                            ))}
                         </select>
                       </div>
                       {editingItem.freeTrialEndDate && editingItem.freeTrialTierId && (
                         <div className="flex items-end">
                           <span className="text-xs text-amber-300 bg-amber-500/10 px-2 py-1.5 rounded-lg">
-                            Free {tiers.find(t => t.id === editingItem.freeTrialTierId)?.name || '?'} until {editingItem.freeTrialEndDate}
+                            Free{' '}
+                            {tiers.find((t) => t.id === editingItem.freeTrialTierId)?.name || '?'}{' '}
+                            until {editingItem.freeTrialEndDate}
                           </span>
                         </div>
                       )}
@@ -443,7 +478,12 @@ export default function OrganizationManager() {
                           type="checkbox"
                           id={`hidden-${org.id}`}
                           checked={editingItem.hiddenFromPictusaci}
-                          onChange={(e) => setEditingItem({ ...editingItem, hiddenFromPictusaci: e.target.checked })}
+                          onChange={(e) =>
+                            setEditingItem({
+                              ...editingItem,
+                              hiddenFromPictusaci: e.target.checked,
+                            })
+                          }
                           className="w-4 h-4 rounded"
                         />
                         <label htmlFor={`hidden-${org.id}`} className="text-sm text-gray-300">
@@ -455,12 +495,35 @@ export default function OrganizationManager() {
                           type="checkbox"
                           id={`benefit-${org.id}`}
                           checked={editingItem.canCreateBenefit}
-                          onChange={(e) => setEditingItem({ ...editingItem, canCreateBenefit: e.target.checked })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, canCreateBenefit: e.target.checked })
+                          }
                           className="w-4 h-4 rounded"
                         />
                         <label htmlFor={`benefit-${org.id}`} className="text-sm text-gray-300">
                           <Gift className="w-3 h-3 inline mr-1" />
                           Can Create Benefit
+                        </label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id={`bonus-dashboards-${org.id}`}
+                          checked={editingItem.bonusBusinessDashboards}
+                          onChange={(e) =>
+                            setEditingItem({
+                              ...editingItem,
+                              bonusBusinessDashboards: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 rounded"
+                        />
+                        <label
+                          htmlFor={`bonus-dashboards-${org.id}`}
+                          className="text-sm text-gray-300"
+                        >
+                          <Gift className="w-3 h-3 inline mr-1" />
+                          Bonus: Business dashboards
                         </label>
                       </div>
                     </div>
@@ -487,11 +550,15 @@ export default function OrganizationManager() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-white text-xl font-light">{org.name}</p>
                         {org.tierRelation && (
-                          <span className={`px-2 py-1 text-xs rounded font-medium ${
-                            org.tierRelation.name === 'FREE' ? 'bg-gray-500/20 text-gray-300' :
-                            org.tierRelation.name === 'BASIC' ? 'bg-blue-500/20 text-blue-300' :
-                            'bg-purple-500/20 text-purple-300'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 text-xs rounded font-medium ${
+                              org.tierRelation.name === 'FREE'
+                                ? 'bg-gray-500/20 text-gray-300'
+                                : org.tierRelation.name === 'BASIC'
+                                  ? 'bg-blue-500/20 text-blue-300'
+                                  : 'bg-purple-500/20 text-purple-300'
+                            }`}
+                          >
                             {org.tierRelation.name}
                           </span>
                         )}
@@ -512,8 +579,10 @@ export default function OrganizationManager() {
                             Hidden
                           </span>
                         )}
-                        {org.freeTrialEndDate && org.freeTrialTierId && (
-                          new Date(org.freeTrialEndDate) < new Date() && !org.stripeSubscriptionStatus ? (
+                        {org.freeTrialEndDate &&
+                          org.freeTrialTierId &&
+                          (new Date(org.freeTrialEndDate) < new Date() &&
+                          !org.stripeSubscriptionStatus ? (
                             <span className="px-2 py-1 bg-red-500/20 text-red-300 text-xs rounded font-medium">
                               Expired
                             </span>
@@ -521,12 +590,12 @@ export default function OrganizationManager() {
                             <span className="px-2 py-1 bg-amber-500/20 text-amber-300 text-xs rounded font-medium">
                               Free until {new Date(org.freeTrialEndDate).toLocaleDateString()}
                             </span>
-                          ) : null
-                        )}
+                          ) : null)}
                         {org.childOrganizations && org.childOrganizations.length > 0 && (
                           <span className="px-2 py-1 bg-pictus-lime/20 text-pictus-lime text-xs rounded">
                             <Users className="w-3 h-3 inline mr-1" />
-                            {org.childOrganizations.length} sub-org{org.childOrganizations.length !== 1 ? 's' : ''}
+                            {org.childOrganizations.length} sub-org
+                            {org.childOrganizations.length !== 1 ? 's' : ''}
                           </span>
                         )}
                       </div>
@@ -546,20 +615,30 @@ export default function OrganizationManager() {
                       {(org.tierRelation || org.usersLimit !== null) && (
                         <div className="flex gap-4 mt-2 text-xs flex-wrap">
                           <span className="text-gray-400">
-                            Users: <span className="text-pictus-lime">{org.currentUsersCount}</span>/{org.usersLimit ?? org.tierRelation?.usersLimit ?? '—'}
+                            Users: <span className="text-pictus-lime">{org.currentUsersCount}</span>
+                            /{org.usersLimit ?? org.tierRelation?.usersLimit ?? '—'}
                           </span>
                           <span className="text-gray-400">
-                            Vehicles: <span className="text-pictus-lime">{org.currentVehiclesCount}</span>/{org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? '—'}
+                            Vehicles:{' '}
+                            <span className="text-pictus-lime">{org.currentVehiclesCount}</span>/
+                            {org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? '—'}
                           </span>
                           <span className="text-gray-400">
-                            Notifications: <span className="text-pictus-lime">{org.currentNotificationsCount}</span>/{org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}
+                            Notifications:{' '}
+                            <span className="text-pictus-lime">
+                              {org.currentNotificationsCount}
+                            </span>
+                            /{org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}
                           </span>
                           <span className="text-gray-400">
-                            Templates: <span className="text-pictus-lime">{org.currentTemplatesCount}</span>/{org.templatesLimit ?? org.tierRelation?.templatesLimit ?? '—'}
+                            Templates:{' '}
+                            <span className="text-pictus-lime">{org.currentTemplatesCount}</span>/
+                            {org.templatesLimit ?? org.tierRelation?.templatesLimit ?? '—'}
                           </span>
                           {org.purchasedVehicles != null && (
                             <span className="text-gray-400">
-                              Purchased: <span className="text-pictus-lime">{org.purchasedVehicles}</span>
+                              Purchased:{' '}
+                              <span className="text-pictus-lime">{org.purchasedVehicles}</span>
                             </span>
                           )}
                         </div>
@@ -588,7 +667,9 @@ export default function OrganizationManager() {
               <div className="text-center py-12">
                 <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-2xl font-light text-pictus-white mb-2">No Organizations</h3>
-                <p className="text-gray-400">Click &quot;Add Organization&quot; to create your first organization</p>
+                <p className="text-gray-400">
+                  Click &quot;Add Organization&quot; to create your first organization
+                </p>
               </div>
             )}
           </div>

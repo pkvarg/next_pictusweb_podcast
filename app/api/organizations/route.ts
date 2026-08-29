@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
             notificationTypesLimit: true,
             pricePerVehicle: true,
             pricePerVehicleYearly: true,
-          }
+          },
         },
         parentOrganization: {
           select: {
@@ -72,25 +72,38 @@ export async function GET(request: NextRequest) {
 
       // For parent orgs, aggregate counts from benefit sub-orgs
       const benefitChildren = org.childOrganizations.filter((child) => (child as any).isBenefitOrg)
-      const benefitUsersCount = benefitChildren.reduce((sum, child) => sum + (child as any)._count.users, 0)
-      const benefitVehiclesCount = benefitChildren.reduce((sum, child) => sum + (child as any)._count.vehicles, 0)
+      const benefitUsersCount = benefitChildren.reduce(
+        (sum, child) => sum + (child as any)._count.users,
+        0,
+      )
+      const benefitVehiclesCount = benefitChildren.reduce(
+        (sum, child) => sum + (child as any)._count.vehicles,
+        0,
+      )
       const totalUserCount = actualOwnUserCount + benefitUsersCount
       const totalVehicleCount = actualOwnVehicleCount + benefitVehiclesCount
 
       // Fire-and-forget sync stored counters
-      if (org.currentVehiclesCount !== totalVehicleCount || org.currentUsersCount !== totalUserCount) {
-        prisma.organization.update({
-          where: { id: org.id },
-          data: {
-            currentVehiclesCount: totalVehicleCount,
-            currentUsersCount: totalUserCount,
-          },
-        }).catch(() => {})
+      if (
+        org.currentVehiclesCount !== totalVehicleCount ||
+        org.currentUsersCount !== totalUserCount
+      ) {
+        prisma.organization
+          .update({
+            where: { id: org.id },
+            data: {
+              currentVehiclesCount: totalVehicleCount,
+              currentUsersCount: totalUserCount,
+            },
+          })
+          .catch(() => {})
       }
 
       const { _count, ...orgData } = org
       // Strip internal fields from childOrganizations before returning
-      const cleanChildren = org.childOrganizations.map(({ _count: _, isBenefitOrg: __, ...child }) => child)
+      const cleanChildren = org.childOrganizations.map(
+        ({ _count: _, isBenefitOrg: __, ...child }) => child,
+      )
       return {
         ...orgData,
         currentVehiclesCount: totalVehicleCount,
@@ -109,7 +122,20 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci, canCreateBenefit } = body
+    const {
+      name,
+      mainContact,
+      parentOrganizationId,
+      tierId,
+      usersLimit,
+      vehiclesLimit,
+      notificationsLimit,
+      templatesLimit,
+      notificationTypesLimit,
+      purchasedVehicles,
+      hiddenFromPictusaci,
+      canCreateBenefit,
+    } = body
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 })
@@ -125,7 +151,8 @@ export async function POST(request: NextRequest) {
         vehiclesLimit: vehiclesLimit != null ? Number(vehiclesLimit) : null,
         notificationsLimit: notificationsLimit != null ? Number(notificationsLimit) : null,
         templatesLimit: templatesLimit != null ? Number(templatesLimit) : null,
-        notificationTypesLimit: notificationTypesLimit != null ? Number(notificationTypesLimit) : null,
+        notificationTypesLimit:
+          notificationTypesLimit != null ? Number(notificationTypesLimit) : null,
         purchasedVehicles: purchasedVehicles != null ? Number(purchasedVehicles) : null,
         hiddenFromPictusaci: hiddenFromPictusaci === true,
         canCreateBenefit: canCreateBenefit === true,
@@ -140,7 +167,7 @@ export async function POST(request: NextRequest) {
             notificationsLimit: true,
             templatesLimit: true,
             notificationTypesLimit: true,
-          }
+          },
         },
         parentOrganization: {
           select: {
@@ -161,14 +188,32 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, name, mainContact, parentOrganizationId, tierId, usersLimit, vehiclesLimit, notificationsLimit, templatesLimit, notificationTypesLimit, purchasedVehicles, hiddenFromPictusaci, canCreateBenefit, freeTrialEndDate, freeTrialTierId } = body
+    const {
+      id,
+      name,
+      mainContact,
+      parentOrganizationId,
+      tierId,
+      usersLimit,
+      vehiclesLimit,
+      notificationsLimit,
+      templatesLimit,
+      notificationTypesLimit,
+      purchasedVehicles,
+      hiddenFromPictusaci,
+      canCreateBenefit,
+      freeTrialEndDate,
+      freeTrialTierId,
+      bonusBusinessDashboards,
+    } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Organization ID is required' }, { status: 400 })
     }
 
     // Convert empty strings / undefined to null for limit fields
-    const toNullableInt = (val: any) => (val === '' || val === undefined || val === null) ? null : Number(val)
+    const toNullableInt = (val: any) =>
+      val === '' || val === undefined || val === null ? null : Number(val)
 
     const organization = await prisma.organization.update({
       where: { id },
@@ -183,10 +228,17 @@ export async function PUT(request: NextRequest) {
         templatesLimit: toNullableInt(templatesLimit),
         notificationTypesLimit: toNullableInt(notificationTypesLimit),
         purchasedVehicles: toNullableInt(purchasedVehicles),
-        ...(hiddenFromPictusaci !== undefined && { hiddenFromPictusaci: hiddenFromPictusaci === true }),
+        ...(hiddenFromPictusaci !== undefined && {
+          hiddenFromPictusaci: hiddenFromPictusaci === true,
+        }),
         ...(canCreateBenefit !== undefined && { canCreateBenefit: canCreateBenefit === true }),
-        ...(freeTrialEndDate !== undefined && { freeTrialEndDate: freeTrialEndDate ? new Date(freeTrialEndDate) : null }),
+        ...(freeTrialEndDate !== undefined && {
+          freeTrialEndDate: freeTrialEndDate ? new Date(freeTrialEndDate) : null,
+        }),
         ...(freeTrialTierId !== undefined && { freeTrialTierId: freeTrialTierId || null }),
+        ...(bonusBusinessDashboards !== undefined && {
+          bonusBusinessDashboards: bonusBusinessDashboards === true,
+        }),
       },
       include: {
         parentOrganization: {

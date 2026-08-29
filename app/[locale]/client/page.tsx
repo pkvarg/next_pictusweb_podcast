@@ -17,6 +17,7 @@ import {
   Check,
   X,
   Car,
+  Gift,
 } from 'lucide-react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
@@ -50,6 +51,7 @@ interface Organization {
   stripeSubscriptionStatus: string | null
   billingInterval: string | null
   purchasedVehicles: number | null
+  bonusBusinessDashboards?: boolean
 }
 
 const ClientZone = () => {
@@ -388,20 +390,29 @@ const ClientZone = () => {
           </section>
         )}
 
-        {/* Fleet Expense Analytics - BUSINESS tier only, and only when expense data exists */}
-        {organization?.name && organization?.tierRelation?.name === 'BUSINESS' && (
-          <section id="expense-analytics" className="mb-16">
-            <FleetExpenseAnalytics
-              organization={
-                organization.name === 'PICTUSACI'
-                  ? 'all'
-                  : organization.name === 'demo'
-                    ? 'demo'
-                    : organization.name
-              }
-            />
-          </section>
-        )}
+        {/* Fleet Expense Analytics - BUSINESS tier, or gifted "business dashboards" bonus */}
+        {organization?.name &&
+          (organization?.tierRelation?.name === 'BUSINESS' ||
+            organization?.bonusBusinessDashboards) && (
+            <section id="expense-analytics" className="mb-16">
+              {organization?.tierRelation?.name !== 'BUSINESS' &&
+                organization?.bonusBusinessDashboards && (
+                  <div className="mb-4 flex items-center gap-2 p-3 rounded-2xl bg-pictus-lime/15 border border-pictus-lime/40 text-pictus-lime">
+                    <Gift className="w-5 h-5 shrink-0" />
+                    <span className="text-sm font-medium">{t('bonusBusinessDashboards')}</span>
+                  </div>
+                )}
+              <FleetExpenseAnalytics
+                organization={
+                  organization.name === 'PICTUSACI'
+                    ? 'all'
+                    : organization.name === 'demo'
+                      ? 'demo'
+                      : organization.name
+                }
+              />
+            </section>
+          )}
 
         {/* Upcoming Duties Overview - Show for ALL users */}
         {organization?.name && (

@@ -695,7 +695,6 @@
     "notificationButton": "Notifications",
     "editButton": "Edit",
     "deleteButton": "Delete",
-    "editButton": "Edit",
     "editBatchButton": "Edit batch",
     "useCustomTemplatesLabel": "I want to use custom templates",
     "useCustomTemplatesHint": "By default the standard template is used and you don't pick anything when creating a notification. When enabled, you can create your own templates and choose one when creating a notification.",
@@ -1116,7 +1115,8 @@
     "nbIntervalsPastSkipped": "__skipped__ past intervals were skipped.",
     "nbSomeFailed": "Some notifications failed to create",
     "nbCreateError": "Error creating notification",
-    "nbValidationPastIntervals": "intervals lead to past dates"
+    "nbValidationPastIntervals": "intervals lead to past dates",
+    "bonusBusinessDashboards": "Bonus: You've been given Business dashboards for free 🎁"
   },
   "Benefit": {
     "activateTitle": "Activate Your Benefit Account",

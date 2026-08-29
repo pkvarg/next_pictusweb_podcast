@@ -1115,7 +1115,8 @@
     "nbIntervalsPastSkipped": "__skipped__ intervalov v minulosti bolo preskočených.",
     "nbSomeFailed": "Niektoré notifikácie sa nepodarilo vytvoriť",
     "nbCreateError": "Chyba pri vytváraní notifikácie",
-    "nbValidationPastIntervals": "intervalov vedie do minulosti"
+    "nbValidationPastIntervals": "intervalov vedie do minulosti",
+    "bonusBusinessDashboards": "Bonus: Získali ste Business dashboardy zdarma 🎁"
   },
   "Benefit": {
     "activateTitle": "Aktivujte svoj Benefit účet",

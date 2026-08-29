@@ -695,7 +695,6 @@
     "notificationButton": "Értesítések",
     "editButton": "Szerkesztés",
     "deleteButton": "Törlés",
-    "editButton": "Szerkesztés",
     "editBatchButton": "Köteg szerkesztése",
     "useCustomTemplatesLabel": "Egyéni sablonokat szeretnék használni",
     "useCustomTemplatesHint": "Alapértelmezés szerint a normál sablon van használatban, és értesítés létrehozásakor nem kell választania. Bekapcsolva saját sablonokat hozhat létre, és létrehozáskor kiválaszthatja őket.",
@@ -1116,7 +1115,8 @@
     "nbIntervalsPastSkipped": "__skipped__ múltbeli intervallum ki lett hagyva.",
     "nbSomeFailed": "Néhány értesítés létrehozása sikertelen",
     "nbCreateError": "Hiba az értesítés létrehozásakor",
-    "nbValidationPastIntervals": "intervallum múltbeli dátumhoz vezet"
+    "nbValidationPastIntervals": "intervallum múltbeli dátumhoz vezet",
+    "bonusBusinessDashboards": "Bónusz: Ingyenes Business irányítópultokat kapott 🎁"
   },
   "Benefit": {
     "activateTitle": "Aktiválja a Benefit fiókját",
