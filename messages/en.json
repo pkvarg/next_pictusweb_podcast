@@ -1040,6 +1040,8 @@
     "nbPastDate": "(past)",
     "nbSingleIntervalHint": "Set only one interval for a one-time notification.",
     "nbEditIntervalsHint": "Edit intervals or add custom days before/after the duty date.",
+    "nbIntervalsDroppedSuggestion": "The due date is near, so some default reminders were skipped (they are in the past) — only __count__ will be sent. We recommend adding closer reminders so you don't miss the deadline.",
+    "nbAddRemindersCta": "➕ Add reminders",
     "nbPdrOverlapWarning": "A reminder on the day after the duty date (+1) overlaps with the PDR reminder — two messages will be sent on the same day.",
     "nbSelectUserOptional": "Select user (optional - fills in name, email and phone)",
     "nbSelectUserPlaceholder": "Select a user or enter manually...",

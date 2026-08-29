@@ -1039,6 +1039,8 @@
     "nbPastDate": "(minulosť)",
     "nbSingleIntervalHint": "Pre jednorázovú notifikáciu nastavte len jeden interval.",
     "nbEditIntervalsHint": "Upravte intervaly alebo pridajte vlastné dni pred/po dátume úlohy.",
+    "nbIntervalsDroppedSuggestion": "Termín je blízko, preto sa niektoré predvolené pripomienky vynechali (sú v minulosti) — odošle sa len __count__. Odporúčame pridať bližšie pripomienky, aby ste na termín nezabudli.",
+    "nbAddRemindersCta": "➕ Pridať pripomienky",
     "nbPdrOverlapWarning": "Pripomienka deň po termíne (+1) sa prekrýva s PDR pripomienkou — v ten istý deň sa odošlú dve správy.",
     "nbSelectUserOptional": "Vybrať používateľa (voliteľné - vyplní meno, email a telefón)",
     "nbSelectUserPlaceholder": "Vyberte používateľa alebo zadajte manuálne...",

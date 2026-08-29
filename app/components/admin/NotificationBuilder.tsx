@@ -124,6 +124,8 @@ export interface NotificationBuilderTranslations {
   singleIntervalHint: string
   editIntervalsHint: string
   pdrOverlapWarning?: string
+  intervalsDroppedSuggestion?: string
+  addRemindersCta?: string
   selectUserOptional: string
   selectUserPlaceholder: string
   selectUserPlaceholderClient: string
@@ -259,6 +261,9 @@ const defaultTranslations: NotificationBuilderTranslations = {
   pastDate: '(minulosť)',
   singleIntervalHint: 'Pre jednorázovú notifikáciu nastavte len jeden interval.',
   editIntervalsHint: 'Upravte intervaly alebo pridajte vlastné dni pred/po dátume úlohy.',
+  intervalsDroppedSuggestion:
+    'Termín je blízko, preto sa niektoré predvolené pripomienky vynechali (sú v minulosti) — odošle sa len __count__. Odporúčame pridať bližšie pripomienky, aby ste na termín nezabudli.',
+  addRemindersCta: '➕ Pridať pripomienky',
   pdrOverlapWarning:
     'Pripomienka deň po termíne (+1) sa prekrýva s PDR pripomienkou — v ten istý deň sa odošlú dve správy.',
   selectUserOptional: 'Vybrať používateľa (voliteľné - vyplní meno, email a telefón)',
@@ -1190,6 +1195,20 @@ export default function NotificationBuilder({
     }
   }
 
+  // Past reminders are never created, so drop them from the preview/count too —
+  // the user shouldn't have to see or clear past intervals manually.
+  const previewIntervals = (() => {
+    if (!formData.dutyDate) return reminderIntervals
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    return reminderIntervals.filter((offset) => {
+      const d = new Date(formData.dutyDate)
+      d.setDate(d.getDate() + offset)
+      d.setHours(0, 0, 0, 0)
+      return d >= startOfToday
+    })
+  })()
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1585,16 +1604,16 @@ export default function NotificationBuilder({
                   </div>
                   <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                     <p className="text-gray-400 text-base mb-3">
-                      {tr.willCreate} {reminderIntervals.length}{' '}
-                      {reminderIntervals.length === 1
+                      {tr.willCreate} {previewIntervals.length}{' '}
+                      {previewIntervals.length === 1
                         ? tr.notificationSingular
-                        : reminderIntervals.length < 5
+                        : previewIntervals.length < 5
                           ? tr.notificationFew
                           : tr.notificationMany}
                       :
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {reminderIntervals
+                      {[...previewIntervals]
                         .sort((a, b) => a - b)
                         .map((interval, index) => {
                           if (!formData.dutyDate) {
@@ -1660,6 +1679,26 @@ export default function NotificationBuilder({
                         ? tr.singleIntervalHint
                         : tr.editIntervalsHint}
                     </p>
+                    {formData.dutyDate && previewIntervals.length < reminderIntervals.length && (
+                      <div className="mt-3 flex flex-col gap-2 p-4 bg-amber-500/15 border border-amber-500/50 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
+                          <p className="text-amber-200 text-sm font-medium">
+                            {(
+                              tr.intervalsDroppedSuggestion ??
+                              'Termín je blízko, preto sa niektoré predvolené pripomienky vynechali — odošle sa len __count__. Odporúčame pridať bližšie pripomienky.'
+                            ).replace('__count__', String(previewIntervals.length))}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowIntervalsModal(true)}
+                          className="self-start px-4 py-2 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/40 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          {tr.addRemindersCta ?? '➕ Pridať pripomienky'}
+                        </button>
+                      </div>
+                    )}
                     {enablePdr && !enableAggressive && reminderIntervals.includes(1) && (
                       <div className="mt-3 flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/40 rounded-lg">
                         <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
@@ -1915,9 +1954,9 @@ export default function NotificationBuilder({
                     <div className="text-sm px-3 py-2 rounded-lg bg-pictus-lime/10 text-pictus-lime inline-block">
                       {formData.notificationDate || formData.dutyDate || tr.notSet}
                     </div>
-                  ) : formData.dutyDate && reminderIntervals.length > 0 ? (
+                  ) : formData.dutyDate && previewIntervals.length > 0 ? (
                     <div className="space-y-1">
-                      {reminderIntervals
+                      {[...previewIntervals]
                         .sort((a, b) => a - b)
                         .map((interval, index) => {
                           const dutyDate = new Date(formData.dutyDate)
@@ -2003,23 +2042,8 @@ export default function NotificationBuilder({
                 }
               }
 
-              // Check for past intervals (not relevant for single-row edit)
-              if (editMode !== 'single' && formData.dutyDate && reminderIntervals.length > 0) {
-                const today = new Date()
-                today.setHours(0, 0, 0, 0)
-
-                const pastCount = reminderIntervals.filter((offset) => {
-                  const dutyDate = new Date(formData.dutyDate)
-                  const notificationDate = new Date(dutyDate)
-                  notificationDate.setDate(notificationDate.getDate() + offset)
-                  notificationDate.setHours(0, 0, 0, 0)
-                  return notificationDate < today
-                }).length
-
-                if (pastCount > 0) {
-                  warnings.push(`${pastCount} ${tr.validationPastIntervals}`)
-                }
-              }
+              // Past intervals are auto-dropped from the preview and never
+              // created, so they are not surfaced as warnings anymore.
 
               if (enablePdr && !enableAggressive && reminderIntervals.includes(1)) {
                 warnings.push(

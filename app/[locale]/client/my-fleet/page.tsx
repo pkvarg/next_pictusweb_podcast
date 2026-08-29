@@ -227,6 +227,8 @@ const MyFleetPage = () => {
       singleIntervalHint: t('nbSingleIntervalHint'),
       editIntervalsHint: t('nbEditIntervalsHint'),
       pdrOverlapWarning: t('nbPdrOverlapWarning'),
+      intervalsDroppedSuggestion: t('nbIntervalsDroppedSuggestion'),
+      addRemindersCta: t('nbAddRemindersCta'),
       dutyDateBatchLocked: t('nbDutyDateBatchLocked'),
       selectUserOptional: t('nbSelectUserOptional'),
       selectUserPlaceholder: t('nbSelectUserPlaceholder'),

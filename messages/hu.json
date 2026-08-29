@@ -1040,6 +1040,8 @@
     "nbPastDate": "(múlt)",
     "nbSingleIntervalHint": "Egyszeri értesítéshez csak egy intervallumot állítson be.",
     "nbEditIntervalsHint": "Szerkessze az intervallumokat vagy adjon hozzá egyéni napokat a feladat dátuma előtt/után.",
+    "nbIntervalsDroppedSuggestion": "A határidő közel van, ezért néhány alapértelmezett emlékeztető kimaradt (a múltban van) — csak __count__ kerül kiküldésre. Javasoljuk, hogy adjon hozzá közelebbi emlékeztetőket, hogy ne maradjon le a határidőről.",
+    "nbAddRemindersCta": "➕ Emlékeztetők hozzáadása",
     "nbPdrOverlapWarning": "A feladat utáni napra (+1) eső emlékeztető átfedésben van a PDR emlékeztetővel — ugyanazon a napon két üzenet kerül kiküldésre.",
     "nbSelectUserOptional": "Felhasználó kiválasztása (opcionális - kitölti a nevet, emailt és telefont)",
     "nbSelectUserPlaceholder": "Válasszon felhasználót vagy adja meg manuálisan...",
