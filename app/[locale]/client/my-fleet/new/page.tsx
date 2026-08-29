@@ -74,9 +74,17 @@ const NewVehiclePage = () => {
     const selectedFile = e.target.files?.[0]
     if (!selectedFile) return
 
-    // Validate file type
-    if (!selectedFile.type.startsWith('image/')) {
-      setError('Prosím, nahrajte obrázok')
+    // Validate file type. iOS Safari often reports HEIC photos with an empty
+    // type, so accept image/*, an unknown type, or a .heic/.heif extension —
+    // the server converts HEIC to JPEG.
+    const lowerName = selectedFile.name.toLowerCase()
+    const looksLikeImage =
+      selectedFile.type.startsWith('image/') ||
+      selectedFile.type === '' ||
+      lowerName.endsWith('.heic') ||
+      lowerName.endsWith('.heif')
+    if (!looksLikeImage) {
+      setError('Prosím, nahrajte obrázok (JPG, PNG, WEBP alebo HEIC)')
       return
     }
 
@@ -114,14 +122,15 @@ const NewVehiclePage = () => {
       })
 
       if (!response.ok) {
-        throw new Error('Nepodarilo sa nahrať obrázok')
+        const errData = await response.json().catch(() => null)
+        throw new Error(errData?.message || 'Nepodarilo sa nahrať obrázok')
       }
 
       const data = await response.json()
       return data.imageUrl
     } catch (err) {
       console.error('Error uploading image:', err)
-      setError('Nepodarilo sa nahrať obrázok')
+      setError(err instanceof Error ? err.message : 'Nepodarilo sa nahrať obrázok')
       return null
     } finally {
       setUploading(false)

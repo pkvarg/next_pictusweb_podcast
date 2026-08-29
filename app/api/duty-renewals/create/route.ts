@@ -64,11 +64,19 @@ export async function POST(request: NextRequest) {
     const totalToCreate = intervals.length + (originalPdrReminder ? 1 : 0)
     const orgId = originalNotifications[0].organizationId
     if (orgId) {
-      const limitCheck = await checkNotificationLimit(orgId, totalToCreate, session?.user?.email || undefined)
+      const limitCheck = await checkNotificationLimit(
+        orgId,
+        totalToCreate,
+        session?.user?.email || undefined,
+      )
       if (!limitCheck.allowed) {
         return NextResponse.json(
-          { error: limitCheck.reason, blocked: limitCheck.blocked, limitReached: limitCheck.limitReached },
-          { status: 403 }
+          {
+            error: limitCheck.reason,
+            blocked: limitCheck.blocked,
+            limitReached: limitCheck.limitReached,
+          },
+          { status: 403 },
         )
       }
     }
@@ -98,10 +106,20 @@ export async function POST(request: NextRequest) {
 
     // Create new notifications with same intervals
     const createdNotifications = []
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
 
     for (const interval of intervals) {
       const newNotificationDate = new Date(newDutyDateObj)
       newNotificationDate.setDate(newNotificationDate.getDate() + interval)
+
+      // Skip intervals that would land in the past (e.g. -30 for a duty date
+      // less than a month away) so the client never gets past-dated reminders.
+      const notifDay = new Date(newNotificationDate)
+      notifDay.setHours(0, 0, 0, 0)
+      if (notifDay < startOfToday) {
+        continue
+      }
 
       const newNotification = await prisma.vehicleNotification.create({
         data: {

@@ -26,10 +26,7 @@ export async function POST(request: NextRequest) {
     } = body
 
     if (!dutyDate) {
-      return NextResponse.json(
-        { error: 'Duty date is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Duty date is required' }, { status: 400 })
     }
 
     // Check notification limit before creating
@@ -37,8 +34,12 @@ export async function POST(request: NextRequest) {
       const limitCheck = await checkNotificationLimit(organizationId, 1, email || undefined)
       if (!limitCheck.allowed) {
         return NextResponse.json(
-          { error: limitCheck.reason, blocked: limitCheck.blocked, limitReached: limitCheck.limitReached },
-          { status: 403 }
+          {
+            error: limitCheck.reason,
+            blocked: limitCheck.blocked,
+            limitReached: limitCheck.limitReached,
+          },
+          { status: 403 },
         )
       }
 
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
       if (org?.tierRelation?.name === 'FREE' && notificationChannel?.toLowerCase() !== 'email') {
         return NextResponse.json(
           { error: 'FREE tier only supports Email channel' },
-          { status: 403 }
+          { status: 403 },
         )
       }
 
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
       if (isAggressiveMode && org?.tierRelation?.name !== 'BUSINESS') {
         return NextResponse.json(
           { error: 'Aggressive mode is only available for BUSINESS tier' },
-          { status: 403 }
+          { status: 403 },
         )
       }
     }
@@ -93,9 +94,17 @@ export async function POST(request: NextRequest) {
         notificationData.myVehicleId = vehicle.id
         notificationData.userId = vehicle.userId
         notificationData.organizationId = vehicle.organizationId
-        notificationData.personName = personName || (vehicle.user ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim() : null) || null
+        notificationData.personName =
+          personName ||
+          (vehicle.user
+            ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim()
+            : null) ||
+          null
         notificationData.email = email || vehicle.user?.email || null
-        console.log('[CREATE-NOTIFICATION] Set vehicleRegistration to:', notificationData.vehicleRegistration)
+        console.log(
+          '[CREATE-NOTIFICATION] Set vehicleRegistration to:',
+          notificationData.vehicleRegistration,
+        )
       } else {
         console.log('[CREATE-NOTIFICATION] Vehicle not found with ID:', vehicleId)
       }
@@ -108,7 +117,8 @@ export async function POST(request: NextRequest) {
     notificationData.notificationType = notificationType
     notificationData.notificationChannel = notificationChannel
     notificationData.emailMessage = emailMessage
-    notificationData.notificationDate = notificationDate && notificationDate.trim() !== '' ? new Date(notificationDate) : null
+    notificationData.notificationDate =
+      notificationDate && notificationDate.trim() !== '' ? new Date(notificationDate) : null
 
     // If template is provided and body values are empty, use template as fallback
     if (templateId) {
@@ -130,6 +140,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Never persist a reminder whose send date is already in the past — the
+    // client should never end up with past notifications it must delete by hand.
+    if (notificationData.notificationDate) {
+      const startOfToday = new Date()
+      startOfToday.setHours(0, 0, 0, 0)
+      if (notificationData.notificationDate < startOfToday) {
+        console.log('Skipping past-dated notification:', notificationData.notificationDate)
+        return NextResponse.json({ skipped: true, reason: 'past_date' }, { status: 200 })
+      }
+    }
+
     console.log('Creating notification with data:', JSON.stringify(notificationData, null, 2))
 
     const notification = await prisma.vehicleNotification.create({
@@ -141,9 +162,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ notification }, { status: 201 })
   } catch (error) {
     console.error('Failed to create notification:', error)
-    return NextResponse.json(
-      { error: 'Failed to create notification' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to create notification' }, { status: 500 })
   }
 }

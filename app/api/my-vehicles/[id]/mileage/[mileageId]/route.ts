@@ -5,7 +5,7 @@ import prisma from '@/db/db'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string; mileageId: string }> }
+  { params }: { params: Promise<{ id: string; mileageId: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -16,7 +16,10 @@ export async function DELETE(
     }
 
     if (!session.user.isFleetManager) {
-      return NextResponse.json({ error: 'Forbidden - Fleet Manager access required' }, { status: 403 })
+      return NextResponse.json(
+        { error: 'Forbidden - Fleet Manager access required' },
+        { status: 403 },
+      )
     }
 
     // Verify mileage record exists and belongs to user's organization
@@ -31,7 +34,7 @@ export async function DELETE(
       },
     })
 
-    if (!mileageRecord || mileageRecord.vehicle.organization !== session.user.organization) {
+    if (!mileageRecord || mileageRecord.vehicle.organizationId !== session.user.organization) {
       return NextResponse.json({ error: 'Mileage record not found' }, { status: 404 })
     }
 

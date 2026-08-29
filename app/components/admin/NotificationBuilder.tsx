@@ -211,7 +211,7 @@ const defaultTranslations: NotificationBuilderTranslations = {
   step1Label: 'Vybrať šablónu',
   step2Label: 'Vyplniť detaily',
   step3Label: 'Skontrolovať a vytvoriť',
-  stepOf: 'Krok __step__ z 3:',
+  stepOf: 'Krok __step__ z __total__:',
   // Step 0 - Organization
   selectOrg: 'Vybrať organizáciu',
   selectOrgDesc: 'Vyberte organizáciu pre túto notifikáciu z dostupných organizácií.',
@@ -235,7 +235,7 @@ const defaultTranslations: NotificationBuilderTranslations = {
   customTypesBusinessOnly: 'ℹ️ Vlastné typy notifikácií sú dostupné iba pre Business tier',
   customTypePlaceholder: 'Zadajte vlastný typ notifikácie...',
   backToDropdown: '← Späť na rozbaľovaciu ponuku',
-  channelLabel: 'Kanál',
+  channelLabel: 'Notifikácie: e-mail / SMS',
   selectChannel: 'Vybrať kanál...',
   pdrLabel: '🔄 Post-Duty Renewal (PDR)',
   pdrDesc: 'Automaticky vytvorí pripomienku deň po termíne úlohy pre plánovanie ďalšej úlohy',
@@ -357,6 +357,7 @@ interface NotificationBuilderProps {
   editingId?: number | null
   editBatchId?: string | null
   originalConfig?: { intervals: number[]; pdr: boolean; aggressive: boolean } | null
+  useCustomTemplates?: boolean
 }
 
 export default function NotificationBuilder({
@@ -373,10 +374,15 @@ export default function NotificationBuilder({
   editingId,
   editBatchId,
   originalConfig,
+  useCustomTemplates = false,
 }: NotificationBuilderProps) {
   const tr = translations || defaultTranslations
-  // If organization is provided, skip Step 0 (organization selection)
-  const [step, setStep] = useState(initialOrganization ? 1 : 0)
+  // The template-selection step is only shown when the org opted into custom
+  // templates; otherwise everyone uses the built-in default and jumps to details.
+  const showTemplateStep = useCustomTemplates
+  // If organization is provided, skip Step 0 (organization selection). Without
+  // custom templates, also skip Step 1 (template selection) and start at details.
+  const [step, setStep] = useState(initialOrganization ? (showTemplateStep ? 1 : 2) : 0)
   const [organization, setOrganization] = useState(initialOrganization || '')
   const [organizationId, setOrganizationId] = useState<string>('')
   const [loading, setLoading] = useState(false)
@@ -400,11 +406,9 @@ export default function NotificationBuilder({
     templateId: '',
     vehicleId: prefillVehicleId || '',
     notificationType: '',
-    notificationChannel: hideChannelDropdown
-      ? organizationTier === 'FREE'
-        ? 'Email'
-        : 'Email/Sms'
-      : '',
+    // Preselect the tier default so the channel isn't a required extra step;
+    // clients can switch to email-only or SMS-only via the dropdown.
+    notificationChannel: organizationTier === 'FREE' ? 'Email' : 'Email/Sms',
     dutyDate: '',
     notificationDate: '',
     personName: '',
@@ -528,11 +532,24 @@ export default function NotificationBuilder({
     }
   }, [organizationId, organizations])
 
-  // FREE tier can only use the Email channel
+  // FREE tier can only use the Email channel. For paid tiers always offer the
+  // three standard choices (Email / SMS / Both) so a client can pick email-only
+  // or SMS-only, merged with any org-configured options (deduped by label).
+  const STANDARD_CHANNELS: ChannelOption[] = [
+    { id: 'std-email', label: 'Email', sortOrder: 1 },
+    { id: 'std-sms', label: 'Sms', sortOrder: 2 },
+    { id: 'std-both', label: 'Email/Sms', sortOrder: 3 },
+  ]
   const filteredChannelOptions =
     organizationTier === 'FREE'
-      ? channelOptions.filter((ch) => ch.label.toLowerCase() === 'email')
-      : channelOptions
+      ? [{ id: 'std-email', label: 'Email', sortOrder: 1 } as ChannelOption]
+      : (() => {
+          const seen = new Set(STANDARD_CHANNELS.map((c) => c.label.toLowerCase()))
+          return [
+            ...STANDARD_CHANNELS,
+            ...channelOptions.filter((ch) => !seen.has(ch.label.toLowerCase())),
+          ]
+        })()
 
   const fetchVehicles = useCallback(async () => {
     if (!organizationId) return
@@ -1194,7 +1211,12 @@ export default function NotificationBuilder({
             <p className="text-gray-400 text-lg">
               {step === 0
                 ? tr.step0Label
-                : `${tr.stepOf.replace('__step__', String(step))} ${step === 1 ? tr.step1Label : step === 2 ? tr.step2Label : tr.step3Label}`}
+                : `${tr.stepOf
+                    .replace('__step__', String(showTemplateStep ? step : step - 1))
+                    .replace(
+                      '__total__',
+                      String(showTemplateStep ? 3 : 2),
+                    )} ${step === 1 ? tr.step1Label : step === 2 ? tr.step2Label : tr.step3Label}`}
             </p>
           </div>
         </div>
@@ -1208,7 +1230,7 @@ export default function NotificationBuilder({
       {/* Progress Bar */}
       {organization && (
         <div className="flex gap-2">
-          {[1, 2, 3].map((s) => (
+          {(showTemplateStep ? [1, 2, 3] : [2, 3]).map((s) => (
             <div
               key={s}
               className={`h-2 flex-1 rounded-full transition-all ${
@@ -1809,12 +1831,14 @@ export default function NotificationBuilder({
             )}
 
             <div className="flex gap-4 mt-6">
-              <button
-                onClick={() => setStep(1)}
-                className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
-              >
-                {tr.back}
-              </button>
+              {showTemplateStep && (
+                <button
+                  onClick={() => setStep(1)}
+                  className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
+                >
+                  {tr.back}
+                </button>
+              )}
               <button
                 onClick={() => setStep(3)}
                 disabled={!formData.dutyDate}

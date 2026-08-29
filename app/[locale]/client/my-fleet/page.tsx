@@ -108,6 +108,8 @@ interface Organization {
   stripeSubscriptionStatus: string | null
   canCreateBenefit: boolean
   isBenefitOrg: boolean
+  useCustomTemplates?: boolean
+  confirmNotificationCreation?: boolean
   createdAt?: string
 }
 
@@ -690,6 +692,23 @@ const MyFleetPage = () => {
     setNotificationEditMode(null)
     setEditingBatchId(null)
     setEditBatchConfig(null)
+  }
+
+  const updateOrgSetting = async (
+    field: 'useCustomTemplates' | 'confirmNotificationCreation',
+    value: boolean,
+  ) => {
+    setOrganization((prev) => (prev ? { ...prev, [field]: value } : prev))
+    try {
+      const res = await fetch('/api/organizations/notification-settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value }),
+      })
+      if (!res.ok) throw new Error('failed')
+    } catch {
+      setOrganization((prev) => (prev ? { ...prev, [field]: !value } : prev))
+    }
   }
 
   const handleDeleteUser = async (userId: string) => {
@@ -1606,6 +1625,26 @@ const MyFleetPage = () => {
                   </button>
                 </div>
 
+                {/* Confirmation-email opt-in */}
+                <label className="mb-6 flex items-start gap-3 p-3 bg-white/5 border border-white/[0.06] rounded-2xl cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={organization?.confirmNotificationCreation ?? false}
+                    onChange={(e) =>
+                      updateOrgSetting('confirmNotificationCreation', e.target.checked)
+                    }
+                    className="mt-1 w-5 h-5 rounded border-gray-300 text-pictus-lime focus:ring-pictus-lime"
+                  />
+                  <span>
+                    <span className="block text-white text-sm font-medium">
+                      {t('confirmCreationLabel')}
+                    </span>
+                    <span className="block text-gray-400 text-xs mt-1">
+                      {t('confirmCreationHint')}
+                    </span>
+                  </span>
+                </label>
+
                 {/* Filters */}
                 {notifications.length > 0 && (
                   <div className="mb-6 bg-white/5 border border-white/[0.06] rounded-2xl p-3 sm:p-6">
@@ -2161,7 +2200,7 @@ const MyFleetPage = () => {
                   <NotificationBuilder
                     organization={organization.name}
                     organizationTier={organization.tierRelation?.name || null}
-                    hideChannelDropdown={true}
+                    hideChannelDropdown={false}
                     clientMode={true}
                     duplicateData={duplicateNotificationData}
                     translations={nbTranslations}
@@ -2169,9 +2208,16 @@ const MyFleetPage = () => {
                     editingId={editingNotificationId}
                     editBatchId={editingBatchId}
                     originalConfig={editBatchConfig}
+                    useCustomTemplates={organization.useCustomTemplates ?? false}
                     onSuccess={async () => {
+                      const wasCreate = !notificationEditMode
                       resetNotificationBuilder()
                       fetchNotifications()
+                      if (wasCreate) {
+                        fetch('/api/fleetsync/confirm-notification-created', {
+                          method: 'POST',
+                        }).catch(() => {})
+                      }
                     }}
                     onCancel={resetNotificationBuilder}
                   />
@@ -2192,20 +2238,39 @@ const MyFleetPage = () => {
             <div className="bg-pictus-onyx900 backdrop-blur-sm rounded-3xl border border-white/[0.06] p-6">
               <h2 className="text-2xl font-bold text-white mb-2">{t('notificationTemplates')}</h2>
               <p className="text-gray-400">{t('manageTemplates')}</p>
+
+              <label className="mt-6 flex items-start gap-3 p-4 bg-white/5 border border-white/[0.06] rounded-2xl cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={organization?.useCustomTemplates ?? false}
+                  onChange={(e) => updateOrgSetting('useCustomTemplates', e.target.checked)}
+                  className="mt-1 w-5 h-5 rounded border-gray-300 text-pictus-lime focus:ring-pictus-lime"
+                />
+                <span>
+                  <span className="block text-white font-medium">
+                    {t('useCustomTemplatesLabel')}
+                  </span>
+                  <span className="block text-gray-400 text-sm mt-1">
+                    {t('useCustomTemplatesHint')}
+                  </span>
+                </span>
+              </label>
             </div>
-            {organization?.id && organization.id.trim() !== '' ? (
-              <NotificationSettings
-                organization={organization.name}
-                organizationId={organization.id}
-                initialTab="templates"
-                hideTabs={true}
-                hideOrganizationSelector={true}
-              />
-            ) : (
-              <div className="mt-6 p-8 bg-white/5 rounded-2xl border border-white/[0.06] text-center">
-                <p className="text-gray-400">{t('loadingOrganization')}</p>
-              </div>
-            )}
+            {organization?.useCustomTemplates ? (
+              organization?.id && organization.id.trim() !== '' ? (
+                <NotificationSettings
+                  organization={organization.name}
+                  organizationId={organization.id}
+                  initialTab="templates"
+                  hideTabs={true}
+                  hideOrganizationSelector={true}
+                />
+              ) : (
+                <div className="mt-6 p-8 bg-white/5 rounded-2xl border border-white/[0.06] text-center">
+                  <p className="text-gray-400">{t('loadingOrganization')}</p>
+                </div>
+              )
+            ) : null}
           </div>
         )}
 
@@ -2492,15 +2557,19 @@ const MyFleetPage = () => {
                 <NotificationBuilder
                   organization={organization.name}
                   organizationTier={organization.tierRelation?.name || null}
-                  hideChannelDropdown={true}
+                  hideChannelDropdown={false}
                   clientMode={true}
                   prefillVehicleId={selectedVehicle.id}
                   translations={nbTranslations}
+                  useCustomTemplates={organization.useCustomTemplates ?? false}
                   onSuccess={() => {
                     setNotificationModalOpen(false)
                     setSelectedVehicle(null)
                     fetchNotifications()
                     fetchOrganization()
+                    fetch('/api/fleetsync/confirm-notification-created', {
+                      method: 'POST',
+                    }).catch(() => {})
                   }}
                   onCancel={() => {
                     setNotificationModalOpen(false)
