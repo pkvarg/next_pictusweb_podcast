@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { checkNotificationLimit } from '@/lib/notificationLimits'
+import { isExpired } from '@/lib/subscription-status'
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +32,22 @@ export async function POST(request: NextRequest) {
 
     // Check notification limit before creating
     if (organizationId) {
+      // Block once a gifted/free trial has expired with no active subscription.
+      const orgSub = await prisma.organization.findUnique({
+        where: { id: organizationId },
+        select: { freeTrialEndDate: true, stripeSubscriptionStatus: true },
+      })
+      if (orgSub && isExpired(orgSub)) {
+        return NextResponse.json(
+          {
+            error:
+              'Vaše skúšobné obdobie skončilo. Pre pokračovanie si prosím aktivujte predplatné.',
+            subscriptionRequired: true,
+          },
+          { status: 403 },
+        )
+      }
+
       const limitCheck = await checkNotificationLimit(organizationId, 1, email || undefined)
       if (!limitCheck.allowed) {
         return NextResponse.json(

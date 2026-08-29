@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
 import { checkNotificationLimit } from '@/lib/notificationLimits'
+import { isExpired } from '@/lib/subscription-status'
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,6 +21,25 @@ export async function POST(request: NextRequest) {
         { error: 'sourceBatchId and newDutyDate are required' },
         { status: 400 },
       )
+    }
+
+    // Block renewals once a gifted/free trial has expired with no active subscription.
+    const trialOrgId = session.user.organization
+    if (trialOrgId) {
+      const orgSub = await prisma.organization.findUnique({
+        where: { id: trialOrgId },
+        select: { freeTrialEndDate: true, stripeSubscriptionStatus: true },
+      })
+      if (orgSub && isExpired(orgSub)) {
+        return NextResponse.json(
+          {
+            error:
+              'Vaše skúšobné obdobie skončilo. Pre pokračovanie si prosím aktivujte predplatné.',
+            subscriptionRequired: true,
+          },
+          { status: 403 },
+        )
+      }
     }
 
     // Fetch original duty notifications (excluding PDR reminder)
