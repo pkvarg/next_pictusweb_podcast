@@ -52,6 +52,7 @@ interface Organization {
   billingInterval: string | null
   purchasedVehicles: number | null
   bonusBusinessDashboards?: boolean
+  manuallyPaid?: boolean
 }
 
 const ClientZone = () => {
@@ -313,13 +314,15 @@ const ClientZone = () => {
         </div>
       </header>
 
-      {/* Expired free trial banner */}
+      {/* Expired free trial banner — mirror isExpired(): blocked when trial past and no active sub */}
       {organization?.freeTrialEndDate &&
         new Date(organization.freeTrialEndDate) < new Date() &&
-        !organization.stripeSubscriptionStatus && (
+        (!organization.stripeSubscriptionStatus ||
+          organization.stripeSubscriptionStatus === 'canceled') && (
           <ExpiredBanner
             tierName={organization.tierRelation?.name || 'BASIC'}
             endDate={organization.freeTrialEndDate}
+            manuallyPaid={organization.manuallyPaid}
           />
         )}
 

@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         freeTrialEndDate: true,
+        manuallyPaid: true,
         tierRelation: { select: { name: true } },
       },
     })
@@ -77,6 +78,7 @@ export async function GET(request: NextRequest) {
           daysLeft,
           loginUrl: `${appUrl}/sk/client`,
           locale: 'sk',
+          manuallyPaid: org.manuallyPaid,
         }),
       })
         .then((r) => r.ok)

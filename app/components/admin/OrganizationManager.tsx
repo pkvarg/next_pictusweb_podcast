@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Building, Plus, Edit2, Trash2, Save, X, Users, Gift } from 'lucide-react'
+import { Building, Plus, Edit2, Trash2, Save, X, Users, Gift, Receipt } from 'lucide-react'
 
 interface TierInfo {
   id: string
@@ -34,6 +34,7 @@ interface Organization {
   hiddenFromPictusaci: boolean
   canCreateBenefit: boolean
   bonusBusinessDashboards: boolean
+  manuallyPaid: boolean
   freeTrialEndDate: string | null
   freeTrialTierId: string | null
   stripeSubscriptionStatus: string | null
@@ -136,6 +137,7 @@ export default function OrganizationManager() {
       hiddenFromPictusaci: organization.hiddenFromPictusaci || false,
       canCreateBenefit: organization.canCreateBenefit || false,
       bonusBusinessDashboards: organization.bonusBusinessDashboards || false,
+      manuallyPaid: organization.manuallyPaid || false,
       freeTrialEndDate: organization.freeTrialEndDate
         ? organization.freeTrialEndDate.split('T')[0]
         : '',
@@ -166,6 +168,7 @@ export default function OrganizationManager() {
           hiddenFromPictusaci: editingItem.hiddenFromPictusaci,
           canCreateBenefit: editingItem.canCreateBenefit,
           bonusBusinessDashboards: editingItem.bonusBusinessDashboards,
+          manuallyPaid: editingItem.manuallyPaid,
           freeTrialEndDate: editingItem.freeTrialEndDate || null,
           freeTrialTierId: editingItem.freeTrialTierId || null,
         }),
@@ -524,6 +527,27 @@ export default function OrganizationManager() {
                         >
                           <Gift className="w-3 h-3 inline mr-1" />
                           Bonus: Business dashboards
+                        </label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id={`manually-paid-${org.id}`}
+                          checked={editingItem.manuallyPaid}
+                          onChange={(e) =>
+                            setEditingItem({
+                              ...editingItem,
+                              manuallyPaid: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 rounded"
+                        />
+                        <label
+                          htmlFor={`manually-paid-${org.id}`}
+                          className="text-sm text-gray-300"
+                        >
+                          <Receipt className="w-3 h-3 inline mr-1" />
+                          Manually paid (invoice / bank transfer)
                         </label>
                       </div>
                     </div>

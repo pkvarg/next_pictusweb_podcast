@@ -377,6 +377,7 @@ model Organization {
   useCustomTemplates              Boolean        @default(false) @map("use_custom_templates")
   confirmNotificationCreation     Boolean        @default(false) @map("confirm_notification_creation")
   bonusBusinessDashboards         Boolean        @default(false) @map("bonus_business_dashboards")
+  manuallyPaid                    Boolean        @default(false) @map("manually_paid")
 
   // Relations
   users                           User[]

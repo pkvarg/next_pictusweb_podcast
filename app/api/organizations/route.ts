@@ -205,6 +205,7 @@ export async function PUT(request: NextRequest) {
       freeTrialEndDate,
       freeTrialTierId,
       bonusBusinessDashboards,
+      manuallyPaid,
     } = body
 
     if (!id) {
@@ -239,6 +240,7 @@ export async function PUT(request: NextRequest) {
         ...(bonusBusinessDashboards !== undefined && {
           bonusBusinessDashboards: bonusBusinessDashboards === true,
         }),
+        ...(manuallyPaid !== undefined && { manuallyPaid: manuallyPaid === true }),
       },
       include: {
         parentOrganization: {
