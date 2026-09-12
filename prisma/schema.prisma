@@ -527,7 +527,7 @@ model PendingOnboarding {
 
 model Invoice {
   id                String   @id @default(uuid())
-  invoiceNumber     String   @unique @map("invoice_number") @db.VarChar(20)
+  invoiceNumber     String   @map("invoice_number") @db.VarChar(20)
   organizationName  String   @map("organization_name") @db.VarChar(100)
   street            String?  @db.VarChar(200)
   city              String?  @db.VarChar(100)
@@ -545,6 +545,9 @@ model Invoice {
   totalPrice        Float    @map("total_price")
   paymentType       String   @default("stripe") @map("payment_type") @db.VarChar(20)
   createdAt         DateTime @default(now()) @map("created_at")
+  deletedAt         DateTime? @map("deleted_at")
+  deletionReason    String?   @map("deletion_reason") @db.VarChar(500)
 
+  @@index([invoiceNumber])
   @@map("invoices")
 }

@@ -1,22 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
-
-async function generateInvoiceNumber(): Promise<string> {
-  const now = new Date()
-  const yy = String(now.getFullYear()).slice(-2)
-  const mm = String(now.getMonth() + 1).padStart(2, '0')
-  const yearStart = new Date(now.getFullYear(), 0, 1)
-  const yearEnd = new Date(now.getFullYear() + 1, 0, 1)
-
-  const count = await prisma.invoice.count({
-    where: {
-      createdAt: { gte: yearStart, lt: yearEnd },
-    },
-  })
-
-  const orderNumber = String(count + 1).padStart(3, '0')
-  return `FS-${yy}${mm}${orderNumber}`
-}
+import { generateInvoiceNumber } from '@/lib/generateInvoice'
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FileText, Download, Mail, Plus, X } from 'lucide-react'
+import { FileText, Download, Mail, Plus, X, Trash2 } from 'lucide-react'
 
 interface Invoice {
   id: string
@@ -90,6 +90,7 @@ export default function InvoiceManager() {
   const [loading, setLoading] = useState(true)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [sendingId, setSendingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [form, setForm] = useState<CreateInvoiceForm>({ ...emptyForm })
@@ -160,6 +161,37 @@ export default function InvoiceManager() {
       alert('Error sending invoice')
     } finally {
       setSendingId(null)
+    }
+  }
+
+  const handleDelete = async (invoice: Invoice) => {
+    const reason = window.prompt(
+      `Delete invoice ${invoice.invoiceNumber}?\n\nIt will be hidden and its number reused. Enter a reason:`,
+    )
+    if (reason === null) return
+    if (!reason.trim()) {
+      alert('A reason is required to delete an invoice.')
+      return
+    }
+
+    setDeletingId(invoice.id)
+    try {
+      const response = await fetch(`/api/invoices/${invoice.id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: reason.trim() }),
+      })
+      if (response.ok) {
+        await fetchInvoices()
+      } else {
+        const data = await response.json().catch(() => ({ error: 'Failed to delete' }))
+        alert(data.error || 'Failed to delete invoice')
+      }
+    } catch (error) {
+      console.error('Failed to delete invoice:', error)
+      alert('Error deleting invoice')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -300,10 +332,15 @@ export default function InvoiceManager() {
           {/* Mobile Invoice Cards */}
           <div className="md:hidden space-y-3">
             {invoices.map((invoice) => (
-              <div key={invoice.id} className="bg-white/5 rounded-lg p-4 border border-white/10 space-y-3">
+              <div
+                key={invoice.id}
+                className="bg-white/5 rounded-lg p-4 border border-white/10 space-y-3"
+              >
                 {/* Top row: invoice number + total */}
                 <div className="flex items-center justify-between">
-                  <span className="text-white font-mono text-sm font-medium">{invoice.invoiceNumber}</span>
+                  <span className="text-white font-mono text-sm font-medium">
+                    {invoice.invoiceNumber}
+                  </span>
                   <span className="text-white font-medium">{formatPrice(invoice.totalPrice)}</span>
                 </div>
                 {/* Organization + email */}
@@ -336,6 +373,14 @@ export default function InvoiceManager() {
                     <Mail className="w-4 h-4" />
                     {sendingId === invoice.id ? 'Sending...' : 'Send Email'}
                   </button>
+                  <button
+                    onClick={() => handleDelete(invoice)}
+                    disabled={deletingId === invoice.id}
+                    className="flex items-center gap-1.5 px-4 py-2.5 text-sm bg-red-600 hover:bg-red-700 disabled:bg-red-800 disabled:opacity-50 text-white rounded-lg transition-colors justify-center"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    {deletingId === invoice.id ? '...' : 'Delete'}
+                  </button>
                 </div>
               </div>
             ))}
@@ -366,7 +411,9 @@ export default function InvoiceManager() {
                     <td className="py-3 text-sm text-gray-300 capitalize">{invoice.tier}</td>
                     <td className="py-3 text-sm text-gray-300 capitalize">{invoice.billing}</td>
                     <td className="py-3 text-sm text-gray-300">{invoice.numberOfVehicles}</td>
-                    <td className="py-3 text-sm text-white font-medium">{formatPrice(invoice.totalPrice)}</td>
+                    <td className="py-3 text-sm text-white font-medium">
+                      {formatPrice(invoice.totalPrice)}
+                    </td>
                     <td className="py-3 text-sm text-gray-300">{formatDate(invoice.createdAt)}</td>
                     <td className="py-3">
                       <div className="flex items-center gap-2">
@@ -386,6 +433,14 @@ export default function InvoiceManager() {
                           <Mail className="w-3 h-3" />
                           {sendingId === invoice.id ? 'Sending...' : 'Send'}
                         </button>
+                        <button
+                          onClick={() => handleDelete(invoice)}
+                          disabled={deletingId === invoice.id}
+                          className="flex items-center gap-1 px-3 py-1 text-sm bg-red-600 hover:bg-red-700 disabled:bg-red-800 disabled:opacity-50 text-white rounded transition-colors"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          {deletingId === invoice.id ? '...' : 'Delete'}
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -402,7 +457,10 @@ export default function InvoiceManager() {
           <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
             <div className="flex items-center justify-between p-5 border-b border-gray-700">
               <h3 className="text-lg font-semibold text-white">Create Invoice</h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white transition-colors">
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -410,15 +468,21 @@ export default function InvoiceManager() {
             <div className="p-5 space-y-4">
               {/* Organization Select */}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Select Organization</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  Select Organization
+                </label>
                 <select
                   onChange={(e) => handleOrgSelect(e.target.value)}
                   className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-blue-500"
                   defaultValue=""
                 >
-                  <option value="" disabled>Choose organization...</option>
+                  <option value="" disabled>
+                    Choose organization...
+                  </option>
                   {organizations.map((org) => (
-                    <option key={org.id} value={org.id}>{org.name}</option>
+                    <option key={org.id} value={org.id}>
+                      {org.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -426,7 +490,9 @@ export default function InvoiceManager() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Organization Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Organization Name</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">
+                    Organization Name
+                  </label>
                   <input
                     type="text"
                     value={form.organizationName}
@@ -492,7 +558,9 @@ export default function InvoiceManager() {
 
                 {/* Postal Code */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Postal Code</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">
+                    Postal Code
+                  </label>
                   <input
                     type="text"
                     value={form.postalCode}
@@ -542,7 +610,9 @@ export default function InvoiceManager() {
                     onChange={(e) => updateForm('tier', e.target.value)}
                     className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-blue-500"
                   >
-                    <option value="" disabled>Select tier...</option>
+                    <option value="" disabled>
+                      Select tier...
+                    </option>
                     <option value="FREE">FREE</option>
                     <option value="BASIC">BASIC</option>
                     <option value="BUSINESS">BUSINESS</option>
@@ -564,7 +634,9 @@ export default function InvoiceManager() {
 
                 {/* Payment Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Payment Type</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">
+                    Payment Type
+                  </label>
                   <select
                     value={form.paymentType}
                     onChange={(e) => updateForm('paymentType', e.target.value)}
@@ -577,7 +649,9 @@ export default function InvoiceManager() {
 
                 {/* Number of Vehicles */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Number of Vehicles</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">
+                    Number of Vehicles
+                  </label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -589,7 +663,9 @@ export default function InvoiceManager() {
 
                 {/* Price per Vehicle */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Price per Vehicle (EUR)</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">
+                    Price per Vehicle (EUR)
+                  </label>
                   <input
                     type="text"
                     inputMode="decimal"
@@ -601,7 +677,9 @@ export default function InvoiceManager() {
 
                 {/* Total Price (auto-calculated, editable) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Total Price (EUR)</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">
+                    Total Price (EUR)
+                  </label>
                   <input
                     type="text"
                     inputMode="decimal"

@@ -7,13 +7,22 @@ export async function generateInvoiceNumber(): Promise<string> {
   const yearStart = new Date(now.getFullYear(), 0, 1)
   const yearEnd = new Date(now.getFullYear() + 1, 0, 1)
 
-  const count = await prisma.invoice.count({
+  const existing = await prisma.invoice.findMany({
     where: {
       createdAt: { gte: yearStart, lt: yearEnd },
+      deletedAt: null,
     },
+    select: { invoiceNumber: true },
   })
 
-  const orderNumber = String(count + 1).padStart(3, '0')
+  const used = new Set(
+    existing.map((i) => parseInt(i.invoiceNumber.slice(7), 10)).filter((n) => !Number.isNaN(n)),
+  )
+
+  let seq = 1
+  while (used.has(seq)) seq++
+
+  const orderNumber = String(seq).padStart(3, '0')
   return `FS-${yy}${mm}${orderNumber}`
 }
 

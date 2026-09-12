@@ -4,6 +4,7 @@ import prisma from '@/db/db'
 export async function GET() {
   try {
     const invoices = await prisma.invoice.findMany({
+      where: { deletedAt: null },
       orderBy: {
         createdAt: 'desc',
       },
