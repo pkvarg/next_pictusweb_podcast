@@ -1,0 +1,76 @@
+{
+  "name": "Data_retention",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "5b0f6a8e-3c1d-4b8a-9e2f-7d4c1a6b9e01",
+      "name": "Daily at 3:30",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        256
+      ],
+      "notesInFlow": true,
+      "notes": "Deletes personal data past the retention periods in the privacy policy"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://www.pictusweb.sk/api/cron/data-retention",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.PICTUSWEB_CRON_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "8c2e4f1a-6b3d-4e7f-a1c9-2f5b8d0e3a02",
+      "name": "Run data retention",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -160,
+        256
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Daily at 3:30": {
+      "main": [
+        [
+          {
+            "node": "Run data retention",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Bratislava"
+  },
+  "tags": []
+}
