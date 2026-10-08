@@ -1,17 +1,37 @@
 'use client'
+import { useEffect, useState } from 'react'
 import CookieConsent from 'react-cookie-consent'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { updateVisitors } from '@/lib/visitorsCounter'
+import { OPEN_COOKIE_SETTINGS_EVENT, storeConsent } from '@/lib/cookieConsent'
+
+type Visibility = 'byCookieValue' | 'show' | 'hidden'
 
 const CookieBanner = () => {
   const t = useTranslations('Home')
+  const locale = useLocale()
+  const [visible, setVisible] = useState<Visibility>('byCookieValue')
 
-  const increaseVisitors = async () => {
-    await updateVisitors()
+  // Footer "Cookie settings" link reopens the banner so consent can be
+  // withdrawn as easily as it was given.
+  useEffect(() => {
+    const open = () => setVisible('show')
+    window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, open)
+    return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, open)
+  }, [])
+
+  const decide = (granted: boolean) => {
+    const firstDecision = visible === 'byCookieValue'
+    storeConsent(granted)
+    setVisible('hidden')
+    if (firstDecision) {
+      updateVisitors()
+    }
   }
 
   return (
     <CookieConsent
+      visible={visible}
       location="bottom"
       style={{
         background: 'rgba(14, 15, 16, 0.92)',
@@ -36,30 +56,28 @@ const CookieBanner = () => {
         borderRadius: '9999px',
         border: 'none',
       }}
-      buttonText="OK"
+      buttonText={t('cookiesAgree')}
       expires={365}
       enableDeclineButton
-      onDecline={() => {
-        localStorage.setItem('CookieConsent', 'false')
-        increaseVisitors()
-      }}
+      flipButtons
+      onDecline={() => decide(false)}
       declineButtonStyle={{
         background: 'transparent',
-        color: '#a1a1aa',
+        color: '#e4e4e7',
         fontFamily: 'Satoshi, system-ui, sans-serif',
         fontSize: '14px',
-        fontWeight: 400,
-        padding: '10px 24px',
+        fontWeight: 700,
+        padding: '10px 32px',
         borderRadius: '9999px',
-        border: '1px solid rgba(255, 255, 255, 0.15)',
+        border: '1px solid rgba(255, 255, 255, 0.35)',
       }}
       declineButtonText={t('cookiesDisagree')}
-      onAccept={() => {
-        localStorage.setItem('CookieConsent', 'true')
-        increaseVisitors()
-      }}
+      onAccept={() => decide(true)}
     >
-      {t('cookies')}
+      {t('cookies')}{' '}
+      <a href={`/${locale}/gdpr#cookies`} style={{ color: '#94b84a', textDecoration: 'underline' }}>
+        {t('cookiesMore')}
+      </a>
     </CookieConsent>
   )
 }

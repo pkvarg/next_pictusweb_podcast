@@ -2,6 +2,7 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import Image from 'next/image'
+import { openCookieSettings } from '@/lib/cookieConsent'
 
 const satoshi = { fontFamily: 'Satoshi, system-ui, sans-serif' }
 
@@ -82,6 +83,9 @@ const Footer = () => {
             <Link href="/trade-rules" className="hover:text-pictus-lime">
               {t('footerTradeRules')}
             </Link>
+            <button type="button" onClick={openCookieSettings} className="hover:text-pictus-lime">
+              {t('footerCookieSettings')}
+            </button>
           </div>
         </div>
       </div>

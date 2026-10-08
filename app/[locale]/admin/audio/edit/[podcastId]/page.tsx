@@ -10,7 +10,6 @@ import Image from 'next/image'
 import { Loader } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import PreviewAudio from '@/lib/PreviewAudio'
-import { createAzureSpeech } from '../../../_actions/podcastAzureActions'
 import { createElevenlabsSpeech } from '../../../_actions/podcastElevenlabsActions'
 import { createOpenAiSpeech } from '../../../_actions/podcastOpenAiActions'
 import AdminBack from '@/app/components/admin/AdminBack'
@@ -52,7 +51,6 @@ const EditPodcast = () => {
   const [voiceProvider, setVoiceProvider] = useState('')
 
   const openaiVoices = ['alloy', 'shimmer', 'nova', 'echo', 'fable', 'onyx']
-  const azureVoices = ['Lukas', 'Viktoria']
   const elevenlabsVoices = [
     'Andrej',
     'Karol',
@@ -123,9 +121,6 @@ const EditPodcast = () => {
     if (voiceProvider === 'openai') {
       setVoiceCategs(openaiVoices)
       handleVoiceType('alloy')
-    } else if (voiceProvider === 'azure') {
-      setVoiceCategs(azureVoices)
-      handleVoiceType('Lukas')
     } else if (voiceProvider === 'elevenlabs') {
       setVoiceCategs(elevenlabsVoices)
       handleVoiceType('Karol')
@@ -216,13 +211,6 @@ const EditPodcast = () => {
     try {
       if (voiceProvider === 'openai') {
         const audio = await createOpenAiSpeech(podcastTitle, voiceType, textPrompt)
-
-        if (audio && audio.frontendPath) {
-          setAudioPath(audio.frontendPath)
-        }
-        setIsSubmittingText(false)
-      } else if (voiceProvider === 'azure') {
-        const audio = await createAzureSpeech(podcastTitle, voiceType, textPrompt)
 
         if (audio && audio.frontendPath) {
           setAudioPath(audio.frontendPath)
@@ -341,14 +329,6 @@ const EditPodcast = () => {
                     height={250}
                     alt="openai"
                     onClick={() => setVoiceProvider('openai')}
-                    className="w-[50px] cursor-pointer"
-                  />
-                  <Image
-                    src={'/tech/azure-logo.webp'}
-                    width={250}
-                    height={250}
-                    alt="azureai"
-                    onClick={() => setVoiceProvider('azure')}
                     className="w-[50px] cursor-pointer"
                   />
                   <Image

@@ -953,7 +953,7 @@ function GetStartedContent() {
               <span className="text-gray-300 font-light">
                 {t('gdprAgree')}{' '}
                 <a
-                  href="/gdpr"
+                  href="/gdpr#fleetsync"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors"
@@ -973,7 +973,7 @@ function GetStartedContent() {
               <span className="text-gray-300 font-light">
                 {t('termsAgree')}{' '}
                 <a
-                  href="/trade-rules"
+                  href="/trade-rules#fleetsync"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors"
@@ -982,6 +982,8 @@ function GetStartedContent() {
                 </a>
               </span>
             </label>
+
+            <p className="text-sm text-gray-400 font-light">{t('newsletterNotice')}</p>
           </div>
         )
 

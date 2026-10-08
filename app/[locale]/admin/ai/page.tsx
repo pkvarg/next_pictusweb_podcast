@@ -1,20 +1,11 @@
 'use client'
 import AdminLayout from '@/app/components/admin/AdminLayout'
 import React from 'react'
-import { createAzureSpeech } from '../_actions/podcastAzureActions'
 import { createElevenlabsSpeech } from '../_actions/podcastElevenlabsActions'
 import { voices } from '../_actions/podcastElevenlabsActions'
-import { Brain, Mic, VolumeX } from 'lucide-react'
+import { Mic, VolumeX } from 'lucide-react'
 
 const AI = () => {
-  const start = async () => {
-    const voiceType = 'Lukas'
-    const text = `Dobrý deň ja som ${voiceType}, hovorím po slovensky.`
-    const podcastTitle = 'azureTitul'
-
-    await createAzureSpeech(podcastTitle, voiceType, text)
-  }
-  
   const startEleven = async () => {
     const voiceType = 'Jessica'
     const text = `Dobrý deň ja som ${voiceType}, hovorím po slovensky.`
@@ -28,14 +19,6 @@ const AI = () => {
   }
 
   const aiServices = [
-    {
-      title: 'Azure Text-to-Speech',
-      description: 'Test Azure TTS with Slovak voice',
-      action: start,
-      icon: Brain,
-      color: 'from-pictus-lime to-pictus-lime600',
-      bgColor: 'bg-pictus-lime/10 hover:bg-pictus-lime/20'
-    },
     {
       title: 'ElevenLabs TTS',
       description: 'Test ElevenLabs voice synthesis',
@@ -100,13 +83,6 @@ const AI = () => {
         <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
           <h2 className="text-xl font-semibold text-white mb-4">Service Information</h2>
           <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-pictus-lime rounded-full mt-2 flex-shrink-0"></div>
-              <div>
-                <h3 className="font-medium text-white">Azure TTS</h3>
-                <p className="text-sm text-gray-400">Microsoft&apos;s neural voice synthesis with Slovak language support</p>
-              </div>
-            </div>
             <div className="flex items-start space-x-3">
               <div className="w-2 h-2 bg-pictus-lime rounded-full mt-2 flex-shrink-0"></div>
               <div>

@@ -2,6 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
+import { openCookieSettings } from '@/lib/cookieConsent'
 
 // homeBase is empty on the landing page (pure in-page hash anchors with smooth
 // scroll) and set to `/{locale}` on subpages so the section links navigate home.
@@ -66,6 +67,9 @@ const PictusFooter = ({ homeBase = '' }: { homeBase?: string }) => {
             <a href={`${homeBase}/contact`}>{t('footer.contact')}</a>
             <a href={`${homeBase}/gdpr`}>GDPR</a>
             <a href={`${homeBase}/trade-rules`}>{t('footer.terms')}</a>
+            <button type="button" className="footer-cookie-settings" onClick={openCookieSettings}>
+              {t('footer.cookieSettings')}
+            </button>
           </nav>
         </div>
       </div>

@@ -14,7 +14,6 @@ const Contact = () => {
   const [messageSuccess, setMessageSuccess] = useState<string | null>(null)
   const [email, setEmail] = useState('')
   const [mailMessage, setMailMessage] = useState('')
-  const [checkBox, setCheckBox] = useState<boolean>(false)
 
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -40,10 +39,6 @@ const Contact = () => {
       console.error('Error reading search params:', error)
     }
   }, [searchParams])
-
-  const handleCheckBox = () => {
-    setCheckBox((current) => !current)
-  }
 
   // Anti-spam: Content validation function
   const isSpamContent = (text: string): boolean => {
@@ -412,22 +407,6 @@ const Contact = () => {
             />
           </div>
 
-          <label className="contact-consent" htmlFor="flexCheckDefault">
-            <input
-              id="flexCheckDefault"
-              type="checkbox"
-              defaultChecked={false}
-              onChange={handleCheckBox}
-              required
-            />
-            <span>
-              {t('contactAgree')}{' '}
-              <Link href="/gdpr" target="_blank">
-                {t('contactGdpr')}
-              </Link>
-            </span>
-          </label>
-
           <input
             className="form-control hidden"
             type="text"
@@ -445,6 +424,15 @@ const Contact = () => {
             <Send className="w-4 h-4" />
             {t('contactSend')}
           </button>
+          <p className="contact-privacy-note">
+            {t.rich('contactPrivacyNote', {
+              link: (chunks) => (
+                <Link href="/gdpr#contact-form" target="_blank">
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </p>
         </form>
       </div>
     </section>

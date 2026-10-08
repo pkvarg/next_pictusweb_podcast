@@ -1,26 +1,18 @@
 'use client'
 import Script from 'next/script'
 import { useEffect, useState } from 'react'
+import { hasAnalyticsConsent } from '@/lib/cookieConsent'
 
 const ConditionalUmami = () => {
   const [hasConsent, setHasConsent] = useState(false)
 
   useEffect(() => {
-    // Check if user has given consent
-    const checkConsent = () => {
-      const consent = localStorage.getItem('CookieConsent')
-      if (consent === 'true') {
-        setHasConsent(true)
-      }
-    }
+    // Follows the consent both ways; a withdrawal is also enforced by
+    // `umami.disabled` (see lib/cookieConsent) for an already loaded script.
+    const checkConsent = () => setHasConsent(hasAnalyticsConsent())
 
-    // Check initially
     checkConsent()
-
-    // Listen for storage changes (when consent is given/revoked)
     window.addEventListener('storage', checkConsent)
-    
-    // Also check periodically in case consent is set in the same tab
     const interval = setInterval(checkConsent, 1000)
 
     return () => {

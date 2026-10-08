@@ -1983,8 +1983,17 @@ input[type='date']::-webkit-calendar-picker-indicator {
 .pl .footer-contact a,
 .pl .footer-client-link,
 .pl .footer-nav a,
-.pl .footer-legal a {
+.pl .footer-legal a,
+.pl .footer-legal .footer-cookie-settings {
   color: rgba(181, 178, 171, 0.78);
+}
+
+.pl .footer-legal .footer-cookie-settings {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
 }
 
 .pl .footer-contact strong,
@@ -3071,6 +3080,54 @@ input[type='date']::-webkit-calendar-picker-indicator {
   border-top: 1px solid var(--line-soft);
 }
 
+.pl .prose section[id] {
+  scroll-margin-top: 96px;
+}
+
+.pl .legal-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto 36px;
+}
+
+.pl .legal-tab {
+  padding: 10px 22px;
+  border: 1px solid var(--line-soft);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+}
+
+.pl .legal-tab:hover {
+  border-color: var(--moss);
+  color: var(--text);
+}
+
+.pl .legal-tab[aria-selected='true'] {
+  border-color: var(--moss);
+  background: var(--moss);
+  color: #0e0f10;
+}
+
+.pl .contact-privacy-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.pl .contact-privacy-note a {
+  color: var(--moss);
+  text-decoration: underline;
+}
+
 /* Auth pages */
 .pl .auth-shell {
   display: grid;
@@ -3941,7 +3998,8 @@ input[type='date']::-webkit-calendar-picker-indicator {
   font-size: 0.9rem;
   transition: color 180ms ease;
 }
-.pl .footer-legal a:hover {
+.pl .footer-legal a:hover,
+.pl .footer-legal .footer-cookie-settings:hover {
   color: var(--moss);
 }
 @media (max-width: 860px) {

@@ -162,20 +162,19 @@ const PictusCta = () => {
             />
           </div>
 
-          <label className="contact-consent">
-            <input type="checkbox" required />
-            <span>
-              {th('contactAgree')}{' '}
-              <a href={`/${currentLocale}/gdpr`} target="_blank" rel="noopener noreferrer">
-                {th('contactGdpr')}
-              </a>
-            </span>
-          </label>
-
           <button className="button button-primary" type="submit" disabled={status === 'sending'}>
             {status === 'sending' ? t('cta.form.sending') : t('cta.form.send')}{' '}
             <span aria-hidden="true">→</span>
           </button>
+          <p className="contact-privacy-note">
+            {th.rich('contactPrivacyNote', {
+              link: (chunks) => (
+                <a href={`/${currentLocale}/gdpr#contact-form`} target="_blank" rel="noopener noreferrer">
+                  {chunks}
+                </a>
+              ),
+            })}
+          </p>
           {status === 'success' && (
             <p className="contact-status contact-status-success">{t('cta.form.success')}</p>
           )}

@@ -7,7 +7,6 @@ import { AiOutlineDelete } from 'react-icons/ai'
 import { Loader } from 'lucide-react'
 import { create } from '@/app/[locale]/admin/_actions/podcastActions'
 import { createOpenAiSpeech } from '../_actions/podcastOpenAiActions'
-import { createAzureSpeech } from '../_actions/podcastAzureActions'
 import { createElevenlabsSpeech } from '../_actions/podcastElevenlabsActions'
 
 import PreviewAudio from '@/lib/PreviewAudio'
@@ -45,7 +44,6 @@ const Audio = () => {
   const [voiceProvider, setVoiceProvider] = useState('')
 
   const openaiVoices = ['alloy', 'shimmer', 'nova', 'echo', 'fable', 'onyx']
-  const azureVoices = ['Lukas', 'Viktoria']
   const elevenlabsVoices = [
     'Andrej',
     'Karol',
@@ -75,9 +73,6 @@ const Audio = () => {
     if (voiceProvider === 'openai') {
       setVoiceCategs(openaiVoices)
       handleVoiceType('alloy')
-    } else if (voiceProvider === 'azure') {
-      setVoiceCategs(azureVoices)
-      handleVoiceType('Lukas')
     } else if (voiceProvider === 'elevenlabs') {
       setVoiceCategs(elevenlabsVoices)
       handleVoiceType('Karol')
@@ -279,8 +274,6 @@ const Audio = () => {
       let audio
       if (voiceProvider === 'openai') {
         audio = await createOpenAiSpeech(podcastTitle, voiceType, textPrompt)
-      } else if (voiceProvider === 'azure') {
-        audio = await createAzureSpeech(podcastTitle, voiceType, textPrompt)
       } else if (voiceProvider === 'elevenlabs') {
         audio = await createElevenlabsSpeech(podcastTitle, voiceType, textPrompt)
       }
@@ -332,14 +325,6 @@ const Audio = () => {
                   height={250}
                   alt="openai"
                   onClick={() => setVoiceProvider('openai')}
-                  className="w-[50px] cursor-pointer"
-                />
-                <Image
-                  src={'/tech/azure-logo.webp'}
-                  width={250}
-                  height={250}
-                  alt="azureai"
-                  onClick={() => setVoiceProvider('azure')}
                   className="w-[50px] cursor-pointer"
                 />
                 <Image

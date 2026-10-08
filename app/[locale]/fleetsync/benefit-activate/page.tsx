@@ -135,7 +135,7 @@ export default function BenefitActivatePage() {
                 <label htmlFor="gdpr" className="text-sm text-gray-300">
                   {to('gdprAgree')}{' '}
                   <a
-                    href="/contact#gdpr"
+                    href="/gdpr#fleetsync"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-pictus-lime hover:text-pictus-lime400 underline"
@@ -160,7 +160,7 @@ export default function BenefitActivatePage() {
                 <label htmlFor="terms" className="text-sm text-gray-300">
                   {to('termsAgree')}{' '}
                   <a
-                    href="/contact#trade-rules"
+                    href="/trade-rules#fleetsync"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-pictus-lime hover:text-pictus-lime400 underline"
