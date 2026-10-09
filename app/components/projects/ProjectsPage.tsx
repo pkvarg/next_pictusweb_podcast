@@ -51,7 +51,6 @@ const projects = [
   {
     title: 'michaldovala.sk',
     image: '/projects/michaldovala.webp',
-    href: 'https://michaldovala.vercel.app',
     descriptionKey: 'projectMichaldovalaDesc',
   },
   {
@@ -92,33 +91,50 @@ const ProjectsPage = () => {
                   className={`project-row${index % 2 === 1 ? ' is-reversed' : ''}`}
                   key={project.title}
                 >
-                  <a
-                    className="project-media"
-                    href={project.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={project.title}
-                  >
-                    <Image
-                      src={project.image}
-                      alt={project.title}
-                      width={1200}
-                      height={750}
-                      style={{ objectPosition: project.objectPosition || 'center top' }}
-                      sizes="(max-width: 860px) 100vw, 55vw"
-                    />
-                  </a>
-
-                  <div className="project-copy">
+                  {project.href ? (
                     <a
-                      className="project-title-link"
+                      className="project-media"
                       href={project.href}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={project.title}
                     >
-                      <h3>{project.title}</h3>
-                      <ExternalLink aria-hidden="true" />
+                      <Image
+                        src={project.image}
+                        alt={project.title}
+                        width={1200}
+                        height={750}
+                        style={{ objectPosition: project.objectPosition || 'center top' }}
+                        sizes="(max-width: 860px) 100vw, 55vw"
+                      />
                     </a>
+                  ) : (
+                    <div className="project-media">
+                      <Image
+                        src={project.image}
+                        alt={project.title}
+                        width={1200}
+                        height={750}
+                        style={{ objectPosition: project.objectPosition || 'center top' }}
+                        sizes="(max-width: 860px) 100vw, 55vw"
+                      />
+                    </div>
+                  )}
+
+                  <div className="project-copy">
+                    {project.href ? (
+                      <a
+                        className="project-title-link"
+                        href={project.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3>{project.title}</h3>
+                        <ExternalLink aria-hidden="true" />
+                      </a>
+                    ) : (
+                      <h3>{project.title}</h3>
+                    )}
                     <p>{t(project.descriptionKey)}</p>
                   </div>
                 </article>

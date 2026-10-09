@@ -2,23 +2,41 @@
 import React, { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
-type Project = { title: string; href: string; image: string; position: string }
+// href is optional: projects whose site is no longer public stay as a showcase without a link.
+type Project = { title: string; href?: string; image: string; position: string }
 
-const ProjectCard = ({ project }: { project: Project }) => (
-  <a
-    className="work-project-card"
-    href={project.href}
-    target="_blank"
-    rel="noopener noreferrer"
-    style={{ '--project-position': project.position } as React.CSSProperties}
-  >
-    <span className="work-project-media">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={project.image} alt={`${project.title} project preview`} loading="lazy" />
-    </span>
-    <span className="work-project-label">{project.title}</span>
-  </a>
-)
+const ProjectCard = ({ project }: { project: Project }) => {
+  const style = { '--project-position': project.position } as React.CSSProperties
+  const content = (
+    <>
+      <span className="work-project-media">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={project.image} alt={`${project.title} project preview`} loading="lazy" />
+      </span>
+      <span className="work-project-label">{project.title}</span>
+    </>
+  )
+
+  if (!project.href) {
+    return (
+      <div className="work-project-card" style={style}>
+        {content}
+      </div>
+    )
+  }
+
+  return (
+    <a
+      className="work-project-card"
+      href={project.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={style}
+    >
+      {content}
+    </a>
+  )
+}
 
 const slides: { variant: 'a' | 'b'; primary: Project; supporting: [Project, Project] }[] = [
   {
@@ -71,7 +89,6 @@ const slides: { variant: 'a' | 'b'; primary: Project; supporting: [Project, Proj
     variant: 'a',
     primary: {
       title: 'michaldovala.sk',
-      href: 'https://michaldovala.vercel.app',
       image: '/projects/michaldovala.webp',
       position: 'center top',
     },
