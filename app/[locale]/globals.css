@@ -3992,15 +3992,23 @@ input[type='date']::-webkit-calendar-picker-indicator {
   display: flex;
   gap: 24px;
 }
-.pl .footer-legal a {
+.pl .footer-legal a,
+.pl .footer-legal .footer-cookie-settings {
   color: var(--text-muted);
   font-family: var(--font-body);
   font-size: 0.9rem;
   transition: color 180ms ease;
 }
-.pl .footer-legal a:hover,
-.pl .footer-legal .footer-cookie-settings:hover {
+.pl .footer-legal a:hover {
   color: var(--moss);
+}
+/* Cookie settings stands out in the site's lime green; hover underlines it instead. */
+.pl .footer-legal .footer-cookie-settings {
+  color: var(--moss);
+}
+.pl .footer-legal .footer-cookie-settings:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 @media (max-width: 860px) {
   .pl .footer-top {

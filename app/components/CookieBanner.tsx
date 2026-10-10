@@ -59,7 +59,6 @@ const CookieBanner = () => {
       buttonText={t('cookiesAgree')}
       expires={365}
       enableDeclineButton
-      flipButtons
       onDecline={() => decide(false)}
       declineButtonStyle={{
         background: 'transparent',
