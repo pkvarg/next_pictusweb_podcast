@@ -1,12 +1,25 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 import jwt from 'jsonwebtoken'
 
 const METABASE_SITE_URL = process.env.METABASE_SITE_URL
 const METABASE_SECRET_KEY = process.env.METABASE_SECRET_KEY
 const METABASE_DASHBOARD_ID = process.env.METABASE_DASHBOARD_ID || '10'
 
-export async function GET() {
+// Middleware skips /api, so the admin check has to live here: a signed embed URL opens the dashboard for anyone.
+export async function GET(request: NextRequest) {
   try {
+    const session = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
+    })
+    if (!session) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    }
+    if (session.role !== 'ADMIN' && session.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     if (!METABASE_SITE_URL || !METABASE_SECRET_KEY) {
       console.error('Metabase environment variables not configured')
       return NextResponse.json({ error: 'Metabase not configured' }, { status: 500 })
