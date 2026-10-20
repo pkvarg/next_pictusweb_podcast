@@ -58,8 +58,6 @@ export async function create(formData: FormData): Promise<{ success: boolean; me
     return { success: false, message: 'Neautorizovaný prístup' }
   }
 
-  'use server'
-
   try {
     const data: PodcastData = {
       title: formData.get('title')?.toString() || '',
@@ -178,8 +176,6 @@ export async function editSinglePodcast(
     return { success: false, message: 'Neautorizovaný prístup' }
   }
 
-  'use server'
-
   try {
     const data: Podcast = {
       id: formData.get('id')?.toString() || '',
@@ -219,8 +215,6 @@ export async function changePodcastPublishStatus(
   if (!(await isAdminSession())) {
     return { success: false, message: 'Neautorizovaný prístup' }
   }
-
-  'use server'
 
   try {
     const id = formData.get('id')?.toString() || ''
