@@ -13,6 +13,7 @@ import PreviewAudio from '@/lib/PreviewAudio'
 import { createElevenlabsSpeech } from '../../../_actions/podcastElevenlabsActions'
 import { createOpenAiSpeech } from '../../../_actions/podcastOpenAiActions'
 import AdminBack from '@/app/components/admin/AdminBack'
+import { uploadAuthHeaders } from '@/lib/uploadTokenClient'
 
 interface Podcast {
   id: string
@@ -176,6 +177,7 @@ const EditPodcast = () => {
         const response = await fetch(apiUrl, {
           method: 'POST',
           body: formdata,
+          headers: await uploadAuthHeaders('pictusweb'),
         })
 
         if (!response.ok) {

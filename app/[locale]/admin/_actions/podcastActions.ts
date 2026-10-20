@@ -4,6 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import OpenAI from 'openai'
 import { getTimeStamp } from '@/lib/timestamp'
+import { isAdminSession } from '@/lib/adminGuard'
 
 const openai = new OpenAI()
 
@@ -53,6 +54,10 @@ interface Podcast extends PodcastData {
 // }
 
 export async function create(formData: FormData): Promise<{ success: boolean; message: string }> {
+  if (!(await isAdminSession())) {
+    return { success: false, message: 'Neautorizovaný prístup' }
+  }
+
   'use server'
 
   try {
@@ -144,6 +149,10 @@ export async function getSinglePodcast(podcastId: string): Promise<{
 export async function deleteSinglePodcast(
   podcastId: string,
 ): Promise<{ success: boolean; message: string }> {
+  if (!(await isAdminSession())) {
+    return { success: false, message: 'Neautorizovaný prístup' }
+  }
+
   const data = {
     deleted: true,
     published: false,
@@ -165,6 +174,10 @@ export async function deleteSinglePodcast(
 export async function editSinglePodcast(
   formData: FormData,
 ): Promise<{ success: boolean; message: string }> {
+  if (!(await isAdminSession())) {
+    return { success: false, message: 'Neautorizovaný prístup' }
+  }
+
   'use server'
 
   try {
@@ -203,6 +216,10 @@ export async function editSinglePodcast(
 export async function changePodcastPublishStatus(
   formData: FormData,
 ): Promise<{ success: boolean; message: string }> {
+  if (!(await isAdminSession())) {
+    return { success: false, message: 'Neautorizovaný prístup' }
+  }
+
   'use server'
 
   try {

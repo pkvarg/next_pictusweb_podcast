@@ -4,6 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import AdminLayout from '@/app/components/admin/AdminLayout'
 import AdminBack from '@/app/components/admin/AdminBack'
+import { uploadAuthHeaders } from '@/lib/uploadTokenClient'
 
 const FileUpload = () => {
   const [loading, setLoading] = useState<boolean>(false)
@@ -67,6 +68,7 @@ const FileUpload = () => {
       const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
+        headers: await uploadAuthHeaders('pictusweb'),
       })
 
       if (!response.ok) {

@@ -3,10 +3,14 @@ import { getTimeStamp } from '@/lib/timestamp'
 import OpenAI from 'openai'
 import fs from 'fs'
 import path from 'path'
+import { uploadAuthHeader } from '@/lib/uploadToken'
+import { assertAdmin } from '@/lib/adminGuard'
 
 const openai = new OpenAI()
 
 export async function createOpenAiSpeech(podcastTitle: string, voiceType: any, inputText: string) {
+  await assertAdmin()
+
   try {
     const mp3Response = await openai.audio.speech.create({
       model: 'tts-1',
@@ -27,6 +31,7 @@ export async function createOpenAiSpeech(podcastTitle: string, voiceType: any, i
       method: 'POST',
       headers: {
         'Content-Type': 'audio/mpeg',
+        ...uploadAuthHeader(),
       },
       body: arrayBuffer,
     })

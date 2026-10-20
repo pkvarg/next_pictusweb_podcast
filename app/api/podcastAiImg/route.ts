@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { getTimeStamp } from '@/lib/timestamp'
+import { uploadAuthHeader } from '@/lib/uploadToken'
+import { isAdminSession } from '@/lib/adminGuard'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -8,6 +10,10 @@ const openai = new OpenAI({
 })
 
 export async function POST(req: NextRequest) {
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     // Check if OpenAI API key is configured
     if (!process.env.OPENAI_API_KEY) {
@@ -80,6 +86,7 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'image/png',
+        ...uploadAuthHeader(),
       },
       body: arrayBuffer,
     })

@@ -5,6 +5,7 @@ import { Link, useRouter } from '@/i18n/routing'
 import { User, UserCheck, LogOut, Car, ArrowLeft, Save, ShieldAlert, Upload, X } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
+import { uploadAuthHeaders } from '@/lib/uploadTokenClient'
 
 const NewVehiclePage = () => {
   const { data: session, status } = useSession()
@@ -119,6 +120,7 @@ const NewVehiclePage = () => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/upload/fleetsync`, {
         method: 'POST',
         body: formDataUpload,
+        headers: await uploadAuthHeaders('fleetsync'),
       })
 
       if (!response.ok) {

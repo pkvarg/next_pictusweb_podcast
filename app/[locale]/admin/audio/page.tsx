@@ -13,6 +13,7 @@ import PreviewAudio from '@/lib/PreviewAudio'
 import AdminLayout from '@/app/components/admin/AdminLayout'
 import AdminBack from '@/app/components/admin/AdminBack'
 import { Download } from 'lucide-react'
+import { uploadAuthHeaders } from '@/lib/uploadTokenClient'
 
 const Audio = () => {
   const { toast } = useToast()
@@ -189,6 +190,7 @@ const Audio = () => {
         const response = await fetch(apiUrl, {
           method: 'POST',
           body: formdata,
+          headers: await uploadAuthHeaders('pictusweb'),
         })
 
         if (!response.ok) {

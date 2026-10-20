@@ -17,6 +17,7 @@ import {
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
+import { uploadAuthHeaders } from '@/lib/uploadTokenClient'
 
 interface MyVehicle {
   id: string
@@ -174,6 +175,7 @@ const EditVehiclePage = () => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/upload/fleetsync`, {
         method: 'POST',
         body: formDataUpload,
+        headers: await uploadAuthHeaders('fleetsync'),
       })
 
       if (!response.ok) {

@@ -2,6 +2,8 @@
 import { ElevenLabsClient, ElevenLabs } from '@elevenlabs/elevenlabs-js'
 import axios from 'axios'
 import { getTimeStamp } from '@/lib/timestamp'
+import { uploadAuthHeader } from '@/lib/uploadToken'
+import { assertAdmin } from '@/lib/adminGuard'
 
 const client = new ElevenLabsClient({ apiKey: process.env.ELEVEN_KEY })
 
@@ -35,6 +37,8 @@ export async function createElevenlabsSpeech(
   voiceType: any,
   inputText: string,
 ) {
+  await assertAdmin()
+
   function getVoiceId(voiceType: string): string {
     // Create a mapping between the voiceType and voiceId
     const voiceMap: { [key: string]: string } = {
@@ -101,6 +105,7 @@ export async function createElevenlabsSpeech(
       method: 'POST',
       headers: {
         'Content-Type': 'audio/mpeg', // Correct content type for MP3
+        ...uploadAuthHeader(),
       },
       //body: new Uint8Array(buffer),
       body: buffer,
@@ -126,6 +131,8 @@ export async function createElevenlabsSpeech(
 
 // get voices Names  2
 export async function voices() {
+  await assertAdmin()
+
   const apiKey = process.env.ELEVEN_KEY!
   const url = 'https://api.elevenlabs.io/v1/voices'
 
