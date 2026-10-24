@@ -50,6 +50,7 @@ const PictusHeader = () => {
           }}
         >
           <Link href="/fleetsync">FleetSync</Link>
+          <Link href="/picdocs">PicDocs</Link>
           <Link href="/podcasts">{th('navbarPodcasts')}</Link>
           <Link href="/projects">{t('nav.work')}</Link>
           <Link href="/contact">{t('nav.contact')}</Link>

@@ -15,6 +15,7 @@
     "footerForClients": "Ügyfeleknek",
     "navbarOffer": "Ajánlat",
     "navbarAutomatizations": "FleetSync",
+    "navbarPicDocs": "PicDocs",
     "navbarPodcasts": "Podcastok",
     "navbarProjects": "Projektek",
     "navbarContact": "Kapcsolat",
@@ -1311,5 +1312,28 @@
     "termsFleetSyncSection15Text": "15.1. Bármely rendelkezés érvénytelensége nem érinti a többi rendelkezés érvényességét.\n15.2. Jelen ÁÜF a Szolgáltatás weboldalán történő közzététel napján lép hatályba.\n15.3. Az ÁÜF aktuális változata mindig elérhető a FleetSync weboldalán.\n15.4. A szlovák és az idegen nyelvű változat közötti ellentmondás esetén a szlovák változat az irányadó.",
     "termsContactTitle": "A SZOLGÁLTATÓ ELÉRHETŐSÉGEI",
     "termsContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Szlovák Köztársaság\nCégjegyzékszám: 54 631 068 | Adószám: 2121741424\nE-mail: info@pictusweb.sk\nTelefon: +421 948 024 638\nWeb: pictusweb.sk"
+  },
+  "PicDocs": {
+    "landingTitle": "PicDocs",
+    "landingSubtitle": "Automatizált számviteli bizonylat-feldolgozás.",
+    "loginCta": "Bejelentkezés",
+    "workspaceTitle": "PicDocs",
+    "workspaceSubtitle": "Munkaterület",
+    "runIntro": "Indítsa el az új számviteli bizonylatok feldolgozását a Dokladóból.",
+    "runButton": "Bizonylatok feldolgozása",
+    "running": "Bizonylatok feldolgozása… ez eltarthat egy ideig",
+    "successMsg": "Kész — {count} bizonylat feldolgozva. Összesítő e-mail elküldve ide: {email}.",
+    "nothingMsg": "Nincs feldolgozandó új bizonylat.",
+    "resetButton": "Bizonylatok visszaállítása (teszt)",
+    "resetting": "Visszaállítás…",
+    "resetDoneMsg": "{count} bizonylat visszaállítva újrafeldolgozásra.",
+    "orgLabel": "Szervezet",
+    "userLabel": "Bejelentkezve",
+    "howToTitle": "Hogyan működik",
+    "howStep1": "A Doklado alkalmazásban szkennelje be a bizonylatot — a tételek beolvasásához FÉNYKÉPEZZE le a bizonylatot.",
+    "howStep2": "Itt kattintson a „Bizonylatok feldolgozása” gombra — minden új (még nem exportált) bizonylat feldolgozásra kerül a Dokladóból.",
+    "howStep3": "Az összesítő és három Money S3 CSV-fájl e-mailben érkezik; a feldolgozott bizonylatok a Dokladóban exportáltként lesznek megjelölve.",
+    "rateLimitMsg": "Túl sok futtatás, próbálja meg később.",
+    "errorMsg": "A feldolgozás sikertelen. A bizonylatok nem változtak, próbálja újra."
   }
 }

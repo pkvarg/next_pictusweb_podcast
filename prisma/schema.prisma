@@ -97,6 +97,7 @@ model User {
   vehicleExpenses      MyVehicleExpense[]
   vehicleMileage       MyVehicleMileage[]
   vehicleNotifications VehicleNotification[]
+  picDocsRuns          PicDocsRun[]
 }
 
 model VehicleNotification {
@@ -280,6 +281,11 @@ enum Role {
   CLIENT
 }
 
+enum Product {
+  FLEETSYNC
+  PICDOCS
+}
+
 model Tier {
   id                      String         @id @default(uuid())
   name                    String         @unique @db.VarChar(50)
@@ -309,6 +315,9 @@ model Organization {
   id                              String         @id @default(uuid())
   name                            String         @db.VarChar(100)
   mainContact                     String?        @map("main_contact") @db.VarChar(100)
+
+  // Which product this organization uses (FleetSync by default so existing orgs are untouched)
+  product                         Product        @default(FLEETSYNC)
 
   // Tier reference
   tierId                          String?        @map("tier_id")
@@ -389,6 +398,10 @@ model Organization {
   notificationChannelOptions      NotificationChannelOption[]
   vehicleNotifications            VehicleNotification[]
   dutyRenewalPresets              DutyRenewalPreset[]
+
+  // PicDocs (only populated when product = PICDOCS)
+  picDocsOrg                      PicDocsOrg?
+  picDocsRuns                     PicDocsRun[]
 
   @@index([tierId])
   @@index([parentOrganizationId])
@@ -550,4 +563,40 @@ model Invoice {
 
   @@index([invoiceNumber])
   @@map("invoices")
+}
+
+model PicDocsOrg {
+  organizationId        String        @id @map("organization_id")
+  organizationRelation  Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  dokladoApiKeyEnc      String?       @map("doklado_api_key_enc")
+  dokladoOrganizationId String        @map("doklado_organization_id") @db.VarChar(50)
+  recipientEmail        String        @map("recipient_email") @db.VarChar(255)
+
+  runsThisHour          Int           @default(0) @map("runs_this_hour")
+  rateWindowStart       DateTime?     @map("rate_window_start")
+  lastRunAt             DateTime?     @map("last_run_at")
+
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  @@map("picdocs_orgs")
+}
+
+model PicDocsRun {
+  id                   String        @id @default(uuid())
+  organizationId       String        @map("organization_id")
+  organizationRelation Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId               String?       @map("user_id")
+  user                 User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status               String        @db.VarChar(20)
+  processedCount       Int           @default(0) @map("processed_count")
+  flaggedCount         Int           @default(0) @map("flagged_count")
+  errorMessage         String?       @map("error_message") @db.Text
+  startedAt            DateTime      @default(now()) @map("started_at")
+  finishedAt           DateTime?     @map("finished_at")
+
+  @@index([organizationId])
+  @@index([status])
+  @@map("picdocs_runs")
 }

@@ -4,6 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { isValidPassword } from './isValidPassword'
 import prisma from '@/db/db'
 import { rateLimit } from './rateLimit'
+import { Product } from '@prisma/client'
 
 // Extend the built-in session types
 declare module 'next-auth' {
@@ -17,6 +18,7 @@ declare module 'next-auth' {
       organizationId?: string // Explicit organizationId field
       isFleetManager?: boolean
       organizationDeleted?: boolean
+      product?: Product // Which product the user's organization uses (FleetSync by default)
     }
   }
 
@@ -28,6 +30,7 @@ declare module 'next-auth' {
     organization?: string // Contains organizationId (UUID) after migration
     organizationId?: string // Explicit organizationId field
     isFleetManager?: boolean
+    product?: Product
   }
 }
 
@@ -86,15 +89,17 @@ export const authOptions = {
             token.organization = dbUser.organizationId || dbUser.organization // Use organizationId (UUID) first
             token.isFleetManager = dbUser.isFleetManager
 
-            // Check if organization is soft-deleted
+            // Check if organization is soft-deleted + load its product dimension
             if (dbUser.organizationId) {
               const org = await prisma.organization.findUnique({
                 where: { id: dbUser.organizationId },
-                select: { deletedAt: true },
+                select: { deletedAt: true, product: true },
               })
               token.organizationDeleted = org?.deletedAt ? true : false
+              token.product = org?.product ?? Product.FLEETSYNC
             } else {
               token.organizationDeleted = false
+              token.product = Product.FLEETSYNC
             }
 
             // Update login tracking
@@ -118,22 +123,26 @@ export const authOptions = {
             token.organization = dbUser.organizationId || dbUser.organization // Use organizationId (UUID) first
             token.isFleetManager = dbUser.isFleetManager
 
-            // Check if organization is soft-deleted
+            // Check if organization is soft-deleted + load its product dimension
             if (dbUser.organizationId) {
               const org = await prisma.organization.findUnique({
                 where: { id: dbUser.organizationId },
-                select: { deletedAt: true },
+                select: { deletedAt: true, product: true },
               })
               token.organizationDeleted = org?.deletedAt ? true : false
+              token.product = org?.product ?? Product.FLEETSYNC
+            } else {
+              token.product = Product.FLEETSYNC
             }
           }
         } else if (token.organizationId) {
-          // Always refresh organizationDeleted status from DB
+          // Always refresh organizationDeleted status + product from DB
           const org = await prisma.organization.findUnique({
             where: { id: token.organizationId as string },
-            select: { deletedAt: true },
+            select: { deletedAt: true, product: true },
           })
           token.organizationDeleted = org?.deletedAt ? true : false
+          token.product = org?.product ?? Product.FLEETSYNC
         }
 
         return token
@@ -154,6 +163,7 @@ export const authOptions = {
           session.user.organization = token.organization
           session.user.isFleetManager = token.isFleetManager || false
           session.user.organizationDeleted = token.organizationDeleted || false
+          session.user.product = token.product || Product.FLEETSYNC
         }
 
         return session

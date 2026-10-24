@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { Link } from '@/i18n/routing'
-import { Upload, Eye, Bot, Mail, Plus, BarChart3, Mic, Building, User, Car } from 'lucide-react'
+import { Upload, Eye, Bot, Mail, Plus, BarChart3, Mic, Building, User, Car, FileText } from 'lucide-react'
 import Counter from './Counter'
 import RefreshButton from './RefreshButton'
 
@@ -30,6 +30,14 @@ const AdminDashboard = () => {
       icon: User,
       color: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-500/10 hover:bg-purple-500/20',
+    },
+    {
+      title: 'PicDocs',
+      description: 'Manage PicDocs organizations',
+      href: '/admin/picdocs',
+      icon: FileText,
+      color: 'from-cyan-500 to-cyan-600',
+      bgColor: 'bg-cyan-500/10 hover:bg-cyan-500/20',
     },
     {
       title: 'Vehicle Notifications',

@@ -38,6 +38,7 @@ const PictusPagesHeader = () => {
   const navLinks = [
     { href: '/', label: t('navbarHome') },
     { href: '/fleetsync', label: t('navbarAutomatizations') },
+    { href: '/picdocs', label: t('navbarPicDocs') },
     { href: '/projects', label: t('navbarProjects') },
     { href: '/podcasts', label: t('navbarPodcasts') },
     { href: '/contact', label: t('navbarContact') },

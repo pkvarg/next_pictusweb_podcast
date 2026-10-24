@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [trustDevice, setTrustDevice] = useState(false)
   const [pendingUserId, setPendingUserId] = useState('')
   const [pendingRole, setPendingRole] = useState('')
+  const [pendingProduct, setPendingProduct] = useState('')
   const [checking2FA, setChecking2FA] = useState(false)
   const [resending, setResending] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
@@ -31,9 +32,13 @@ export default function LoginPage() {
 
   const locale = pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
 
+  // Post-login landing: admins manage everything, others go to their product's workspace.
+  const targetFor = (role?: string, product?: string) =>
+    role === 'admin' ? 'admin' : product === 'PICDOCS' ? 'picdocs/app' : 'client'
+
   useEffect(() => {
     if (session?.user && !checking2FA) {
-      const redirectPath = session.user.role === 'admin' ? 'admin' : 'client'
+      const redirectPath = targetFor(session.user.role, (session.user as any).product)
       window.location.href = `/${locale}/${redirectPath}`
     }
   }, [session, locale, checking2FA])
@@ -82,20 +87,22 @@ export default function LoginPage() {
         const sessionData = await sessionRes.json()
         const userId = sessionData?.user?.id || ''
         const role = sessionData?.user?.role || 'client'
+        const product = sessionData?.user?.product
 
         if (process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true') {
-          window.location.href = `/${locale}/${role === 'admin' ? 'admin' : 'client'}`
+          window.location.href = `/${locale}/${targetFor(role, product)}`
           return
         }
 
         const trusted = await checkDeviceTrust(userId)
         if (trusted) {
-          window.location.href = `/${locale}/${role === 'admin' ? 'admin' : 'client'}`
+          window.location.href = `/${locale}/${targetFor(role, product)}`
           return
         }
 
         setPendingUserId(userId)
         setPendingRole(role)
+        setPendingProduct(product || '')
 
         await fetch('/api/auth/send-2fa', {
           method: 'POST',
@@ -151,7 +158,7 @@ export default function LoginPage() {
         })
       }
 
-      window.location.href = `/${locale}/${pendingRole === 'admin' ? 'admin' : 'client'}`
+      window.location.href = `/${locale}/${targetFor(pendingRole, pendingProduct)}`
     } catch {
       setError(t('loginError'))
     } finally {

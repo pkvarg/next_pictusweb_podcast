@@ -24,6 +24,10 @@ const protectedRoutes = [
   '/en/client',
   '/sk/client',
   '/hu/client',
+  '/picdocs/app',
+  '/en/picdocs/app',
+  '/sk/picdocs/app',
+  '/hu/picdocs/app',
 ]
 // Routes that require admin role
 const adminRoutes = ['/admin', '/en/admin', '/sk/admin', '/hu/admin']
@@ -34,6 +38,7 @@ export default async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   const isLoggedIn = !!token
   const userRole = token?.role // Get role from JWT token
+  const userProduct = (token?.product as string) || 'FLEETSYNC' // Product dimension (missing = FleetSync)
 
   const isProtectedRoute = protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
   const isAdminRoute = adminRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
@@ -57,6 +62,20 @@ export default async function middleware(req: NextRequest) {
     // Only allow access if user has ADMIN role (check both cases for compatibility)
     if (userRole !== 'ADMIN' && userRole !== 'admin') {
       return NextResponse.redirect(new URL(`/${locale}`, req.url))
+    }
+  }
+
+  // Product guard for logged-in non-admins — keep each product's users in their own workspace.
+  // Admins are exempt: they manage both products.
+  if (isLoggedIn && userRole !== 'ADMIN' && userRole !== 'admin') {
+    const path = req.nextUrl.pathname.replace(/^\/(en|sk|hu)/, '')
+    // FleetSync workspace, but a PicDocs user → send to PicDocs workspace
+    if (path.startsWith('/client') && userProduct === 'PICDOCS') {
+      return NextResponse.redirect(new URL(`/${locale}/picdocs/app`, req.url))
+    }
+    // PicDocs workspace, but a FleetSync user → send to FleetSync workspace
+    if (path.startsWith('/picdocs/app') && userProduct !== 'PICDOCS') {
+      return NextResponse.redirect(new URL(`/${locale}/client`, req.url))
     }
   }
 

@@ -15,6 +15,7 @@
     "footerForClients": "For Clients",
     "navbarOffer": "Offer",
     "navbarAutomatizations": "FleetSync",
+    "navbarPicDocs": "PicDocs",
     "navbarProjects": "Projects",
     "navbarPodcasts": "Podcasts",
     "navbarContact": "Contact",
@@ -1311,5 +1312,28 @@
     "termsFleetSyncSection15Text": "15.1. Invalidity of any provision does not affect the validity of others.\n15.2. These GTC take effect upon publication on the Service's website.\n15.3. The current version of the GTC is always available on the FleetSync website.\n15.4. In case of conflict between the Slovak and foreign language version, the Slovak version prevails.",
     "termsContactTitle": "PROVIDER CONTACT DETAILS",
     "termsContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Slovak Republic\nCompany ID: 54 631 068 | Tax ID: 2121741424\nEmail: info@pictusweb.sk\nPhone: +421 948 024 638\nWeb: pictusweb.sk"
+  },
+  "PicDocs": {
+    "landingTitle": "PicDocs",
+    "landingSubtitle": "Automated accounting-document processing.",
+    "loginCta": "Sign in",
+    "workspaceTitle": "PicDocs",
+    "workspaceSubtitle": "Workspace",
+    "runIntro": "Process new accounting documents from Doklado.",
+    "runButton": "Process documents",
+    "running": "Processing documents… this may take a moment",
+    "successMsg": "Done — {count, plural, one {# document} other {# documents}} processed. Summary e-mail sent to {email}.",
+    "nothingMsg": "No new documents to process.",
+    "resetButton": "Reset documents (testing)",
+    "resetting": "Resetting…",
+    "resetDoneMsg": "Reset {count, plural, one {# document} other {# documents}} for reprocessing.",
+    "orgLabel": "Organization",
+    "userLabel": "Signed in",
+    "howToTitle": "How it works",
+    "howStep1": "In the Doklado app, scan your document — to capture line items, take a PHOTO of the receipt.",
+    "howStep2": "Here, click “Process documents” — all new (not-yet-exported) documents from Doklado are processed.",
+    "howStep3": "A summary and three Money S3 CSV files arrive by e-mail; processed documents are marked exported in Doklado.",
+    "rateLimitMsg": "Too many runs, please try again later.",
+    "errorMsg": "Processing failed. Your documents were not changed; please try again."
   }
 }

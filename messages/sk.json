@@ -15,6 +15,7 @@
     "footerForClients": "Pre klientov",
     "navbarOffer": "Ponuka",
     "navbarAutomatizations": "FleetSync",
+    "navbarPicDocs": "PicDocs",
     "navbarPodcasts": "Podcasty",
     "navbarProjects": "Projekty",
     "navbarContact": "Kontakt",
@@ -1311,5 +1312,28 @@
     "termsFleetSyncSection15Text": "15.1. Neplatnosť jednotlivého ustanovenia nemá vplyv na platnosť ostatných.\n15.2. VOP nadobúdajú platnosť dňom zverejnenia na webovej stránke Služby.\n15.3. Aktuálne znenie VOP je vždy dostupné na webovej stránke FleetSync.\n15.4. V prípade rozporu medzi slovenskou a cudzojazyčnou verziou VOP má prednosť slovenská verzia.",
     "termsContactTitle": "KONTAKTNÉ ÚDAJE POSKYTOVATEĽA",
     "termsContactText": "Pictusweb s.r.o.\nNábrežná 42, 940 02 Nové Zámky, Slovenská republika\nIČO: 54 631 068 | DIČ: 2121741424\nE-mail: info@pictusweb.sk\nTelefón: +421 948 024 638\nWeb: pictusweb.sk"
+  },
+  "PicDocs": {
+    "landingTitle": "PicDocs",
+    "landingSubtitle": "Automatizované spracovanie účtovných dokladov.",
+    "loginCta": "Prihlásiť sa",
+    "workspaceTitle": "PicDocs",
+    "workspaceSubtitle": "Pracovný priestor",
+    "runIntro": "Spustite spracovanie nových účtovných dokladov z Doklada.",
+    "runButton": "Spracovať doklady",
+    "running": "Spracúvam doklady… môže to chvíľu trvať",
+    "successMsg": "Hotovo — {count, plural, one {spracovaný # doklad} few {spracované # doklady} other {spracovaných # dokladov}}. Súhrnný e-mail odoslaný na {email}.",
+    "nothingMsg": "Žiadne nové doklady na spracovanie.",
+    "resetButton": "Obnoviť doklady (test)",
+    "resetting": "Obnovujem…",
+    "resetDoneMsg": "Obnovených {count, plural, one {# doklad} few {# doklady} other {# dokladov}} na opätovné spracovanie.",
+    "orgLabel": "Organizácia",
+    "userLabel": "Prihlásený",
+    "howToTitle": "Ako postupovať",
+    "howStep1": "V aplikácii Doklado naskenujte doklad — aby sa načítali jednotlivé položky, doklad ODFOŤTE.",
+    "howStep2": "Tu kliknite na „Spracovať doklady“ — spracujú sa všetky nové (ešte neexportované) doklady z Doklada.",
+    "howStep3": "Súhrn a tri CSV súbory pre Money S3 prídu e-mailom; spracované doklady sa v Doklade označia ako exportované.",
+    "rateLimitMsg": "Priveľa spustení, skúste neskôr.",
+    "errorMsg": "Spracovanie zlyhalo. Vaše doklady sa nezmenili, skúste to znova."
   }
 }
