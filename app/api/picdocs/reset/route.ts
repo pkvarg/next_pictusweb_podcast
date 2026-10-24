@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
 import { decrypt } from '@/lib/crypto'
-import { listExported, setUnexported } from '@/lib/doklado'
+import { listExported, setUnexported, DokladoRateLimitError } from '@/lib/doklado'
 import { Product } from '@prisma/client'
 
 // TESTING helper: resets this org's already-exported Doklado documents back to not_exported so they
@@ -48,6 +48,15 @@ export async function POST() {
     return NextResponse.json({ status: 'ok', reset: documentIds.length })
   } catch (err: any) {
     console.error('PicDocs reset: failed:', err?.message)
+    if (err instanceof DokladoRateLimitError) {
+      return NextResponse.json(
+        {
+          error: 'Doklado is busy (rate limit). Please try again in a few minutes.',
+          code: 'doklado_rate_limited',
+        },
+        { status: 429 },
+      )
+    }
     return NextResponse.json({ error: 'Could not reset documents in Doklado.' }, { status: 502 })
   }
 }

@@ -1334,6 +1334,7 @@
     "howStep2": "Itt kattintson a „Bizonylatok feldolgozása” gombra — minden új (még nem exportált) bizonylat feldolgozásra kerül a Dokladóból.",
     "howStep3": "Az összesítő és három Money S3 CSV-fájl e-mailben érkezik; a feldolgozott bizonylatok a Dokladóban exportáltként lesznek megjelölve.",
     "rateLimitMsg": "Túl sok futtatás, próbálja meg később.",
+    "dokladoBusyMsg": "A Doklado jelenleg foglalt (kéréskorlát). Kérjük, próbálja meg néhány perc múlva.",
     "errorMsg": "A feldolgozás sikertelen. A bizonylatok nem változtak, próbálja újra."
   }
 }

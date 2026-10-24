@@ -4,6 +4,9 @@
 
 const DOKLADO_BASE = 'https://api-gateway-prod-europe-west-1-7epuecvu.ew.gateway.dev'
 
+// Thrown when Doklado rate-limits us (HTTP 429) so callers can surface a distinct, non-alarming message.
+export class DokladoRateLimitError extends Error {}
+
 // We forward documents raw to n8n/Nova — only the id field is relied on here.
 export type DokladoDocument = { documentId: string } & Record<string, unknown>
 
@@ -50,6 +53,9 @@ async function listDocuments(
       body: JSON.stringify({ data }),
     })
 
+    if (res.status === 429) {
+      throw new DokladoRateLimitError('Doklado rate limit (HTTP 429)')
+    }
     if (!res.ok) {
       throw new Error(`Doklado list failed (HTTP ${res.status})`)
     }
@@ -102,6 +108,9 @@ async function setDocumentsStatus(
     }),
   })
 
+  if (res.status === 429) {
+    throw new DokladoRateLimitError('Doklado rate limit (HTTP 429)')
+  }
   if (!res.ok) {
     throw new Error(`Doklado setExported failed (HTTP ${res.status})`)
   }

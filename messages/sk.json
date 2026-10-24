@@ -1334,6 +1334,7 @@
     "howStep2": "Tu kliknite na „Spracovať doklady“ — spracujú sa všetky nové (ešte neexportované) doklady z Doklada.",
     "howStep3": "Súhrn a tri CSV súbory pre Money S3 prídu e-mailom; spracované doklady sa v Doklade označia ako exportované.",
     "rateLimitMsg": "Priveľa spustení, skúste neskôr.",
+    "dokladoBusyMsg": "Doklado je momentálne zaneprázdnené (limit požiadaviek). Skúste to prosím o pár minút.",
     "errorMsg": "Spracovanie zlyhalo. Vaše doklady sa nezmenili, skúste to znova."
   }
 }

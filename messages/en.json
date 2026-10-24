@@ -1334,6 +1334,7 @@
     "howStep2": "Here, click “Process documents” — all new (not-yet-exported) documents from Doklado are processed.",
     "howStep3": "A summary and three Money S3 CSV files arrive by e-mail; processed documents are marked exported in Doklado.",
     "rateLimitMsg": "Too many runs, please try again later.",
+    "dokladoBusyMsg": "Doklado is busy right now (rate limit). Please try again in a few minutes.",
     "errorMsg": "Processing failed. Your documents were not changed; please try again."
   }
 }

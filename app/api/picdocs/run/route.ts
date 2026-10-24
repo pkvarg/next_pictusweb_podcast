@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
 import { decrypt } from '@/lib/crypto'
-import { listUnexported, setExported } from '@/lib/doklado'
+import { listUnexported, setExported, DokladoRateLimitError } from '@/lib/doklado'
 import { Product } from '@prisma/client'
 
 // Session-authed run endpoint for regular PicDocs users. Max-safety: pictusweb calls Doklado with
@@ -31,7 +31,10 @@ export async function POST() {
   // Load the org's PicDocs config.
   const picDocsOrg = await prisma.picDocsOrg.findUnique({ where: { organizationId } })
   if (!picDocsOrg) {
-    return NextResponse.json({ error: 'This organization is not set up for PicDocs.' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'This organization is not set up for PicDocs.' },
+      { status: 400 },
+    )
   }
   if (!picDocsOrg.dokladoApiKeyEnc) {
     return NextResponse.json(
@@ -90,12 +93,29 @@ export async function POST() {
   try {
     documents = await listUnexported(key, dokladoOrganizationId)
   } catch (err: any) {
+    const rateLimited = err instanceof DokladoRateLimitError
     console.error('PicDocs run: Doklado list failed:', err?.message)
     await prisma.picDocsRun.update({
       where: { id: run.id },
-      data: { status: 'error', errorMessage: 'Doklado list failed', finishedAt: new Date() },
+      data: {
+        status: 'error',
+        errorMessage: rateLimited ? 'Doklado rate limit' : 'Doklado list failed',
+        finishedAt: new Date(),
+      },
     })
-    return NextResponse.json({ error: 'Could not reach Doklado. Please try again.' }, { status: 502 })
+    if (rateLimited) {
+      return NextResponse.json(
+        {
+          error: 'Doklado is busy (rate limit). Please try again in a few minutes.',
+          code: 'doklado_rate_limited',
+        },
+        { status: 429 },
+      )
+    }
+    return NextResponse.json(
+      { error: 'Could not reach Doklado. Please try again.' },
+      { status: 502 },
+    )
   }
 
   // Nothing to do: close out without calling n8n or marking anything.
@@ -134,7 +154,10 @@ export async function POST() {
       n8nOk = body.success !== false && body.status !== 'error'
     }
   } catch (err: any) {
-    console.error('PicDocs run: n8n call failed:', err?.name === 'AbortError' ? 'timeout' : err?.message)
+    console.error(
+      'PicDocs run: n8n call failed:',
+      err?.name === 'AbortError' ? 'timeout' : err?.message,
+    )
   } finally {
     clearTimeout(timeout)
   }
@@ -146,7 +169,9 @@ export async function POST() {
       data: { status: 'error', errorMessage: 'Processing service failed', finishedAt: new Date() },
     })
     return NextResponse.json(
-      { error: 'The processing service failed. Your documents were not changed; please try again.' },
+      {
+        error: 'The processing service failed. Your documents were not changed; please try again.',
+      },
       { status: 502 },
     )
   }
@@ -158,7 +183,8 @@ export async function POST() {
     await setExported(key, documentIds)
   } catch (err: any) {
     console.error('PicDocs run: setExported failed after email sent:', err?.message)
-    markNote = 'Documents were emailed but could not be marked exported in Doklado; they may appear again next run.'
+    markNote =
+      'Documents were emailed but could not be marked exported in Doklado; they may appear again next run.'
   }
 
   await prisma.picDocsRun.update({

@@ -61,7 +61,10 @@ const PicDocsWorkspace = () => {
       const data = await res.json().catch(() => ({}))
 
       if (res.status === 429) {
-        setState({ kind: 'error', message: t('rateLimitMsg') })
+        setState({
+          kind: 'error',
+          message: data.code === 'doklado_rate_limited' ? t('dokladoBusyMsg') : t('rateLimitMsg'),
+        })
         return
       }
       if (!res.ok) {
@@ -88,6 +91,13 @@ const PicDocsWorkspace = () => {
     try {
       const res = await fetch('/api/picdocs/reset', { method: 'POST' })
       const data = await res.json().catch(() => ({}))
+      if (res.status === 429) {
+        setState({
+          kind: 'error',
+          message: data.code === 'doklado_rate_limited' ? t('dokladoBusyMsg') : t('rateLimitMsg'),
+        })
+        return
+      }
       if (!res.ok) {
         setState({ kind: 'error', message: t('errorMsg') })
         return
