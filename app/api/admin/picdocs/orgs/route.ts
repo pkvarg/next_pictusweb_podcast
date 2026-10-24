@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { isAdminSession } from '@/lib/adminGuard'
+import { sameOriginOk } from '@/lib/sameOrigin'
 import { encrypt } from '@/lib/crypto'
 import { Product } from '@prisma/client'
 
@@ -49,6 +50,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  if (!sameOriginOk(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
   if (!(await isAdminSession())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }

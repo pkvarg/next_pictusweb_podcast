@@ -3,10 +3,15 @@ import prisma from '@/db/db'
 import { hashPassword } from '../../../lib/isValidPassword'
 import { checkIPBan } from '@/lib/checkIPBan'
 import { checkTierLimit, TierLimitError } from '@/lib/tier-limits'
+import { isAdminSession } from '@/lib/adminGuard'
+import { sameOriginOk } from '@/lib/sameOrigin'
 import { randomUUID } from 'crypto'
 import axios from 'axios'
 
 export async function GET(request: NextRequest) {
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
   try {
     // Check if IP is banned
     const ipCheck = await checkIPBan(request)
@@ -51,7 +56,7 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             name: true,
-          }
+          },
         },
         role: true,
         active: true,
@@ -67,11 +72,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(users)
   } catch (error: any) {
     console.error('Error fetching users:', error)
-    return NextResponse.json({ error: 'Failed to fetch users', details: error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to fetch users', details: error.message },
+      { status: 500 },
+    )
   }
 }
 
 export async function POST(request: NextRequest) {
+  if (!sameOriginOk(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
   try {
     // Check if IP is banned
     const ipCheck = await checkIPBan(request)
@@ -86,12 +100,24 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { email, firstName, lastName, phoneNumber, organizationId, active, isFleetManager, password, loginProvider, isBenefit, locale } = body
+    const {
+      email,
+      firstName,
+      lastName,
+      phoneNumber,
+      organizationId,
+      active,
+      isFleetManager,
+      password,
+      loginProvider,
+      isBenefit,
+      locale,
+    } = body
 
     if (!email || !firstName || !lastName) {
       return NextResponse.json(
         { error: 'Email, firstName, and lastName are required' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -116,7 +142,7 @@ export async function POST(request: NextRequest) {
       if (!parentOrg || !parentOrg.canCreateBenefit) {
         return NextResponse.json(
           { error: 'This organization is not enabled for benefit user creation' },
-          { status: 403 }
+          { status: 403 },
         )
       }
 
@@ -124,14 +150,15 @@ export async function POST(request: NextRequest) {
       if (parentOrg.isBenefitOrg || parentOrg.parentOrganizationId) {
         return NextResponse.json(
           { error: 'Sub-organizations cannot create benefit users' },
-          { status: 403 }
+          { status: 403 },
         )
       }
 
       const benefitActivationToken = randomUUID()
-      const subOrgName = firstName && lastName
-        ? `${parentOrg.name} — ${firstName} ${lastName}`
-        : `${parentOrg.name} — ${email}`
+      const subOrgName =
+        firstName && lastName
+          ? `${parentOrg.name} — ${firstName} ${lastName}`
+          : `${parentOrg.name} — ${email}`
 
       // Transaction: create sub-org (dormant) + user (inactive)
       const result = await prisma.$transaction(async (tx) => {
@@ -164,9 +191,9 @@ export async function POST(request: NextRequest) {
           },
           include: {
             organizationRelation: {
-              select: { id: true, name: true }
-            }
-          }
+              select: { id: true, name: true },
+            },
+          },
         })
 
         return { user, subOrg }
@@ -178,35 +205,41 @@ export async function POST(request: NextRequest) {
       const activationUrl = `${appUrl}/${userLocale}/fleetsync/benefit-activate?token=${benefitActivationToken}`
 
       try {
-        await axios.post(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/benefit-activation`, {
-          userEmail: email,
-          userName: `${firstName} ${lastName}`,
-          parentOrgName: parentOrg.name,
-          activationUrl,
-          locale: userLocale,
-        })
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/benefit-activation`,
+          {
+            userEmail: email,
+            userName: `${firstName} ${lastName}`,
+            parentOrgName: parentOrg.name,
+            activationUrl,
+            locale: userLocale,
+          },
+        )
       } catch (emailError) {
         console.error('Failed to send benefit activation email:', emailError)
       }
 
       // Send info email to admin (non-blocking)
       try {
-        await axios.post(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/benefit-notification`, {
-          parentOrgName: parentOrg.name,
-          parentOrgId: parentOrg.id,
-          userEmail: email,
-          userName: `${firstName} ${lastName}`,
-          subOrgName: result.subOrg.name,
-          subOrgId: result.subOrg.id,
-          locale: userLocale,
-        })
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_HONO_API_URL}/api/pictusweb/client/benefit-notification`,
+          {
+            parentOrgName: parentOrg.name,
+            parentOrgId: parentOrg.id,
+            userEmail: email,
+            userName: `${firstName} ${lastName}`,
+            subOrgName: result.subOrg.name,
+            subOrgId: result.subOrg.id,
+            locale: userLocale,
+          },
+        )
       } catch (emailError) {
         console.error('Failed to send benefit admin notification:', emailError)
       }
 
       return NextResponse.json(
         { ...result.user, benefitPending: true, subOrgId: result.subOrg.id },
-        { status: 201 }
+        { status: 201 },
       )
     }
 
@@ -239,9 +272,9 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     })
 
     return NextResponse.json(user, { status: 201 })
@@ -250,6 +283,9 @@ export async function POST(request: NextRequest) {
     if (error.code === 'P2002') {
       return NextResponse.json({ error: 'Email already exists' }, { status: 409 })
     }
-    return NextResponse.json({ error: 'Failed to create user', details: error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to create user', details: error.message },
+      { status: 500 },
+    )
   }
 }

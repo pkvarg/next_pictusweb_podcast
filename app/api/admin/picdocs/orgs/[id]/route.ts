@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { isAdminSession } from '@/lib/adminGuard'
+import { sameOriginOk } from '@/lib/sameOrigin'
 import { encrypt } from '@/lib/crypto'
 
 // Admin-only. Carries the encrypted Doklado key — never return the key, never log it.
@@ -8,6 +9,9 @@ import { encrypt } from '@/lib/crypto'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!sameOriginOk(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
   if (!(await isAdminSession())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }

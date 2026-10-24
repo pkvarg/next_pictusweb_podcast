@@ -1,21 +1,24 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
 import { decrypt } from '@/lib/crypto'
 import { listUnexported, setExported, DokladoRateLimitError } from '@/lib/doklado'
+import { enforcePicDocsRateLimit, PicDocsRateLimitError } from '@/lib/picdocsRateLimit'
+import { sameOriginOk } from '@/lib/sameOrigin'
 import { Product } from '@prisma/client'
 
 // Session-authed run endpoint for regular PicDocs users. Max-safety: pictusweb calls Doklado with
 // the org's OWN decrypted key (never leaves here), forwards only the document DATA to n8n, then
 // marks exported. The Doklado key and the n8n secret are NEVER returned or logged.
 
-const RATE_LIMIT_PER_HOUR = 20
-const HOUR_MS = 60 * 60 * 1000
 const N8N_TIMEOUT_MS = 120_000
 const DEFAULT_N8N_URL = 'https://notifications.pictusweb.sk/webhook/doklado-run'
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  if (!sameOriginOk(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
   const session = await getServerSession(authOptions)
   const organizationId = (session?.user as any)?.organizationId as string | undefined
   if (!session?.user || !organizationId) {
@@ -43,34 +46,11 @@ export async function POST() {
     )
   }
 
-  // Per-org rate limiting (best-effort atomic): reset the window if stale, else enforce the cap.
+  // Per-org rate limiting (shared with the reset endpoint).
   try {
-    await prisma.$transaction(async (tx) => {
-      const current = await tx.picDocsOrg.findUnique({
-        where: { organizationId },
-        select: { runsThisHour: true, rateWindowStart: true },
-      })
-      const now = new Date()
-      const windowStale =
-        !current?.rateWindowStart || now.getTime() - current.rateWindowStart.getTime() > HOUR_MS
-
-      if (windowStale) {
-        await tx.picDocsOrg.update({
-          where: { organizationId },
-          data: { runsThisHour: 1, rateWindowStart: now },
-        })
-        return
-      }
-      if ((current?.runsThisHour ?? 0) >= RATE_LIMIT_PER_HOUR) {
-        throw new RateLimitError()
-      }
-      await tx.picDocsOrg.update({
-        where: { organizationId },
-        data: { runsThisHour: { increment: 1 } },
-      })
-    })
+    await enforcePicDocsRateLimit(organizationId)
   } catch (err) {
-    if (err instanceof RateLimitError) {
+    if (err instanceof PicDocsRateLimitError) {
       return NextResponse.json(
         { error: 'Too many runs this hour. Please try again later.' },
         { status: 429 },
@@ -208,5 +188,3 @@ export async function POST() {
     ...(markNote ? { note: markNote } : {}),
   })
 }
-
-class RateLimitError extends Error {}

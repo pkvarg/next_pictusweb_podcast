@@ -1,14 +1,19 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
 import { decrypt } from '@/lib/crypto'
 import { listExported, setUnexported, DokladoRateLimitError } from '@/lib/doklado'
+import { enforcePicDocsRateLimit, PicDocsRateLimitError } from '@/lib/picdocsRateLimit'
+import { sameOriginOk } from '@/lib/sameOrigin'
 import { Product } from '@prisma/client'
 
 // TESTING helper: resets this org's already-exported Doklado documents back to not_exported so they
 // can be reprocessed. Session-authed (PicDocs users only). Consider removing or admin-gating for production.
-export async function POST() {
+export async function POST(request: NextRequest) {
+  if (!sameOriginOk(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
   const session = await getServerSession(authOptions)
   const organizationId = (session?.user as any)?.organizationId as string | undefined
   if (!session?.user || !organizationId) {
@@ -32,6 +37,19 @@ export async function POST() {
       { error: 'Doklado API key not configured for this organization.' },
       { status: 400 },
     )
+  }
+
+  // Per-org rate limiting (shared with the run endpoint) — reset also spends Doklado quota.
+  try {
+    await enforcePicDocsRateLimit(organizationId)
+  } catch (err) {
+    if (err instanceof PicDocsRateLimitError) {
+      return NextResponse.json(
+        { error: 'Too many runs this hour. Please try again later.' },
+        { status: 429 },
+      )
+    }
+    throw err
   }
 
   const key = decrypt(picDocsOrg.dokladoApiKeyEnc)
