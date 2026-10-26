@@ -1,7 +1,20 @@
 'use client'
 import React from 'react'
 import { Link } from '@/i18n/routing'
-import { Upload, Eye, Bot, Mail, Plus, BarChart3, Mic, Building, User, Car, FileText } from 'lucide-react'
+import {
+  Upload,
+  Eye,
+  Bot,
+  Mail,
+  Plus,
+  BarChart3,
+  Mic,
+  Building,
+  User,
+  Car,
+  FileText,
+  RotateCcw,
+} from 'lucide-react'
 import Counter from './Counter'
 import RefreshButton from './RefreshButton'
 
@@ -46,6 +59,14 @@ const AdminDashboard = () => {
       icon: Car,
       color: 'from-orange-500 to-orange-600',
       bgColor: 'bg-orange-500/10 hover:bg-orange-500/20',
+    },
+    {
+      title: 'Dismissed Renewals',
+      description: 'Restore dismissed renewal suggestions',
+      href: '/admin/dismissed-renewals',
+      icon: RotateCcw,
+      color: 'from-amber-500 to-orange-600',
+      bgColor: 'bg-amber-500/10 hover:bg-amber-500/20',
     },
     {
       title: 'Upload Files',
@@ -150,7 +171,6 @@ const AdminDashboard = () => {
           })}
         </div>
       </div>
-
     </div>
   )
 }

@@ -10,6 +10,7 @@ import {
   RotateCcw,
   ChevronDown,
   ChevronUp,
+  Trash2,
 } from 'lucide-react'
 import RenewalModal from './RenewalModal'
 
@@ -69,6 +70,7 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
   const [presets, setPresets] = useState<RenewalPreset[]>([])
   const [loadingPresets, setLoadingPresets] = useState(true)
   const [expanded, setExpanded] = useState(false)
+  const [dismissing, setDismissing] = useState(false)
 
   const fetchPresets = useCallback(async () => {
     setLoadingPresets(true)
@@ -188,6 +190,38 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
     }
   }
 
+  const handleDismiss = async () => {
+    if (
+      !confirm(
+        `Zrušiť navrhovanú obnovu pre ${dutyBatch.vehicleRegistration}? Prestane sa zobrazovať aj odosielať.`,
+      )
+    ) {
+      return
+    }
+
+    setDismissing(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/duty-renewals', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dutyBatchId: dutyBatch.dutyBatchId }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.error || 'Nepodarilo sa zrušiť obnovu')
+      }
+
+      onRenewalSuccess()
+    } catch (error: any) {
+      console.error('Error dismissing renewal:', error)
+      setError(error?.message || 'Nepodarilo sa zrušiť obnovu')
+      setDismissing(false)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('sk-SK', {
@@ -248,16 +282,31 @@ const RenewalCard = ({ dutyBatch, onRenewalSuccess }: RenewalCardProps) => {
               Pôvodný termín: {formatDate(dutyBatch.originalDutyDate)}
             </p>
           </div>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="p-2 hover:bg-white/5 rounded-full transition-colors"
-          >
-            {expanded ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            )}
-          </button>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={handleDismiss}
+              disabled={dismissing}
+              title="Zrušiť obnovu"
+              aria-label="Zrušiť obnovu"
+              className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-full transition-colors disabled:opacity-50"
+            >
+              {dismissing ? (
+                <Loader className="w-5 h-5 animate-spin" />
+              ) : (
+                <Trash2 className="w-5 h-5" />
+              )}
+            </button>
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="p-2 hover:bg-white/5 rounded-full transition-colors"
+            >
+              {expanded ? (
+                <ChevronUp className="w-5 h-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
