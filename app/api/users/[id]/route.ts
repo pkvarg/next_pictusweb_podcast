@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { hashPassword } from '../../../../lib/isValidPassword'
+import { sameOriginOk } from '@/lib/sameOrigin'
+import { resolveUserApiAccess } from '@/lib/userApiAccess'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const access = await resolveUserApiAccess()
+  if (!access) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   try {
     const resolvedParams = await params
     const user = await prisma.user.findUnique({
@@ -18,13 +22,17 @@ export async function GET(
           select: {
             id: true,
             name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     })
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    if (!access.isAdmin && user.organizationId !== access.organizationId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     return NextResponse.json(user)
@@ -33,14 +41,41 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!sameOriginOk(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
+  const access = await resolveUserApiAccess()
+  if (!access) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   try {
     const resolvedParams = await params
+
+    const target = await prisma.user.findUnique({
+      where: { id: resolvedParams.id, deletedAt: null },
+      select: { organizationId: true },
+    })
+    if (!target) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+    if (!access.isAdmin && target.organizationId !== access.organizationId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const body = await request.json()
-    const { email, firstName, lastName, phoneNumber, organizationId, active, isFleetManager, password, loginProvider } = body
+    const {
+      email,
+      firstName,
+      lastName,
+      phoneNumber,
+      organizationId,
+      active,
+      isFleetManager,
+      password,
+      loginProvider,
+    } = body
 
     // Prepare update data
     const updateData: any = {}
@@ -49,8 +84,8 @@ export async function PUT(
     if (lastName !== undefined) updateData.lastName = lastName
     if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber
 
-    // Update organizationId if provided
-    if (organizationId !== undefined) {
+    // Only admins may move a user to another organization
+    if (organizationId !== undefined && access.isAdmin) {
       updateData.organizationId = organizationId
     }
 
@@ -77,9 +112,9 @@ export async function PUT(
           select: {
             id: true,
             name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     })
 
     return NextResponse.json(user)
@@ -96,11 +131,31 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  if (!sameOriginOk(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
+  const access = await resolveUserApiAccess()
+  if (!access) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   try {
     const resolvedParams = await params
-    const user = await prisma.user.update({
+
+    const target = await prisma.user.findUnique({
+      where: { id: resolvedParams.id, deletedAt: null },
+      select: { organizationId: true },
+    })
+    if (!target) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+    if (!access.isAdmin && target.organizationId !== access.organizationId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    await prisma.user.update({
       where: {
         id: resolvedParams.id,
         deletedAt: null,

@@ -3,15 +3,17 @@ import prisma from '@/db/db'
 import { hashPassword } from '../../../lib/isValidPassword'
 import { checkIPBan } from '@/lib/checkIPBan'
 import { checkTierLimit, TierLimitError } from '@/lib/tier-limits'
-import { isAdminSession } from '@/lib/adminGuard'
 import { sameOriginOk } from '@/lib/sameOrigin'
+import { resolveUserApiAccess } from '@/lib/userApiAccess'
 import { randomUUID } from 'crypto'
 import axios from 'axios'
 
 export async function GET(request: NextRequest) {
-  if (!(await isAdminSession())) {
+  const access = await resolveUserApiAccess()
+  if (!access) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
+
   try {
     // Check if IP is banned
     const ipCheck = await checkIPBan(request)
@@ -33,8 +35,10 @@ export async function GET(request: NextRequest) {
       deletedAt: null,
     }
 
-    // Filter by organization if provided
-    if (organizationId) {
+    // Non-admins may only list users of their own organization
+    if (!access.isAdmin) {
+      whereClause.organizationId = access.organizationId
+    } else if (organizationId) {
       whereClause.organizationId = organizationId
     }
 
@@ -83,7 +87,8 @@ export async function POST(request: NextRequest) {
   if (!sameOriginOk(request)) {
     return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   }
-  if (!(await isAdminSession())) {
+  const access = await resolveUserApiAccess()
+  if (!access) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
   try {
@@ -105,7 +110,7 @@ export async function POST(request: NextRequest) {
       firstName,
       lastName,
       phoneNumber,
-      organizationId,
+      organizationId: bodyOrganizationId,
       active,
       isFleetManager,
       password,
@@ -113,6 +118,9 @@ export async function POST(request: NextRequest) {
       isBenefit,
       locale,
     } = body
+
+    // Non-admins can only create users in their own organization
+    const organizationId = access.isAdmin ? bodyOrganizationId : access.organizationId
 
     if (!email || !firstName || !lastName) {
       return NextResponse.json(
