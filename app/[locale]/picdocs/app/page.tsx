@@ -13,8 +13,12 @@ import {
   AlertCircle,
   Info,
   RotateCcw,
+  Mail,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
+
+// Fixed inbox for the email-in workflow (Doklady_v9_AI_Extract).
+const INTAKE_EMAIL = 'posli@pictusweb.com'
 
 type RunState =
   | { kind: 'idle' }
@@ -35,6 +39,7 @@ const PicDocsWorkspace = () => {
     organizationName: string | null
     userName: string | null
     userEmail: string | null
+    recipientEmail: string | null
   } | null>(null)
 
   useEffect(() => {
@@ -179,91 +184,114 @@ const PicDocsWorkspace = () => {
               {ctx.userEmail ? <span className="text-gray-400"> ({ctx.userEmail})</span> : null}
             </p>
           )}
-          <p className="text-base text-gray-400 mb-6">{t('runIntro')}</p>
+          <p className="text-base text-gray-400 mb-8">{t('workflowsIntro')}</p>
 
-          <div className="mb-10 text-left bg-white/5 border border-white/10 rounded-2xl px-5 py-4 max-w-xl mx-auto">
+          {/* Workflow 1 — scan in Doklado, process here */}
+          <div className="text-left bg-white/5 border border-white/10 rounded-2xl px-5 py-5 max-w-xl mx-auto mb-6">
             <div className="flex items-center gap-2 mb-3 text-pictus-lime">
-              <Info className="h-5 w-5 shrink-0" />
-              <h2 className="text-lg font-semibold">{t('howToTitle')}</h2>
+              <FileText className="h-5 w-5 shrink-0" />
+              <h2 className="text-lg font-semibold">{t('flow1Title')}</h2>
             </div>
-            <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
+            <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300 mb-4">
               <li>{t('howStep1')}</li>
               <li>{t('howStep2')}</li>
               <li>{t('howStep3')}</li>
             </ol>
-          </div>
-
-          <button
-            onClick={handleRun}
-            disabled={isBusy}
-            className="inline-flex items-center gap-3 px-8 py-4 bg-pictus-lime text-pictus-black rounded-full text-lg font-semibold hover:bg-pictus-lime600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {isRunning ? (
-              <>
-                <span className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin" />
-                {t('running')}
-              </>
-            ) : (
-              <>
-                <Play className="h-5 w-5" />
-                {t('runButton')}
-              </>
+            {ctx?.recipientEmail && (
+              <p className="text-sm text-gray-300 mb-4 flex items-start gap-2">
+                <Mail className="h-4 w-4 shrink-0 mt-0.5 text-pictus-lime" />
+                <span>{t('flow1Recipient', { email: ctx.recipientEmail })}</span>
+              </p>
             )}
-          </button>
 
-          {/* Testing-only: reset exported documents so they can be reprocessed */}
-          <div className="mt-4">
-            <button
-              onClick={handleReset}
-              disabled={isBusy}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-400 hover:text-pictus-white border border-white/15 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isResetting ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-gray-500/40 border-t-gray-300 rounded-full animate-spin" />
-                  {t('resetting')}
-                </>
-              ) : (
-                <>
-                  <RotateCcw className="h-4 w-4" />
-                  {t('resetButton')}
-                </>
-              )}
-            </button>
-          </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={handleRun}
+                disabled={isBusy}
+                className="inline-flex items-center gap-3 px-6 py-3 bg-pictus-lime text-pictus-black rounded-full text-base font-semibold hover:bg-pictus-lime600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isRunning ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin" />
+                    {t('running')}
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-5 w-5" />
+                    {t('runButton')}
+                  </>
+                )}
+              </button>
 
-          {/* Result banners */}
-          <div className="mt-8 text-left">
-            {state.kind === 'success' && (
-              <div className="bg-pictus-lime/15 border border-pictus-lime/40 text-pictus-lime px-5 py-4 rounded-2xl flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
-                <div>
-                  <p>{t('successMsg', { count: state.count, email: state.email })}</p>
-                  {state.note && <p className="text-sm text-gray-300 mt-1">{state.note}</p>}
+              {/* Testing-only: reset exported documents so they can be reprocessed */}
+              <button
+                onClick={handleReset}
+                disabled={isBusy}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-400 hover:text-pictus-white border border-white/15 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isResetting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-gray-500/40 border-t-gray-300 rounded-full animate-spin" />
+                    {t('resetting')}
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="h-4 w-4" />
+                    {t('resetButton')}
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Result banners */}
+            <div className="mt-6">
+              {state.kind === 'success' && (
+                <div className="bg-pictus-lime/15 border border-pictus-lime/40 text-pictus-lime px-5 py-4 rounded-2xl flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
+                  <div>
+                    <p>{t('successMsg', { count: state.count, email: state.email })}</p>
+                    {state.note && <p className="text-sm text-gray-300 mt-1">{state.note}</p>}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {state.kind === 'nothing' && (
-              <div className="bg-white/5 border border-white/15 text-gray-200 px-5 py-4 rounded-2xl flex items-center gap-3">
-                <Info className="h-5 w-5 shrink-0" />
-                <p>{t('nothingMsg')}</p>
-              </div>
-            )}
+              {state.kind === 'nothing' && (
+                <div className="bg-white/5 border border-white/15 text-gray-200 px-5 py-4 rounded-2xl flex items-center gap-3">
+                  <Info className="h-5 w-5 shrink-0" />
+                  <p>{t('nothingMsg')}</p>
+                </div>
+              )}
 
-            {state.kind === 'reset-done' && (
-              <div className="bg-white/5 border border-white/15 text-gray-200 px-5 py-4 rounded-2xl flex items-center gap-3">
-                <RotateCcw className="h-5 w-5 shrink-0" />
-                <p>{t('resetDoneMsg', { count: state.count })}</p>
-              </div>
-            )}
+              {state.kind === 'reset-done' && (
+                <div className="bg-white/5 border border-white/15 text-gray-200 px-5 py-4 rounded-2xl flex items-center gap-3">
+                  <RotateCcw className="h-5 w-5 shrink-0" />
+                  <p>{t('resetDoneMsg', { count: state.count })}</p>
+                </div>
+              )}
 
-            {state.kind === 'error' && (
-              <div className="bg-red-500/15 border border-red-500/30 text-red-200 px-5 py-4 rounded-2xl flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 shrink-0" />
-                <p>{state.message}</p>
-              </div>
-            )}
+              {state.kind === 'error' && (
+                <div className="bg-red-500/15 border border-red-500/30 text-red-200 px-5 py-4 rounded-2xl flex items-center gap-3">
+                  <AlertCircle className="h-5 w-5 shrink-0" />
+                  <p>{state.message}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Workflow 2 — send a scan by email */}
+          <div className="text-left bg-white/5 border border-white/10 rounded-2xl px-5 py-5 max-w-xl mx-auto">
+            <div className="flex items-center gap-2 mb-3 text-pictus-lime">
+              <Mail className="h-5 w-5 shrink-0" />
+              <h2 className="text-lg font-semibold">{t('flow2Title')}</h2>
+            </div>
+            <p className="text-sm text-gray-300 mb-2">
+              {t('flow2Desc', {
+                userEmail: ctx?.userEmail || session?.user?.email || '',
+                intakeEmail: INTAKE_EMAIL,
+              })}
+            </p>
+            <p className="text-sm text-gray-300 mb-2">{t('flow2Result')}</p>
+            <p className="text-xs text-gray-500">{t('flow2Note')}</p>
           </div>
         </section>
       </main>

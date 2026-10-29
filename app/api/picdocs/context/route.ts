@@ -22,9 +22,16 @@ export async function GET() {
     select: { name: true },
   })
 
+  // The org's own result-recipient address (not a secret — shown to that org's own user).
+  const picDocsOrg = await prisma.picDocsOrg.findUnique({
+    where: { organizationId },
+    select: { recipientEmail: true },
+  })
+
   return NextResponse.json({
     organizationName: organization?.name ?? null,
     userName: (session.user as any).name ?? null,
     userEmail: (session.user as any).email ?? null,
+    recipientEmail: picDocsOrg?.recipientEmail ?? null,
   })
 }
