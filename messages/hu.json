@@ -288,11 +288,8 @@
     "solutionTitle": "A mi",
     "solutionTitleHighlight": "megoldásunk",
     "solutionSubtitle": "Intelligens rendszer, amely mindent figyel Önért és időben értesíti",
-    "step1Title": "Adatok megadása",
     "step1Description": "A kliens zónában kezeli az összes feladatot minden járművéhez - rendszámok, vizsgadátumok, szervizek, biztosítások és értesítési preferenciák.",
-    "step2Title": "Rendszer figyel",
     "step2Description": "Az AI rendszer értesít és nyomon követi a megerősítéseket. A kliens zónában található dashboard-ok tökéletes áttekintést nyújtanak a járműveivel kapcsolatos összes feladatról.",
-    "step3Title": "Értesítések fogadása",
     "step3Description": "SMS és email értesítések az Ön által választott időközönként. Elegendő ideje van mindent stressz nélkül megtervezni.",
     "calculatorTitle": "Megtakarítás",
     "calculatorTitleHighlight": "kalkulátor",
@@ -387,11 +384,8 @@
     "pageSubtitle": "Állítsa be fiókját néhány egyszerű lépésben",
     "freePlanLimit": "Az ingyenes csomag legfeljebb 10 e-mail értesítést tartalmaz.",
     "backToPricing": "Vissza az árakhoz",
-    "step1Title": "Szervezet adatai",
     "step1Subtitle": "Meséljen cégéről",
-    "step2Title": "Az Ön fiókja",
     "step2Subtitle": "Hozza létre bejelentkezési adatait",
-    "step3Title": "Ellenőrzés",
     "step3Subtitle": "Erősítse meg email címét és telefonszámát",
     "step4Title": "Hozzájárulások",
     "step4Subtitle": "Kérjük, olvassa el és fogadja el az alábbiakat",
@@ -1067,6 +1061,8 @@
       "podcastsButton": "Podcastok megtekintése",
       "fleetsyncButton": "FleetSync megtekintése",
       "contactButton": "Írj nekünk",
+      "picdocsButton": "PicDocs megtekintése",
+      "newLabel": "Új",
       "rows": [
         {
           "title": "Weboldalak",
@@ -1087,6 +1083,11 @@
           "title": "Fleetsync",
           "summary": "Rendszer az autód és a szervizfolyamatok kezelésére. Kevesebb elfelejtett határidő, kevesebb „ezt már múlt hónapban meg kellett volna oldani“ pillanat.",
           "alt": "Fleetsync"
+        },
+        {
+          "title": "PicDocs",
+          "summary": "AI ügynök, amely feldolgozza a blokkokat és számlákat, és előkészíti őket a könyvelőszoftveredhez. Kevesebb átgépelés, kevesebb kézi adatbevitel.",
+          "alt": "PicDocs"
         },
         {
           "title": "Állandó támogatás",
@@ -1317,6 +1318,8 @@
     "landingTitle": "PicDocs",
     "landingSubtitle": "Automatizált számviteli bizonylat-feldolgozás.",
     "loginCta": "Bejelentkezés",
+    "introTitle": "Mi az a PicDocs?",
+    "introText": "A PicDocs egy AI ügynök, amely helyetted dolgozza fel a blokkokat és számlákat. A beszkennelt bizonylatokat automatikusan beolvassa, kinyeri belőlük az összes szükséges adatot, és előkészíti a könyvelőszoftveredhez — átgépelés és kézi adatbevitel nélkül.",
     "workspaceTitle": "PicDocs",
     "workspaceSubtitle": "Munkaterület",
     "runIntro": "Indítsa el az új számviteli bizonylatok feldolgozását a Dokladóból.",

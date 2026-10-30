@@ -9,13 +9,15 @@ type ServiceRow = { title: string; summary: string; alt: string }
 // specific destination.
 const PODCASTS_INDEX = 2
 const FLEETSYNC_INDEX = 3
-const SUPPORT_INDEX = 4
+const PICDOCS_INDEX = 4
+const SUPPORT_INDEX = 5
 
 const images = [
   '/pictus/services/web.webp',
   '/pictus/services/web-redesign.webp',
   '/pictus/services/podcasts.webp',
   '/pictus/services/fleetsync.webp',
+  '/pictus/services/picdocs.svg',
   '/pictus/services/support.webp',
 ]
 
@@ -33,6 +35,9 @@ const PictusServices = () => {
   } else if (active === FLEETSYNC_INDEX) {
     ctaHref = `/${locale as string}/fleetsync`
     ctaLabel = t('services.fleetsyncButton')
+  } else if (active === PICDOCS_INDEX) {
+    ctaHref = `/${locale as string}/picdocs`
+    ctaLabel = t('services.picdocsButton')
   } else if (active === SUPPORT_INDEX) {
     ctaHref = '#contact'
     ctaLabel = t('services.contactButton')
@@ -61,7 +66,12 @@ const PictusServices = () => {
                   >
                     <span className="row-index">{String(index + 1).padStart(2, '0')}</span>
                     <span className="service-row-copy">
-                      <span className="service-row-title">{row.title}</span>
+                      <span className="service-row-title">
+                        {row.title}
+                        {index === PICDOCS_INDEX && (
+                          <span className="service-new-badge">{t('services.newLabel')}</span>
+                        )}
+                      </span>
                       <span className="service-row-summary">{row.summary}</span>
                     </span>
                   </button>

@@ -829,6 +829,10 @@ input[type='date']::-webkit-calendar-picker-indicator {
   margin: 0;
 }
 
+.pl .testimonial-quote blockquote {
+  white-space: pre-line;
+}
+
 .pl h1,
 .pl h2,
 .pl h3 {
@@ -1321,6 +1325,21 @@ input[type='date']::-webkit-calendar-picker-indicator {
   font-size: clamp(1.32rem, 1.72vw, 1.72rem);
   font-weight: 700;
   line-height: 1.12;
+}
+
+.pl .service-new-badge {
+  display: inline-block;
+  margin-left: 0.6em;
+  padding: 0.14em 0.6em;
+  border-radius: 999px;
+  background: var(--moss-signal);
+  color: #141511;
+  font-family: var(--font-body, inherit);
+  font-size: 0.62em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
 }
 
 .pl .service-row-summary {
@@ -3102,7 +3121,10 @@ input[type='date']::-webkit-calendar-picker-indicator {
   font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;
-  transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background 180ms ease;
 }
 
 .pl .legal-tab:hover {

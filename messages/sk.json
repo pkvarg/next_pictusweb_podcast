@@ -288,11 +288,8 @@
     "solutionTitle": "Naše",
     "solutionTitleHighlight": "riešenie",
     "solutionSubtitle": "Inteligentný systém, ktorý za vás sleduje všetko a včas vás upozorní",
-    "step1Title": "Zadajte údaje",
     "step1Description": "V klientskej zóne spravujete všetky úlohy pre každé Vaše vozidlo - EČV, dátumy TK, servisy, poistky a preferencie upozornení.",
-    "step2Title": "Systém sleduje",
     "step2Description": "AI systém notifikuje a sleduje Vaše potvrdenia. Dashboardy v klientskej zóne Vám poskytnú dokonalý prehľad všetkých úloh spojených s Vašimi vozidlami.",
-    "step3Title": "Dostávate upozornenia",
     "step3Description": "SMS a email upozornenia vo Vami zvolených intervaloch. Máte dostatok času všetko naplánovať bez stresu.",
     "calculatorTitle": "Kalkulačka",
     "calculatorTitleHighlight": "úspor",
@@ -387,11 +384,8 @@
     "pageSubtitle": "Nastavte si účet v niekoľkých jednoduchých krokoch",
     "freePlanLimit": "Plán FREE je obmedzený na 10 e-mailových notifikácií.",
     "backToPricing": "Späť na cenník",
-    "step1Title": "Údaje organizácie",
     "step1Subtitle": "Povedzte nám o vašej firme",
-    "step2Title": "Váš účet",
     "step2Subtitle": "Vytvorte si prihlasovacie údaje",
-    "step3Title": "Overenie",
     "step3Subtitle": "Overte svoj email a telefónne číslo",
     "step4Title": "Súhlasy",
     "step4Subtitle": "Prosím, prečítajte si a odsúhlaste nasledovné",
@@ -1067,6 +1061,8 @@
       "podcastsButton": "Pozri podcasty",
       "fleetsyncButton": "Pozri FleetSync",
       "contactButton": "Napíš nám",
+      "picdocsButton": "Pozri PicDocs",
+      "newLabel": "Nové",
       "rows": [
         {
           "title": "Webové stránky",
@@ -1087,6 +1083,11 @@
           "title": "Fleetsync",
           "summary": "Systém pre správu tvojho auta a servisných procesov. Menej zabudnutých termínov, menej momentov „to sme mali riešiť ešte minulý mesiac“.",
           "alt": "Fleetsync"
+        },
+        {
+          "title": "PicDocs",
+          "summary": "AI agent, ktorý spracuje tvoje bločky a faktúry a pripraví ich pre tvoj účtovný softvér. Menej prepisovania, menej ručného zadávania.",
+          "alt": "PicDocs"
         },
         {
           "title": "Stála podpora",
@@ -1132,7 +1133,7 @@
       "title": "Čo Pictusa potešilo",
       "items": [
         {
-          "quote": "Peter mi dokázal vytvoriť web profesionálne, promptne, kvalitne a za rozumnú cenu. S výsledkom som veľmi spokojná. Ďakujem Peter.",
+          "quote": "Peter mi dokázal vytvoriť web profesionálne, promptne, kvalitne a za rozumnú cenu.\nS výsledkom som veľmi spokojná. Ďakujem Peter.",
           "name": "Ioana Mindrila",
           "role": "Designer - IoanaM"
         },
@@ -1317,6 +1318,8 @@
     "landingTitle": "PicDocs",
     "landingSubtitle": "Automatizované spracovanie účtovných dokladov.",
     "loginCta": "Prihlásiť sa",
+    "introTitle": "Čo je PicDocs?",
+    "introText": "PicDocs je AI agent, ktorý za teba spracuje bločky a faktúry. Naskenované doklady automaticky prečíta, vytiahne z nich všetky potrebné údaje a pripraví ich pre tvoj účtovný softvér — bez prepisovania a ručného zadávania.",
     "workspaceTitle": "PicDocs",
     "workspaceSubtitle": "Pracovný priestor",
     "runIntro": "Spustite spracovanie nových účtovných dokladov z Doklada.",

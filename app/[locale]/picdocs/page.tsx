@@ -45,8 +45,8 @@ export default async function PicDocs({ params }: { params: Promise<{ locale: st
           <div className="layout-container">
             <div className="fs-hero-copy">
               <p className="section-kicker">PicDocs</p>
-              <h1 id="pd-hero-title">{t('landingTitle')}</h1>
-              <p className="section-lede">{t('landingSubtitle')}</p>
+              <h1 id="pd-hero-title">{t('introTitle')}</h1>
+              <p className="section-lede">{t('introText')}</p>
               <div className="button-row">
                 <Link className="button button-primary" href="/auth/login">
                   {t('loginCta')} <span aria-hidden="true">→</span>

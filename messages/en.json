@@ -288,11 +288,8 @@
     "solutionTitle": "Our",
     "solutionTitleHighlight": "solution",
     "solutionSubtitle": "Intelligent system that monitors everything for you and notifies you on time",
-    "step1Title": "Enter data",
     "step1Description": "In the client zone, you manage all tasks for each of your vehicles - license plates, inspection dates, services, insurance and notification preferences.",
-    "step2Title": "System monitors",
     "step2Description": "AI system notifies and tracks your confirmations. Dashboards in the client zone provide you with a perfect overview of all tasks related to your vehicles.",
-    "step3Title": "Receive notifications",
     "step3Description": "SMS and email notifications at intervals you choose. You have enough time to plan everything without stress.",
     "calculatorTitle": "Savings",
     "calculatorTitleHighlight": "calculator",
@@ -387,11 +384,8 @@
     "pageSubtitle": "Set up your account in a few simple steps",
     "freePlanLimit": "The FREE plan is limited to 10 email notifications.",
     "backToPricing": "Back to pricing",
-    "step1Title": "Organization Details",
     "step1Subtitle": "Tell us about your company",
-    "step2Title": "Your Account",
     "step2Subtitle": "Create your login credentials",
-    "step3Title": "Verification",
     "step3Subtitle": "Verify your email and phone number",
     "step4Title": "Agreements",
     "step4Subtitle": "Please review and accept the following",
@@ -1067,6 +1061,8 @@
       "podcastsButton": "See podcasts",
       "fleetsyncButton": "See FleetSync",
       "contactButton": "Get in touch",
+      "picdocsButton": "See PicDocs",
+      "newLabel": "New",
       "rows": [
         {
           "title": "Websites",
@@ -1087,6 +1083,11 @@
           "title": "Fleetsync",
           "summary": "A system to manage your car and its service tasks. Fewer forgotten deadlines, fewer “we should have handled this last month” moments.",
           "alt": "Fleetsync"
+        },
+        {
+          "title": "PicDocs",
+          "summary": "An AI agent that processes your receipts and invoices and prepares them for your accounting software. Less retyping, less manual data entry.",
+          "alt": "PicDocs"
         },
         {
           "title": "Ongoing support",
@@ -1317,6 +1318,8 @@
     "landingTitle": "PicDocs",
     "landingSubtitle": "Automated accounting-document processing.",
     "loginCta": "Sign in",
+    "introTitle": "What is PicDocs?",
+    "introText": "PicDocs is an AI agent that processes your receipts and invoices for you. It automatically reads scanned documents, extracts all the data you need and prepares it for your accounting software — no retyping, no manual data entry.",
     "workspaceTitle": "PicDocs",
     "workspaceSubtitle": "Workspace",
     "runIntro": "Process new accounting documents from Doklado.",
