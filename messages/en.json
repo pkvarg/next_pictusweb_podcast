@@ -449,6 +449,8 @@
     "resendCodes": "Resend verification codes",
     "verificationSendError": "Failed to send verification codes",
     "verificationInvalid": "Invalid verification code(s). Please try again.",
+    "verificationInvalidEmail": "Wrong email code. Check your inbox (and spam) — the email code is different from the SMS code.",
+    "verificationInvalidPhone": "Wrong SMS code. Check the message on your phone.",
     "verificationError": "Verification failed. Please try again.",
     "gdprAgree": "I have read the",
     "gdprLink": "Privacy Policy",

@@ -449,6 +449,8 @@
     "resendCodes": "Ellenőrző kódok újraküldése",
     "verificationSendError": "Nem sikerült elküldeni az ellenőrző kódokat",
     "verificationInvalid": "Érvénytelen ellenőrző kód. Kérjük, próbálja újra.",
+    "verificationInvalidEmail": "Hibás e-mail kód. Ellenőrizze a postafiókját (a spam mappát is) — az e-mail kód más, mint az SMS kód.",
+    "verificationInvalidPhone": "Hibás SMS kód. Ellenőrizze a telefonjára érkezett üzenetet.",
     "verificationError": "Az ellenőrzés sikertelen. Kérjük, próbálja újra.",
     "gdprAgree": "Megismertem az",
     "gdprLink": "Adatvédelmi tájékoztatót",

@@ -8,9 +8,7 @@ const SESSION_SECRET = process.env.VERIFICATION_SESSION_SECRET!
 const MAX_ATTEMPTS = 5
 
 function hashCode(code: string, identifier: string): string {
-  return createHash('sha256')
-    .update(`${code}:${identifier}:${OTP_SALT}`)
-    .digest('hex')
+  return createHash('sha256').update(`${code}:${identifier}:${OTP_SALT}`).digest('hex')
 }
 
 function hashToken(token: string): string {
@@ -48,8 +46,17 @@ async function verifyOneCode(
     where: { tokenHash },
   })
 
-  if (!record || record.usedAt || record.expiresAt < new Date() || record.purpose !== purpose) {
+  if (!record || record.expiresAt < new Date() || record.purpose !== purpose) {
     return false
+  }
+
+  const expectedHash = hashCode(code, identifier)
+
+  // Idempotent: once a code is verified, resubmitting the SAME correct code still
+  // passes. Without this, verifying email + phone together gets stuck — whichever
+  // code was right first is marked used and then re-rejected on the next submit.
+  if (record.usedAt) {
+    return record.codeHash === expectedHash
   }
 
   // Increment attempts
@@ -62,7 +69,6 @@ async function verifyOneCode(
     return false
   }
 
-  const expectedHash = hashCode(code, identifier)
   if (record.codeHash !== expectedHash) return false
 
   // Mark as used
@@ -85,11 +91,21 @@ export async function POST(request: NextRequest) {
 
     // Global lockout: 15 failed verify attempts per identifier per hour
     const emailLockoutKey = `verify_onboard:${email.toLowerCase()}`
-    const emailLockout = rateLimit({ key: emailLockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000, checkOnly: true })
+    const emailLockout = rateLimit({
+      key: emailLockoutKey,
+      maxAttempts: 7,
+      windowMs: 60 * 60 * 1000,
+      checkOnly: true,
+    })
     if (!emailLockout.success) return rateLimitResponse(emailLockout.retryAfterMs)
     if (phoneNumber) {
       const phoneLockoutKey = `verify_onboard:${phoneNumber}`
-      const phoneLockout = rateLimit({ key: phoneLockoutKey, maxAttempts: 7, windowMs: 60 * 60 * 1000, checkOnly: true })
+      const phoneLockout = rateLimit({
+        key: phoneLockoutKey,
+        maxAttempts: 7,
+        windowMs: 60 * 60 * 1000,
+        checkOnly: true,
+      })
       if (!phoneLockout.success) return rateLimitResponse(phoneLockout.retryAfterMs)
     }
 

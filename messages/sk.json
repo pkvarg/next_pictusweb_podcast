@@ -449,6 +449,8 @@
     "resendCodes": "Znova odoslať overovacie kódy",
     "verificationSendError": "Nepodarilo sa odoslať overovacie kódy",
     "verificationInvalid": "Neplatný overovací kód. Skúste to prosím znova.",
+    "verificationInvalidEmail": "Nesprávny kód z emailu. Skontrolujte svoju emailovú schránku (aj priečinok spam) — kód z emailu je iný ako kód z SMS.",
+    "verificationInvalidPhone": "Nesprávny kód z SMS. Skontrolujte správu vo svojom telefóne.",
     "verificationError": "Overenie zlyhalo. Skúste to prosím znova.",
     "gdprAgree": "Oboznámil(a) som sa so",
     "gdprLink": "Zásadami ochrany osobných údajov",

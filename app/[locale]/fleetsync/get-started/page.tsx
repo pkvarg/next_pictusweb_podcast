@@ -246,15 +246,17 @@ function GetStartedContent() {
         }),
       })
       const data = await res.json()
-      const phoneOk = !smsEnabled || data.phoneVerified
-      if (data.emailVerified && phoneOk) {
-        updateForm('emailVerified', true)
-        updateForm('phoneVerified', true)
+      if (data.emailVerified) updateForm('emailVerified', true)
+      if (data.phoneVerified) updateForm('phoneVerified', true)
+      const emailOk = !!data.emailVerified
+      const phoneOk = !smsEnabled || !!data.phoneVerified
+      if (emailOk && phoneOk) {
         return true
-      } else {
-        setError(t('verificationInvalid'))
-        return false
       }
+      if (!emailOk && !phoneOk) setError(t('verificationInvalid'))
+      else if (!emailOk) setError(t('verificationInvalidEmail'))
+      else setError(t('verificationInvalidPhone'))
+      return false
     } catch {
       setError(t('verificationError'))
       return false
