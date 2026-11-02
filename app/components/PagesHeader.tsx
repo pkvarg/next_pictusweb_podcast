@@ -47,7 +47,7 @@ const PagesHeader = () => {
 
   return (
     <header
-      className="sticky top-0 z-40 bg-[#0e0f10]/85 backdrop-blur-md md:bg-transparent md:bg-gradient-to-b md:from-[#0e0f10]/55 md:to-transparent md:backdrop-blur-none"
+      className="sticky top-0 z-40 bg-[#0e0f10]/90 backdrop-blur-md border-b border-white/5"
       style={satoshi}
       aria-label="Site header"
     >

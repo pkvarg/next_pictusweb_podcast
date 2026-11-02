@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect, useRef, Suspense } from 'react'
+import { useSearchParams, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import PagesHeader from '@/app/components/PagesHeader'
@@ -22,6 +22,15 @@ import {
 
 const STEPS = ['organization', 'account', 'verification', 'agreements', 'review'] as const
 type Step = (typeof STEPS)[number]
+
+const COUNTRY_CODES: { code: string; dial: string }[] = [
+  { code: 'SK', dial: '+421' },
+  { code: 'CZ', dial: '+420' },
+  { code: 'HU', dial: '+36' },
+  { code: 'AT', dial: '+43' },
+]
+// Countries we can currently deliver SMS OTP to.
+const SMS_COUNTRIES = ['SK']
 
 interface FormData {
   // Step 1 - Organization
@@ -53,7 +62,19 @@ interface FormData {
 
 function GetStartedContent() {
   const searchParams = useSearchParams()
+  const params = useParams()
   const t = useTranslations('FleetSyncOnboarding')
+
+  const regionName = (code: string) => {
+    try {
+      return (
+        new Intl.DisplayNames([(params?.locale as string) || 'sk'], { type: 'region' }).of(code) ||
+        code
+      )
+    } catch {
+      return code
+    }
+  }
 
   const tierParam = searchParams.get('tier')?.toUpperCase() || 'FREE'
   const billingParam = searchParams.get('billing') || 'monthly'
@@ -66,6 +87,7 @@ function GetStartedContent() {
   const [currentStep, setCurrentStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const errorRef = useRef<HTMLDivElement>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [emailCheckLoading, setEmailCheckLoading] = useState(false)
@@ -88,7 +110,7 @@ function GetStartedContent() {
     street: '',
     city: '',
     postalCode: '',
-    country: '',
+    country: 'SK',
     numberOfVehicles: tier === 'BUSINESS' ? 4 : 1,
     firstName: '',
     lastName: '',
@@ -138,12 +160,21 @@ function GetStartedContent() {
     }
   }, [resendCooldown])
 
+  // Bring the error banner into view (it sits above the form, out of sight on long steps)
+  useEffect(() => {
+    if (error) {
+      errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [error])
+
   const updateForm = (field: keyof FormData, value: string | number | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }))
     setError('')
   }
 
-  const fullPhoneNumber = `+421${form.phoneNumber.replace(/\s/g, '')}`
+  const phonePrefix = COUNTRY_CODES.find((c) => c.code === form.country)?.dial ?? '+421'
+  const smsEnabled = SMS_COUNTRIES.includes(form.country)
+  const fullPhoneNumber = `${phonePrefix}${form.phoneNumber.replace(/\s/g, '')}`
 
   // Email availability check
   const checkEmail = async (email: string): Promise<boolean | null> => {
@@ -178,7 +209,7 @@ function GetStartedContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: form.email,
-          phoneNumber: fullPhoneNumber,
+          phoneNumber: smsEnabled ? fullPhoneNumber : undefined,
           firstName: form.firstName,
           locale: window.location.pathname.split('/')[1] || 'sk',
         }),
@@ -207,15 +238,16 @@ function GetStartedContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: form.email,
-          phoneNumber: fullPhoneNumber,
           emailCode: form.emailCode,
-          phoneCode: form.phoneCode,
           emailToken,
-          phoneToken,
+          ...(smsEnabled
+            ? { phoneNumber: fullPhoneNumber, phoneCode: form.phoneCode, phoneToken }
+            : {}),
         }),
       })
       const data = await res.json()
-      if (data.emailVerified && data.phoneVerified) {
+      const phoneOk = !smsEnabled || data.phoneVerified
+      if (data.emailVerified && phoneOk) {
         updateForm('emailVerified', true)
         updateForm('phoneVerified', true)
         return true
@@ -249,15 +281,22 @@ function GetStartedContent() {
         if (!form.country.trim()) return t('errorCountry')
         if (!isFree && form.numberOfVehicles < 1) return t('errorVehicles')
         return null
-      case 'account':
+      case 'account': {
         if (!form.email.includes('@')) return t('errorEmail')
         if (!skipEmailCheck && emailAvailable !== true) return t('errorEmailTaken')
-        if (!form.phoneNumber.trim()) return t('errorPhone')
+        const phoneDigits = form.phoneNumber.replace(/\D/g, '')
+        if (!phoneDigits) return t('errorPhone')
+        if (
+          smsEnabled ? phoneDigits.length !== 9 : phoneDigits.length < 6 || phoneDigits.length > 12
+        )
+          return t('errorPhoneFormat')
         if (form.password.length < 8) return t('errorPasswordLength')
         if (form.password !== form.confirmPassword) return t('errorPasswordMatch')
         return null
+      }
       case 'verification':
-        if (!form.emailVerified || !form.phoneVerified) return t('errorVerification')
+        if (!form.emailVerified) return t('errorVerification')
+        if (smsEnabled && !form.phoneVerified) return t('errorVerification')
         return null
       case 'agreements':
         if (!form.gdprAccepted) return t('errorGdpr')
@@ -713,16 +752,19 @@ function GetStartedContent() {
 
             <div>
               <label className={labelClass}>{t('country')} *</label>
-              <input
-                type="text"
+              <select
                 name="country-name"
                 autoComplete="country-name"
                 className={inputClass}
                 value={form.country}
                 onChange={(e) => updateForm('country', e.target.value)}
-                placeholder={t('countryPlaceholder')}
-                maxLength={100}
-              />
+              >
+                {COUNTRY_CODES.map((c) => (
+                  <option key={c.code} value={c.code} className="bg-pictus-black">
+                    {regionName(c.code)}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {!isFree && (
@@ -792,7 +834,7 @@ function GetStartedContent() {
               <label className={labelClass}>{t('phoneNumber')} *</label>
               <div className="flex gap-2">
                 <span className="flex items-center px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-gray-400 font-light text-sm select-none">
-                  +421
+                  {phonePrefix}
                 </span>
                 <input
                   type="tel"
@@ -881,7 +923,7 @@ function GetStartedContent() {
             <p className="text-gray-400 font-light">{t('step3Subtitle')}</p>
 
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-sm text-blue-300 font-light">
-              {t('verificationInfo')}
+              {smsEnabled ? t('verificationInfo') : t('verificationInfoEmailOnly')}
             </div>
 
             <div>
@@ -905,26 +947,28 @@ function GetStartedContent() {
               )}
             </div>
 
-            <div>
-              <label className={labelClass}>{t('phoneCodeLabel')}</label>
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  maxLength={6}
-                  className={`${inputClass} tracking-[0.5em] text-center text-lg font-mono`}
-                  value={form.phoneCode}
-                  onChange={(e) =>
-                    updateForm('phoneCode', e.target.value.replace(/\D/g, '').slice(0, 6))
-                  }
-                  placeholder="000000"
-                />
+            {smsEnabled && (
+              <div>
+                <label className={labelClass}>{t('phoneCodeLabel')}</label>
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    className={`${inputClass} tracking-[0.5em] text-center text-lg font-mono`}
+                    value={form.phoneCode}
+                    onChange={(e) =>
+                      updateForm('phoneCode', e.target.value.replace(/\D/g, '').slice(0, 6))
+                    }
+                    placeholder="000000"
+                  />
+                </div>
+                {form.phoneVerified && (
+                  <p className="text-green-400 text-sm mt-1 flex items-center gap-1 font-light">
+                    <CheckCircle className="w-4 h-4" /> {t('phoneVerifiedLabel')}
+                  </p>
+                )}
               </div>
-              {form.phoneVerified && (
-                <p className="text-green-400 text-sm mt-1 flex items-center gap-1 font-light">
-                  <CheckCircle className="w-4 h-4" /> {t('phoneVerifiedLabel')}
-                </p>
-              )}
-            </div>
+            )}
 
             <button
               onClick={sendVerificationCodes}
@@ -1106,7 +1150,10 @@ function GetStartedContent() {
 
         {/* Error display */}
         {error && (
-          <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg mb-6 font-light">
+          <div
+            ref={errorRef}
+            className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg mb-6 font-light scroll-mt-24"
+          >
             {error}
           </div>
         )}

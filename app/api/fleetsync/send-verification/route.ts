@@ -16,9 +16,7 @@ function generateOTP(): string {
 }
 
 function hashCode(code: string, identifier: string): string {
-  return createHash('sha256')
-    .update(`${code}:${identifier}:${OTP_SALT}`)
-    .digest('hex')
+  return createHash('sha256').update(`${code}:${identifier}:${OTP_SALT}`).digest('hex')
 }
 
 function createToken(identifier: string, purpose: string, expiresAt: number): string {
@@ -35,13 +33,17 @@ export async function POST(request: NextRequest) {
   try {
     const { email, phoneNumber, firstName, locale } = await request.json()
 
-    if (!email || !phoneNumber) {
-      return NextResponse.json({ error: 'Email and phone number are required' }, { status: 400 })
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
     // Rate limit: 5 sends per IP per hour
     const ip = getClientIP(request.headers)
-    const ipLimit = rateLimit({ key: `send_verification:${ip}`, maxAttempts: 5, windowMs: 60 * 60 * 1000 })
+    const ipLimit = rateLimit({
+      key: `send_verification:${ip}`,
+      maxAttempts: 5,
+      windowMs: 60 * 60 * 1000,
+    })
     if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
 
     const expiresAt = Date.now() + EXPIRES_MINUTES * 60 * 1000
@@ -71,12 +73,12 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Generate codes
+    // Generate codes (phone is optional — only for SMS-enabled countries)
     const emailCode = generateOTP()
-    const phoneCode = generateOTP()
-
     const emailToken = createToken(email, 'onboard_email', expiresAt)
-    const phoneToken = createToken(phoneNumber, 'onboard_phone', expiresAt)
+
+    const phoneCode = phoneNumber ? generateOTP() : null
+    const phoneToken = phoneNumber ? createToken(phoneNumber, 'onboard_phone', expiresAt) : null
 
     // Store hashed codes in DB
     await prisma.verificationCode.createMany({
@@ -88,13 +90,17 @@ export async function POST(request: NextRequest) {
           tokenHash: hashToken(emailToken),
           expiresAt: expiresAtDate,
         },
-        {
-          userId: phoneNumber,
-          purpose: 'onboard_phone',
-          codeHash: hashCode(phoneCode, phoneNumber),
-          tokenHash: hashToken(phoneToken),
-          expiresAt: expiresAtDate,
-        },
+        ...(phoneNumber && phoneCode && phoneToken
+          ? [
+              {
+                userId: phoneNumber,
+                purpose: 'onboard_phone',
+                codeHash: hashCode(phoneCode, phoneNumber),
+                tokenHash: hashToken(phoneToken),
+                expiresAt: expiresAtDate,
+              },
+            ]
+          : []),
       ],
     })
 
@@ -111,12 +117,14 @@ export async function POST(request: NextRequest) {
       }),
     })
 
-    // Send SMS OTP via hono_bun
-    await fetch(`${HONO_API}/api/pictusweb/client/send-otp-sms`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone: phoneNumber, code: phoneCode, purpose: 'verify' }),
-    })
+    // Send SMS OTP via hono_bun (only when a phone number is provided)
+    if (phoneNumber && phoneCode) {
+      await fetch(`${HONO_API}/api/pictusweb/client/send-otp-sms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phoneNumber, code: phoneCode, purpose: 'verify' }),
+      })
+    }
 
     return NextResponse.json({
       success: true,

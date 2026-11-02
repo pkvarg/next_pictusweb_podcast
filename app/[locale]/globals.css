@@ -389,6 +389,11 @@ input[type='date']::-webkit-calendar-picker-indicator {
   overflow: clip;
 }
 
+/* Trim the empty space between the page header and the first section's content */
+.pl main > .section-shell:first-child {
+  padding-top: clamp(16px, 2.5vw, 40px);
+}
+
 .pl .section-shell + .section-shell {
   margin-top: clamp(-28px, -1.8vw, -12px);
 }
@@ -470,6 +475,46 @@ input[type='date']::-webkit-calendar-picker-indicator {
 .pl .nav-controls {
   justify-content: end;
   gap: 10px;
+}
+
+@keyframes navCtaBorder {
+  to {
+    background-position:
+      0 0,
+      300% 0;
+  }
+}
+
+.pl .nav-cta {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#141511, #141511) padding-box,
+    linear-gradient(90deg, #b6e036, #ffffff, #7bb026, #b6e036) border-box;
+  background-size:
+    100% 100%,
+    300% 100%;
+  color: #b6e036;
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  animation: navCtaBorder 2.5s linear infinite;
+}
+
+.pl .nav-cta:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 560px) {
+  .pl .nav-cta {
+    display: none;
+  }
 }
 
 .pl .language-menu {

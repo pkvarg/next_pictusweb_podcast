@@ -75,6 +75,11 @@ const PictusPagesHeader = () => {
         </nav>
 
         <div className="nav-controls">
+          {cleanPath === '/fleetsync' && (
+            <Link className="nav-cta" href="/fleetsync/get-started?tier=FREE">
+              {t('navbarTryFree')}
+            </Link>
+          )}
           <div className="language-inline" role="group" aria-label={tl('nav.changeLanguage')}>
             {languages.map((lang) => (
               <button
