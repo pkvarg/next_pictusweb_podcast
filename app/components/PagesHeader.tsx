@@ -6,8 +6,6 @@ import { Link } from '@/i18n/routing'
 import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 
-const satoshi = { fontFamily: 'Satoshi, system-ui, sans-serif' }
-
 const languages = [
   { code: 'sk', label: 'SK', flag: '🇸🇰' },
   { code: 'en', label: 'EN', flag: '🇬🇧' },
@@ -46,11 +44,7 @@ const PagesHeader = () => {
     href === '/' ? cleanPath === '' || cleanPath === '/' : cleanPath.startsWith(href)
 
   return (
-    <header
-      className="sticky top-0 z-40 bg-[#0e0f10]/90 backdrop-blur-md border-b border-white/5"
-      style={satoshi}
-      aria-label="Site header"
-    >
+    <header className="relative z-40 bg-transparent" aria-label="Site header">
       <div className="mx-auto flex min-h-[76px] w-[min(100%-2rem,1296px)] items-center justify-between gap-6 md:min-h-[90px]">
         {/* Brand */}
         <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Pictus home">
@@ -66,8 +60,8 @@ const PagesHeader = () => {
             <Link
               key={link.href}
               href={link.href}
-              className={`inline-flex min-h-[44px] items-center text-[0.92rem] transition-colors hover:text-pictus-white ${
-                isActive(link.href) ? 'text-pictus-white' : 'text-pictus-white/75'
+              className={`inline-flex min-h-[44px] items-center text-[1.02rem] font-semibold transition-colors hover:text-pictus-white ${
+                isActive(link.href) ? 'text-pictus-white' : 'text-pictus-white/90'
               }`}
             >
               {link.label}
