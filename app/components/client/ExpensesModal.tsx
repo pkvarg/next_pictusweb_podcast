@@ -277,9 +277,9 @@ const ExpensesModal = ({
                   className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                 />
               </div>
-              <div>
+              <div className="md:col-span-3">
                 <label className="block text-pictus-white text-lg font-light mb-2">
-                  Link napr. na obdchod
+                  Link napr. na obchod
                 </label>
                 <input
                   type="url"
@@ -289,7 +289,7 @@ const ExpensesModal = ({
                   className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                 />
               </div>
-              <div className="md:col-span-2">
+              <div className="md:col-span-3">
                 <button
                   type="submit"
                   disabled={loading}

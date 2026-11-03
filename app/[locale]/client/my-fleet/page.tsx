@@ -164,7 +164,13 @@ interface VehicleNotification {
 }
 
 type TabType =
-  'vehicles' | 'users' | 'notifications' | 'renewals' | 'templates' | 'types' | 'organizations'
+  | 'vehicles'
+  | 'users'
+  | 'notifications'
+  | 'renewals'
+  | 'templates'
+  | 'types'
+  | 'organizations'
 
 const MyFleetPage = () => {
   const { data: session, status } = useSession()
@@ -2241,21 +2247,17 @@ const MyFleetPage = () => {
               <h2 className="text-2xl font-bold text-white mb-2">{t('notificationTemplates')}</h2>
               <p className="text-gray-400">{t('manageTemplates')}</p>
 
-              <label className="mt-6 flex items-start gap-3 p-4 bg-white/5 border border-white/[0.06] rounded-2xl cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={organization?.useCustomTemplates ?? false}
-                  onChange={(e) => updateOrgSetting('useCustomTemplates', e.target.checked)}
-                  className="mt-1 w-5 h-5 rounded border-gray-300 text-pictus-lime focus:ring-pictus-lime"
-                />
-                <span>
-                  <span className="block text-white font-medium">
-                    {t('useCustomTemplatesLabel')}
-                  </span>
-                  <span className="block text-gray-400 text-sm mt-1">
-                    {t('useCustomTemplatesHint')}
-                  </span>
-                </span>
+              <label className="mt-6 block p-4 bg-white/5 border border-white/[0.06] rounded-2xl cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={organization?.useCustomTemplates ?? false}
+                    onChange={(e) => updateOrgSetting('useCustomTemplates', e.target.checked)}
+                    className="w-5 h-5 shrink-0 rounded border-gray-300 text-pictus-lime focus:ring-pictus-lime"
+                  />
+                  <span className="text-white font-medium">{t('useCustomTemplatesLabel')}</span>
+                </div>
+                <p className="text-gray-400 text-sm mt-1 pl-8">{t('useCustomTemplatesHint')}</p>
               </label>
             </div>
             {organization?.useCustomTemplates ? (
