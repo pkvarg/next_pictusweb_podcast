@@ -894,16 +894,6 @@ function GetStartedContent() {
                   placeholder="9XX XXX XXX"
                 />
               </div>
-              <p className="text-sm text-yellow-400/80 mt-2 font-light bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-3 py-2">
-                {t('phoneSkOnly')}{' '}
-                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                <Link
-                  href="/contact"
-                  className="text-pictus-lime hover:text-pictus-lime600 underline transition-colors"
-                >
-                  {t('phoneSkContact')}
-                </Link>
-              </p>
             </div>
 
             <div>
