@@ -18,6 +18,7 @@ import {
   X,
   Car,
   Gift,
+  Receipt,
 } from 'lucide-react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
@@ -93,6 +94,78 @@ const ClientZone = () => {
   const [passwordChangeError, setPasswordChangeError] = useState('')
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('')
 
+  // Account profile edit state
+  const emptyOrgInfo = {
+    name: '',
+    mainContact: '',
+    ico: '',
+    dic: '',
+    street: '',
+    city: '',
+    postalCode: '',
+    country: '',
+  }
+  const [profile, setProfile] = useState({ firstName: '', lastName: '', phoneNumber: '' })
+  const [orgInfo, setOrgInfo] = useState(emptyOrgInfo)
+  const [canEditOrg, setCanEditOrg] = useState(false)
+  const [profileLoaded, setProfileLoaded] = useState(false)
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileMsg, setProfileMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(
+    null,
+  )
+
+  const fetchProfile = useCallback(async () => {
+    try {
+      const res = await fetch('/api/client/settings')
+      if (!res.ok) return
+      const data = await res.json()
+      const a = data.account || {}
+      setProfile({
+        firstName: a.firstName || '',
+        lastName: a.lastName || '',
+        phoneNumber: a.phoneNumber || '',
+      })
+      const o = data.organization || {}
+      setOrgInfo({
+        name: o.name || '',
+        mainContact: o.mainContact || '',
+        ico: o.ico || '',
+        dic: o.dic || '',
+        street: o.street || '',
+        city: o.city || '',
+        postalCode: o.postalCode || '',
+        country: o.country || '',
+      })
+      setCanEditOrg(Boolean(data.canEditOrg))
+      setProfileLoaded(true)
+    } catch {
+      // Leave the session name as the fallback display.
+    }
+  }, [])
+
+  const handleProfileSave = async () => {
+    setSavingProfile(true)
+    setProfileMsg(null)
+    try {
+      const res = await fetch('/api/client/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(
+          canEditOrg ? { account: profile, organization: orgInfo } : { account: profile },
+        ),
+      })
+      if (!res.ok) throw new Error('save failed')
+      setEditingProfile(false)
+      setProfileMsg({ type: 'success', text: t('profileSaved') })
+      setTimeout(() => setProfileMsg(null), 4000)
+    } catch {
+      setProfileMsg({ type: 'error', text: t('profileError') })
+    } finally {
+      setSavingProfile(false)
+    }
+  }
+
   // Vehicle count management
   const [editingVehicles, setEditingVehicles] = useState(false)
   const [newVehicleCount, setNewVehicleCount] = useState(1)
@@ -127,8 +200,9 @@ const ClientZone = () => {
   useEffect(() => {
     if (session?.user) {
       fetchOrganization()
+      fetchProfile()
     }
-  }, [session?.user, fetchOrganization])
+  }, [session?.user, fetchOrganization, fetchProfile])
 
   const handleLogout = () => {
     signOut({ callbackUrl: '/' })
@@ -298,6 +372,13 @@ const ClientZone = () => {
                   </button>
                 ))}
               </div>
+              <Link
+                href="/client/settings"
+                className="flex items-center text-pictus-white hover:text-pictus-lime transition-colors p-2 rounded-full hover:bg-white/10 shrink-0"
+                title={t('settings')}
+              >
+                <Settings className="h-4 w-4" />
+              </Link>
               <div className="hidden sm:flex items-center space-x-2 text-pictus-white">
                 <User size={16} className="shrink-0" />
                 <span className="text-lg truncate">{session?.user?.name}</span>
@@ -471,22 +552,240 @@ const ClientZone = () => {
             <div className="grid md:grid-cols-2 gap-6">
               {/* User Profile */}
               <div className="">
-                <div className="flex items-center gap-2 mb-3">
-                  <User className="w-5 h-5 text-pictus-lime" />
-                  <h3 className="text-xl font-bold text-pictus-white">{t('userProfile')}</h3>
-                </div>
-                <div className="space-y-2">
-                  <div>
-                    <label className="text-pictus-white text-sm font-light">{t('nameLabel')}</label>
-                    <p className="text-pictus-white text-base">{session?.user?.name}</p>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <User className="w-5 h-5 text-pictus-lime" />
+                    <h3 className="text-xl font-bold text-pictus-white">{t('userProfile')}</h3>
                   </div>
-                  <div>
-                    <label className="text-pictus-white text-sm font-light">
-                      {t('emailLabel')}
-                    </label>
-                    <p className="text-pictus-white text-base">{session?.user?.email}</p>
-                  </div>
+                  {!editingProfile && (
+                    <button
+                      onClick={() => {
+                        setProfileMsg(null)
+                        setEditingProfile(true)
+                      }}
+                      className="flex items-center gap-1.5 text-sm text-pictus-lime hover:text-pictus-lime600 transition-colors"
+                    >
+                      <Settings className="w-4 h-4" />
+                      {t('editProfile')}
+                    </button>
+                  )}
                 </div>
+
+                {!editingProfile ? (
+                  <div className="space-y-2">
+                    <div>
+                      <label className="text-pictus-white text-sm font-light">
+                        {t('nameLabel')}
+                      </label>
+                      <p className="text-pictus-white text-base">
+                        {profileLoaded
+                          ? `${profile.firstName} ${profile.lastName}`.trim() || session?.user?.name
+                          : session?.user?.name}
+                      </p>
+                    </div>
+                    {profileLoaded && profile.phoneNumber && (
+                      <div>
+                        <label className="text-pictus-white text-sm font-light">
+                          {t('phoneLabel')}
+                        </label>
+                        <p className="text-pictus-white text-base">{profile.phoneNumber}</p>
+                      </div>
+                    )}
+                    <div>
+                      <label className="text-pictus-white text-sm font-light">
+                        {t('emailLabel')}
+                      </label>
+                      <p className="text-pictus-white text-base">{session?.user?.email}</p>
+                    </div>
+                    {profileMsg && (
+                      <div
+                        className={`mt-2 px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 ${
+                          profileMsg.type === 'success'
+                            ? 'bg-green-500/15 border border-green-500/30 text-green-200'
+                            : 'bg-red-500/15 border border-red-500/30 text-red-200'
+                        }`}
+                      >
+                        {profileMsg.type === 'success' ? <Check size={16} /> : <X size={16} />}
+                        {profileMsg.text}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      handleProfileSave()
+                    }}
+                    className="space-y-3"
+                  >
+                    <div>
+                      <label className="text-pictus-white text-sm font-light block mb-1">
+                        {t('firstNameLabel')}
+                      </label>
+                      <input
+                        value={profile.firstName}
+                        onChange={(e) => setProfile((p) => ({ ...p, firstName: e.target.value }))}
+                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-pictus-white text-sm font-light block mb-1">
+                        {t('lastNameLabel')}
+                      </label>
+                      <input
+                        value={profile.lastName}
+                        onChange={(e) => setProfile((p) => ({ ...p, lastName: e.target.value }))}
+                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-pictus-white text-sm font-light block mb-1">
+                        {t('phoneLabel')}
+                      </label>
+                      <input
+                        value={profile.phoneNumber}
+                        onChange={(e) => setProfile((p) => ({ ...p, phoneNumber: e.target.value }))}
+                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-pictus-white text-sm font-light block mb-1">
+                        {t('emailLabel')}
+                      </label>
+                      <p className="text-gray-400 text-base px-1">{session?.user?.email}</p>
+                    </div>
+
+                    {canEditOrg && (
+                      <div className="border-t border-white/[0.06] pt-4 mt-2 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Receipt className="w-4 h-4 text-pictus-lime" />
+                          <h4 className="text-base font-bold text-pictus-white">
+                            {t('orgSectionTitle')}
+                          </h4>
+                        </div>
+                        <div>
+                          <label className="text-pictus-white text-sm font-light block mb-1">
+                            {t('orgNameLabel')}
+                          </label>
+                          <input
+                            value={orgInfo.name}
+                            onChange={(e) => setOrgInfo((o) => ({ ...o, name: e.target.value }))}
+                            className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-pictus-white text-sm font-light block mb-1">
+                              {t('icoLabel')}
+                            </label>
+                            <input
+                              value={orgInfo.ico}
+                              onChange={(e) => setOrgInfo((o) => ({ ...o, ico: e.target.value }))}
+                              className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-pictus-white text-sm font-light block mb-1">
+                              {t('dicLabel')}
+                            </label>
+                            <input
+                              value={orgInfo.dic}
+                              onChange={(e) => setOrgInfo((o) => ({ ...o, dic: e.target.value }))}
+                              className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-pictus-white text-sm font-light block mb-1">
+                            {t('streetLabel')}
+                          </label>
+                          <input
+                            value={orgInfo.street}
+                            onChange={(e) => setOrgInfo((o) => ({ ...o, street: e.target.value }))}
+                            className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-pictus-white text-sm font-light block mb-1">
+                              {t('zipLabel')}
+                            </label>
+                            <input
+                              value={orgInfo.postalCode}
+                              onChange={(e) =>
+                                setOrgInfo((o) => ({ ...o, postalCode: e.target.value }))
+                              }
+                              className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-pictus-white text-sm font-light block mb-1">
+                              {t('cityLabel')}
+                            </label>
+                            <input
+                              value={orgInfo.city}
+                              onChange={(e) => setOrgInfo((o) => ({ ...o, city: e.target.value }))}
+                              className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-pictus-white text-sm font-light block mb-1">
+                            {t('countryLabel')}
+                          </label>
+                          <input
+                            value={orgInfo.country}
+                            onChange={(e) => setOrgInfo((o) => ({ ...o, country: e.target.value }))}
+                            className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-pictus-white text-sm font-light block mb-1">
+                            {t('orgContactLabel')}
+                          </label>
+                          <input
+                            value={orgInfo.mainContact}
+                            onChange={(e) =>
+                              setOrgInfo((o) => ({ ...o, mainContact: e.target.value }))
+                            }
+                            className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-pictus-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {profileMsg?.type === 'error' && (
+                      <div className="bg-red-500/15 border border-red-500/30 text-red-200 px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                        <X size={16} />
+                        {profileMsg.text}
+                      </div>
+                    )}
+                    <div className="flex gap-3 pt-1">
+                      <button
+                        type="submit"
+                        disabled={savingProfile}
+                        className="flex-1 bg-pictus-lime text-pictus-black py-2.5 px-6 rounded-full font-semibold hover:bg-pictus-lime600 focus:outline-none focus:ring-2 focus:ring-pictus-lime transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {savingProfile ? (
+                          <div className="w-5 h-5 border-2 border-pictus-black/30 border-t-pictus-black rounded-full animate-spin mx-auto" />
+                        ) : (
+                          t('saveProfile')
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingProfile(false)
+                          setProfileMsg(null)
+                          fetchProfile()
+                        }}
+                        className="px-6 py-2.5 bg-white/5 text-pictus-white rounded-full font-semibold hover:bg-white/10 transition-all"
+                      >
+                        {t('cancel')}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
 
               {/* Password Change */}
