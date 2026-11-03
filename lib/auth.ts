@@ -4,6 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { isValidPassword } from './isValidPassword'
 import prisma from '@/db/db'
 import { rateLimit } from './rateLimit'
+import { verifyImpersonationToken } from './impersonationToken'
 import { Product } from '@prisma/client'
 
 // Extend the built-in session types
@@ -19,6 +20,7 @@ declare module 'next-auth' {
       isFleetManager?: boolean
       organizationDeleted?: boolean
       product?: Product // Which product the user's organization uses (FleetSync by default)
+      impersonatedBy?: string // Admin user id when this is an impersonated session
     }
   }
 
@@ -31,6 +33,7 @@ declare module 'next-auth' {
     organizationId?: string // Explicit organizationId field
     isFleetManager?: boolean
     product?: Product
+    impersonatedBy?: string
   }
 }
 
@@ -50,6 +53,12 @@ export const authOptions = {
   callbacks: {
     async signIn({ user, account }: any) {
       console.log('JWT SignIn attempt:', user.email, 'Provider:', account?.provider)
+
+      // Impersonation is already authorized inside the 'impersonate' provider (signed token minted
+      // only after an admin check), so don't re-run the active/not-deleted gate here.
+      if (account?.provider === 'impersonate') {
+        return true
+      }
 
       // Check if user exists in database for JWT mode
       if (account?.provider !== 'credentials') {
@@ -75,6 +84,8 @@ export const authOptions = {
     async jwt({ token, user, account }: any) {
       try {
         if (user && account) {
+          const isImpersonation = account.provider === 'impersonate'
+
           // Get user data from database for JWT
           const dbUser = await prisma.user.findUnique({
             where: { email: user.email },
@@ -88,6 +99,7 @@ export const authOptions = {
             token.organizationId = dbUser.organizationId
             token.organization = dbUser.organizationId || dbUser.organization // Use organizationId (UUID) first
             token.isFleetManager = dbUser.isFleetManager
+            token.impersonatedBy = isImpersonation ? user.impersonatedBy : undefined
 
             // Check if organization is soft-deleted + load its product dimension
             if (dbUser.organizationId) {
@@ -102,14 +114,16 @@ export const authOptions = {
               token.product = Product.FLEETSYNC
             }
 
-            // Update login tracking
-            await prisma.user.update({
-              where: { id: dbUser.id },
-              data: {
-                lastLoggedIn: new Date(),
-                loginCount: { increment: 1 },
-              },
-            })
+            // Update login tracking — never for impersonation, so it stays out of the per-user counts.
+            if (!isImpersonation) {
+              await prisma.user.update({
+                where: { id: dbUser.id },
+                data: {
+                  lastLoggedIn: new Date(),
+                  loginCount: { increment: 1 },
+                },
+              })
+            }
           } else {
           }
         } else if (token.email && !token.organization) {
@@ -164,6 +178,7 @@ export const authOptions = {
           session.user.isFleetManager = token.isFleetManager || false
           session.user.organizationDeleted = token.organizationDeleted || false
           session.user.product = token.product || Product.FLEETSYNC
+          session.user.impersonatedBy = token.impersonatedBy || undefined
         }
 
         return session
@@ -274,6 +289,45 @@ export const authOptions = {
         } catch (error) {
           console.error('Credentials login ERROR for:', credentials.username, error)
           return null
+        }
+      },
+    }),
+    CredentialsProvider({
+      id: 'impersonate',
+      name: 'Impersonate',
+      credentials: {
+        token: { label: 'Token', type: 'text' },
+      },
+      async authorize(credentials) {
+        const raw = credentials?.token
+        if (!raw) return null
+
+        const claims = verifyImpersonationToken(raw)
+        if (!claims) {
+          console.log('Impersonation FAILED - invalid or expired token')
+          return null
+        }
+
+        const target = await prisma.user.findUnique({
+          where: { id: claims.sub },
+        })
+        if (!target || target.deletedAt) {
+          console.log('Impersonation FAILED - target not found:', claims.sub)
+          return null
+        }
+
+        console.log(
+          'Impersonation SUCCESS - by:',
+          claims.by ?? '(return-to-admin)',
+          'as:',
+          target.email,
+        )
+        return {
+          id: target.id,
+          name: `${target.firstName || ''} ${target.lastName || ''}`.trim() || target.email,
+          email: target.email,
+          image: target.image,
+          impersonatedBy: claims.by,
         }
       },
     }),

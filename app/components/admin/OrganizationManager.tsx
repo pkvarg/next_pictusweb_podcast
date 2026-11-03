@@ -1,7 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Building, Plus, Edit2, Trash2, Save, X, Users, Gift, Receipt } from 'lucide-react'
+import { signIn } from 'next-auth/react'
+import { useParams } from 'next/navigation'
+import { Building, Plus, Edit2, Trash2, Save, X, Users, Gift, Receipt, LogIn } from 'lucide-react'
+
+interface ImpersonateUser {
+  id: string
+  email: string
+  firstName: string | null
+  lastName: string | null
+}
 
 interface TierInfo {
   id: string
@@ -60,10 +69,61 @@ export default function OrganizationManager() {
   const [editingItem, setEditingItem] = useState<any>(null)
   const [newItem, setNewItem] = useState<any>(null)
 
+  const params = useParams()
+  const locale = (params?.locale as string) || 'sk'
+  const [impersonateBusy, setImpersonateBusy] = useState<string | null>(null)
+  const [picker, setPicker] = useState<{ org: Organization; users: ImpersonateUser[] } | null>(null)
+
   useEffect(() => {
     fetchOrganizations()
     fetchTiers()
   }, [])
+
+  const impersonateUser = async (userId: string) => {
+    setImpersonateBusy(userId)
+    try {
+      const res = await fetch('/api/admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        alert(data.error || 'Nepodarilo sa prihlásiť za používateľa.')
+        setImpersonateBusy(null)
+        return
+      }
+      const { token } = await res.json()
+      await signIn('impersonate', { token, callbackUrl: `/${locale}/client` })
+    } catch {
+      alert('Nepodarilo sa prihlásiť za používateľa.')
+      setImpersonateBusy(null)
+    }
+  }
+
+  const startImpersonate = async (org: Organization) => {
+    setImpersonateBusy(org.id)
+    try {
+      const res = await fetch(`/api/users?organizationId=${org.id}&excludeBenefit=true`)
+      if (!res.ok) throw new Error('users failed')
+      const data = await res.json()
+      const users: ImpersonateUser[] = Array.isArray(data) ? data : data.users || []
+      if (users.length === 0) {
+        alert('Táto organizácia nemá žiadnych používateľov.')
+        setImpersonateBusy(null)
+        return
+      }
+      if (users.length === 1) {
+        await impersonateUser(users[0].id)
+        return
+      }
+      setImpersonateBusy(null)
+      setPicker({ org, users })
+    } catch {
+      alert('Nepodarilo sa načítať používateľov.')
+      setImpersonateBusy(null)
+    }
+  }
 
   const fetchTiers = async () => {
     try {
@@ -670,6 +730,14 @@ export default function OrganizationManager() {
                     </div>
                     <div className="flex gap-2 shrink-0">
                       <button
+                        onClick={() => startImpersonate(org)}
+                        disabled={impersonateBusy === org.id}
+                        title="Prihlásiť sa za používateľa"
+                        className="p-2.5 hover:bg-white/10 rounded-lg transition-all disabled:opacity-50"
+                      >
+                        <LogIn className="w-4 h-4 text-amber-400" />
+                      </button>
+                      <button
                         onClick={() => handleEdit(org)}
                         className="p-2.5 hover:bg-white/10 rounded-lg transition-all"
                       >
@@ -699,6 +767,52 @@ export default function OrganizationManager() {
           </div>
         )}
       </div>
+
+      {picker && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setPicker(null)}
+        >
+          <div
+            className="w-full max-w-md bg-pictus-onyx900 border border-white/10 rounded-2xl p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-light text-pictus-white">
+                Prihlásiť sa za — {picker.org.name}
+              </h3>
+              <button
+                onClick={() => setPicker(null)}
+                className="p-1.5 hover:bg-white/10 rounded-lg transition-all"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-400 mb-4">
+              Vyberte používateľa, za ktorého sa chcete prihlásiť:
+            </p>
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {picker.users.map((u) => {
+                const label = `${u.firstName || ''} ${u.lastName || ''}`.trim()
+                return (
+                  <button
+                    key={u.id}
+                    onClick={() => impersonateUser(u.id)}
+                    disabled={impersonateBusy === u.id}
+                    className="w-full flex items-center gap-3 text-left px-4 py-3 bg-white/[0.04] hover:bg-white/[0.08] rounded-lg transition-all disabled:opacity-50"
+                  >
+                    <LogIn className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="min-w-0">
+                      {label && <span className="block text-pictus-white truncate">{label}</span>}
+                      <span className="block text-sm text-gray-400 truncate">{u.email}</span>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
