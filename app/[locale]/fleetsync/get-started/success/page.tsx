@@ -145,19 +145,19 @@ function SuccessContent() {
         <div className="bg-gradient-to-br from-pictus-onyx900/30 to-pictus-black/50 rounded-2xl p-6 mb-8 text-left border border-pictus-lime/30 backdrop-blur-sm">
           <h3 className="font-normal text-lg mb-4 text-pictus-white">{t('successNextSteps')}</h3>
           <div className="space-y-4">
-            <div className="flex items-start gap-3">
+            <div className="flex items-center gap-3">
               <span className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-sm w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 font-normal">
                 1
               </span>
               <p className="text-gray-300 font-light">{t('successStep1')}</p>
             </div>
-            <div className="flex items-start gap-3">
+            <div className="flex items-center gap-3">
               <span className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-sm w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 font-normal">
                 2
               </span>
               <p className="text-gray-300 font-light">{t('successStep2')}</p>
             </div>
-            <div className="flex items-start gap-3">
+            <div className="flex items-center gap-3">
               <span className="bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black text-sm w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 font-normal">
                 3
               </span>

@@ -85,6 +85,7 @@ function GetStartedContent() {
   )
 
   const [currentStep, setCurrentStep] = useState(0)
+  const [verifyPhase, setVerifyPhase] = useState<'email' | 'phone'>('email')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const errorRef = useRef<HTMLDivElement>(null)
@@ -228,8 +229,33 @@ function GetStartedContent() {
     }
   }
 
-  // Verify codes
-  const verifyCodes = async () => {
+  // Verify the email code only (first verification sub-step)
+  const verifyEmail = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/fleetsync/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email, emailCode: form.emailCode, emailToken }),
+      })
+      const data = await res.json()
+      if (data.emailVerified) {
+        updateForm('emailVerified', true)
+        return true
+      }
+      setError(t('verificationInvalidEmail'))
+      return false
+    } catch {
+      setError(t('verificationError'))
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Verify the SMS code only (second verification sub-step, SK only)
+  const verifyPhone = async () => {
     setLoading(true)
     setError('')
     try {
@@ -238,24 +264,17 @@ function GetStartedContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: form.email,
-          emailCode: form.emailCode,
-          emailToken,
-          ...(smsEnabled
-            ? { phoneNumber: fullPhoneNumber, phoneCode: form.phoneCode, phoneToken }
-            : {}),
+          phoneNumber: fullPhoneNumber,
+          phoneCode: form.phoneCode,
+          phoneToken,
         }),
       })
       const data = await res.json()
-      if (data.emailVerified) updateForm('emailVerified', true)
-      if (data.phoneVerified) updateForm('phoneVerified', true)
-      const emailOk = !!data.emailVerified
-      const phoneOk = !smsEnabled || !!data.phoneVerified
-      if (emailOk && phoneOk) {
+      if (data.phoneVerified) {
+        updateForm('phoneVerified', true)
         return true
       }
-      if (!emailOk && !phoneOk) setError(t('verificationInvalid'))
-      else if (!emailOk) setError(t('verificationInvalidEmail'))
-      else setError(t('verificationInvalidPhone'))
+      setError(t('verificationInvalidPhone'))
       return false
     } catch {
       setError(t('verificationError'))
@@ -345,19 +364,41 @@ function GetStartedContent() {
       updateForm('email', form.organizationContact.trim())
     }
 
-    // When entering verification step, auto-send codes
-    if (STEPS[currentStep] === 'account' && !verificationSent) {
-      await sendVerificationCodes()
+    // When leaving the account step: send codes and start at the email phase
+    if (STEPS[currentStep] === 'account') {
+      setVerifyPhase('email')
+      if (!verificationSent) {
+        await sendVerificationCodes()
+      }
     }
 
-    // When leaving verification step, verify codes first
+    // Verification step: one code per phase — email first, then phone (SK only)
     if (STEPS[currentStep] === 'verification') {
-      if (!form.emailCode || !form.phoneCode) {
-        setError(t('errorVerification'))
-        return
+      if (verifyPhase === 'email') {
+        if (!form.emailVerified) {
+          if (!form.emailCode) {
+            setError(t('errorVerification'))
+            return
+          }
+          const ok = await verifyEmail()
+          if (!ok) return
+        }
+        if (smsEnabled) {
+          setVerifyPhase('phone')
+          setError('')
+          return
+        }
+        // non-SK: no phone verification, fall through to the next step
+      } else {
+        if (!form.phoneVerified) {
+          if (!form.phoneCode) {
+            setError(t('errorVerification'))
+            return
+          }
+          const ok = await verifyPhone()
+          if (!ok) return
+        }
       }
-      const verified = await verifyCodes()
-      if (!verified) return
     }
 
     setError('')
@@ -366,6 +407,10 @@ function GetStartedContent() {
 
   const handleBack = () => {
     setError('')
+    if (STEPS[currentStep] === 'verification' && verifyPhase === 'phone') {
+      setVerifyPhase('email')
+      return
+    }
     setCurrentStep((prev) => Math.max(prev - 1, 0))
   }
 
@@ -921,55 +966,70 @@ function GetStartedContent() {
       case 'verification':
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-light text-pictus-white">{t('step3Title')}</h2>
-            <p className="text-gray-400 font-light">{t('step3Subtitle')}</p>
+            {verifyPhase === 'email' ? (
+              <>
+                <h2 className="text-2xl font-light text-pictus-white">{t('verifyEmailTitle')}</h2>
+                <p className="text-gray-400 font-light">{t('verifyEmailSubtitle')}</p>
 
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-sm text-blue-300 font-light">
-              {smsEnabled ? t('verificationInfo') : t('verificationInfoEmailOnly')}
-            </div>
-
-            <div>
-              <label className={labelClass}>{t('emailCode')}</label>
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  maxLength={6}
-                  className={`${inputClass} tracking-[0.5em] text-center text-lg font-mono`}
-                  value={form.emailCode}
-                  onChange={(e) =>
-                    updateForm('emailCode', e.target.value.replace(/\D/g, '').slice(0, 6))
-                  }
-                  placeholder="000000"
-                />
-              </div>
-              {form.emailVerified && (
-                <p className="text-green-400 text-sm mt-1 flex items-center gap-1 font-light">
-                  <CheckCircle className="w-4 h-4" /> {t('emailVerifiedLabel')}
-                </p>
-              )}
-            </div>
-
-            {smsEnabled && (
-              <div>
-                <label className={labelClass}>{t('phoneCodeLabel')}</label>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    maxLength={6}
-                    className={`${inputClass} tracking-[0.5em] text-center text-lg font-mono`}
-                    value={form.phoneCode}
-                    onChange={(e) =>
-                      updateForm('phoneCode', e.target.value.replace(/\D/g, '').slice(0, 6))
-                    }
-                    placeholder="000000"
-                  />
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-sm text-blue-300 font-light">
+                  {t('verificationInfoEmailOnly')}
                 </div>
-                {form.phoneVerified && (
-                  <p className="text-green-400 text-sm mt-1 flex items-center gap-1 font-light">
-                    <CheckCircle className="w-4 h-4" /> {t('phoneVerifiedLabel')}
-                  </p>
-                )}
-              </div>
+
+                <div>
+                  <label className={labelClass}>{t('emailCode')}</label>
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      className={`${inputClass} tracking-[0.5em] text-center text-lg font-mono`}
+                      value={form.emailCode}
+                      onChange={(e) =>
+                        updateForm('emailCode', e.target.value.replace(/\D/g, '').slice(0, 6))
+                      }
+                      placeholder="000000"
+                    />
+                  </div>
+                  {form.emailVerified && (
+                    <p className="text-green-400 text-sm mt-1 flex items-center gap-1 font-light">
+                      <CheckCircle className="w-4 h-4" /> {t('emailVerifiedLabel')}
+                    </p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-light text-pictus-white">{t('verifyPhoneTitle')}</h2>
+                <p className="text-gray-400 font-light">{t('verifyPhoneSubtitle')}</p>
+
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-sm text-blue-300 font-light">
+                  {t('verificationInfoPhoneOnly')}
+                </div>
+
+                <div>
+                  <label className={labelClass}>{t('phoneCodeLabel')}</label>
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      className={`${inputClass} tracking-[0.5em] text-center text-lg font-mono`}
+                      value={form.phoneCode}
+                      onChange={(e) =>
+                        updateForm('phoneCode', e.target.value.replace(/\D/g, '').slice(0, 6))
+                      }
+                      placeholder="000000"
+                    />
+                  </div>
+                  {form.phoneVerified && (
+                    <p className="text-green-400 text-sm mt-1 flex items-center gap-1 font-light">
+                      <CheckCircle className="w-4 h-4" /> {t('phoneVerifiedLabel')}
+                    </p>
+                  )}
+                </div>
+              </>
             )}
 
             <button
