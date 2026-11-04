@@ -24,6 +24,8 @@ import {
   Sparkles,
   RotateCcw,
   Layers,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
@@ -164,13 +166,7 @@ interface VehicleNotification {
 }
 
 type TabType =
-  | 'vehicles'
-  | 'users'
-  | 'notifications'
-  | 'renewals'
-  | 'templates'
-  | 'types'
-  | 'organizations'
+  'vehicles' | 'users' | 'notifications' | 'renewals' | 'templates' | 'types' | 'organizations'
 
 const MyFleetPage = () => {
   const { data: session, status } = useSession()
@@ -334,6 +330,16 @@ const MyFleetPage = () => {
     }
   }, [])
   const [vehicles, setVehicles] = useState<MyVehicle[]>([])
+  const [vehiclesPerPage, setVehiclesPerPage] = useState<number>(() => {
+    if (typeof window === 'undefined') return 6
+    try {
+      const v = Number(localStorage.getItem('fleetVehiclesPerPage'))
+      return [3, 6, 9, 12, 0].includes(v) ? v : 6
+    } catch {
+      return 6
+    }
+  })
+  const [vehiclePage, setVehiclePage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [expensesModalOpen, setExpensesModalOpen] = useState(false)
@@ -357,6 +363,27 @@ const MyFleetPage = () => {
       )
     }
   }, [organization])
+
+  // Vehicle paging — persist the chosen page size and keep the current page in range
+  useEffect(() => {
+    try {
+      localStorage.setItem('fleetVehiclesPerPage', String(vehiclesPerPage))
+    } catch {
+      // per-viewer convenience only; ignore storage failures
+    }
+  }, [vehiclesPerPage])
+
+  const vehiclePageCount =
+    vehiclesPerPage === 0 ? 1 : Math.max(1, Math.ceil(vehicles.length / vehiclesPerPage))
+
+  useEffect(() => {
+    if (vehiclePage > vehiclePageCount) setVehiclePage(1)
+  }, [vehiclePage, vehiclePageCount])
+
+  const pagedVehicles =
+    vehiclesPerPage === 0
+      ? vehicles
+      : vehicles.slice((vehiclePage - 1) * vehiclesPerPage, vehiclePage * vehiclesPerPage)
 
   // Organizations state (for PICTUSACI users)
   const [organizations, setOrganizations] = useState<Organization[]>([])
@@ -1201,162 +1228,233 @@ const MyFleetPage = () => {
                 </div>
               </div>
             ) : (
-              // Vehicle Cards Grid
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {vehicles.map((vehicle) => (
-                  <div
-                    key={vehicle.id}
-                    className="bg-pictus-onyx900 rounded-2xl overflow-hidden border border-white/[0.06] hover:border-pictus-lime/40 transition-all"
-                  >
-                    {vehicle.image && (
-                      <div className="relative w-full h-48 bg-pictus-black/50 overflow-hidden">
-                        <Image
-                          src={vehicle.image}
-                          alt={vehicle.registration}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
+              <>
+                {vehicles.length > 3 && (
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-400">{t('vehPerPage')}</span>
+                      {[3, 6, 9, 12, 0].map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => {
+                            setVehiclesPerPage(size)
+                            setVehiclePage(1)
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+                            vehiclesPerPage === size
+                              ? 'bg-pictus-lime text-pictus-black font-semibold'
+                              : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                          }`}
+                        >
+                          {size === 0 ? t('vehAll') : size}
+                        </button>
+                      ))}
+                    </div>
+                    {vehiclePageCount > 1 && (
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => setVehiclePage((p) => Math.max(1, p - 1))}
+                          disabled={vehiclePage === 1}
+                          aria-label={t('vehPrev')}
+                          className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <span className="text-sm text-gray-400 min-w-[7rem] text-center">
+                          {t('vehPageOf', { page: vehiclePage, pages: vehiclePageCount })}
+                        </span>
+                        <button
+                          onClick={() => setVehiclePage((p) => Math.min(vehiclePageCount, p + 1))}
+                          disabled={vehiclePage === vehiclePageCount}
+                          aria-label={t('vehNext')}
+                          className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
                       </div>
                     )}
+                  </div>
+                )}
+                {/* Vehicle Cards Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {pagedVehicles.map((vehicle) => (
+                    <div
+                      key={vehicle.id}
+                      className="bg-pictus-onyx900 rounded-2xl overflow-hidden border border-white/[0.06] hover:border-pictus-lime/40 transition-all"
+                    >
+                      {vehicle.image && (
+                        <div className="relative w-full h-48 bg-pictus-black/50 overflow-hidden">
+                          <Image
+                            src={vehicle.image}
+                            alt={vehicle.registration}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                        </div>
+                      )}
 
-                    <div className="p-6">
-                      <div className="mb-4">
-                        <h3 className="text-3xl font-light text-pictus-white mb-2">
-                          {vehicle.registration}
-                        </h3>
-                        <p className="text-xl text-pictus-lime">{vehicle.type}</p>
-                        {vehicle.year && (
-                          <p className="text-lg text-pictus-lime mt-1">
-                            {t('year', { year: vehicle.year })}
+                      <div className="p-6">
+                        <div className="mb-4">
+                          <h3 className="text-3xl font-light text-pictus-white mb-2">
+                            {vehicle.registration}
+                          </h3>
+                          <p className="text-xl text-pictus-lime">{vehicle.type}</p>
+                          {vehicle.year && (
+                            <p className="text-lg text-pictus-lime mt-1">
+                              {t('year', { year: vehicle.year })}
+                            </p>
+                          )}
+                        </div>
+
+                        {vehicle.note && (
+                          <p className="text-pictus-white/80 text-sm mb-4 line-clamp-2">
+                            {vehicle.note}
                           </p>
                         )}
+
+                        {/* Stats Display */}
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                          {/* Latest Mileage */}
+                          <div className="bg-white/5 border border-white/[0.06] rounded-xl p-3">
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                              <Gauge size={14} className="text-blue-400" />
+                              <span className="text-xs text-pictus-white/70">
+                                {t('mileageStatus')}
+                              </span>
+                            </div>
+                            {vehicle.mileageRecords && vehicle.mileageRecords.length > 0 ? (
+                              <>
+                                <p className="text-xl font-light text-pictus-white">
+                                  {vehicle.mileageRecords[0].kilometers.toLocaleString(locale)}
+                                </p>
+                                <p className="text-xs text-pictus-white/50">km</p>
+                              </>
+                            ) : (
+                              <p className="text-sm text-pictus-white/50">{t('noData')}</p>
+                            )}
+                          </div>
+
+                          {/* Total Expenses */}
+                          <div className="bg-white/5 border border-white/[0.06] rounded-xl p-3">
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                              <FaEuroSign size={12} className="text-green-400" />
+                              <span className="text-xs text-pictus-white/70">{t('expenses')}</span>
+                            </div>
+                            {vehicle.expenses && vehicle.expenses.length > 0 ? (
+                              <>
+                                <p className="text-xl font-light text-pictus-white">
+                                  {vehicle.expenses
+                                    .reduce((sum, exp) => sum + Number(exp.cost), 0)
+                                    .toLocaleString(locale, {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                    })}
+                                </p>
+                                <p className="text-xs text-pictus-white/50">
+                                  {t('recordCount', { count: vehicle.expenses.length })}
+                                </p>
+                              </>
+                            ) : (
+                              <p className="text-sm text-pictus-white/50">{t('noData')}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Only show Expenses/Mileage buttons for vehicles from user's organization */}
+                        {vehicle.organizationId === organization?.id && (
+                          <div className="space-y-2 mb-4">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => {
+                                  setSelectedVehicle(vehicle)
+                                  setExpensesModalOpen(true)
+                                }}
+                                className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-3 py-2 rounded-full hover:bg-white/10 transition text-sm"
+                              >
+                                <FaEuroSign size={16} />
+                                {t('expensesButton')}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSelectedVehicle(vehicle)
+                                  setMileageModalOpen(true)
+                                }}
+                                className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-3 py-2 rounded-full hover:bg-white/10 transition text-sm"
+                              >
+                                <Gauge size={16} />
+                                {t('mileageButton')}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSelectedVehicle(vehicle)
+                                  setNotificationModalOpen(true)
+                                }}
+                                className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-3 py-2 rounded-full hover:bg-white/10 transition text-sm"
+                              >
+                                <Bell size={16} />
+                                {t('notificationButton')}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Only show Edit/Delete buttons for vehicles from user's organization */}
+                        {vehicle.organizationId === organization?.id ? (
+                          <div className="flex items-center gap-2 pt-4 border-t border-white/[0.06]">
+                            <Link
+                              href={`/client/my-fleet/${vehicle.id}`}
+                              className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-4 py-2 rounded-full hover:bg-white/10 transition text-sm"
+                            >
+                              <Edit size={16} />
+                              {t('editButton')}
+                            </Link>
+                            <button
+                              onClick={() => handleDelete(vehicle.id)}
+                              className="flex-1 inline-flex items-center justify-center gap-2 bg-red-500/15 text-red-300 px-4 py-2 rounded-full hover:bg-red-500/25 transition text-sm"
+                            >
+                              <Trash2 size={16} />
+                              {t('deleteButton')}
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="pt-4 border-t border-white/[0.06]">
+                            <p className="text-gray-400 text-xs text-center italic">
+                              {t('viewOnlyVehicle', {
+                                orgName:
+                                  vehicle.organizationRelation?.name || vehicle.organization || '',
+                              })}
+                            </p>
+                          </div>
+                        )}
                       </div>
-
-                      {vehicle.note && (
-                        <p className="text-pictus-white/80 text-sm mb-4 line-clamp-2">
-                          {vehicle.note}
-                        </p>
-                      )}
-
-                      {/* Stats Display */}
-                      <div className="grid grid-cols-2 gap-3 mb-4">
-                        {/* Latest Mileage */}
-                        <div className="bg-white/5 border border-white/[0.06] rounded-xl p-3">
-                          <div className="flex items-center gap-1.5 mb-1.5">
-                            <Gauge size={14} className="text-blue-400" />
-                            <span className="text-xs text-pictus-white/70">
-                              {t('mileageStatus')}
-                            </span>
-                          </div>
-                          {vehicle.mileageRecords && vehicle.mileageRecords.length > 0 ? (
-                            <>
-                              <p className="text-xl font-light text-pictus-white">
-                                {vehicle.mileageRecords[0].kilometers.toLocaleString(locale)}
-                              </p>
-                              <p className="text-xs text-pictus-white/50">km</p>
-                            </>
-                          ) : (
-                            <p className="text-sm text-pictus-white/50">{t('noData')}</p>
-                          )}
-                        </div>
-
-                        {/* Total Expenses */}
-                        <div className="bg-white/5 border border-white/[0.06] rounded-xl p-3">
-                          <div className="flex items-center gap-1.5 mb-1.5">
-                            <FaEuroSign size={12} className="text-green-400" />
-                            <span className="text-xs text-pictus-white/70">{t('expenses')}</span>
-                          </div>
-                          {vehicle.expenses && vehicle.expenses.length > 0 ? (
-                            <>
-                              <p className="text-xl font-light text-pictus-white">
-                                {vehicle.expenses
-                                  .reduce((sum, exp) => sum + Number(exp.cost), 0)
-                                  .toLocaleString(locale, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })}
-                              </p>
-                              <p className="text-xs text-pictus-white/50">
-                                {t('recordCount', { count: vehicle.expenses.length })}
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-sm text-pictus-white/50">{t('noData')}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Only show Expenses/Mileage buttons for vehicles from user's organization */}
-                      {vehicle.organizationId === organization?.id && (
-                        <div className="space-y-2 mb-4">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                setSelectedVehicle(vehicle)
-                                setExpensesModalOpen(true)
-                              }}
-                              className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-3 py-2 rounded-full hover:bg-white/10 transition text-sm"
-                            >
-                              <FaEuroSign size={16} />
-                              {t('expensesButton')}
-                            </button>
-                            <button
-                              onClick={() => {
-                                setSelectedVehicle(vehicle)
-                                setMileageModalOpen(true)
-                              }}
-                              className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-3 py-2 rounded-full hover:bg-white/10 transition text-sm"
-                            >
-                              <Gauge size={16} />
-                              {t('mileageButton')}
-                            </button>
-                            <button
-                              onClick={() => {
-                                setSelectedVehicle(vehicle)
-                                setNotificationModalOpen(true)
-                              }}
-                              className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-3 py-2 rounded-full hover:bg-white/10 transition text-sm"
-                            >
-                              <Bell size={16} />
-                              {t('notificationButton')}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Only show Edit/Delete buttons for vehicles from user's organization */}
-                      {vehicle.organizationId === organization?.id ? (
-                        <div className="flex items-center gap-2 pt-4 border-t border-white/[0.06]">
-                          <Link
-                            href={`/client/my-fleet/${vehicle.id}`}
-                            className="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white px-4 py-2 rounded-full hover:bg-white/10 transition text-sm"
-                          >
-                            <Edit size={16} />
-                            {t('editButton')}
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(vehicle.id)}
-                            className="flex-1 inline-flex items-center justify-center gap-2 bg-red-500/15 text-red-300 px-4 py-2 rounded-full hover:bg-red-500/25 transition text-sm"
-                          >
-                            <Trash2 size={16} />
-                            {t('deleteButton')}
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="pt-4 border-t border-white/[0.06]">
-                          <p className="text-gray-400 text-xs text-center italic">
-                            {t('viewOnlyVehicle', {
-                              orgName:
-                                vehicle.organizationRelation?.name || vehicle.organization || '',
-                            })}
-                          </p>
-                        </div>
-                      )}
                     </div>
+                  ))}
+                </div>
+                {vehicles.length > 3 && vehiclePageCount > 1 && (
+                  <div className="flex items-center justify-center gap-3 mt-8">
+                    <button
+                      onClick={() => setVehiclePage((p) => Math.max(1, p - 1))}
+                      disabled={vehiclePage === 1}
+                      aria-label={t('vehPrev')}
+                      className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <span className="text-sm text-gray-400 min-w-[7rem] text-center">
+                      {t('vehPageOf', { page: vehiclePage, pages: vehiclePageCount })}
+                    </span>
+                    <button
+                      onClick={() => setVehiclePage((p) => Math.min(vehiclePageCount, p + 1))}
+                      disabled={vehiclePage === vehiclePageCount}
+                      aria-label={t('vehNext')}
+                      className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </>
         )}

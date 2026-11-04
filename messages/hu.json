@@ -1053,7 +1053,12 @@
     "cityLabel": "Város",
     "zipLabel": "Irányítószám",
     "countryLabel": "Ország",
-    "orgContactLabel": "Kapcsolattartó e-mail (számlákhoz)"
+    "orgContactLabel": "Kapcsolattartó e-mail (számlákhoz)",
+    "vehPerPage": "Mutat",
+    "vehAll": "Összes",
+    "vehPageOf": "{page}. oldal / {pages}",
+    "vehPrev": "Előző",
+    "vehNext": "Következő"
   },
   "Benefit": {
     "activateTitle": "Aktiválja a Benefit fiókját",

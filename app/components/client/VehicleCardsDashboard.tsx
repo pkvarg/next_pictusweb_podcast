@@ -11,6 +11,8 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 
 interface MyVehicle {
@@ -80,6 +82,33 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
   const [loading, setLoading] = useState(true)
   const [expandedTaskTypes, setExpandedTaskTypes] = useState<Set<string>>(new Set())
   const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set())
+  const [perPage, setPerPage] = useState<number>(() => {
+    if (typeof window === 'undefined') return 6
+    try {
+      const v = Number(localStorage.getItem('fleetVehiclesPerPage'))
+      return [3, 6, 9, 12, 0].includes(v) ? v : 6
+    } catch {
+      return 6
+    }
+  })
+  const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('fleetVehiclesPerPage', String(perPage))
+    } catch {
+      // per-viewer convenience only
+    }
+  }, [perPage])
+
+  const pageCount = perPage === 0 ? 1 : Math.max(1, Math.ceil(vehicleCards.length / perPage))
+
+  useEffect(() => {
+    if (page > pageCount) setPage(1)
+  }, [page, pageCount])
+
+  const pagedCards =
+    perPage === 0 ? vehicleCards : vehicleCards.slice((page - 1) * perPage, page * perPage)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -357,9 +386,57 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
         </div>
       </div>
 
+      {/* Paging controls */}
+      {vehicleCards.length > 3 && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-400">Zobraziť</span>
+            {[3, 6, 9, 12, 0].map((size) => (
+              <button
+                key={size}
+                onClick={() => {
+                  setPerPage(size)
+                  setPage(1)
+                }}
+                className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+                  perPage === size
+                    ? 'bg-pictus-lime text-pictus-black font-semibold'
+                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                }`}
+              >
+                {size === 0 ? 'Všetky' : size}
+              </button>
+            ))}
+          </div>
+          {pageCount > 1 && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                aria-label="Predchádzajúce"
+                className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <span className="text-sm text-gray-400 min-w-[7rem] text-center">
+                Strana {page} z {pageCount}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                disabled={page === pageCount}
+                aria-label="Ďalšie"
+                className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Vehicle Cards List */}
       <div className="space-y-4">
-        {vehicleCards.map((vehicle) => {
+        {pagedCards.map((vehicle) => {
           const vehicleKey = vehicle.vehicleRegistration
           const isExpanded = expandedVehicles.has(vehicleKey)
 
@@ -680,6 +757,30 @@ const VehicleCardsDashboard = ({ company, organizationName }: VehicleCardsDashbo
           )
         })}
       </div>
+
+      {vehicleCards.length > 3 && pageCount > 1 && (
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            aria-label="Predchádzajúce"
+            className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <span className="text-sm text-gray-400 min-w-[7rem] text-center">
+            Strana {page} z {pageCount}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+            disabled={page === pageCount}
+            aria-label="Ďalšie"
+            className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -1053,7 +1053,12 @@
     "cityLabel": "City",
     "zipLabel": "ZIP",
     "countryLabel": "Country",
-    "orgContactLabel": "Contact email (for invoices)"
+    "orgContactLabel": "Contact email (for invoices)",
+    "vehPerPage": "Show",
+    "vehAll": "All",
+    "vehPageOf": "Page {page} of {pages}",
+    "vehPrev": "Previous",
+    "vehNext": "Next"
   },
   "Benefit": {
     "activateTitle": "Activate Your Benefit Account",

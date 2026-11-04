@@ -1053,7 +1053,12 @@
     "cityLabel": "Mesto",
     "zipLabel": "PSČ",
     "countryLabel": "Krajina",
-    "orgContactLabel": "Kontaktný email (pre faktúry)"
+    "orgContactLabel": "Kontaktný email (pre faktúry)",
+    "vehPerPage": "Zobraziť",
+    "vehAll": "Všetky",
+    "vehPageOf": "Strana {page} z {pages}",
+    "vehPrev": "Predchádzajúce",
+    "vehNext": "Ďalšie"
   },
   "Benefit": {
     "activateTitle": "Aktivujte svoj Benefit účet",

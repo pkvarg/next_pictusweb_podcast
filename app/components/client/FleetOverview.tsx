@@ -17,6 +17,8 @@ import {
   CheckCircle,
   Clock,
   AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { FaEuroSign } from 'react-icons/fa'
 
@@ -105,6 +107,33 @@ const FleetOverview = ({
   const [error, setError] = useState('')
   const [expenseFilters, setExpenseFilters] = useState<Record<string, ExpenseFilter>>({})
   const [dutyFilters, setDutyFilters] = useState<Record<string, DutyFilter>>({})
+  const [perPage, setPerPage] = useState<number>(() => {
+    if (typeof window === 'undefined') return 6
+    try {
+      const v = Number(localStorage.getItem('fleetVehiclesPerPage'))
+      return [3, 6, 9, 12, 0].includes(v) ? v : 6
+    } catch {
+      return 6
+    }
+  })
+  const [vehiclePage, setVehiclePage] = useState(1)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('fleetVehiclesPerPage', String(perPage))
+    } catch {
+      // per-viewer convenience only
+    }
+  }, [perPage])
+
+  const vehiclePageCount = perPage === 0 ? 1 : Math.max(1, Math.ceil(vehicles.length / perPage))
+
+  useEffect(() => {
+    if (vehiclePage > vehiclePageCount) setVehiclePage(1)
+  }, [vehiclePage, vehiclePageCount])
+
+  const pagedVehicles =
+    perPage === 0 ? vehicles : vehicles.slice((vehiclePage - 1) * perPage, vehiclePage * perPage)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -509,11 +538,59 @@ const FleetOverview = ({
         )}
       </div>
 
+      {/* Paging controls */}
+      {vehicles.length > 3 && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-400">{t('vehPerPage')}</span>
+            {[3, 6, 9, 12, 0].map((size) => (
+              <button
+                key={size}
+                onClick={() => {
+                  setPerPage(size)
+                  setVehiclePage(1)
+                }}
+                className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+                  perPage === size
+                    ? 'bg-pictus-lime text-pictus-black font-semibold'
+                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                }`}
+              >
+                {size === 0 ? t('vehAll') : size}
+              </button>
+            ))}
+          </div>
+          {vehiclePageCount > 1 && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setVehiclePage((p) => Math.max(1, p - 1))}
+                disabled={vehiclePage === 1}
+                aria-label={t('vehPrev')}
+                className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <span className="text-sm text-gray-400 min-w-[7rem] text-center">
+                {t('vehPageOf', { page: vehiclePage, pages: vehiclePageCount })}
+              </span>
+              <button
+                onClick={() => setVehiclePage((p) => Math.min(vehiclePageCount, p + 1))}
+                disabled={vehiclePage === vehiclePageCount}
+                aria-label={t('vehNext')}
+                className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Vehicle Cards Grid */}
       <div
         className={`grid gap-6 ${vehicles.length <= 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'}`}
       >
-        {vehicles.map((vehicle) => {
+        {pagedVehicles.map((vehicle) => {
           const expenseFilter = expenseFilters[vehicle.id] || 'all'
           const dutyFilter = dutyFilters[vehicle.id] || 'all'
           const latestMileage = getLatestMileage(vehicle.mileageRecords)
@@ -897,6 +974,30 @@ const FleetOverview = ({
           )
         })}
       </div>
+
+      {vehicles.length > 3 && vehiclePageCount > 1 && (
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={() => setVehiclePage((p) => Math.max(1, p - 1))}
+            disabled={vehiclePage === 1}
+            aria-label={t('vehPrev')}
+            className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <span className="text-sm text-gray-400 min-w-[7rem] text-center">
+            {t('vehPageOf', { page: vehiclePage, pages: vehiclePageCount })}
+          </span>
+          <button
+            onClick={() => setVehiclePage((p) => Math.min(vehiclePageCount, p + 1))}
+            disabled={vehiclePage === vehiclePageCount}
+            aria-label={t('vehNext')}
+            className="p-2 rounded-full bg-white/5 text-pictus-white hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }
