@@ -157,7 +157,7 @@
     "metaDescription": "Modern weboldalakat és FleetSync-et építünk - intelligens értesítési rendszer járművek kezeléséhez. Műszaki vizsga, biztosítás, szerviz és még több. Egyedi AI megoldások.",
     "ogTitle": "Pictusweb - Weboldalak, FleetSync járműértesítések és AI megoldások",
     "ogDescription": "Modern weboldalakat és FleetSync-et építünk - intelligens értesítési rendszer járművek kezeléséhez. Műszaki vizsga, biztosítás, szerviz és még több. Egyedi AI megoldások.",
-    "projectsSubtitle": "Válogatás projektjeinkből. Mindegyik egyedi — a tervezéstől a fejlesztésen át az üzembe helyezésig.",
+    "projectsSubtitle": "Válogatás projektjeinkből. Mindegyik egyedi, a tervezéstől a fejlesztésen át az üzembe helyezésig.",
     "projectBow4bassDesc": "Weboldal egy kézműves nagybőgő-vonó készítőnek. Kézzel készített vonók, javítások és restaurálás bemutatása, a történelmi hitelesség hangsúlyozásával. Egyedi admin felület a tartalom kezeléséhez.",
     "projectIoanaDesc": "Portfólió weboldal egy illusztrátor és designer számára. Munkák galériája animációkkal és finom vizuális stílussal, amely tükrözi a művész kézjegyét.",
     "projectMiestnacirkevDesc": "Weboldal egy pozsonyi keresztény gyülekezet számára. Blog, konferenciák, audio- és videóanyagok, énekeskönyv és kapcsolatfelvételi űrlap. Többnyelvű támogatás.",
@@ -374,7 +374,7 @@
     "heroDaySuffix": "n",
     "analyticsShowcaseTitle": "Tartsa kézben a flotta",
     "analyticsShowcaseHighlight": "költségeit",
-    "analyticsShowcaseSubtitle": "A járműkártyákon rögzített kiadásokból automatikusan áttekinthető grafikonokat kap — költségek kategóriánként, havi trendek és járművek összehasonlítása.",
+    "analyticsShowcaseSubtitle": "A járműkártyákon rögzített kiadásokból automatikusan áttekinthető grafikonokat kap, költségek kategóriánként, havi trendek és járművek összehasonlítása.",
     "businessButton": "Kezdés",
     "businessContact": "Szeretném elkezdeni a Business csomaggal a járműértesítéseket (€3/jármű/hónap)",
     "ctaTitle": "Készen áll a bírságok",
@@ -463,7 +463,7 @@
     "resendCodes": "Ellenőrző kódok újraküldése",
     "verificationSendError": "Nem sikerült elküldeni az ellenőrző kódokat",
     "verificationInvalid": "Érvénytelen ellenőrző kód. Kérjük, próbálja újra.",
-    "verificationInvalidEmail": "Hibás e-mail kód. Ellenőrizze a postafiókját (a spam mappát is) — az e-mail kód más, mint az SMS kód.",
+    "verificationInvalidEmail": "Hibás e-mail kód. Ellenőrizze a postafiókját (a spam mappát is), az e-mail kód más, mint az SMS kód.",
     "verificationInvalidPhone": "Hibás SMS kód. Ellenőrizze a telefonjára érkezett üzenetet.",
     "verificationError": "Az ellenőrzés sikertelen. Kérjük, próbálja újra.",
     "gdprAgree": "Megismertem az",
@@ -499,7 +499,7 @@
     "successTitle": "Fiók sikeresen létrehozva!",
     "successDescriptionFree": "Ingyenes FleetSync fiókja létrejött. Most bejelentkezhet és elkezdheti járművei kezelését.",
     "successDescriptionPaid": "Sikeres fizetés! FleetSync fiókja létrejött. Most bejelentkezhet és elkezdheti járművei kezelését.",
-    "accountSetupIssue": "A fizetés sikeres volt, de a fiók létrehozását még véglegesítjük. Kérjük, próbáljon meg néhány perc múlva bejelentkezni — ha továbbra sem sikerül, írjon nekünk az info@pictusweb.sk címre, és azonnal aktiváljuk.",
+    "accountSetupIssue": "A fizetés sikeres volt, de a fiók létrehozását még véglegesítjük. Kérjük, próbáljon meg néhány perc múlva bejelentkezni, ha továbbra sem sikerül, írjon nekünk az info@pictusweb.sk címre, és azonnal aktiváljuk.",
     "successNextSteps": "Következő lépések",
     "successStep1": "Jelentkezzen be email címével és jelszavával",
     "successStep2": "Adja hozzá járműveit az irányítópulthoz",
@@ -943,10 +943,10 @@
     "nbPdrDesc": "Automatikusan létrehoz egy emlékeztetőt a feladat dátuma utáni napon a következő feladat tervezéséhez",
     "nbAggressiveLabel": "⚠️ Agresszív mód (30 napos napi emlékeztetők)",
     "nbAggressiveDesc": "A szabványos emlékeztetők kimerülése után a rendszer napi emlékeztetőket küld 30 napig, amíg az ügyfél nem erősíti meg.",
-    "nbAggressivePdrDeferred": "🔄 A PDR emlékeztető elhalasztásra kerül — az agresszív ciklus befejezése után jön létre.",
+    "nbAggressivePdrDeferred": "🔄 A PDR emlékeztető elhalasztásra kerül, az agresszív ciklus befejezése után jön létre.",
     "nbDutyDateLabel": "Feladat dátuma *",
     "nbDutyDateRequired": "A feladat dátuma kötelező az értesítés létrehozásához",
-    "nbDutyDateBatchLocked": "A feladat dátuma közös az egész kötegben — módosítsa a „Köteg szerkesztése” gombbal.",
+    "nbDutyDateBatchLocked": "A feladat dátuma közös az egész kötegben, módosítsa a „Köteg szerkesztése” gombbal.",
     "nbReminderIntervals": "Emlékeztető intervallumok",
     "nbEditIntervals": "✏️ Intervallumok szerkesztése",
     "nbWillCreate": "Létrejön",
@@ -959,9 +959,9 @@
     "nbPastDate": "(múlt)",
     "nbSingleIntervalHint": "Egyszeri értesítéshez csak egy intervallumot állítson be.",
     "nbEditIntervalsHint": "Szerkessze az intervallumokat vagy adjon hozzá egyéni napokat a feladat dátuma előtt/után.",
-    "nbIntervalsDroppedSuggestion": "A határidő közel van, ezért néhány alapértelmezett emlékeztető kimaradt (a múltban van) — csak __count__ kerül kiküldésre. Javasoljuk, hogy adjon hozzá közelebbi emlékeztetőket, hogy ne maradjon le a határidőről.",
+    "nbIntervalsDroppedSuggestion": "A határidő közel van, ezért néhány alapértelmezett emlékeztető kimaradt (a múltban van), csak __count__ kerül kiküldésre. Javasoljuk, hogy adjon hozzá közelebbi emlékeztetőket, hogy ne maradjon le a határidőről.",
     "nbAddRemindersCta": "➕ Emlékeztetők hozzáadása",
-    "nbPdrOverlapWarning": "A feladat utáni napra (+1) eső emlékeztető átfedésben van a PDR emlékeztetővel — ugyanazon a napon két üzenet kerül kiküldésre.",
+    "nbPdrOverlapWarning": "A feladat utáni napra (+1) eső emlékeztető átfedésben van a PDR emlékeztetővel, ugyanazon a napon két üzenet kerül kiküldésre.",
     "nbSelectUserOptional": "Felhasználó kiválasztása (opcionális - kitölti a nevet, emailt és telefont)",
     "nbSelectUserPlaceholder": "Válasszon felhasználót vagy adja meg manuálisan...",
     "nbSelectUserPlaceholderClient": "Válasszon felhasználót...",
@@ -991,7 +991,7 @@
     "nbPdrEnabled": "🔄 Bekapcsolva",
     "nbPdrDisabled": "Kikapcsolva",
     "nbPdrWillCreate": "Emlékeztető jön létre a feladat dátuma utáni napon új dátum megadásához.",
-    "nbPdrDeferredReview": "A PDR elhalasztásra kerül — automatikusan létrejön az agresszív ciklus befejezése után.",
+    "nbPdrDeferredReview": "A PDR elhalasztásra kerül, automatikusan létrejön az agresszív ciklus befejezése után.",
     "nbAggressiveModeReview": "Agresszív mód",
     "nbAggressiveEnabled": "⚠️ Bekapcsolva (30 nap)",
     "nbAggressiveReviewDesc": "Az emlékeztetők kimerülése után a rendszer napi emlékeztetőket küld 30 napig.",
@@ -1030,7 +1030,7 @@
     "nbSuccessSingle": "Az értesítés sikeresen létrejött!",
     "nbSuccessMultiple": "__count__ értesítés sikeresen létrejött!",
     "nbPdrCreated": "🔄 PDR emlékeztető is létrejött a feladat utáni napra.",
-    "nbAggressiveEnabled2": "⚠️ Az agresszív mód be van kapcsolva — az emlékeztetők kimerülése után a rendszer napi emlékeztetőket küld 30 napig.",
+    "nbAggressiveEnabled2": "⚠️ Az agresszív mód be van kapcsolva, az emlékeztetők kimerülése után a rendszer napi emlékeztetőket küld 30 napig.",
     "nbAggressivePdrDeferred2": "🔄 A PDR emlékeztető automatikusan létrejön az agresszív ciklus befejezése után.",
     "nbIntervalsPastSkipped": "__skipped__ múltbeli intervallum ki lett hagyva.",
     "nbSomeFailed": "Néhány értesítés létrehozása sikertelen",
@@ -1119,12 +1119,12 @@
         },
         {
           "title": "Webes újratervezés",
-          "summary": "Van egy régebbi weboldalad, amely ráférne egy frissítésre? Modern dizájnt, gyorsaságot és új lendületet adunk neki — anélkül, hogy elveszne, ami már működik.",
+          "summary": "Van egy régebbi weboldalad, amely ráférne egy frissítésre? Modern dizájnt, gyorsaságot és új lendületet adunk neki, anélkül, hogy elveszne, ami már működik.",
           "alt": "Webes újratervezés"
         },
         {
           "title": "AI podcastok",
-          "summary": "Blogodból vagy szövegedből teljes értékű AI podcastot készítünk — természetes, profi és több nyelven. Mintákat a Podcastok oldalon hallgathatsz.",
+          "summary": "Blogodból vagy szövegedből teljes értékű AI podcastot készítünk, természetes, profi és több nyelven. Mintákat a Podcastok oldalon hallgathatsz.",
           "alt": "AI podcastok"
         },
         {
@@ -1147,7 +1147,7 @@
     "about": {
       "kicker": "Kik vagyunk",
       "title": "Rólunk és Pictusról",
-      "text": "Peter: lelke mélyén programozó — a backend a szíve csücske: adatbázisok, foglalási rendszerek, szerverek, appok, logika.. a színezés és a stílus viszont Barbora világa: dizájn, esztétika, a feeling és a vibe. Mindennek a helyén kell lennie, csak akkor elégedett. Egyébként ez a kettő órákig képes beszélgetni a lélek, a psziché és a zoé örökkévalóságáról, és örülni a hétköznapi apróságoknak. Pictus pedig annak a bizonyítéka, hogy a csapatban nem kell tudni kódolni vagy tervezni — elég a jó vibe és egy kéznél lévő kávé. A kabalánk, a morál támasza és a cég legnyugodtabb tagja.",
+      "text": "Peter: lelke mélyén programozó, a backend a szíve csücske: adatbázisok, foglalási rendszerek, szerverek, appok, logika.. a színezés és a stílus viszont Barbora világa: dizájn, esztétika, a feeling és a vibe. Mindennek a helyén kell lennie, csak akkor elégedett. Egyébként ez a kettő órákig képes beszélgetni a lélek, a psziché és a zoé örökkévalóságáról, és örülni a hétköznapi apróságoknak. Pictus pedig annak a bizonyítéka, hogy a csapatban nem kell tudni kódolni vagy tervezni, elég a jó vibe és egy kéznél lévő kávé. A kabalánk, a morál támasza és a cég legnyugodtabb tagja.",
       "cta": "Ismerj meg minket"
     },
     "work": {
@@ -1173,7 +1173,7 @@
         },
         {
           "title": "Átadjuk",
-          "summary": "Átadunk egy működő eredményt, amit használni tudsz — elmagyarázzuk, hogyan, és ott vagyunk, ha bármi felmerül."
+          "summary": "Átadunk egy működő eredményt, amit használni tudsz, elmagyarázzuk, hogyan, és ott vagyunk, ha bármi felmerül."
         }
       ]
     },
@@ -1186,7 +1186,7 @@
           "role": "Tervező - IoanaM"
         },
         {
-          "quote": "A Peterrel való együttműködés kiváló — remek kommunikáció és eredmény. Szereti a munkáját, becsületesen és alaposan végzi. A jövőbeli projektjeimnél biztosan számítok rá.",
+          "quote": "A Peterrel való együttműködés kiváló, remek kommunikáció és eredmény. Szereti a munkáját, becsületesen és alaposan végzi. A jövőbeli projektjeimnél biztosan számítok rá.",
           "name": "Tomáš Dovala",
           "role": "Ügyvezető - Dovala Construction"
         },
@@ -1367,7 +1367,7 @@
     "landingSubtitle": "Automatizált számviteli bizonylat-feldolgozás.",
     "loginCta": "Bejelentkezés",
     "introTitle": "Mi az a PicDocs?",
-    "introText": "A PicDocs egy AI ügynök, amely helyetted dolgozza fel a blokkokat és számlákat. A beszkennelt bizonylatokat automatikusan beolvassa, kinyeri belőlük az összes szükséges adatot, és előkészíti a könyvelőszoftveredhez — átgépelés és kézi adatbevitel nélkül.",
+    "introText": "A PicDocs egy AI ügynök, amely helyetted dolgozza fel a blokkokat és számlákat. A beszkennelt bizonylatokat automatikusan beolvassa, kinyeri belőlük az összes szükséges adatot, és előkészíti a könyvelőszoftveredhez, átgépelés és kézi adatbevitel nélkül.",
     "workspaceTitle": "PicDocs",
     "workspaceSubtitle": "Munkaterület",
     "runIntro": "Indítsa el az új számviteli bizonylatok feldolgozását a Dokladóból.",
@@ -1380,7 +1380,7 @@
     "flow2Note": "Az Ön e-mail-címét engedélyezett feladóként kell beállítani.",
     "runButton": "Bizonylatok feldolgozása",
     "running": "Bizonylatok feldolgozása… ez eltarthat egy ideig",
-    "successMsg": "Kész — {count} bizonylat feldolgozva. Összesítő e-mail elküldve ide: {email}.",
+    "successMsg": "Kész, {count} bizonylat feldolgozva. Összesítő e-mail elküldve ide: {email}.",
     "nothingMsg": "Nincs feldolgozandó új bizonylat.",
     "resetButton": "Bizonylatok visszaállítása (teszt)",
     "resetting": "Visszaállítás…",
@@ -1388,8 +1388,8 @@
     "orgLabel": "Szervezet",
     "userLabel": "Bejelentkezve",
     "howToTitle": "Hogyan működik",
-    "howStep1": "A Doklado alkalmazásban szkennelje be a bizonylatot — a tételek beolvasásához FÉNYKÉPEZZE le a bizonylatot.",
-    "howStep2": "Itt kattintson a „Bizonylatok feldolgozása” gombra — minden új (még nem exportált) bizonylat feldolgozásra kerül a Dokladóból.",
+    "howStep1": "A Doklado alkalmazásban szkennelje be a bizonylatot, a tételek beolvasásához FÉNYKÉPEZZE le a bizonylatot.",
+    "howStep2": "Itt kattintson a „Bizonylatok feldolgozása” gombra, minden új (még nem exportált) bizonylat feldolgozásra kerül a Dokladóból.",
     "howStep3": "Az összesítő és három Money S3 CSV-fájl e-mailben érkezik; a feldolgozott bizonylatok a Dokladóban exportáltként lesznek megjelölve.",
     "rateLimitMsg": "Túl sok futtatás, próbálja meg később.",
     "dokladoBusyMsg": "A Doklado jelenleg foglalt (kéréskorlát). Kérjük, próbálja meg néhány perc múlva.",
