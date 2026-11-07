@@ -115,16 +115,20 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 
 ## Product surfaces & onboarding (M11–M15)
 
-## M11 — Accounts, garage, sharing & GDPR
+## M11 — Accounts, garage, sharing & GDPR ← _backend done on local, awaiting review_
 
 - [x] MVP · Registration and login (reuse); password reset and account recovery (reuse)
 - [x] MVP · User profile and preferences (settings page already built)
-- [ ] MVP · Create and rename garage; multiple vehicles per garage
-- [ ] MVP · Garage members & invitations (invite by email, accept/reject, expiry)
-- [ ] MVP · Roles Owner/Member/Viewer; per-vehicle access; backend access enforcement
-- [ ] MVP · Assign responsibility; revoke/reassign on member removal
-- [ ] **MVP · GDPR: account deletion and data export** (per-garage export + deletion)
-  > **Review gate M11.**
+- [x] MVP · Garage = organization (reuse); multiple vehicles already supported
+- [x] MVP · Garage members & invitations (`lib/carcare/garage.ts`: createInvitation/acceptInvitation, token + 7-day expiry); schema `garage_invitations`
+- [x] MVP · Roles Owner/Member/Viewer (`GarageMembership`); per-vehicle access (`VehicleAccess`); backend enforcement `canAccessVehicle()` + legacy single-org bridge
+- [x] MVP · Owner fallback for reminder recipient wired into the planner (`resolveGarageOwner`)
+- [x] MVP · Assign/reassign responsibility (M10 `reassignResponsibleUser`); account deletion detaches responsibilities
+- [x] **MVP · GDPR** (`lib/carcare/gdpr.ts`): `exportGarageData` (bundle) + `deleteUserData` (erasure: remove deliveries/memberships/access, detach events, anonymize + soft-delete)
+- [x] Integration tests (`tests/carcare/garage.itest.ts`): access, owner-fallback, invite-accept, export, erasure
+- [x] MVP · `removeMember()` — detaches their events (→ owner fallback), suppresses their reminders, deletes membership
+- [ ] invitation **email** send (hono) + roles/members **UI** → **M14**
+  > **Review gate M11.** Roles/access/invitations/owner-fallback/GDPR backend delivered & tested; UI + invite-email are M14/surfaces.
 
 ## M12 — Vehicles & catalogue
 

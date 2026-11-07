@@ -109,3 +109,14 @@ ALTER TABLE "recurring_events" ADD COLUMN "interval_days" INTEGER;
 ALTER TABLE "recurring_events" ADD COLUMN "preferred_provider_id" TEXT;
 ALTER TABLE "recurring_events" ADD CONSTRAINT "recurring_events_preferred_provider_id_fkey"
   FOREIGN KEY ("preferred_provider_id") REFERENCES "providers"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+
+-- ----------------------------------------------------------------------------
+-- M11 — Garage sharing, roles, invitations
+--      STATUS: APPLIED on local :5434 (2026-11-07)
+--      Prisma migration: prisma/migrations/20261107190000_carcare_garage_sharing_m11
+-- ----------------------------------------------------------------------------
+-- Additive only. Enums: GarageRole, InvitationStatus.
+-- Tables: garage_memberships (unique org+user), vehicle_access (unique membership+vehicle),
+--         garage_invitations (unique token). FKs cascade from organization/user/vehicle.
+-- Authoritative SQL: the migration file above / `prisma migrate deploy`.

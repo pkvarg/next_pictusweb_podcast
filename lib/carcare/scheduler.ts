@@ -1,5 +1,6 @@
 import { Prisma, NotificationStage, type PrismaClient, type Channel } from '@prisma/client'
 import { addDaysUTC } from './recurrence'
+import { resolveGarageOwner } from './garage'
 import type { Channels } from './channels'
 
 export const BOOKING_STAGES: NotificationStage[] = [
@@ -54,7 +55,9 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
     return []
 
   const def = occ.recurringEvent
-  const recipientUserId = def.responsibleUserId
+  // Responsible user, or the garage owner as fallback (FS owner fallback).
+  const recipientUserId =
+    def.responsibleUserId ?? (await resolveGarageOwner(tx, def.organizationId))
   if (!recipientUserId || !occ.dueDate) return [] // no recipient or no date to anchor on
 
   const recipient = await tx.user.findUnique({ where: { id: recipientUserId } })
@@ -220,7 +223,11 @@ export async function dispatchDue(
 
 // Returns the local hour (0-23) of a UTC instant in the given IANA timezone.
 function localHour(d: Date, timeZone: string): number {
-  const s = new Intl.DateTimeFormat('en-GB', { timeZone, hour: '2-digit', hourCycle: 'h23' }).format(d)
+  const s = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    hour: '2-digit',
+    hourCycle: 'h23',
+  }).format(d)
   return Number(s) % 24
 }
 

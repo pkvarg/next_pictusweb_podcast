@@ -118,6 +118,7 @@ model User {
   picDocsRuns            PicDocsRun[]
   responsibleEvents      RecurringEvent[]
   notificationDeliveries NotificationDelivery[]
+  garageMemberships      GarageMembership[]
 
   @@map("users")
 }
@@ -254,6 +255,7 @@ model MyVehicle {
   vehicleNotifications VehicleNotification[]
   recurringEvents      RecurringEvent[]
   eventOccurrences     EventOccurrence[]
+  vehicleAccess        VehicleAccess[]
 
   @@index([userId])
   @@index([organizationId])
@@ -435,6 +437,8 @@ model Organization {
   recurringEvents   RecurringEvent[]
   providers         Provider[]
   notificationRules NotificationRule[]
+  garageMemberships GarageMembership[]
+  garageInvitations GarageInvitation[]
 
   @@index([tierId])
   @@index([parentOrganizationId])
@@ -887,4 +891,68 @@ model NotificationDelivery {
   @@index([status, scheduledFor])
   @@index([occurrenceId, stage])
   @@map("notification_deliveries")
+}
+
+// ============================================================================
+// CarCare — M11 (garage sharing, roles, invitations)
+// ============================================================================
+
+enum GarageRole {
+  OWNER
+  MEMBER
+  VIEWER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model GarageMembership {
+  id             String     @id @default(uuid())
+  organizationId String     @map("organization_id")
+  userId         String     @map("user_id")
+  role           GarageRole @default(MEMBER)
+  createdAt      DateTime   @default(now()) @map("created_at")
+
+  organization  Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicleAccess VehicleAccess[]
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@map("garage_memberships")
+}
+
+model VehicleAccess {
+  id           String @id @default(uuid())
+  membershipId String @map("membership_id")
+  vehicleId    String @map("vehicle_id")
+
+  membership GarageMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  vehicle    MyVehicle        @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@unique([membershipId, vehicleId])
+  @@index([vehicleId])
+  @@map("vehicle_access")
+}
+
+model GarageInvitation {
+  id              String           @id @default(uuid())
+  organizationId  String           @map("organization_id")
+  email           String
+  role            GarageRole       @default(MEMBER)
+  token           String           @unique
+  status          InvitationStatus @default(PENDING)
+  expiresAt       DateTime         @map("expires_at")
+  invitedByUserId String?          @map("invited_by_user_id")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("garage_invitations")
 }
