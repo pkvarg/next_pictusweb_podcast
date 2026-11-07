@@ -57,11 +57,9 @@ function inviteUrl(token: string) {
 export default function CarCareGarageView({
   data,
   reload,
-  preview = false,
 }: {
   data: GarageData
   reload: () => void
-  preview?: boolean
 }) {
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<'MEMBER' | 'VIEWER'>('MEMBER')
@@ -76,7 +74,6 @@ export default function CarCareGarageView({
       setError('Zadajte platný e-mail.')
       return
     }
-    if (preview) return
     setInviting(true)
     try {
       const res = await fetch('/api/carcare/garage/invitations', {
@@ -106,7 +103,6 @@ export default function CarCareGarageView({
   }
 
   const revoke = async (id: string) => {
-    if (preview) return
     setBusyId(id)
     try {
       const res = await fetch(`/api/carcare/garage/invitations/${id}/revoke`, { method: 'POST' })
@@ -117,7 +113,6 @@ export default function CarCareGarageView({
   }
 
   const removeMember = async (userId: string) => {
-    if (preview) return
     setBusyId(userId)
     try {
       const res = await fetch(`/api/carcare/garage/members/${userId}/remove`, { method: 'POST' })

@@ -25,13 +25,6 @@ const POWERTRAIN_OPTIONS: { value: string; label: string }[] = [
   { value: 'OTHER', label: 'Iné' },
 ]
 
-const PREVIEW_CATALOGUE: CatalogueEntry[] = [
-  { id: 'c1', make: 'Škoda', model: 'Octavia', powertrain: 'DIESEL', yearFrom: 2013 },
-  { id: 'c2', make: 'Škoda', model: 'Fabia', powertrain: 'PETROL', yearFrom: 2015 },
-  { id: 'c3', make: 'Volkswagen', model: 'Golf', powertrain: 'PETROL', yearFrom: 2012 },
-  { id: 'c4', make: 'Kia', model: 'Sportage', powertrain: 'PETROL', yearFrom: 2016 },
-]
-
 function powertrainLabel(v: string | null) {
   return POWERTRAIN_OPTIONS.find((o) => o.value === v)?.label ?? ''
 }
@@ -40,7 +33,7 @@ const inputClass =
   'w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none'
 const labelClass = 'block text-sm text-gray-400 mb-1.5'
 
-export default function CarCareAddVehicleView({ preview = false }: { preview?: boolean }) {
+export default function CarCareAddVehicleView() {
   const router = useRouter()
 
   const [registration, setRegistration] = useState('')
@@ -68,16 +61,6 @@ export default function CarCareAddVehicleView({ preview = false }: { preview?: b
     }
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
-      if (preview) {
-        const q = query.trim().toLowerCase()
-        setResults(
-          PREVIEW_CATALOGUE.filter(
-            (e) => e.make.toLowerCase().includes(q) || e.model.toLowerCase().includes(q),
-          ),
-        )
-        setShowResults(true)
-        return
-      }
       try {
         const res = await fetch(`/api/carcare/catalogue?q=${encodeURIComponent(query.trim())}`)
         if (res.ok) {
@@ -92,7 +75,7 @@ export default function CarCareAddVehicleView({ preview = false }: { preview?: b
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [query, picked, preview])
+  }, [query, picked])
 
   const pick = (e: CatalogueEntry) => {
     setMake(e.make)
@@ -117,7 +100,6 @@ export default function CarCareAddVehicleView({ preview = false }: { preview?: b
       setError('ŠPZ je povinná.')
       return
     }
-    if (preview) return
     setSubmitting(true)
     try {
       const res = await fetch('/api/carcare/vehicles', {
