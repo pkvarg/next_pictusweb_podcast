@@ -10,6 +10,20 @@ import { Link } from '@/i18n/routing'
 
 type Step = 'credentials' | '2fa'
 
+function targetFor(role?: string, product?: string) {
+  return role === 'admin' ? 'admin' : product === 'PICDOCS' ? 'picdocs/app' : 'client'
+}
+
+function destinationFor(locale: string, role?: string, product?: string): string {
+  if (typeof window !== 'undefined') {
+    const cb = new URLSearchParams(window.location.search).get('callbackUrl')
+    if (cb && cb.startsWith('/') && !cb.startsWith('//')) {
+      return /^\/(en|sk|hu)(\/|$)/.test(cb) ? cb : `/${locale}${cb}`
+    }
+  }
+  return `/${locale}/${targetFor(role, product)}`
+}
+
 export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -32,14 +46,13 @@ export default function LoginPage() {
 
   const locale = pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
 
-  // Post-login landing: admins manage everything, others go to their product's workspace.
-  const targetFor = (role?: string, product?: string) =>
-    role === 'admin' ? 'admin' : product === 'PICDOCS' ? 'picdocs/app' : 'client'
-
   useEffect(() => {
     if (session?.user && !checking2FA) {
-      const redirectPath = targetFor(session.user.role, (session.user as any).product)
-      window.location.href = `/${locale}/${redirectPath}`
+      window.location.href = destinationFor(
+        locale,
+        session.user.role,
+        (session.user as any).product,
+      )
     }
   }, [session, locale, checking2FA])
 
@@ -90,13 +103,13 @@ export default function LoginPage() {
         const product = sessionData?.user?.product
 
         if (process.env.NEXT_PUBLIC_SKIP_VERIFICATION === 'true') {
-          window.location.href = `/${locale}/${targetFor(role, product)}`
+          window.location.href = destinationFor(locale, role, product)
           return
         }
 
         const trusted = await checkDeviceTrust(userId)
         if (trusted) {
-          window.location.href = `/${locale}/${targetFor(role, product)}`
+          window.location.href = destinationFor(locale, role, product)
           return
         }
 
@@ -158,7 +171,7 @@ export default function LoginPage() {
         })
       }
 
-      window.location.href = `/${locale}/${targetFor(pendingRole, pendingProduct)}`
+      window.location.href = destinationFor(locale, pendingRole, pendingProduct)
     } catch {
       setError(t('loginError'))
     } finally {
