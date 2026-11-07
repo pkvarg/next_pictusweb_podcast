@@ -151,10 +151,22 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 
 ## M14 — Dashboard & calendar
 
+### Sub-step A — API layer ← _done on local, awaiting review_
+
+- [x] Auth/access helper (`lib/carcare/apiAuth.ts`) + `canModifyVehicle` / `listAccessibleVehicleIds` (`garage.ts`)
+- [x] `GET /api/carcare/dashboard` (KPI counts + needs-attention/upcoming/arranged + vehicles, access-scoped)
+- [x] `GET /api/carcare/catalogue?q=`; `GET/POST /api/carcare/vehicles`
+- [x] `POST /api/carcare/events/activate`, `POST /api/carcare/events` (custom)
+- [x] `POST /api/carcare/occurrences/:id/complete`; `POST /api/carcare/appointments`, `POST /api/carcare/appointments/:id/cancel`
+- [x] All auth-gated (`resolveCarCareSession`), same-origin guarded (mutations), vehicle access/role enforced; typecheck + lint clean
+
+### Sub-step B — React pages (next)
+
 - [ ] MVP · Action-first home: action cards, deadlines, booked appointments, responsibility, recently completed, vehicle filters
 - [ ] MVP · Events list + calendar (due dates vs appointment dates)
-- [ ] MVP · Responsive navigation Home / Events / Garage / Costs / More
-  > **Review gate M14.**
+- [ ] MVP · Responsive nav Home / Events / Garage / Costs / More
+- [ ] Deferred surfaces land here: provider call/email/booking actions, roles/members UI + invite email (hono), template i18n names, viewer read-only enforcement in UI
+  > **Review gate M14.** API contract done & typechecked; pages built next (with the browser preview to iterate on the look).
 
 ## M15 — PWA + web push
 

@@ -122,6 +122,56 @@ export async function grantVehicleAccess(
   })
 }
 
+// Write access: can access the vehicle AND is not a read-only VIEWER.
+export async function canModifyVehicle(
+  tx: Prisma.TransactionClient,
+  userId: string,
+  vehicleId: string,
+): Promise<boolean> {
+  if (!(await canAccessVehicle(tx, userId, vehicleId))) return false
+  const vehicle = await tx.myVehicle.findUnique({
+    where: { id: vehicleId },
+    select: { organizationId: true },
+  })
+  if (!vehicle) return false
+  const user = await tx.user.findUnique({ where: { id: userId }, select: { role: true } })
+  if (user?.role === 'ADMIN') return true
+  const membership = await tx.garageMembership.findUnique({
+    where: { organizationId_userId: { organizationId: vehicle.organizationId, userId } },
+  })
+  if (membership) return membership.role !== 'VIEWER'
+  return true // legacy single-org bridge
+}
+
+// Vehicle ids a user may see in a garage (ADMIN/OWNER/legacy → all; MEMBER/VIEWER → granted).
+export async function listAccessibleVehicleIds(
+  tx: Prisma.TransactionClient,
+  userId: string,
+  organizationId: string,
+): Promise<string[]> {
+  const user = await tx.user.findUnique({ where: { id: userId }, select: { role: true } })
+  const membership = await tx.garageMembership.findUnique({
+    where: { organizationId_userId: { organizationId, userId } },
+  })
+  const membershipCount = await tx.garageMembership.count({ where: { organizationId } })
+
+  if (user?.role === 'ADMIN' || membership?.role === 'OWNER' || membershipCount === 0) {
+    const vs = await tx.myVehicle.findMany({
+      where: { organizationId, deletedAt: null },
+      select: { id: true },
+    })
+    return vs.map((v) => v.id)
+  }
+  if (membership) {
+    const access = await tx.vehicleAccess.findMany({
+      where: { membershipId: membership.id },
+      select: { vehicleId: true },
+    })
+    return access.map((a) => a.vehicleId)
+  }
+  return []
+}
+
 // Removing a member detaches them from any events they were responsible for (so those
 // events fall back to the garage owner on the next planning pass), suppresses their
 // still-scheduled reminders for this garage, and deletes the membership (cascading its
