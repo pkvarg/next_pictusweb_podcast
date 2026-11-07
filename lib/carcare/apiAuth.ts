@@ -1,6 +1,9 @@
 import { getServerSession } from 'next-auth'
+import { cookies } from 'next/headers'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
+
+export const ACTIVE_GARAGE_COOKIE = 'carcare_garage'
 
 export interface CarCareSession {
   userId: string
@@ -37,6 +40,19 @@ export async function resolveCarCareSession(): Promise<CarCareSession | null> {
     organizationId = active.organizationId
     garageRole = active.role
   }
+
+  const preferred = (await cookies()).get(ACTIVE_GARAGE_COOKIE)?.value
+  if (preferred) {
+    const pm = memberships.find((m) => m.organizationId === preferred)
+    if (pm) {
+      organizationId = preferred
+      garageRole = pm.role
+    } else if (preferred === user.organizationId && memberships.length === 0) {
+      organizationId = preferred
+      garageRole = 'OWNER'
+    }
+  }
+
   if (user.role === 'ADMIN') garageRole = 'OWNER'
 
   return {

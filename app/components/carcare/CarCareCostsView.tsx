@@ -2,6 +2,7 @@
 
 import { Wallet, CalendarCheck, Receipt } from 'lucide-react'
 import CarCareBottomNav from './CarCareBottomNav'
+import { categoryLabel } from '@/lib/carcare/labels'
 
 export interface CostEntry {
   id: string
@@ -21,21 +22,6 @@ export interface CostsData {
   entries: CostEntry[]
 }
 
-const CATEGORY_LABEL: Record<string, string> = {
-  inspection: 'Kontroly (STK/EK)',
-  service: 'Servis',
-  insurance: 'Poistenie',
-  tyres: 'Pneumatiky',
-  vignette: 'Diaľničné známky',
-  permit: 'Povolenia',
-  warranty: 'Záruky',
-  subscription: 'Predplatné',
-  other: 'Ostatné',
-}
-
-function categoryLabel(c: string) {
-  return CATEGORY_LABEL[c] ?? c.charAt(0).toUpperCase() + c.slice(1)
-}
 function eur(n: number) {
   return `${n.toLocaleString('sk-SK', { maximumFractionDigits: 0 })} €`
 }

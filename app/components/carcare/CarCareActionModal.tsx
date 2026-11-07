@@ -1,9 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { X, Loader2, CalendarPlus, CheckCircle2 } from 'lucide-react'
 
 export interface ActionOccurrence {
+  id: string
+  name: string
+}
+
+interface ProviderOption {
   id: string
   name: string
 }
@@ -34,6 +39,15 @@ export default function CarCareActionModal({
   const [scheduledAt, setScheduledAt] = useState('')
   const [estimatedCost, setEstimatedCost] = useState('')
   const [bookingReference, setBookingReference] = useState('')
+  const [providerId, setProviderId] = useState('')
+  const [providers, setProviders] = useState<ProviderOption[]>([])
+
+  useEffect(() => {
+    fetch('/api/carcare/providers')
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d) => setProviders(d.providers ?? []))
+      .catch(() => setProviders([]))
+  }, [])
 
   const [doneDate, setDoneDate] = useState(todayLocal())
   const [mileage, setMileage] = useState('')
@@ -54,6 +68,7 @@ export default function CarCareActionModal({
         body: JSON.stringify({
           occurrenceId: occurrence.id,
           scheduledAt: new Date(scheduledAt).toISOString(),
+          providerId: providerId || null,
           estimatedCost: estimatedCost ? Number(estimatedCost) : null,
           bookingReference: bookingReference.trim() || null,
         }),
@@ -137,6 +152,23 @@ export default function CarCareActionModal({
                 onChange={(e) => setScheduledAt(e.target.value)}
               />
             </div>
+            {providers.length > 0 && (
+              <div>
+                <label className={labelClass}>Poskytovateľ</label>
+                <select
+                  className={inputClass}
+                  value={providerId}
+                  onChange={(e) => setProviderId(e.target.value)}
+                >
+                  <option value="">—</option>
+                  {providers.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={labelClass}>Odhad. cena (€)</label>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Users,
   UserPlus,
@@ -12,6 +12,10 @@ import {
   Mail,
   Car,
   ChevronDown,
+  Wrench,
+  Phone,
+  ExternalLink,
+  Plus,
 } from 'lucide-react'
 import CarCareBottomNav from './CarCareBottomNav'
 
@@ -29,6 +33,15 @@ export interface GarageVehicle {
   id: string
   name: string
   registration: string
+}
+
+export interface GarageProvider {
+  id: string
+  name: string
+  category: string | null
+  phone: string | null
+  email: string | null
+  bookingUrl: string | null
 }
 
 export interface GarageInvitationItem {
@@ -89,6 +102,80 @@ export default function CarCareGarageView({
   const [notice, setNotice] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [accessBusy, setAccessBusy] = useState<string | null>(null)
+
+  const [providers, setProviders] = useState<GarageProvider[]>([])
+  const [provForm, setProvForm] = useState(false)
+  const [provName, setProvName] = useState('')
+  const [provPhone, setProvPhone] = useState('')
+  const [provEmail, setProvEmail] = useState('')
+  const [provBooking, setProvBooking] = useState('')
+  const [provBusy, setProvBusy] = useState(false)
+
+  const loadProviders = () => {
+    fetch('/api/carcare/providers')
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d) => setProviders(d.providers ?? []))
+      .catch(() => setProviders([]))
+  }
+  useEffect(loadProviders, [])
+
+  const [garages, setGarages] = useState<{ organizationId: string; name: string }[]>([])
+  const [activeOrg, setActiveOrg] = useState<string | null>(null)
+  useEffect(() => {
+    fetch('/api/carcare/garages')
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d) => {
+        setGarages(d.garages ?? [])
+        setActiveOrg(d.activeOrganizationId ?? null)
+      })
+      .catch(() => setGarages([]))
+  }, [])
+
+  const switchGarage = async (organizationId: string) => {
+    const res = await fetch('/api/carcare/active-garage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ organizationId }),
+    })
+    if (res.ok) window.location.reload()
+  }
+
+  const addProvider = async () => {
+    if (!provName.trim()) return
+    setProvBusy(true)
+    try {
+      const res = await fetch('/api/carcare/providers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: provName.trim(),
+          phone: provPhone.trim() || null,
+          email: provEmail.trim() || null,
+          bookingUrl: provBooking.trim() || null,
+        }),
+      })
+      if (res.ok) {
+        setProvName('')
+        setProvPhone('')
+        setProvEmail('')
+        setProvBooking('')
+        setProvForm(false)
+        loadProviders()
+      }
+    } finally {
+      setProvBusy(false)
+    }
+  }
+
+  const archiveProvider = async (id: string) => {
+    setProvBusy(true)
+    try {
+      const res = await fetch(`/api/carcare/providers/${id}/archive`, { method: 'POST' })
+      if (res.ok) loadProviders()
+    } finally {
+      setProvBusy(false)
+    }
+  }
 
   const toggleExpanded = (userId: string) =>
     setExpanded((prev) => {
@@ -181,9 +268,22 @@ export default function CarCareGarageView({
           <div className="w-14 h-14 rounded-2xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
             <Users className="w-7 h-7 text-pictus-lime" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <h1 className="text-3xl font-light">Garáž</h1>
             <p className="text-gray-400">Členovia a prístup k vozidlám</p>
+            {garages.length > 1 && (
+              <select
+                value={activeOrg ?? ''}
+                onChange={(e) => switchGarage(e.target.value)}
+                className="mt-3 bg-pictus-onyx900 border border-white/10 rounded-xl px-3 py-2 text-sm text-pictus-white focus:border-pictus-lime/50 focus:outline-none"
+              >
+                {garages.map((g) => (
+                  <option key={g.organizationId} value={g.organizationId}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         </header>
 
@@ -374,6 +474,132 @@ export default function CarCareGarageView({
             </div>
           </section>
         )}
+
+        <section className="mt-8">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-bold">Poskytovatelia</h2>
+            {data.canManage && !provForm && (
+              <button
+                onClick={() => setProvForm(true)}
+                className="text-sm text-pictus-lime hover:text-pictus-lime600 inline-flex items-center gap-1"
+              >
+                <Plus className="w-4 h-4" /> Pridať
+              </button>
+            )}
+          </div>
+
+          {provForm && (
+            <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-3 mb-3">
+              <input
+                className="w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
+                placeholder="Názov (napr. AutoServis Nitra)"
+                value={provName}
+                onChange={(e) => setProvName(e.target.value)}
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input
+                  className="w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
+                  placeholder="Telefón"
+                  value={provPhone}
+                  onChange={(e) => setProvPhone(e.target.value)}
+                />
+                <input
+                  className="w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
+                  placeholder="E-mail"
+                  value={provEmail}
+                  onChange={(e) => setProvEmail(e.target.value)}
+                />
+              </div>
+              <input
+                className="w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
+                placeholder="Odkaz na objednanie (voliteľné)"
+                value={provBooking}
+                onChange={(e) => setProvBooking(e.target.value)}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={addProvider}
+                  disabled={provBusy}
+                  className="inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-2 rounded-xl hover:bg-pictus-lime600 transition-colors disabled:opacity-50"
+                >
+                  {provBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Uložiť'}
+                </button>
+                <button
+                  onClick={() => setProvForm(false)}
+                  className="px-4 py-2 rounded-xl text-gray-400 hover:text-pictus-white"
+                >
+                  Zrušiť
+                </button>
+              </div>
+            </div>
+          )}
+
+          {providers.length === 0 && !provForm ? (
+            <div className="p-6 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
+              Žiadni poskytovatelia. Pridajte servis či poisťovňu a budete ich mať po ruke.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {providers.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06]"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 text-gray-400">
+                    <Wrench className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-pictus-white font-medium truncate">{p.name}</p>
+                    {(p.phone || p.email) && (
+                      <p className="text-sm text-gray-400 truncate">
+                        {[p.phone, p.email].filter(Boolean).join(' · ')}
+                      </p>
+                    )}
+                  </div>
+                  {p.phone && (
+                    <a
+                      href={`tel:${p.phone}`}
+                      className="shrink-0 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-pictus-lime"
+                      aria-label="Zavolať"
+                    >
+                      <Phone className="w-4 h-4" />
+                    </a>
+                  )}
+                  {p.email && (
+                    <a
+                      href={`mailto:${p.email}`}
+                      className="shrink-0 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-pictus-lime"
+                      aria-label="Napísať e-mail"
+                    >
+                      <Mail className="w-4 h-4" />
+                    </a>
+                  )}
+                  {p.bookingUrl && (
+                    <a
+                      href={p.bookingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-pictus-lime"
+                      aria-label="Objednať online"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                  {data.canManage && (
+                    <button
+                      onClick={() => archiveProvider(p.id)}
+                      disabled={provBusy}
+                      className="shrink-0 text-gray-500 hover:text-red-400 disabled:opacity-50"
+                      aria-label="Odstrániť poskytovateľa"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
       <CarCareBottomNav current="garage" />
     </div>

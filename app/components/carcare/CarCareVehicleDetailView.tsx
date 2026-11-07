@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import CarCareActionModal, { type ActionOccurrence } from './CarCareActionModal'
+import { ACTION_LABEL, templateName, powertrainLabel } from '@/lib/carcare/labels'
 
 export interface VdOccurrence {
   id: string
@@ -64,49 +65,6 @@ export interface VehicleDetailData {
   canModify?: boolean
 }
 
-const ACTION_LABEL: Record<string, string> = {
-  BOOK: 'Objednať',
-  RENEW: 'Obnoviť',
-  PAY: 'Zaplatiť',
-  PURCHASE: 'Kúpiť',
-  INSPECT: 'Objednať',
-  CUSTOM: 'Zobraziť',
-}
-
-const TEMPLATE_LABEL: Record<string, string> = {
-  stk: 'STK – technická kontrola',
-  ek: 'EK – emisná kontrola',
-  pzp: 'PZP – povinné zmluvné poistenie',
-  comprehensive_insurance: 'Havarijné poistenie (KASKO)',
-  insurance: 'Poistenie',
-  regular_service: 'Pravidelný servis',
-  service: 'Servis',
-  winter_tyres: 'Prezutie na zimné pneumatiky',
-  summer_tyres: 'Prezutie na letné pneumatiky',
-  tyres: 'Pneumatiky – sezónna výmena',
-  highway_vignette: 'Diaľničná známka',
-  vignette: 'Diaľničná známka',
-  parking_permit: 'Parkovacia karta',
-  permit: 'Povolenie',
-  battery_warranty: 'Záruka na batériu',
-  warranty: 'Záruka',
-  charging_subscription: 'Predplatné nabíjania',
-  subscription: 'Predplatné',
-}
-
-const POWERTRAIN_LABEL: Record<string, string> = {
-  PETROL: 'Benzín',
-  DIESEL: 'Diesel',
-  MHEV: 'Mild hybrid',
-  HEV: 'Hybrid',
-  PHEV: 'Plug-in hybrid',
-  BEV: 'Elektromobil',
-  LPG: 'LPG',
-  CNG: 'CNG',
-  HYDROGEN: 'Vodík',
-  OTHER: 'Iné',
-}
-
 const toneClass = {
   red: 'bg-red-500/15 text-red-300 border border-red-500/30',
   amber: 'bg-amber-500/15 text-amber-300 border border-amber-500/30',
@@ -114,12 +72,6 @@ const toneClass = {
   lime: 'bg-pictus-lime/15 text-pictus-lime border border-pictus-lime/30',
 }
 
-function humanize(key: string) {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-}
-function templateName(key: string) {
-  return TEMPLATE_LABEL[key] ?? humanize(key)
-}
 function daysUntil(iso: string | null) {
   return iso == null ? null : Math.round((new Date(iso).getTime() - Date.now()) / 86400000)
 }
@@ -180,9 +132,7 @@ export default function CarCareVehicleDetailView({
       ? { label: 'Značka a model', value: [vehicle.make, vehicle.model].filter(Boolean).join(' ') }
       : null,
     vehicle.year ? { label: 'Rok výroby', value: String(vehicle.year) } : null,
-    vehicle.powertrain
-      ? { label: 'Pohon', value: POWERTRAIN_LABEL[vehicle.powertrain] ?? vehicle.powertrain }
-      : null,
+    vehicle.powertrain ? { label: 'Pohon', value: powertrainLabel(vehicle.powertrain) } : null,
     vehicle.vin ? { label: 'VIN', value: vehicle.vin } : null,
     vehicle.country ? { label: 'Krajina', value: vehicle.country } : null,
   ].filter((x): x is { label: string; value: string } => x != null)
