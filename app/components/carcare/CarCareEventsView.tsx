@@ -64,7 +64,7 @@ function EventList({
   onSelect,
 }: {
   occurrences: EvOccurrence[]
-  onSelect: (o: EvOccurrence) => void
+  onSelect?: (o: EvOccurrence) => void
 }) {
   if (occurrences.length === 0) {
     return (
@@ -77,12 +77,8 @@ function EventList({
     <div className="space-y-3">
       {occurrences.map((o) => {
         const badge = dueBadge(o)
-        return (
-          <button
-            key={o.id}
-            onClick={() => onSelect(o)}
-            className="w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors"
-          >
+        const inner = (
+          <>
             <div className="min-w-0 flex-1">
               <p className="text-pictus-white font-medium truncate">{o.recurringEvent.name}</p>
               <p className="text-sm text-gray-400 truncate">
@@ -92,8 +88,23 @@ function EventList({
             <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full ${toneClass[badge.tone]}`}>
               {badge.text}
             </span>
-            <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
+            {onSelect && <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />}
+          </>
+        )
+        const base =
+          'w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06]'
+        return onSelect ? (
+          <button
+            key={o.id}
+            onClick={() => onSelect(o)}
+            className={`${base} hover:border-white/20 transition-colors`}
+          >
+            {inner}
           </button>
+        ) : (
+          <div key={o.id} className={base}>
+            {inner}
+          </div>
         )
       })}
     </div>
@@ -192,9 +203,11 @@ function MonthCalendar({ occurrences }: { occurrences: EvOccurrence[] }) {
 export default function CarCareEventsView({
   occurrences,
   reload,
+  canModify = true,
 }: {
   occurrences: EvOccurrence[]
   reload?: () => void
+  canModify?: boolean
 }) {
   const [view, setView] = useState<'list' | 'calendar'>('list')
   const [active, setActive] = useState<ActionOccurrence | null>(null)
@@ -224,7 +237,9 @@ export default function CarCareEventsView({
         {view === 'list' ? (
           <EventList
             occurrences={occurrences}
-            onSelect={(o) => setActive({ id: o.id, name: o.recurringEvent.name })}
+            onSelect={
+              canModify ? (o) => setActive({ id: o.id, name: o.recurringEvent.name }) : undefined
+            }
           />
         ) : (
           <MonthCalendar occurrences={occurrences} />

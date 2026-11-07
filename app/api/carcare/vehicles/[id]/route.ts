@@ -81,6 +81,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const num = (d: { toNumber(): number } | null | undefined) => (d ? d.toNumber() : 0)
 
   return NextResponse.json({
+    canModify: session.canModify,
     vehicle: {
       id: vehicle.id,
       registration: vehicle.registration,

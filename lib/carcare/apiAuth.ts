@@ -6,6 +6,8 @@ export interface CarCareSession {
   userId: string
   organizationId: string | null
   role: string
+  garageRole: 'OWNER' | 'MEMBER' | 'VIEWER'
+  canModify: boolean
 }
 
 // Resolves the signed-in user for CarCare API routes. Returns null when unauthenticated.
@@ -24,13 +26,24 @@ export async function resolveCarCareSession(): Promise<CarCareSession | null> {
   let organizationId = user.organizationId
   const memberships = await prisma.garageMembership.findMany({
     where: { userId: user.id },
-    select: { organizationId: true },
+    select: { organizationId: true, role: true },
     orderBy: { createdAt: 'asc' },
   })
+
+  let garageRole: 'OWNER' | 'MEMBER' | 'VIEWER' = 'OWNER'
   if (memberships.length > 0) {
     const own = memberships.find((m) => m.organizationId === user.organizationId)
-    organizationId = own ? user.organizationId : memberships[0].organizationId
+    const active = own ?? memberships[0]
+    organizationId = active.organizationId
+    garageRole = active.role
   }
+  if (user.role === 'ADMIN') garageRole = 'OWNER'
 
-  return { userId: user.id, organizationId, role: user.role }
+  return {
+    userId: user.id,
+    organizationId,
+    role: user.role,
+    garageRole,
+    canModify: garageRole !== 'VIEWER',
+  }
 }

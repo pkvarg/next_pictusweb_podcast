@@ -49,5 +49,5 @@ export async function GET(request: NextRequest) {
       o.status !== 'ARRANGED' &&
       o.status !== 'COMPLETED',
   }))
-  return NextResponse.json({ occurrences: withOverdue })
+  return NextResponse.json({ occurrences: withOverdue, canModify: session.canModify })
 }
