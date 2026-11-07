@@ -163,12 +163,13 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 ### Sub-step B — React pages (in progress)
 
 - [x] MVP · Action-first home dashboard: `CarCareDashboardView` + `/[locale]/carcare` page (auth-guarded, fetches `/api/carcare/dashboard`); KPI cards, needs-attention/upcoming list with status badges + actions, vehicles, bottom nav — **visually verified in dev preview vs Eva's mockup**
-- [ ] MVP · Events list + calendar (due dates vs appointment dates)
-- [ ] MVP · Garage / vehicle detail / onboarding pages; Costs page
-- [ ] wire action buttons (book / complete / activate) to the API endpoints
+- [x] MVP · Events list + calendar: `GET /api/carcare/occurrences` (access-scoped, filters, overdue flag) + `CarCareEventsView` + `/[locale]/carcare/events` page; Zoznam/Kalendár toggle, status badges, Monday-first month calendar (amber=due, lime=appointment) — **visually verified** (commit `4f1c242`)
+- [x] MVP · Vehicle detail: `GET /api/carcare/vehicles/:id` (spec, open events, history, cost-this-year, latest mileage, not-yet-activated template suggestions) + `CarCareVehicleDetailView` + `/[locale]/carcare/vehicles/[id]` page; mileage/cost KPIs, events with actions, "Sledovať" activation (wired to `/events/activate`), history, note, spec table — **visually verified** (uncommitted)
+- [ ] MVP · Garage / onboarding pages; Costs page
+- [ ] wire remaining action buttons (book / complete) to the API endpoints
 - [ ] Deferred surfaces land here: provider call/email/booking actions, roles/members UI + invite email (hono), template i18n names, viewer read-only enforcement in UI
-- _temporary `/[locale]/carcare/preview` mock route exists for design iteration — remove before shipping_
-  > **Review gate M14.** API done; dashboard page built & previewed. Remaining pages next.
+- _temporary mock routes exist for design iteration — remove before shipping: `/[locale]/carcare/preview`, `/[locale]/carcare/events/preview`, `/[locale]/carcare/vehicles/preview`_
+  > **Review gate M14.** API done; dashboard + events/calendar + vehicle detail built & previewed. Garage / onboarding / costs next.
 
 ## M15 — PWA + web push
 
