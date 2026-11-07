@@ -144,3 +144,7 @@ ALTER TABLE "recurring_events" ADD CONSTRAINT "recurring_events_preferred_provid
 -- warranty, battery_warranty, charging_subscription), ON CONFLICT(key) DO NOTHING.
 -- Legal vs recommended via kind; SK-scoped where legal; EK excludes BEV/HYDROGEN.
 -- Review/adjust intervals & legal classification against current SK rules before prod.
+
+-- M14b: accent-insensitive catalogue search (searchCatalogue uses unaccent()).
+-- Required for /api/carcare/catalogue so "skoda" matches "Škoda". Idempotent.
+CREATE EXTENSION IF NOT EXISTS unaccent;

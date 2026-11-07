@@ -178,7 +178,9 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [x] cross-org member scoping: `resolveCarCareSession` resolves the active garage org from the user's membership (not their account home org), so an invited member whose home org differs (e.g. a PicDocs user) sees the garage they joined
 - [x] member access default: members/viewers with no explicit `VehicleAccess` grants see ALL garage vehicles (`canAccessVehicle` + `listAccessibleVehicleIds`); grants act as an optional restriction; garage UI shows "všetky" when unrestricted
 - [x] invite email-match: authenticated accept (`acceptInvitation`) now requires the signed-in user's email to match the invitation (register path already binds to the invite email); accept page shows a tailored mismatch message
-- [ ] Deferred surfaces: provider call/email/booking actions, template i18n names, viewer read-only enforcement in UI; accent-insensitive catalogue search (Postgres `unaccent`); garage switcher for users in multiple garages
+- [x] viewer read-only enforcement in UI: `resolveCarCareSession` now returns `garageRole`/`canModify`; dashboard, occurrences and vehicle-detail GETs expose `canModify`; VIEWERs get non-interactive event rows (no action modal), and the "Pridať vozidlo" + "Sledovať" affordances are hidden
+- [x] accent-insensitive catalogue search: `searchCatalogue` uses Postgres `unaccent` (extension logged in CARCARE_PROD_DB_CHANGES) so "skoda" matches "Škoda"
+- [ ] Deferred surfaces: provider call/email/booking actions, template i18n names (proper next-intl messages; SK label maps cover common ones now), garage switcher for users in multiple garages
 - [x] removed all temporary mock preview routes and their `preview` prop scaffolding
   > **Review gate M14.** Sub-step B complete: dashboard, events/calendar, vehicle detail, onboarding, costs, garage (+ invite accept), and book/complete action wiring. Remaining before done: remove temp preview routes; deferred surfaces (invite email via hono, per-member vehicle-access UI, provider call/email actions, template i18n names, viewer read-only UI, unaccent search).
 

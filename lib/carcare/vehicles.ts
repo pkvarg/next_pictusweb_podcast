@@ -42,20 +42,31 @@ export async function createVehicle(
   })
 }
 
-// Searchable make/model catalogue (substring match on make or model).
-export async function searchCatalogue(tx: Prisma.TransactionClient, query: string, limit = 20) {
+// Searchable make/model catalogue. Accent- and case-insensitive via Postgres
+// unaccent so "skoda" matches "Škoda" (extension enabled in CARCARE_PROD_DB_CHANGES).
+export interface CatalogueResult {
+  id: string
+  make: string
+  model: string
+  powertrain: Powertrain | null
+  yearFrom: number | null
+}
+
+export async function searchCatalogue(
+  tx: Prisma.TransactionClient,
+  query: string,
+  limit = 20,
+): Promise<CatalogueResult[]> {
   const q = query.trim()
   if (!q) return []
-  return tx.vehicleCatalogueEntry.findMany({
-    where: {
-      OR: [
-        { make: { contains: q, mode: 'insensitive' } },
-        { model: { contains: q, mode: 'insensitive' } },
-      ],
-    },
-    take: limit,
-    orderBy: [{ make: 'asc' }, { model: 'asc' }],
-  })
+  const like = `%${q}%`
+  return tx.$queryRaw<CatalogueResult[]>(Prisma.sql`
+    SELECT id, make, model, powertrain, year_from AS "yearFrom"
+    FROM vehicle_catalogue
+    WHERE unaccent(make) ILIKE unaccent(${like}) OR unaccent(model) ILIKE unaccent(${like})
+    ORDER BY make ASC, model ASC
+    LIMIT ${limit}
+  `)
 }
 
 // Powertrain- and country-applicable event templates for a vehicle. A template with an
