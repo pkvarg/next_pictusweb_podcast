@@ -18,7 +18,16 @@ export async function GET() {
 
     const memberships = await tx.garageMembership.findMany({
       where: { organizationId: session.organizationId! },
-      include: { user: { select: { id: true, firstName: true, lastName: true, email: true } } },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true } },
+        vehicleAccess: { select: { vehicleId: true } },
+      },
+      orderBy: { createdAt: 'asc' },
+    })
+
+    const vehicles = await tx.myVehicle.findMany({
+      where: { organizationId: session.organizationId!, deletedAt: null },
+      select: { id: true, registration: true, nickname: true, make: true, model: true },
       orderBy: { createdAt: 'asc' },
     })
 
@@ -36,7 +45,7 @@ export async function GET() {
       select: { firstName: true, lastName: true, email: true },
     })
 
-    return { role, isLegacyOwner, memberships, invitations, currentUser }
+    return { role, isLegacyOwner, memberships, invitations, currentUser, vehicles }
   })
 
   if (!data) return NextResponse.json({ error: 'No access' }, { status: 403 })
@@ -59,6 +68,7 @@ export async function GET() {
               email: data.currentUser?.email ?? null,
               isYou: true,
               implicit: true,
+              vehicleIds: [],
             },
           ]
         : data.memberships.map((m) => ({
@@ -68,6 +78,7 @@ export async function GET() {
             email: m.user.email,
             isYou: m.userId === session.userId,
             implicit: false,
+            vehicleIds: m.vehicleAccess.map((a) => a.vehicleId),
           })),
     invitations: data.invitations.map((i) => ({
       id: i.id,
@@ -75,6 +86,11 @@ export async function GET() {
       role: i.role,
       token: i.token,
       expiresAt: i.expiresAt,
+    })),
+    vehicles: data.vehicles.map((v) => ({
+      id: v.id,
+      name: v.nickname || [v.make, v.model].filter(Boolean).join(' ') || v.registration,
+      registration: v.registration,
     })),
   })
 }

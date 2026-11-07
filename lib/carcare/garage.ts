@@ -158,6 +158,14 @@ export async function grantVehicleAccess(
   })
 }
 
+export async function revokeVehicleAccess(
+  tx: Prisma.TransactionClient,
+  membershipId: string,
+  vehicleId: string,
+) {
+  await tx.vehicleAccess.deleteMany({ where: { membershipId, vehicleId } })
+}
+
 // Write access: can access the vehicle AND is not a read-only VIEWER.
 export async function canModifyVehicle(
   tx: Prisma.TransactionClient,

@@ -1,7 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { Users, UserPlus, X, Copy, Check, Loader2, Shield, Mail } from 'lucide-react'
+import {
+  Users,
+  UserPlus,
+  X,
+  Copy,
+  Check,
+  Loader2,
+  Shield,
+  Mail,
+  Car,
+  ChevronDown,
+} from 'lucide-react'
 import CarCareBottomNav from './CarCareBottomNav'
 
 export interface GarageMember {
@@ -11,6 +22,13 @@ export interface GarageMember {
   email: string | null
   isYou: boolean
   implicit: boolean
+  vehicleIds: string[]
+}
+
+export interface GarageVehicle {
+  id: string
+  name: string
+  registration: string
 }
 
 export interface GarageInvitationItem {
@@ -27,6 +45,7 @@ export interface GarageData {
   currentUserId: string
   members: GarageMember[]
   invitations: GarageInvitationItem[]
+  vehicles: GarageVehicle[]
 }
 
 const ROLE_LABEL: Record<string, string> = {
@@ -67,10 +86,37 @@ export default function CarCareGarageView({
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const [accessBusy, setAccessBusy] = useState<string | null>(null)
+
+  const toggleExpanded = (userId: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(userId)) next.delete(userId)
+      else next.add(userId)
+      return next
+    })
+
+  const toggleAccess = async (userId: string, vehicleId: string, grant: boolean) => {
+    setAccessBusy(`${userId}:${vehicleId}`)
+    try {
+      const res = await fetch(`/api/carcare/garage/members/${userId}/access`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehicleId, grant }),
+      })
+      if (res.ok) reload()
+    } finally {
+      setAccessBusy(null)
+    }
+  }
 
   const invite = async () => {
     setError(null)
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    setNotice(null)
+    const target = email.trim()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) {
       setError('Zadajte platný e-mail.')
       return
     }
@@ -79,12 +125,18 @@ export default function CarCareGarageView({
       const res = await fetch('/api/carcare/garage/invitations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), role }),
+        body: JSON.stringify({ email: target, role }),
       })
       if (!res.ok) {
         setError('Pozvánku sa nepodarilo vytvoriť.')
         return
       }
+      const data = await res.json().catch(() => ({}))
+      setNotice(
+        data?.emailSent
+          ? `Pozvánka odoslaná e-mailom na ${target}.`
+          : 'Pozvánka vytvorená. E-mail sa nepodarilo odoslať — skopírujte odkaz nižšie.',
+      )
       setEmail('')
       reload()
     } finally {
@@ -138,42 +190,91 @@ export default function CarCareGarageView({
         <section className="mb-8">
           <h2 className="text-xl font-bold mb-3">Členovia ({data.members.length})</h2>
           <div className="space-y-3">
-            {data.members.map((m) => (
-              <div
-                key={m.userId}
-                className="flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06]"
-              >
-                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0 text-sm text-gray-300">
-                  {initials(m)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-pictus-white font-medium truncate">
-                    {memberLabel(m)} {m.isYou && <span className="text-gray-400">(vy)</span>}
-                  </p>
-                  {m.email && m.name && <p className="text-sm text-gray-400 truncate">{m.email}</p>}
-                </div>
-                <span
-                  className={`shrink-0 inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full ${
-                    m.role === 'OWNER'
-                      ? 'bg-pictus-lime/15 text-pictus-lime border border-pictus-lime/30'
-                      : 'bg-white/5 text-gray-300 border border-white/10'
-                  }`}
+            {data.members.map((m) => {
+              const manageable = data.canManage && m.role !== 'OWNER' && data.vehicles.length > 0
+              const isOpen = expanded.has(m.userId)
+              return (
+                <div
+                  key={m.userId}
+                  className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06]"
                 >
-                  {m.role === 'OWNER' && <Shield className="w-3 h-3" />}
-                  {ROLE_LABEL[m.role]}
-                </span>
-                {data.canManage && !m.isYou && m.role !== 'OWNER' && (
-                  <button
-                    onClick={() => removeMember(m.userId)}
-                    disabled={busyId === m.userId}
-                    className="shrink-0 text-gray-500 hover:text-red-400 disabled:opacity-50"
-                    aria-label="Odobrať člena"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-            ))}
+                  <div className="flex items-center gap-3 p-4">
+                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0 text-sm text-gray-300">
+                      {initials(m)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-pictus-white font-medium truncate">
+                        {memberLabel(m)} {m.isYou && <span className="text-gray-400">(vy)</span>}
+                      </p>
+                      {m.email && m.name && (
+                        <p className="text-sm text-gray-400 truncate">{m.email}</p>
+                      )}
+                    </div>
+                    <span
+                      className={`shrink-0 inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full ${
+                        m.role === 'OWNER'
+                          ? 'bg-pictus-lime/15 text-pictus-lime border border-pictus-lime/30'
+                          : 'bg-white/5 text-gray-300 border border-white/10'
+                      }`}
+                    >
+                      {m.role === 'OWNER' && <Shield className="w-3 h-3" />}
+                      {ROLE_LABEL[m.role]}
+                    </span>
+                    {manageable && (
+                      <button
+                        onClick={() => toggleExpanded(m.userId)}
+                        className="shrink-0 inline-flex items-center gap-1 text-xs text-gray-400 hover:text-pictus-white"
+                        aria-label="Prístup k vozidlám"
+                      >
+                        <Car className="w-4 h-4" />
+                        {m.vehicleIds.length}/{data.vehicles.length}
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        />
+                      </button>
+                    )}
+                    {data.canManage && !m.isYou && m.role !== 'OWNER' && (
+                      <button
+                        onClick={() => removeMember(m.userId)}
+                        disabled={busyId === m.userId}
+                        className="shrink-0 text-gray-500 hover:text-red-400 disabled:opacity-50"
+                        aria-label="Odobrať člena"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                  {manageable && isOpen && (
+                    <div className="border-t border-white/[0.06] px-4 py-3">
+                      <p className="text-xs text-gray-500 mb-2">Prístup k vozidlám</p>
+                      <div className="space-y-1">
+                        {data.vehicles.map((v) => {
+                          const has = m.vehicleIds.includes(v.id)
+                          const key = `${m.userId}:${v.id}`
+                          return (
+                            <label
+                              key={v.id}
+                              className="flex items-center justify-between gap-3 py-1.5 cursor-pointer"
+                            >
+                              <span className="text-sm text-pictus-white truncate">
+                                {v.name} <span className="text-gray-500">· {v.registration}</span>
+                              </span>
+                              <input
+                                type="checkbox"
+                                checked={has}
+                                disabled={accessBusy === key}
+                                onChange={(e) => toggleAccess(m.userId, v.id, e.target.checked)}
+                                className="w-4 h-4 accent-pictus-lime shrink-0 disabled:opacity-50"
+                              />
+                            </label>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </section>
 
@@ -214,6 +315,7 @@ export default function CarCareGarageView({
                 </button>
               </div>
               {error && <p className="text-sm text-red-400">{error}</p>}
+              {notice && <p className="text-sm text-pictus-lime">{notice}</p>}
               <p className="text-xs text-gray-500">
                 Člen môže spravovať pridelené vozidlá, prehliadač ich vidí iba na čítanie. Po
                 vytvorení pozvánky skopírujte odkaz a pošlite ho pozvanému.
