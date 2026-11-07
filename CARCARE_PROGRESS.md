@@ -130,13 +130,15 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [ ] invitation **email** send (hono) + roles/members **UI** → **M14**
   > **Review gate M11.** Roles/access/invitations/owner-fallback/GDPR backend delivered & tested; UI + invite-email are M14/surfaces.
 
-## M12 — Vehicles & catalogue
+## M12 — Vehicles & catalogue ← _backend done on local, awaiting review_
 
-- [ ] MVP · Add/edit/archive vehicle; vehicle nickname and identifiers
-- [ ] MVP · Make, model, year and powertrain; current mileage and updates; country of registration
-- [ ] MVP · Searchable make/model catalogue; manual vehicle entry
-- [ ] MVP · Store VIN and EČV; vehicle technical profile; powertrain-specific event suggestions
-  > **Review gate M12.**
+- [x] MVP · `createVehicle` (`lib/carcare/vehicles.ts`); edit/archive via existing MyVehicle CRUD + `deletedAt` (reuse); nickname + identifiers
+- [x] MVP · Make, model, year, powertrain (`Powertrain` enum), country columns added; mileage reuse (`my_vehicle_mileages`)
+- [x] MVP · Searchable make/model catalogue (`vehicle_catalogue` + `searchCatalogue`, 10-row sample seed); manual entry
+- [x] MVP · Store VIN (new) + EČV (existing `registration`); `suggestTemplatesForVehicle` (powertrain + country applicability)
+- [x] Integration tests (`tests/carcare/vehicles.itest.ts`): catalogue search, structured create, template suggestion
+- [ ] catalogue real-data import (seed is a 10-row sample); onboarding/vehicle-edit **UI** → **M14**
+  > **Review gate M12.** Schema + create/search/suggest backend delivered & tested; real catalogue data + UI are M14/import.
 
 ## M13 — Event catalogue & Slovak templates
 

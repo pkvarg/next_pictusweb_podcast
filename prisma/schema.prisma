@@ -242,6 +242,12 @@ model MyVehicle {
   organizationRelation Organization          @relation(fields: [organizationId], references: [id])
   type                 String                @db.VarChar(100)
   registration         String                @db.VarChar(20)
+  nickname             String?               @db.VarChar(100)
+  make                 String?               @db.VarChar(60)
+  model                String?               @db.VarChar(60)
+  powertrain           Powertrain?
+  country              String?               @db.VarChar(2)
+  vin                  String?               @db.VarChar(20)
   year                 Int?
   image                String?
   note                 String?               @db.Text
@@ -955,4 +961,34 @@ model GarageInvitation {
   @@index([organizationId])
   @@index([email])
   @@map("garage_invitations")
+}
+
+// ============================================================================
+// CarCare — M12 (vehicle powertrain + make/model catalogue)
+// ============================================================================
+
+enum Powertrain {
+  PETROL
+  DIESEL
+  MHEV
+  HEV
+  PHEV
+  BEV
+  LPG
+  CNG
+  HYDROGEN
+  OTHER
+}
+
+model VehicleCatalogueEntry {
+  id         String      @id @default(uuid())
+  make       String      @db.VarChar(60)
+  model      String      @db.VarChar(60)
+  powertrain Powertrain?
+  yearFrom   Int?        @map("year_from")
+  yearTo     Int?        @map("year_to")
+
+  @@unique([make, model, powertrain])
+  @@index([make])
+  @@map("vehicle_catalogue")
 }

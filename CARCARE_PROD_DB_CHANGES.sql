@@ -120,3 +120,15 @@ ALTER TABLE "recurring_events" ADD CONSTRAINT "recurring_events_preferred_provid
 -- Tables: garage_memberships (unique org+user), vehicle_access (unique membership+vehicle),
 --         garage_invitations (unique token). FKs cascade from organization/user/vehicle.
 -- Authoritative SQL: the migration file above / `prisma migrate deploy`.
+
+
+-- ----------------------------------------------------------------------------
+-- M12 — Vehicle powertrain + make/model catalogue
+--      STATUS: APPLIED on local :5434 (2026-11-07)
+--      Prisma migration: prisma/migrations/20261107200000_carcare_vehicle_catalogue_m12
+-- ----------------------------------------------------------------------------
+-- Additive. Enum Powertrain. New nullable columns on my_vehicles: nickname, make,
+-- model, powertrain, country, vin. New table vehicle_catalogue (unique make+model+powertrain)
+-- with a MINIMAL sample seed (10 rows) — replace/extend with a real catalogue import on prod.
+-- NOTE: the seed uses gen_random_uuid() (built-in on PG13+).
+-- Authoritative SQL: the migration file above / `prisma migrate deploy`.
