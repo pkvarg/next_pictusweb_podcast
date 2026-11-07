@@ -28,6 +28,7 @@ export default function CarCareAcceptInvitePage({
   const router = useRouter()
 
   const [accept, setAccept] = useState<'working' | 'done' | 'error'>('working')
+  const [mismatch, setMismatch] = useState(false)
   const started = useRef(false)
 
   const [info, setInfo] = useState<InviteInfo | null>(null)
@@ -54,7 +55,15 @@ export default function CarCareAcceptInvitePage({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
     })
-      .then((r) => setAccept(r.ok ? 'done' : 'error'))
+      .then(async (r) => {
+        if (r.ok) {
+          setAccept('done')
+          return
+        }
+        const d = await r.json().catch(() => ({}))
+        setMismatch(d?.error === 'EMAIL_MISMATCH')
+        setAccept('error')
+      })
       .catch(() => setAccept('error'))
   }, [status, token])
 
@@ -137,7 +146,11 @@ export default function CarCareAcceptInvitePage({
           <>
             <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto" />
             <h1 className="mt-4 text-2xl font-light">Pozvánku sa nepodarilo prijať</h1>
-            <p className="mt-2 text-gray-400">Odkaz je neplatný, už bol použitý alebo vypršal.</p>
+            <p className="mt-2 text-gray-400">
+              {mismatch
+                ? 'Táto pozvánka je určená pre iný e-mail. Odhláste sa a prihláste sa účtom, na ktorý bola pozvánka poslaná.'
+                : 'Odkaz je neplatný, už bol použitý alebo vypršal.'}
+            </p>
             <Link
               href="/carcare"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-pictus-lime px-5 py-2.5 font-semibold text-pictus-black hover:bg-pictus-lime600 transition-colors"

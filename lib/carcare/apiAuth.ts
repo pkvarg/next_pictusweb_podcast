@@ -9,6 +9,9 @@ export interface CarCareSession {
 }
 
 // Resolves the signed-in user for CarCare API routes. Returns null when unauthenticated.
+// The active garage org is the org the user owns/belongs to as a garage member, not
+// necessarily their account's home org: an invited member's home org (e.g. a PicDocs
+// org) differs from the garage they joined, so prefer a membership org.
 export async function resolveCarCareSession(): Promise<CarCareSession | null> {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) return null
@@ -17,5 +20,17 @@ export async function resolveCarCareSession(): Promise<CarCareSession | null> {
     select: { id: true, organizationId: true, role: true },
   })
   if (!user) return null
-  return { userId: user.id, organizationId: user.organizationId, role: user.role }
+
+  let organizationId = user.organizationId
+  const memberships = await prisma.garageMembership.findMany({
+    where: { userId: user.id },
+    select: { organizationId: true },
+    orderBy: { createdAt: 'asc' },
+  })
+  if (memberships.length > 0) {
+    const own = memberships.find((m) => m.organizationId === user.organizationId)
+    organizationId = own ? user.organizationId : memberships[0].organizationId
+  }
+
+  return { userId: user.id, organizationId, role: user.role }
 }

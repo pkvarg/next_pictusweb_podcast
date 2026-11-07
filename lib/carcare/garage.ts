@@ -52,6 +52,8 @@ export async function canAccessVehicle(
   })
   if (membership) {
     if (membership.role === 'OWNER') return true
+    const accessCount = await tx.vehicleAccess.count({ where: { membershipId: membership.id } })
+    if (accessCount === 0) return true
     const access = await tx.vehicleAccess.findUnique({
       where: { membershipId_vehicleId: { membershipId: membership.id, vehicleId } },
     })
@@ -137,6 +139,11 @@ export async function acceptInvitation(
     throw new Error('invitation expired')
   }
 
+  const user = await tx.user.findUnique({ where: { id: userId }, select: { email: true } })
+  if (!user || user.email.toLowerCase().trim() !== inv.email.toLowerCase().trim()) {
+    throw new Error('EMAIL_MISMATCH')
+  }
+
   const membership = await tx.garageMembership.upsert({
     where: { organizationId_userId: { organizationId: inv.organizationId, userId } },
     create: { organizationId: inv.organizationId, userId, role: inv.role },
@@ -211,6 +218,13 @@ export async function listAccessibleVehicleIds(
       where: { membershipId: membership.id },
       select: { vehicleId: true },
     })
+    if (access.length === 0) {
+      const vs = await tx.myVehicle.findMany({
+        where: { organizationId, deletedAt: null },
+        select: { id: true },
+      })
+      return vs.map((v) => v.id)
+    }
     return access.map((a) => a.vehicleId)
   }
   return []

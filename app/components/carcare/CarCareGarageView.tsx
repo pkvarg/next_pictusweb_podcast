@@ -227,7 +227,9 @@ export default function CarCareGarageView({
                         aria-label="Prístup k vozidlám"
                       >
                         <Car className="w-4 h-4" />
-                        {m.vehicleIds.length}/{data.vehicles.length}
+                        {m.vehicleIds.length === 0
+                          ? 'všetky'
+                          : `${m.vehicleIds.length}/${data.vehicles.length}`}
                         <ChevronDown
                           className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                         />
@@ -246,7 +248,10 @@ export default function CarCareGarageView({
                   </div>
                   {manageable && isOpen && (
                     <div className="border-t border-white/[0.06] px-4 py-3">
-                      <p className="text-xs text-gray-500 mb-2">Prístup k vozidlám</p>
+                      <p className="text-xs text-gray-500 mb-2">
+                        Prístup k vozidlám — bez výberu vidí všetky; zaškrtnutím obmedzíte na
+                        vybrané
+                      </p>
                       <div className="space-y-1">
                         {data.vehicles.map((v) => {
                           const has = m.vehicleIds.includes(v.id)
