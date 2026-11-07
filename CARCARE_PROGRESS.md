@@ -160,13 +160,15 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [x] `POST /api/carcare/occurrences/:id/complete`; `POST /api/carcare/appointments`, `POST /api/carcare/appointments/:id/cancel`
 - [x] All auth-gated (`resolveCarCareSession`), same-origin guarded (mutations), vehicle access/role enforced; typecheck + lint clean
 
-### Sub-step B — React pages (next)
+### Sub-step B — React pages (in progress)
 
-- [ ] MVP · Action-first home: action cards, deadlines, booked appointments, responsibility, recently completed, vehicle filters
+- [x] MVP · Action-first home dashboard: `CarCareDashboardView` + `/[locale]/carcare` page (auth-guarded, fetches `/api/carcare/dashboard`); KPI cards, needs-attention/upcoming list with status badges + actions, vehicles, bottom nav — **visually verified in dev preview vs Eva's mockup**
 - [ ] MVP · Events list + calendar (due dates vs appointment dates)
-- [ ] MVP · Responsive nav Home / Events / Garage / Costs / More
+- [ ] MVP · Garage / vehicle detail / onboarding pages; Costs page
+- [ ] wire action buttons (book / complete / activate) to the API endpoints
 - [ ] Deferred surfaces land here: provider call/email/booking actions, roles/members UI + invite email (hono), template i18n names, viewer read-only enforcement in UI
-  > **Review gate M14.** API contract done & typechecked; pages built next (with the browser preview to iterate on the look).
+- _temporary `/[locale]/carcare/preview` mock route exists for design iteration — remove before shipping_
+  > **Review gate M14.** API done; dashboard page built & previewed. Remaining pages next.
 
 ## M15 — PWA + web push
 
