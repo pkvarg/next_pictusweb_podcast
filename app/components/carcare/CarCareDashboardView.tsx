@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Plus,
 } from 'lucide-react'
+import { Link } from '@/i18n/routing'
 
 export interface DashOccurrence {
   id: string
@@ -161,9 +162,12 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold">Najbližšie udalosti</h2>
-            <a href="events" className="text-sm text-pictus-lime hover:text-pictus-lime600">
+            <Link
+              href="/carcare/events"
+              className="text-sm text-pictus-lime hover:text-pictus-lime600"
+            >
               Zobraziť všetky
-            </a>
+            </Link>
           </div>
           {events.length === 0 ? (
             <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
@@ -181,18 +185,18 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold">Moje vozidlá ({data.vehicles.length})</h2>
-            <a
-              href="garage"
+            <Link
+              href="/carcare/vehicles/new"
               className="text-sm text-pictus-lime hover:text-pictus-lime600 inline-flex items-center gap-1"
             >
               <Plus className="w-4 h-4" /> Pridať vozidlo
-            </a>
+            </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {data.vehicles.map((v) => (
-              <a
+              <Link
                 key={v.id}
-                href={`vehicles/${v.id}`}
+                href={`/carcare/vehicles/${v.id}`}
                 className="p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] flex items-center gap-3 hover:border-white/20 transition-colors"
               >
                 <div className="w-10 h-10 rounded-xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
@@ -206,7 +210,7 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
                   </p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
-              </a>
+              </Link>
             ))}
           </div>
         </section>

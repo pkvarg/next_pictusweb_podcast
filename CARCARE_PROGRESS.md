@@ -164,12 +164,15 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 
 - [x] MVP · Action-first home dashboard: `CarCareDashboardView` + `/[locale]/carcare` page (auth-guarded, fetches `/api/carcare/dashboard`); KPI cards, needs-attention/upcoming list with status badges + actions, vehicles, bottom nav — **visually verified in dev preview vs Eva's mockup**
 - [x] MVP · Events list + calendar: `GET /api/carcare/occurrences` (access-scoped, filters, overdue flag) + `CarCareEventsView` + `/[locale]/carcare/events` page; Zoznam/Kalendár toggle, status badges, Monday-first month calendar (amber=due, lime=appointment) — **visually verified** (commit `4f1c242`)
-- [x] MVP · Vehicle detail: `GET /api/carcare/vehicles/:id` (spec, open events, history, cost-this-year, latest mileage, not-yet-activated template suggestions) + `CarCareVehicleDetailView` + `/[locale]/carcare/vehicles/[id]` page; mileage/cost KPIs, events with actions, "Sledovať" activation (wired to `/events/activate`), history, note, spec table — **visually verified** (uncommitted)
-- [ ] MVP · Garage / onboarding pages; Costs page
+- [x] MVP · Vehicle detail: `GET /api/carcare/vehicles/:id` (spec, open events, history, cost-this-year, latest mileage, not-yet-activated template suggestions) + `CarCareVehicleDetailView` + `/[locale]/carcare/vehicles/[id]` page; mileage/cost KPIs, events with actions, "Sledovať" activation (wired to `/events/activate`), history, note, spec table — **visually verified** (commit `2eb6fae`)
+- [x] MVP · Onboarding / add vehicle: `CarCareAddVehicleView` + `/[locale]/carcare/vehicles/new` page; debounced catalogue search (`/api/carcare/catalogue`) prefilling make/model/powertrain + manual fields, `POST /api/carcare/vehicles` then redirect to detail (where template suggestions offer activation) — **visually verified**
+- [x] Nav fix: all CarCare internal links use next-intl `Link` with absolute `/carcare/...` paths (relative hrefs were resolving against `/[locale]/` and 404ing); dashboard "Pridať vozidlo"/"Zobraziť všetky"/vehicle cards + detail/add "Späť"
+- [x] App-wide: added root `app/not-found.tsx` (self-contained html/body) + `app/[locale]/not-found.tsx`; previously any 404 crashed with "Missing <html> and <body> tags" because the root layout has no html/body (those live in `[locale]/layout.tsx`)
+- [ ] MVP · Garage page; Costs page
 - [ ] wire remaining action buttons (book / complete) to the API endpoints
-- [ ] Deferred surfaces land here: provider call/email/booking actions, roles/members UI + invite email (hono), template i18n names, viewer read-only enforcement in UI
-- _temporary mock routes exist for design iteration — remove before shipping: `/[locale]/carcare/preview`, `/[locale]/carcare/events/preview`, `/[locale]/carcare/vehicles/preview`_
-  > **Review gate M14.** API done; dashboard + events/calendar + vehicle detail built & previewed. Garage / onboarding / costs next.
+- [ ] Deferred surfaces land here: provider call/email/booking actions, roles/members UI + invite email (hono), template i18n names, viewer read-only enforcement in UI; accent-insensitive catalogue search (Postgres `unaccent`)
+- _temporary mock routes exist for design iteration — remove before shipping: `/[locale]/carcare/preview`, `/[locale]/carcare/events/preview`, `/[locale]/carcare/vehicles/preview`, `/[locale]/carcare/vehicles/new/preview`_
+  > **Review gate M14.** API done; dashboard + events/calendar + vehicle detail + onboarding built & previewed. Garage / costs next.
 
 ## M15 — PWA + web push
 
