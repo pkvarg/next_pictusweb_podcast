@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")  
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Blog {
@@ -19,6 +19,8 @@ model Blog {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deleted   Boolean?
+
+  @@map("blogs")
 }
 
 model Podcast {
@@ -36,6 +38,8 @@ model Podcast {
   deleted     Boolean  @default(false)
   voiceType   String?
   published   Boolean  @default(false)
+
+  @@map("podcasts")
 }
 
 model UsedImages {
@@ -45,6 +49,8 @@ model UsedImages {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   reallyUsed   Boolean?
+
+  @@map("used_images")
 }
 
 model UsedPodcasts {
@@ -54,50 +60,66 @@ model UsedPodcasts {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   reallyUsed   Boolean?
+
+  @@map("used_podcasts")
 }
 
 model VisitorsCounter {
   id        String   @id @default(uuid())
   count     Int      @default(0)
   updatedAt DateTime @updatedAt
+
+  @@map("visitors_counters")
 }
 
 model User {
-  id                   String                 @id @default(uuid())
-  email                String                 @unique
+  id                   String        @id @default(uuid())
+  email                String        @unique
   password             String?
-  role                 Role                   @default(CLIENT)
+  role                 Role          @default(CLIENT)
   emailVerified        DateTime?
   image                String?
   lastLoggedIn         DateTime?
-  loginCount           Int                    @default(0)
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
-  active               Boolean                @default(true)
+  loginCount           Int           @default(0)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  active               Boolean       @default(true)
   deletedAt            DateTime?
   firstName            String?
   lastName             String?
-  phoneNumber          String?                @map("phone_number") @db.VarChar(20)
-  organizationId       String?                @map("organization_id")
-  organizationRelation Organization?          @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  isFleetManager       Boolean                @default(false)
+  phoneNumber          String?       @map("phone_number") @db.VarChar(20)
+  organizationId       String?       @map("organization_id")
+  organizationRelation Organization? @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  isFleetManager       Boolean       @default(false)
   loginProvider        String?
 
-  phoneVerified        DateTime?              @map("phone_verified")
-  // Benefit fields
-  isBenefit              Boolean    @default(false)   @map("is_benefit")
-  benefitParentOrgId     String?    @db.Uuid          @map("benefit_parent_org_id")
-  benefitGdprAccepted    Boolean    @default(false)   @map("benefit_gdpr_accepted")
-  benefitGdprAcceptedAt  DateTime?                    @map("benefit_gdpr_accepted_at")
-  benefitTermsAccepted   Boolean    @default(false)   @map("benefit_terms_accepted")
-  benefitTermsAcceptedAt DateTime?                    @map("benefit_terms_accepted_at")
-  benefitActivationToken String?    @unique           @map("benefit_activation_token")
+  // CarCare notification preferences
+  timezone         String    @default("Europe/Bratislava")
+  quietHoursStart  Int?      @map("quiet_hours_start")
+  quietHoursEnd    Int?      @map("quiet_hours_end")
+  channelOptIns    Channel[] @map("channel_opt_ins")
+  smsMonthlyLimit  Int       @default(20) @map("sms_monthly_limit")
+  smsSentThisMonth Int       @default(0) @map("sms_sent_this_month")
 
-  vehicles             MyVehicle[]
-  vehicleExpenses      MyVehicleExpense[]
-  vehicleMileage       MyVehicleMileage[]
-  vehicleNotifications VehicleNotification[]
-  picDocsRuns          PicDocsRun[]
+  phoneVerified          DateTime? @map("phone_verified")
+  // Benefit fields
+  isBenefit              Boolean   @default(false) @map("is_benefit")
+  benefitParentOrgId     String?   @map("benefit_parent_org_id") @db.Uuid
+  benefitGdprAccepted    Boolean   @default(false) @map("benefit_gdpr_accepted")
+  benefitGdprAcceptedAt  DateTime? @map("benefit_gdpr_accepted_at")
+  benefitTermsAccepted   Boolean   @default(false) @map("benefit_terms_accepted")
+  benefitTermsAcceptedAt DateTime? @map("benefit_terms_accepted_at")
+  benefitActivationToken String?   @unique @map("benefit_activation_token")
+
+  vehicles               MyVehicle[]
+  vehicleExpenses        MyVehicleExpense[]
+  vehicleMileage         MyVehicleMileage[]
+  vehicleNotifications   VehicleNotification[]
+  picDocsRuns            PicDocsRun[]
+  responsibleEvents      RecurringEvent[]
+  notificationDeliveries NotificationDelivery[]
+
+  @@map("users")
 }
 
 model VehicleNotification {
@@ -110,7 +132,7 @@ model VehicleNotification {
   aggressiveStart      DateTime?     @map("aggressive_start")
   aggressiveEnd        DateTime?     @map("aggressive_end")
   aggressiveDaysSent   Int           @default(0) @map("aggressive_days_sent")
-  organizationId       String?       @map("organization_id")  // TEXT to match organizations.id
+  organizationId       String?       @map("organization_id") // TEXT to match organizations.id
   organization         Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   personName           String?       @db.VarChar(100)
   email                String?       @db.VarChar(150)
@@ -145,7 +167,7 @@ model VehicleNotification {
   @@index([renewedFromBatchId])
   @@index([isAggressiveMode])
   @@index([organizationId])
-  @@map("vehiclenotification")
+  @@map("vehicle_notifications")
 }
 
 model BotLog {
@@ -163,6 +185,8 @@ model BotLog {
   locale           String?
   origin           String?
   createdAt        DateTime @default(now())
+
+  @@map("bot_logs")
 }
 
 model ContactLog {
@@ -181,6 +205,8 @@ model ContactLog {
   timeSpent      Int?
   emailSent      Boolean  @default(false)
   createdAt      DateTime @default(now())
+
+  @@map("contact_logs")
 }
 
 model IPReputation {
@@ -206,26 +232,28 @@ model ConfirmationLog {
   timestamp      DateTime @default(now())
 
   @@index([notificationId])
-  @@map("confirmation_log")
+  @@map("confirmation_logs")
 }
 
 model MyVehicle {
-  id                    String                 @id @default(uuid())
-  organizationId        String                 @map("organization_id")
-  organizationRelation  Organization           @relation(fields: [organizationId], references: [id])
-  type                  String                 @db.VarChar(100)
-  registration          String                 @db.VarChar(20)
-  year                  Int?
-  image                 String?
-  note                  String?                @db.Text
-  createdAt             DateTime               @default(now()) @map("created_at")
-  updatedAt             DateTime               @updatedAt @map("updated_at")
-  deletedAt             DateTime?              @map("deleted_at")
-  userId                String                 @map("user_id")
-  user                  User                   @relation(fields: [userId], references: [id])
-  expenses              MyVehicleExpense[]
-  mileageRecords        MyVehicleMileage[]
-  vehicleNotifications  VehicleNotification[]
+  id                   String                @id @default(uuid())
+  organizationId       String                @map("organization_id")
+  organizationRelation Organization          @relation(fields: [organizationId], references: [id])
+  type                 String                @db.VarChar(100)
+  registration         String                @db.VarChar(20)
+  year                 Int?
+  image                String?
+  note                 String?               @db.Text
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+  deletedAt            DateTime?             @map("deleted_at")
+  userId               String                @map("user_id")
+  user                 User                  @relation(fields: [userId], references: [id])
+  expenses             MyVehicleExpense[]
+  mileageRecords       MyVehicleMileage[]
+  vehicleNotifications VehicleNotification[]
+  recurringEvents      RecurringEvent[]
+  eventOccurrences     EventOccurrence[]
 
   @@index([userId])
   @@index([organizationId])
@@ -233,21 +261,21 @@ model MyVehicle {
 }
 
 model MyVehicleExpense {
-  id                   String        @id @default(uuid())
-  vehicleId            String        @map("vehicle_id")
-  vehicle              MyVehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  organizationId       String        @map("organization_id")
-  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
-  item                 String        @db.VarChar(200)
-  cost         Decimal    @db.Decimal(10, 2)
-  date         DateTime
-  note         String?    @db.VarChar(500)
-  link         String?    @db.VarChar(500)
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
-  deletedAt    DateTime?  @map("deleted_at")
-  userId       String     @map("user_id")
-  user         User       @relation(fields: [userId], references: [id])
+  id                   String       @id @default(uuid())
+  vehicleId            String       @map("vehicle_id")
+  vehicle              MyVehicle    @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  organizationId       String       @map("organization_id")
+  organizationRelation Organization @relation(fields: [organizationId], references: [id])
+  item                 String       @db.VarChar(200)
+  cost                 Decimal      @db.Decimal(10, 2)
+  date                 DateTime
+  note                 String?      @db.VarChar(500)
+  link                 String?      @db.VarChar(500)
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+  deletedAt            DateTime?    @map("deleted_at")
+  userId               String       @map("user_id")
+  user                 User         @relation(fields: [userId], references: [id])
 
   @@index([vehicleId])
   @@index([userId])
@@ -256,24 +284,24 @@ model MyVehicleExpense {
 }
 
 model MyVehicleMileage {
-  id                   String        @id @default(uuid())
-  vehicleId            String        @map("vehicle_id")
-  vehicle              MyVehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  organizationId       String        @map("organization_id")
-  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
+  id                   String       @id @default(uuid())
+  vehicleId            String       @map("vehicle_id")
+  vehicle              MyVehicle    @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  organizationId       String       @map("organization_id")
+  organizationRelation Organization @relation(fields: [organizationId], references: [id])
   kilometers           Int
-  date       DateTime
-  note       String?    @db.Text
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @updatedAt @map("updated_at")
-  deletedAt  DateTime?  @map("deleted_at")
-  userId     String     @map("user_id")
-  user       User       @relation(fields: [userId], references: [id])
+  date                 DateTime
+  note                 String?      @db.Text
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+  deletedAt            DateTime?    @map("deleted_at")
+  userId               String       @map("user_id")
+  user                 User         @relation(fields: [userId], references: [id])
 
   @@index([vehicleId])
   @@index([userId])
   @@index([organizationId])
-  @@map("my_vehicle_mileage")
+  @@map("my_vehicle_mileages")
 }
 
 enum Role {
@@ -287,121 +315,126 @@ enum Product {
 }
 
 model Tier {
-  id                      String         @id @default(uuid())
-  name                    String         @unique @db.VarChar(50)
-  usersLimit              Int            @map("users_limit")
-  vehiclesLimit           Int            @map("vehicles_limit")
-  notificationsLimit      Int            @map("notifications_limit")
-  templatesLimit          Int            @map("templates_limit")
-  notificationTypesLimit  Int            @map("notification_types_limit")
-  pricePerVehicle         Decimal?       @map("price_per_vehicle") @db.Decimal(10, 2)
-  pricePerVehicleYearly   Decimal?       @map("price_per_vehicle_yearly") @db.Decimal(10, 2)
-  yearlyDiscount          Decimal?       @map("yearly_discount") @db.Decimal(4, 2)
-  stripePriceMonthly      String?        @map("stripe_price_monthly") @db.VarChar(100)
-  stripePriceYearly       String?        @map("stripe_price_yearly") @db.VarChar(100)
-  createdAt               DateTime       @default(now()) @map("created_at")
-  updatedAt               DateTime       @updatedAt @map("updated_at")
-  deletedAt               DateTime?      @map("deleted_at")
+  id                     String    @id @default(uuid())
+  name                   String    @unique @db.VarChar(50)
+  usersLimit             Int       @map("users_limit")
+  vehiclesLimit          Int       @map("vehicles_limit")
+  notificationsLimit     Int       @map("notifications_limit")
+  templatesLimit         Int       @map("templates_limit")
+  notificationTypesLimit Int       @map("notification_types_limit")
+  pricePerVehicle        Decimal?  @map("price_per_vehicle") @db.Decimal(10, 2)
+  pricePerVehicleYearly  Decimal?  @map("price_per_vehicle_yearly") @db.Decimal(10, 2)
+  yearlyDiscount         Decimal?  @map("yearly_discount") @db.Decimal(4, 2)
+  stripePriceMonthly     String?   @map("stripe_price_monthly") @db.VarChar(100)
+  stripePriceYearly      String?   @map("stripe_price_yearly") @db.VarChar(100)
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+  deletedAt              DateTime? @map("deleted_at")
 
   // Note: This relation field is required by Prisma ORM for querying.
   // It does NOT create a database column - only Organization has tier_id FK.
-  organizations           Organization[]
-  pendingOnboardings      PendingOnboarding[]
+  organizations      Organization[]
+  pendingOnboardings PendingOnboarding[]
 
   @@map("tiers")
 }
 
 model Organization {
-  id                              String         @id @default(uuid())
-  name                            String         @db.VarChar(100)
-  mainContact                     String?        @map("main_contact") @db.VarChar(100)
+  id          String  @id @default(uuid())
+  name        String  @db.VarChar(100)
+  mainContact String? @map("main_contact") @db.VarChar(100)
 
   // Which product this organization uses (FleetSync by default so existing orgs are untouched)
-  product                         Product        @default(FLEETSYNC)
+  product Product @default(FLEETSYNC)
 
   // Tier reference
-  tierId                          String?        @map("tier_id")
-  tierRelation                    Tier?          @relation(fields: [tierId], references: [id])
+  tierId       String? @map("tier_id")
+  tierRelation Tier?   @relation(fields: [tierId], references: [id])
 
   // Live tracking columns (count of rows with deletedAt = NULL)
-  currentUsersCount               Int            @default(0) @map("current_users_count")
-  currentVehiclesCount            Int            @default(0) @map("current_vehicles_count")
-  currentNotificationsCount       Int            @default(0) @map("current_notifications_count")
-  currentTemplatesCount           Int            @default(0) @map("current_templates_count")
-  currentNotificationTypesCount   Int            @default(0) @map("current_notification_types_count")
+  currentUsersCount             Int @default(0) @map("current_users_count")
+  currentVehiclesCount          Int @default(0) @map("current_vehicles_count")
+  currentNotificationsCount     Int @default(0) @map("current_notifications_count")
+  currentTemplatesCount         Int @default(0) @map("current_templates_count")
+  currentNotificationTypesCount Int @default(0) @map("current_notification_types_count")
 
   // Notification usage tracking
-  notificationPeriodStart         DateTime?      @map("notification_period_start")
-  notificationsBlocked            Boolean        @default(false) @map("notifications_blocked")
+  notificationPeriodStart DateTime? @map("notification_period_start")
+  notificationsBlocked    Boolean   @default(false) @map("notifications_blocked")
 
   // Org-level limit overrides (fallback to tier if null)
-  usersLimit                      Int?           @map("users_limit")
-  vehiclesLimit                   Int?           @map("vehicles_limit")
-  notificationsLimit              Int?           @map("notifications_limit")
-  templatesLimit                  Int?           @map("templates_limit")
-  notificationTypesLimit          Int?           @map("notification_types_limit")
-  purchasedVehicles               Int?           @map("purchased_vehicles")
-  hiddenFromPictusaci             Boolean        @default(false) @map("hidden_from_pictusaci")
+  usersLimit             Int?    @map("users_limit")
+  vehiclesLimit          Int?    @map("vehicles_limit")
+  notificationsLimit     Int?    @map("notifications_limit")
+  templatesLimit         Int?    @map("templates_limit")
+  notificationTypesLimit Int?    @map("notification_types_limit")
+  purchasedVehicles      Int?    @map("purchased_vehicles")
+  hiddenFromPictusaci    Boolean @default(false) @map("hidden_from_pictusaci")
 
   // Stripe billing
-  stripeCustomerId                String?        @unique @map("stripe_customer_id") @db.VarChar(100)
-  stripeSubscriptionId            String?        @unique @map("stripe_subscription_id") @db.VarChar(100)
-  stripeSubscriptionStatus        String?        @map("stripe_subscription_status") @db.VarChar(30)
-  billingInterval                 String?        @map("billing_interval") @db.VarChar(10)
-  subscriptionStartDate           DateTime?      @map("subscription_start_date")
-  subscriptionEndDate             DateTime?      @map("subscription_end_date")
+  stripeCustomerId         String?   @unique @map("stripe_customer_id") @db.VarChar(100)
+  stripeSubscriptionId     String?   @unique @map("stripe_subscription_id") @db.VarChar(100)
+  stripeSubscriptionStatus String?   @map("stripe_subscription_status") @db.VarChar(30)
+  billingInterval          String?   @map("billing_interval") @db.VarChar(10)
+  subscriptionStartDate    DateTime? @map("subscription_start_date")
+  subscriptionEndDate      DateTime? @map("subscription_end_date")
 
   // Upgrade & free trial
-  pendingTierId                   String?        @map("pending_tier_id")
-  pendingTierStartsAt             DateTime?      @map("pending_tier_starts_at")
-  freeTrialEndDate                DateTime?      @map("free_trial_end_date")
-  freeTrialTierId                 String?        @map("free_trial_tier_id")
+  pendingTierId       String?   @map("pending_tier_id")
+  pendingTierStartsAt DateTime? @map("pending_tier_starts_at")
+  freeTrialEndDate    DateTime? @map("free_trial_end_date")
+  freeTrialTierId     String?   @map("free_trial_tier_id")
 
   // Invoicing / business identification
-  ico                             String?        @db.VarChar(20)
-  dic                             String?        @db.VarChar(20)
-  street                          String?        @db.VarChar(200)
-  city                            String?        @db.VarChar(100)
-  postalCode                      String?        @map("postal_code") @db.VarChar(20)
-  country                         String?        @db.VarChar(100)
+  ico        String? @db.VarChar(20)
+  dic        String? @db.VarChar(20)
+  street     String? @db.VarChar(200)
+  city       String? @db.VarChar(100)
+  postalCode String? @map("postal_code") @db.VarChar(20)
+  country    String? @db.VarChar(100)
 
   // Onboarding
-  onboardedBy                     String?        @map("onboarded_by") @db.VarChar(255)
-  agentConsentBy                  String?        @map("agent_consent_by") @db.VarChar(255)
-  agentConsentAt                  DateTime?      @map("agent_consent_at")
+  onboardedBy    String?   @map("onboarded_by") @db.VarChar(255)
+  agentConsentBy String?   @map("agent_consent_by") @db.VarChar(255)
+  agentConsentAt DateTime? @map("agent_consent_at")
 
-  createdAt                       DateTime       @default(now()) @map("created_at")
-  updatedAt                       DateTime       @updatedAt @map("updated_at")
-  deletedAt                       DateTime?      @map("deleted_at")
-  parentOrganizationId            String?                    @map("parent_organization_id")
-  parentOrganization              Organization?              @relation("OrganizationHierarchy", fields: [parentOrganizationId], references: [id])
-  childOrganizations              Organization[]             @relation("OrganizationHierarchy")
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+  deletedAt            DateTime?      @map("deleted_at")
+  parentOrganizationId String?        @map("parent_organization_id")
+  parentOrganization   Organization?  @relation("OrganizationHierarchy", fields: [parentOrganizationId], references: [id])
+  childOrganizations   Organization[] @relation("OrganizationHierarchy")
 
   // Benefit
-  isBenefitOrg                    Boolean        @default(false) @map("is_benefit_org")
-  canCreateBenefit                Boolean        @default(false) @map("can_create_benefit")
+  isBenefitOrg     Boolean @default(false) @map("is_benefit_org")
+  canCreateBenefit Boolean @default(false) @map("can_create_benefit")
 
   // Newsletter
-  newsletterOptOut                Boolean        @default(false) @map("newsletter_opt_out")
-  useCustomTemplates              Boolean        @default(false) @map("use_custom_templates")
-  confirmNotificationCreation     Boolean        @default(false) @map("confirm_notification_creation")
-  bonusBusinessDashboards         Boolean        @default(false) @map("bonus_business_dashboards")
-  manuallyPaid                    Boolean        @default(false) @map("manually_paid")
+  newsletterOptOut            Boolean @default(false) @map("newsletter_opt_out")
+  useCustomTemplates          Boolean @default(false) @map("use_custom_templates")
+  confirmNotificationCreation Boolean @default(false) @map("confirm_notification_creation")
+  bonusBusinessDashboards     Boolean @default(false) @map("bonus_business_dashboards")
+  manuallyPaid                Boolean @default(false) @map("manually_paid")
 
   // Relations
-  users                           User[]
-  vehicles                        MyVehicle[]
-  expenses                        MyVehicleExpense[]
-  mileageRecords                  MyVehicleMileage[]
-  templates                       NotificationTemplate[]
-  notificationTypeOptions         NotificationTypeOption[]
-  notificationChannelOptions      NotificationChannelOption[]
-  vehicleNotifications            VehicleNotification[]
-  dutyRenewalPresets              DutyRenewalPreset[]
+  users                      User[]
+  vehicles                   MyVehicle[]
+  expenses                   MyVehicleExpense[]
+  mileageRecords             MyVehicleMileage[]
+  templates                  NotificationTemplate[]
+  notificationTypeOptions    NotificationTypeOption[]
+  notificationChannelOptions NotificationChannelOption[]
+  vehicleNotifications       VehicleNotification[]
+  dutyRenewalPresets         DutyRenewalPreset[]
 
   // PicDocs (only populated when product = PICDOCS)
-  picDocsOrg                      PicDocsOrg?
-  picDocsRuns                     PicDocsRun[]
+  picDocsOrg  PicDocsOrg?
+  picDocsRuns PicDocsRun[]
+
+  // CarCare event engine
+  recurringEvents   RecurringEvent[]
+  providers         Provider[]
+  notificationRules NotificationRule[]
 
   @@index([tierId])
   @@index([parentOrganizationId])
@@ -409,67 +442,67 @@ model Organization {
 }
 
 model NotificationTemplate {
-  id                    String        @id @default(uuid())
-  organizationId        String        @map("organization_id")
-  organizationRelation  Organization  @relation(fields: [organizationId], references: [id])
-  name                  String        @db.VarChar(100)
-  notificationType      String   @db.VarChar(50)
-  notificationChannel   String   @db.VarChar(50)
-  reminderIntervals     Json?    // Array of integers: e.g., [-30, -14, -7, 0, 1, 2]
-  emailMessage          String?  @db.Text
-  smsMessage            String?  @db.Text
-  isActive              Boolean   @default(true)
-  createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
-  deletedAt             DateTime? @map("deleted_at")
+  id                   String       @id @default(uuid())
+  organizationId       String       @map("organization_id")
+  organizationRelation Organization @relation(fields: [organizationId], references: [id])
+  name                 String       @db.VarChar(100)
+  notificationType     String       @db.VarChar(50)
+  notificationChannel  String       @db.VarChar(50)
+  reminderIntervals    Json? // Array of integers: e.g., [-30, -14, -7, 0, 1, 2]
+  emailMessage         String?      @db.Text
+  smsMessage           String?      @db.Text
+  isActive             Boolean      @default(true)
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+  deletedAt            DateTime?    @map("deleted_at")
 
   @@index([organizationId])
   @@map("notification_templates")
 }
 
 model NotificationTypeOption {
-  id                   String        @id @default(uuid())
-  organizationId       String        @map("organization_id")
-  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
-  label                String        @db.VarChar(100)
-  isActive             Boolean       @default(true)
-  isPdr                Boolean       @default(false) @map("is_pdr")
-  sortOrder            Int           @default(0)
-  createdAt            DateTime      @default(now()) @map("created_at")
-  updatedAt            DateTime      @updatedAt @map("updated_at")
-  deletedAt            DateTime?     @map("deleted_at")
+  id                   String       @id @default(uuid())
+  organizationId       String       @map("organization_id")
+  organizationRelation Organization @relation(fields: [organizationId], references: [id])
+  label                String       @db.VarChar(100)
+  isActive             Boolean      @default(true)
+  isPdr                Boolean      @default(false) @map("is_pdr")
+  sortOrder            Int          @default(0)
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+  deletedAt            DateTime?    @map("deleted_at")
 
   @@index([organizationId])
   @@map("notification_type_options")
 }
 
 model NotificationChannelOption {
-  id                   String        @id @default(uuid())
-  organizationId       String        @map("organization_id")
-  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
-  label                String        @db.VarChar(50)
-  isActive     Boolean  @default(true)
-  sortOrder    Int      @default(0)
-  createdAt    DateTime @default(now()) @map("created_at")
+  id                   String       @id @default(uuid())
+  organizationId       String       @map("organization_id")
+  organizationRelation Organization @relation(fields: [organizationId], references: [id])
+  label                String       @db.VarChar(50)
+  isActive             Boolean      @default(true)
+  sortOrder            Int          @default(0)
+  createdAt            DateTime     @default(now()) @map("created_at")
 
   @@index([organizationId])
   @@map("notification_channel_options")
 }
 
 model DutyRenewalPreset {
-  id                   String        @id @default(uuid())
-  notificationTypeId   String?       @map("notification_type_id")
+  id                    String       @id @default(uuid())
+  notificationTypeId    String?      @map("notification_type_id")
   notificationTypeLabel String?      @map("notification_type_label") @db.VarChar(50)
-  organizationId       String        @map("organization_id")
-  organizationRelation Organization  @relation(fields: [organizationId], references: [id])
+  organizationId        String       @map("organization_id")
+  organizationRelation  Organization @relation(fields: [organizationId], references: [id])
 
   // Preset options - stored as comma-separated or JSON
-  presetMonths         String        @map("preset_months") @db.VarChar(100) // e.g., "6,12,24"
-  presetLabels         String        @map("preset_labels") @db.VarChar(255) // e.g., "+6 mesiacov,+1 rok,+2 roky"
-  defaultPresetIndex   Int           @default(0) @map("default_preset_index")
+  presetMonths       String @map("preset_months") @db.VarChar(100) // e.g., "6,12,24"
+  presetLabels       String @map("preset_labels") @db.VarChar(255) // e.g., "+6 mesiacov,+1 rok,+2 roky"
+  defaultPresetIndex Int    @default(0) @map("default_preset_index")
 
-  createdAt            DateTime      @default(now()) @map("created_at")
-  updatedAt            DateTime      @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([organizationId])
   @@index([notificationTypeId])
@@ -507,96 +540,346 @@ model TrustedDevice {
 }
 
 model PendingOnboarding {
-  id                String    @id @default(uuid())
-  organizationName  String    @map("organization_name") @db.VarChar(100)
-  organizationContact String? @map("organization_contact") @db.VarChar(100)
-  tierId            String    @map("tier_id")
-  tier              Tier      @relation(fields: [tierId], references: [id])
-  purchasedVehicles Int       @default(1) @map("purchased_vehicles")
-  billingInterval   String    @map("billing_interval") @db.VarChar(10)
-  firstName         String    @map("first_name") @db.VarChar(50)
-  lastName          String    @map("last_name") @db.VarChar(50)
-  email             String    @unique @db.VarChar(100)
-  password          String
-  phoneNumber       String?   @map("phone_number") @db.VarChar(20)
-  ico               String?   @db.VarChar(20)
-  dic               String?   @db.VarChar(20)
-  street            String?   @db.VarChar(200)
-  city              String?   @db.VarChar(100)
-  postalCode        String?   @map("postal_code") @db.VarChar(20)
-  country           String?   @db.VarChar(100)
-  emailVerified     Boolean   @default(false) @map("email_verified")
-  phoneVerified     Boolean   @default(false) @map("phone_verified")
-  gdprAccepted      Boolean   @default(false) @map("gdpr_accepted")
-  termsAccepted     Boolean   @default(false) @map("terms_accepted")
-  gdprAcceptedAt    DateTime? @map("gdpr_accepted_at")
-  termsAcceptedAt   DateTime? @map("terms_accepted_at")
-  stripeSessionId   String?   @unique @map("stripe_session_id") @db.VarChar(200)
-  createdAt         DateTime  @default(now()) @map("created_at")
-  expiresAt         DateTime  @map("expires_at")
+  id                  String    @id @default(uuid())
+  organizationName    String    @map("organization_name") @db.VarChar(100)
+  organizationContact String?   @map("organization_contact") @db.VarChar(100)
+  tierId              String    @map("tier_id")
+  tier                Tier      @relation(fields: [tierId], references: [id])
+  purchasedVehicles   Int       @default(1) @map("purchased_vehicles")
+  billingInterval     String    @map("billing_interval") @db.VarChar(10)
+  firstName           String    @map("first_name") @db.VarChar(50)
+  lastName            String    @map("last_name") @db.VarChar(50)
+  email               String    @unique @db.VarChar(100)
+  password            String
+  phoneNumber         String?   @map("phone_number") @db.VarChar(20)
+  ico                 String?   @db.VarChar(20)
+  dic                 String?   @db.VarChar(20)
+  street              String?   @db.VarChar(200)
+  city                String?   @db.VarChar(100)
+  postalCode          String?   @map("postal_code") @db.VarChar(20)
+  country             String?   @db.VarChar(100)
+  emailVerified       Boolean   @default(false) @map("email_verified")
+  phoneVerified       Boolean   @default(false) @map("phone_verified")
+  gdprAccepted        Boolean   @default(false) @map("gdpr_accepted")
+  termsAccepted       Boolean   @default(false) @map("terms_accepted")
+  gdprAcceptedAt      DateTime? @map("gdpr_accepted_at")
+  termsAcceptedAt     DateTime? @map("terms_accepted_at")
+  stripeSessionId     String?   @unique @map("stripe_session_id") @db.VarChar(200)
+  createdAt           DateTime  @default(now()) @map("created_at")
+  expiresAt           DateTime  @map("expires_at")
 
-  @@map("pending_onboarding")
+  @@map("pending_onboardings")
 }
 
 model Invoice {
-  id                String   @id @default(uuid())
-  invoiceNumber     String   @map("invoice_number") @db.VarChar(20)
-  organizationName  String   @map("organization_name") @db.VarChar(100)
-  street            String?  @db.VarChar(200)
-  city              String?  @db.VarChar(100)
-  postalCode        String?  @map("postal_code") @db.VarChar(20)
-  country           String?  @db.VarChar(100)
-  ico               String?  @db.VarChar(20)
-  dic               String?  @db.VarChar(20)
-  firstName         String   @map("first_name") @db.VarChar(50)
-  lastName          String   @map("last_name") @db.VarChar(50)
-  email             String   @db.VarChar(100)
-  tier              String   @db.VarChar(20)
-  billing           String   @db.VarChar(10)
-  numberOfVehicles  Int      @map("number_of_vehicles")
-  pricePerVehicle   Float    @map("price_per_vehicle")
-  totalPrice        Float    @map("total_price")
-  paymentType       String   @default("stripe") @map("payment_type") @db.VarChar(20)
-  createdAt         DateTime @default(now()) @map("created_at")
-  deletedAt         DateTime? @map("deleted_at")
-  deletionReason    String?   @map("deletion_reason") @db.VarChar(500)
+  id               String    @id @default(uuid())
+  invoiceNumber    String    @map("invoice_number") @db.VarChar(20)
+  organizationName String    @map("organization_name") @db.VarChar(100)
+  street           String?   @db.VarChar(200)
+  city             String?   @db.VarChar(100)
+  postalCode       String?   @map("postal_code") @db.VarChar(20)
+  country          String?   @db.VarChar(100)
+  ico              String?   @db.VarChar(20)
+  dic              String?   @db.VarChar(20)
+  firstName        String    @map("first_name") @db.VarChar(50)
+  lastName         String    @map("last_name") @db.VarChar(50)
+  email            String    @db.VarChar(100)
+  tier             String    @db.VarChar(20)
+  billing          String    @db.VarChar(10)
+  numberOfVehicles Int       @map("number_of_vehicles")
+  pricePerVehicle  Float     @map("price_per_vehicle")
+  totalPrice       Float     @map("total_price")
+  paymentType      String    @default("stripe") @map("payment_type") @db.VarChar(20)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  deletedAt        DateTime? @map("deleted_at")
+  deletionReason   String?   @map("deletion_reason") @db.VarChar(500)
 
   @@index([invoiceNumber])
   @@map("invoices")
 }
 
 model PicDocsOrg {
-  organizationId        String        @id @map("organization_id")
-  organizationRelation  Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String       @id @map("organization_id")
+  organizationRelation Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  dokladoApiKeyEnc      String?       @map("doklado_api_key_enc")
-  dokladoOrganizationId String        @map("doklado_organization_id") @db.VarChar(50)
-  recipientEmail        String        @map("recipient_email") @db.VarChar(255)
+  dokladoApiKeyEnc      String? @map("doklado_api_key_enc")
+  dokladoOrganizationId String  @map("doklado_organization_id") @db.VarChar(50)
+  recipientEmail        String  @map("recipient_email") @db.VarChar(255)
 
-  runsThisHour          Int           @default(0) @map("runs_this_hour")
-  rateWindowStart       DateTime?     @map("rate_window_start")
-  lastRunAt             DateTime?     @map("last_run_at")
+  runsThisHour    Int       @default(0) @map("runs_this_hour")
+  rateWindowStart DateTime? @map("rate_window_start")
+  lastRunAt       DateTime? @map("last_run_at")
 
-  createdAt             DateTime      @default(now()) @map("created_at")
-  updatedAt             DateTime      @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("picdocs_orgs")
 }
 
 model PicDocsRun {
-  id                   String        @id @default(uuid())
-  organizationId       String        @map("organization_id")
-  organizationRelation Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  userId               String?       @map("user_id")
-  user                 User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
-  status               String        @db.VarChar(20)
-  processedCount       Int           @default(0) @map("processed_count")
-  flaggedCount         Int           @default(0) @map("flagged_count")
-  errorMessage         String?       @map("error_message") @db.Text
-  startedAt            DateTime      @default(now()) @map("started_at")
-  finishedAt           DateTime?     @map("finished_at")
+  id                   String       @id @default(uuid())
+  organizationId       String       @map("organization_id")
+  organizationRelation Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId               String?      @map("user_id")
+  user                 User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status               String       @db.VarChar(20)
+  processedCount       Int          @default(0) @map("processed_count")
+  flaggedCount         Int          @default(0) @map("flagged_count")
+  errorMessage         String?      @map("error_message") @db.Text
+  startedAt            DateTime     @default(now()) @map("started_at")
+  finishedAt           DateTime?    @map("finished_at")
 
   @@index([organizationId])
   @@index([status])
   @@map("picdocs_runs")
+}
+
+// ============================================================================
+// CarCare event engine — M2 (event schema) + M3 (providers & appointments)
+// ============================================================================
+
+enum RecurrenceType {
+  ONE_TIME
+  FIXED_INTERVAL
+  AFTER_COMPLETION
+  SEASONAL
+  MILEAGE
+  DATE_OR_MILEAGE
+}
+
+enum OccurrenceStatus {
+  UPCOMING
+  ACTION_REQUIRED
+  ARRANGED
+  COMPLETED
+  SKIPPED
+  CANCELLED
+}
+
+enum EventKind {
+  LEGAL
+  RECOMMENDED
+}
+
+enum ActionType {
+  BOOK
+  RENEW
+  PAY
+  PURCHASE
+  INSPECT
+  CUSTOM
+}
+
+enum AppointmentStatus {
+  BOOKED
+  COMPLETED
+  CANCELLED
+  MISSED
+}
+
+model EventTemplate {
+  id              String           @id @default(uuid())
+  key             String           @unique
+  category        String           @db.VarChar(50)
+  country         String?          @db.VarChar(2)
+  powertrains     String[]
+  kind            EventKind        @default(RECOMMENDED)
+  actionType      ActionType       @default(BOOK) @map("action_type")
+  recurrenceType  RecurrenceType   @map("recurrence_type")
+  intervalMonths  Int?             @map("interval_months")
+  intervalKm      Int?             @map("interval_km")
+  seasonalMonth   Int?             @map("seasonal_month")
+  seasonalDay     Int?             @map("seasonal_day")
+  defaultLeadDays Int              @default(30) @map("default_lead_days")
+  active          Boolean          @default(true)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  recurringEvents RecurringEvent[]
+
+  @@index([country])
+  @@map("event_templates")
+}
+
+model RecurringEvent {
+  id                String         @id @default(uuid())
+  organizationId    String         @map("organization_id")
+  vehicleId         String         @map("vehicle_id")
+  templateId        String?        @map("template_id")
+  name              String         @db.VarChar(120)
+  category          String         @db.VarChar(50)
+  kind              EventKind      @default(RECOMMENDED)
+  actionType        ActionType     @default(BOOK) @map("action_type")
+  recurrenceType    RecurrenceType @map("recurrence_type")
+  intervalMonths    Int?           @map("interval_months")
+  intervalKm        Int?           @map("interval_km")
+  seasonalMonth     Int?           @map("seasonal_month")
+  seasonalDay       Int?           @map("seasonal_day")
+  anchorDate        DateTime?      @map("anchor_date")
+  responsibleUserId String?        @map("responsible_user_id")
+  expectedCost      Decimal?       @map("expected_cost") @db.Decimal(10, 2)
+  currency          String         @default("EUR") @db.VarChar(3)
+  paused            Boolean        @default(false)
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+  deletedAt         DateTime?      @map("deleted_at")
+
+  organization    Organization           @relation(fields: [organizationId], references: [id])
+  vehicle         MyVehicle              @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  template        EventTemplate?         @relation(fields: [templateId], references: [id])
+  responsibleUser User?                  @relation(fields: [responsibleUserId], references: [id])
+  occurrences     EventOccurrence[]
+  rules           NotificationRule[]
+  deliveries      NotificationDelivery[]
+
+  @@index([organizationId])
+  @@index([vehicleId])
+  @@index([responsibleUserId])
+  @@map("recurring_events")
+}
+
+model EventOccurrence {
+  id                   String           @id @default(uuid())
+  recurringEventId     String           @map("recurring_event_id")
+  vehicleId            String           @map("vehicle_id")
+  sequenceNo           Int              @map("sequence_no")
+  generatedFromId      String?          @unique @map("generated_from_id")
+  status               OccurrenceStatus @default(UPCOMING)
+  dueDate              DateTime?        @map("due_date")
+  dueMileage           Int?             @map("due_mileage")
+  completedAt          DateTime?        @map("completed_at")
+  completedMileage     Int?             @map("completed_mileage")
+  completionProviderId String?          @map("completion_provider_id")
+  actualCost           Decimal?         @map("actual_cost") @db.Decimal(10, 2)
+  currency             String?          @db.VarChar(3)
+  notes                String?          @db.Text
+  skipReason           String?          @map("skip_reason")
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @updatedAt @map("updated_at")
+
+  recurringEvent RecurringEvent         @relation(fields: [recurringEventId], references: [id], onDelete: Cascade)
+  vehicle        MyVehicle              @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  appointments   Appointment[]
+  deliveries     NotificationDelivery[]
+
+  @@unique([recurringEventId, sequenceNo])
+  @@index([status, dueDate])
+  @@index([vehicleId])
+  @@map("event_occurrences")
+}
+
+model Provider {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  name           String    @db.VarChar(120)
+  category       String?   @db.VarChar(50)
+  phone          String?   @db.VarChar(40)
+  email          String?   @db.VarChar(150)
+  website        String?   @db.VarChar(255)
+  bookingUrl     String?   @map("booking_url") @db.VarChar(255)
+  address        String?   @db.VarChar(255)
+  notes          String?   @db.Text
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  appointments Appointment[]
+
+  @@index([organizationId])
+  @@map("providers")
+}
+
+model Appointment {
+  id               String            @id @default(uuid())
+  occurrenceId     String            @map("occurrence_id")
+  providerId       String?           @map("provider_id")
+  scheduledAt      DateTime          @map("scheduled_at")
+  status           AppointmentStatus @default(BOOKED)
+  bookingReference String?           @map("booking_reference")
+  estimatedCost    Decimal?          @map("estimated_cost") @db.Decimal(10, 2)
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  occurrence EventOccurrence @relation(fields: [occurrenceId], references: [id], onDelete: Cascade)
+  provider   Provider?       @relation(fields: [providerId], references: [id])
+
+  @@index([occurrenceId])
+  @@index([providerId])
+  @@map("appointments")
+}
+
+// ============================================================================
+// CarCare event engine — M4 (notifications schema)
+// ============================================================================
+
+enum NotificationStage {
+  PREPARATION
+  BOOKING
+  BOOKING_FOLLOWUP
+  APPOINTMENT
+  DEADLINE
+  OVERDUE
+  COMPLETION
+  LOGGING
+}
+
+enum Channel {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+}
+
+enum DeliveryStatus {
+  SCHEDULED
+  SENT
+  FAILED
+  SUPPRESSED
+  CANCELLED
+}
+
+model NotificationRule {
+  id                  String            @id @default(uuid())
+  organizationId      String            @map("organization_id")
+  recurringEventId    String?           @map("recurring_event_id")
+  stage               NotificationStage
+  leadDays            Int               @default(0) @map("lead_days")
+  channels            Channel[]
+  repeatUntilActioned Boolean           @default(false) @map("repeat_until_actioned")
+  repeatEveryDays     Int?              @map("repeat_every_days")
+  active              Boolean           @default(true)
+  createdAt           DateTime          @default(now()) @map("created_at")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
+
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  recurringEvent RecurringEvent? @relation(fields: [recurringEventId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, stage])
+  @@map("notification_rules")
+}
+
+model NotificationDelivery {
+  id               String            @id @default(uuid())
+  occurrenceId     String            @map("occurrence_id")
+  recurringEventId String            @map("recurring_event_id")
+  stage            NotificationStage
+  channel          Channel
+  recipientUserId  String            @map("recipient_user_id")
+  scheduledFor     DateTime          @map("scheduled_for")
+  status           DeliveryStatus    @default(SCHEDULED)
+  attempts         Int               @default(0)
+  lastError        String?           @map("last_error")
+  sentAt           DateTime?         @map("sent_at")
+  suppressedReason String?           @map("suppressed_reason")
+  dedupeKey        String            @unique @map("dedupe_key")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  occurrence     EventOccurrence @relation(fields: [occurrenceId], references: [id], onDelete: Cascade)
+  recurringEvent RecurringEvent  @relation(fields: [recurringEventId], references: [id], onDelete: Cascade)
+  recipient      User            @relation(fields: [recipientUserId], references: [id])
+
+  @@index([status, scheduledFor])
+  @@index([occurrenceId, stage])
+  @@map("notification_deliveries")
 }
