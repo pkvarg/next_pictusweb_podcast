@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function NotFound() {
   return (
     <html lang="sk">
@@ -32,7 +34,7 @@ export default function NotFound() {
         <p style={{ marginTop: '8px', color: '#9ca3af' }}>
           Táto stránka neexistuje alebo bola presunutá.
         </p>
-        <a
+        <Link
           href="/"
           style={{
             marginTop: '32px',
@@ -45,7 +47,7 @@ export default function NotFound() {
           }}
         >
           Domov
-        </a>
+        </Link>
       </body>
     </html>
   )
