@@ -702,36 +702,38 @@ model EventTemplate {
 }
 
 model RecurringEvent {
-  id                String         @id @default(uuid())
-  organizationId    String         @map("organization_id")
-  vehicleId         String         @map("vehicle_id")
-  templateId        String?        @map("template_id")
-  name              String         @db.VarChar(120)
-  category          String         @db.VarChar(50)
-  kind              EventKind      @default(RECOMMENDED)
-  actionType        ActionType     @default(BOOK) @map("action_type")
-  recurrenceType    RecurrenceType @map("recurrence_type")
-  intervalMonths    Int?           @map("interval_months")
-  intervalDays      Int?           @map("interval_days")
-  intervalKm        Int?           @map("interval_km")
-  seasonalMonth     Int?           @map("seasonal_month")
-  seasonalDay       Int?           @map("seasonal_day")
-  anchorDate        DateTime?      @map("anchor_date")
-  responsibleUserId String?        @map("responsible_user_id")
-  expectedCost      Decimal?       @map("expected_cost") @db.Decimal(10, 2)
-  currency          String         @default("EUR") @db.VarChar(3)
-  paused            Boolean        @default(false)
-  createdAt         DateTime       @default(now()) @map("created_at")
-  updatedAt         DateTime       @updatedAt @map("updated_at")
-  deletedAt         DateTime?      @map("deleted_at")
+  id                  String         @id @default(uuid())
+  organizationId      String         @map("organization_id")
+  vehicleId           String         @map("vehicle_id")
+  templateId          String?        @map("template_id")
+  name                String         @db.VarChar(120)
+  category            String         @db.VarChar(50)
+  kind                EventKind      @default(RECOMMENDED)
+  actionType          ActionType     @default(BOOK) @map("action_type")
+  recurrenceType      RecurrenceType @map("recurrence_type")
+  intervalMonths      Int?           @map("interval_months")
+  intervalDays        Int?           @map("interval_days")
+  intervalKm          Int?           @map("interval_km")
+  seasonalMonth       Int?           @map("seasonal_month")
+  seasonalDay         Int?           @map("seasonal_day")
+  anchorDate          DateTime?      @map("anchor_date")
+  responsibleUserId   String?        @map("responsible_user_id")
+  preferredProviderId String?        @map("preferred_provider_id")
+  expectedCost        Decimal?       @map("expected_cost") @db.Decimal(10, 2)
+  currency            String         @default("EUR") @db.VarChar(3)
+  paused              Boolean        @default(false)
+  createdAt           DateTime       @default(now()) @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+  deletedAt           DateTime?      @map("deleted_at")
 
-  organization    Organization           @relation(fields: [organizationId], references: [id])
-  vehicle         MyVehicle              @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  template        EventTemplate?         @relation(fields: [templateId], references: [id])
-  responsibleUser User?                  @relation(fields: [responsibleUserId], references: [id])
-  occurrences     EventOccurrence[]
-  rules           NotificationRule[]
-  deliveries      NotificationDelivery[]
+  organization      Organization           @relation(fields: [organizationId], references: [id])
+  vehicle           MyVehicle              @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  template          EventTemplate?         @relation(fields: [templateId], references: [id])
+  responsibleUser   User?                  @relation(fields: [responsibleUserId], references: [id])
+  preferredProvider Provider?              @relation(fields: [preferredProviderId], references: [id], onDelete: SetNull)
+  occurrences       EventOccurrence[]
+  rules             NotificationRule[]
+  deliveries        NotificationDelivery[]
 
   @@index([organizationId])
   @@index([vehicleId])
@@ -784,8 +786,9 @@ model Provider {
   updatedAt      DateTime  @updatedAt @map("updated_at")
   deletedAt      DateTime? @map("deleted_at")
 
-  organization Organization  @relation(fields: [organizationId], references: [id])
-  appointments Appointment[]
+  organization       Organization     @relation(fields: [organizationId], references: [id])
+  appointments       Appointment[]
+  preferredForEvents RecurringEvent[]
 
   @@index([organizationId])
   @@map("providers")

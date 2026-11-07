@@ -99,3 +99,13 @@ COMMIT;
 -- Additive. Enables day-granular recurrence (e.g. "every 2 weeks").
 ALTER TABLE "event_templates"  ADD COLUMN "interval_days" INTEGER;
 ALTER TABLE "recurring_events" ADD COLUMN "interval_days" INTEGER;
+
+
+-- ----------------------------------------------------------------------------
+-- M7 addendum — preferred provider per recurring event
+--      STATUS: APPLIED on local :5434 (2026-11-07)
+--      Prisma migration: prisma/migrations/20261107180000_recurring_event_preferred_provider
+-- ----------------------------------------------------------------------------
+ALTER TABLE "recurring_events" ADD COLUMN "preferred_provider_id" TEXT;
+ALTER TABLE "recurring_events" ADD CONSTRAINT "recurring_events_preferred_provider_id_fkey"
+  FOREIGN KEY ("preferred_provider_id") REFERENCES "providers"("id") ON DELETE SET NULL ON UPDATE CASCADE;

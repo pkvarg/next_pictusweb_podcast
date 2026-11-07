@@ -72,21 +72,23 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [ ] Chronological service history + expense categories / vehicle cost totals / upcoming expected expenses → **M14** (surfaces; builds on existing `my_vehicle_expenses`)
   > **Review gate M6.** Core completion engine delivered; the remaining items are UI/transition surfaces deliberately deferred to M7/M10/M14 where they fit.
 
-## M7 — Providers & appointments
+## M7 — Providers & appointments ← _backend done on local, awaiting review_
 
-- [ ] MVP · Add/edit provider; category & contact details; telephone & email shortcuts; website & booking URL; preferred provider; provider notes
-- [ ] MVP · Create/record appointment; appointment date independent of due date; edit/reschedule; cancel
-- [ ] MVP · Status (booked/completed/cancelled/missed); booking reference; estimated cost
-- [ ] MVP · Open provider call/email/booking actions; appointment follow-up prompt
-  > **Review gate M7.**
+- [x] MVP · Provider create/update/archive(soft-delete)/list (`lib/carcare/providers.ts`): category, contact, phone/email, website & booking URL, notes
+- [x] MVP · Appointment book/reschedule/cancel (`lib/carcare/appointments.ts`); scheduled_at independent of due date (BR-01); booking → ARRANGED; cancel → ACTION_REQUIRED, obligation kept (BR-05); booking reference; estimated cost; status enum
+- [x] Integration tests pass (`tests/carcare/appointments.itest.ts`): BR-01, BR-05, reschedule, provider CRUD
+- [x] MVP · "Preferred provider" per event: `recurring_events.preferred_provider_id` (FK → providers, SET NULL) added (migration `20261107180000_recurring_event_preferred_provider`)
+- [ ] call/email/booking-link UI actions → **M14** (surfaces); `completed`/`missed` appointment status → set on completion (M6) / scheduler miss-check (M9); follow-up prompt → **M9** (notification stage)
+  > **Review gate M7.** Backend handlers + transitions + preferred-provider field delivered; UI actions and the follow-up reminder deferred.
 
-## M8 — Scheduler: planner + in-app channel
+## M8 — Scheduler: planner + in-app channel ← _done on local, awaiting review_
 
-- [ ] Cron tick endpoint (token-guarded); planner materializes deliveries via `dedupeKey`
-- [ ] MVP · Reminder stages: preparation/booking, booking follow-up
-- [ ] MVP · In-app notification centre
-- [ ] Suppression on booking (tests T7/T8)
-  > **Review gate M8.**
+- [x] Planner `planDeliveries()` (`lib/carcare/scheduler.ts`): materializes `notification_deliveries` from rules, idempotent via `dedupe_key`; event-override-else-org-default rule resolution; due-anchored stages (prep/booking/follow-up/deadline/overdue)
+- [x] MVP · Reminder stages: preparation / booking / booking follow-up (deadline/overdue too; appointment/completion/logging anchor on appointment/completion → M9)
+- [x] MVP · In-app notification centre (`listInAppNotifications()`)
+- [x] Suppression on booking + reactivation on cancel wired into appointment handlers; **tests T7/T8 pass** (`tests/carcare/scheduler.itest.ts`)
+- [ ] Cron **tick HTTP endpoint** (token-guarded) → **M9** (one tick does plan + dispatch together)
+  > **Review gate M8.** Planner/suppression/in-app logic done & tested; the HTTP cron entrypoint lands with the dispatcher in M9.
 
 ## M9 — Scheduler: dispatcher + email/SMS
 
