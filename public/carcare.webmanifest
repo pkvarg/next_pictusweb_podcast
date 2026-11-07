@@ -1,0 +1,20 @@
+{
+  "name": "FleetSync CarCare",
+  "short_name": "CarCare",
+  "description": "Pripomienky a správa vašich vozidiel",
+  "start_url": "/carcare",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#141511",
+  "theme_color": "#141511",
+  "icons": [
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

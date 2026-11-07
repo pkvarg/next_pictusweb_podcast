@@ -188,9 +188,9 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 
 ## M15 — PWA + web push
 
-- [ ] MVP · Installable PWA shell (manifest + service worker)
-- [ ] MVP · Web push infrastructure + opt-in/delivery (push notification channel)
-  > **Review gate M15.**
+- [x] MVP · Installable PWA shell: CarCare-scoped `public/carcare.webmanifest` (standalone, #141511), `public/sw.js` (push + notificationclick handlers, passthrough fetch), `CarCareServiceWorker` registration, and `app/[locale]/carcare/layout.tsx` wiring the manifest/theme/apple-web-app meta — **verified: /carcare links the scoped manifest, sw.js + manifest serve 200**
+- [ ] Web push (Part 2): needs the `web-push` dependency, VAPID keys (prod secrets), and a `push_subscriptions` migration. Plan: subscribe endpoint + opt-in UI, store subscriptions, send via web-push, wire the scheduler PUSH channel (currently a stub)
+  > **Review gate M15.** PWA install done; web push pending dependency + VAPID keys.
 
 ---
 
