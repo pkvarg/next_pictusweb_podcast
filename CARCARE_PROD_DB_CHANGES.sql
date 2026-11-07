@@ -148,3 +148,11 @@ ALTER TABLE "recurring_events" ADD CONSTRAINT "recurring_events_preferred_provid
 -- M14b: accent-insensitive catalogue search (searchCatalogue uses unaccent()).
 -- Required for /api/carcare/catalogue so "skoda" matches "Škoda". Idempotent.
 CREATE EXTENSION IF NOT EXISTS unaccent;
+
+-- M16: legacy data migration (vehicle_notifications -> my_vehicles / recurring_events /
+-- event_occurrences). NOT SQL — run the idempotent route once on prod after deploy:
+--   curl -X POST "https://<host>/api/carcare/admin/migrate-notifications?dryRun=true&token=$CRON_TOKEN"   # review
+--   curl -X POST "https://<host>/api/carcare/admin/migrate-notifications?token=$CRON_TOKEN"               # apply
+-- Mapping: STK/EK, Kontrola (checkup), Technický preukaz platnosť (distinct), Výmena oleja,
+-- Diaľničná známka, Poistenie->PZP, Pneu leto/zima (seasonal). One vehicle per org+registration,
+-- one recurring event per vehicle+type, one UPCOMING occurrence (next due). Re-runnable.

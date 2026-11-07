@@ -198,9 +198,9 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 
 ## M16 — Data migration from `vehicle_notifications`
 
-- [ ] Backfill existing rows → occurrences; reconstruct recurrence lineage; reconciliation report (BR-13)
-- [ ] Dual-run with legacy n8n path; retire after reconcile
-  > **Review gate M16.**
+- [x] Backfill: `lib/carcare/migrateNotifications.ts` + token-guarded `POST /api/carcare/admin/migrate-notifications` (`?dryRun=true`). Converts alive `vehicle_notifications` → one `MyVehicle` per org+registration (reuses `my_vehicle_id`/existing, owner = row user ↦ garage-owner fallback), one custom `RecurringEvent` per vehicle+type (STK/EK, Kontrola, Technický preukaz platnosť distinct; Poistenie→PZP; tyres seasonal), one UPCOMING occurrence at the next due. **Idempotent; verified on local DB: 15 vehicles + 25 events from 94 rows, re-run = 0 created / all reused.** Prod run documented in CARCARE_PROD_DB_CHANGES.sql.
+- [ ] Dual-run with legacy n8n path; retire after reconcile (ops — M17)
+  > **Review gate M16.** Backfill done & verified locally; dual-run/retire is M17.
 
 ## M17 — Operational readiness & pilot (all MVP)
 
