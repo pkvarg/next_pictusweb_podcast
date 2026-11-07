@@ -132,3 +132,15 @@ ALTER TABLE "recurring_events" ADD CONSTRAINT "recurring_events_preferred_provid
 -- with a MINIMAL sample seed (10 rows) — replace/extend with a real catalogue import on prod.
 -- NOTE: the seed uses gen_random_uuid() (built-in on PG13+).
 -- Authoritative SQL: the migration file above / `prisma migrate deploy`.
+
+
+-- ----------------------------------------------------------------------------
+-- M13 — Slovak event templates (data seed)
+--      STATUS: APPLIED on local :5434 (2026-11-07)
+--      Prisma migration: prisma/migrations/20261107210000_carcare_slovak_event_templates_m13
+-- ----------------------------------------------------------------------------
+-- Data-only. INSERTs 12 event_templates (stk, ek, pzp, comprehensive_insurance,
+-- winter_tyres, summer_tyres, regular_service, highway_vignette, parking_permit,
+-- warranty, battery_warranty, charging_subscription), ON CONFLICT(key) DO NOTHING.
+-- Legal vs recommended via kind; SK-scoped where legal; EK excludes BEV/HYDROGEN.
+-- Review/adjust intervals & legal classification against current SK rules before prod.

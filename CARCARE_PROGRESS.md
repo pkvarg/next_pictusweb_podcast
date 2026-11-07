@@ -140,13 +140,14 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [ ] catalogue real-data import (seed is a 10-row sample); onboarding/vehicle-edit **UI** → **M14**
   > **Review gate M12.** Schema + create/search/suggest backend delivered & tested; real catalogue data + UI are M14/import.
 
-## M13 — Event catalogue & Slovak templates
+## M13 — Event catalogue & Slovak templates ← _backend done on local, awaiting review_
 
-- [ ] MVP · Universal event templates; ICE/hybrid/EV templates
-- [ ] MVP · Country-specific templates (STK/EK/PZP/tyres/service/vignette/permits); legal vs recommended
-- [ ] MVP · Create custom event; edit/disable/remove suggested events
-- [ ] MVP · Admin: event template administration; country applicability rules; regulatory catalogue updates; multilingual UI framework
-  > **Review gate M13.**
+- [x] MVP · Universal templates (service, insurance, tyres, warranty) + EV-specific (battery_warranty, charging_subscription); 12 seeded
+- [x] MVP · SK templates (stk, ek, pzp, highway_vignette) with country scoping + legal-vs-recommended (`kind`); EK excludes BEV/HYDROGEN
+- [x] MVP · `activateTemplate` (idempotent, creates event + first occurrence) + `createCustomEvent` (`lib/carcare/events.ts`); edit/disable via existing event CRUD; applicability via `suggestTemplatesForVehicle`
+- [x] Integration tests (`tests/carcare/events.itest.ts`): seed present, suggestion by powertrain/country, activation idempotency, custom event
+- [ ] template-admin **UI**, i18n display names, regulatory-rule review → **M14** / content pass (classifications & intervals need legal verification before prod)
+  > **Review gate M13.** Seed + activation/custom-event backend delivered & tested. ⚠️ Intervals & legal classifications are first-pass — verify against current SK rules before go-live.
 
 ## M14 — Dashboard & calendar
 
