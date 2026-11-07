@@ -90,19 +90,26 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [ ] Cron **tick HTTP endpoint** (token-guarded) → **M9** (one tick does plan + dispatch together)
   > **Review gate M8.** Planner/suppression/in-app logic done & tested; the HTTP cron entrypoint lands with the dispatcher in M9.
 
-## M9 — Scheduler: dispatcher + email/SMS
+## M9 — Scheduler: dispatcher + email/SMS ← _done on local, awaiting review_
 
-- [ ] Dispatcher claim `FOR UPDATE SKIP LOCKED` (test T11); retries/logging
-- [ ] MVP · Email + SMS delivery via hono_bun; SMS limits enforced (T12/T13)
-- [ ] MVP · Reminder stages: appointment, deadline, overdue, completion, logging
-  > **Review gate M9.**
+- [x] Dispatcher `dispatchDue()` (`lib/carcare/scheduler.ts`): claim with `FOR UPDATE SKIP LOCKED` (T11), retry→SCHEDULED/FAILED (T13), counts logged
+- [x] Channel senders (`lib/carcare/channels.ts`, injectable): email/SMS via hono_bun, in-app no-op, push stub (M15)
+- [x] MVP · Channel opt-in gating + SMS monthly limit enforced (T12); SMS counter increments on success
+- [x] Cron **tick endpoint** `GET /api/cron/notifications/tick` (token-guarded) — plan pass + dispatch pass
+- [x] MVP · Stages deadline + overdue (due-anchored, from M8 planner)
+- [x] Integration tests pass (`tests/carcare/dispatch.itest.ts`): T11, T12, T13, opt-in gating, counter
+- [ ] appointment / completion / logging stages (anchored on appointment/completion) + the follow-up prompt → **M10**
+- [ ] ⚠️ hono_bun needs a generic `POST /pictusweb/client/sendReminder` endpoint for real email/SMS (dispatcher tested with injected fakes; cross-service wiring)
+  > **Review gate M9.** Dispatcher + gating + cron entrypoint done & tested; real email/SMS transport needs the hono endpoint; appointment/completion-anchored stages land in M10.
 
-## M10 — Full suppression + reassignment + quiet hours
+## M10 — Full suppression + reassignment + quiet hours ← _done on local, awaiting review_
 
-- [ ] MVP · Smart suppression on complete/cancel/reassign across channels (T9/T10)
-- [ ] MVP · Assign responsible person → reminders to responsible user; reassignment
-- [ ] MVP · Quiet hours + snooze scheduling (T15)
-  > **Review gate M10.**
+- [x] MVP · Completion suppresses all remaining reminders across channels (`cancelAllDeliveries`, wired into `completeOccurrence`) — **T9**; booking suppression/reactivation already in M8
+- [x] MVP · Reassign responsible user re-targets future reminders (`reassignResponsibleUser`: suppress old recipient, re-plan for new) — **T10**
+- [x] MVP · Quiet hours: planner shifts sends out of the recipient's quiet window (`applyQuietHours`, tz-aware) — **T15** (unit test)
+- [x] hono*bun `POST /api/pictusweb/client/send-reminder` endpoint added (email+SMS) — \_separate repo, needs its own commit + deploy*
+- [ ] occurrence skip/cancel transition handlers (will call `cancelAllDeliveries`); **snooze** (per-user runtime action); appointment/completion/logging-anchored stage scheduling → small follow-ups
+  > **Review gate M10.** The three BR-critical behaviors (T9/T10/T15) done & tested. Snooze + the appointment/completion-anchored reminder stages remain as bounded follow-ups.
 
 ---
 

@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { computeNextDue, type RecurrenceDefinition } from './recurrence'
+import { cancelAllDeliveries } from './scheduler'
 
 export interface CompletionInput {
   date: Date
@@ -42,6 +43,8 @@ export async function completeOccurrence(
       notes: input.notes ?? occ.notes,
     },
   })
+
+  await cancelAllDeliveries(tx, occ.id, 'event completed') // BR-06
 
   const def = occ.recurringEvent
   if (def.paused || def.deletedAt || def.recurrenceType === 'ONE_TIME') return updated
