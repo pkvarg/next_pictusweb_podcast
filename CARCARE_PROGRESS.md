@@ -168,11 +168,13 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [x] MVP · Onboarding / add vehicle: `CarCareAddVehicleView` + `/[locale]/carcare/vehicles/new` page; debounced catalogue search (`/api/carcare/catalogue`) prefilling make/model/powertrain + manual fields, `POST /api/carcare/vehicles` then redirect to detail (where template suggestions offer activation) — **visually verified**
 - [x] Nav fix: all CarCare internal links use next-intl `Link` with absolute `/carcare/...` paths (relative hrefs were resolving against `/[locale]/` and 404ing); dashboard "Pridať vozidlo"/"Zobraziť všetky"/vehicle cards + detail/add "Späť"
 - [x] App-wide: added root `app/not-found.tsx` (self-contained html/body) + `app/[locale]/not-found.tsx`; previously any 404 crashed with "Missing <html> and <body> tags" because the root layout has no html/body (those live in `[locale]/layout.tsx`)
-- [ ] MVP · Garage page; Costs page
+- [x] MVP · Costs: `GET /api/carcare/costs` (completed-event costs + expenses across accessible vehicles; this-year/all-time totals, by-category + by-vehicle breakdown, recent entries) + `CarCareCostsView` + `/[locale]/carcare/costs` page; KPI cards, lime breakdown bars, entries list — **visually verified**
+- [x] Bottom nav: shared `CarCareBottomNav` (Domov/Udalosti/Náklady, next-intl `Link`, active state) on dashboard/events/costs; dashboard "Náklady tento rok" KPI links to costs (nav reduced from 5 placeholder items to 3 working tabs)
+- [ ] MVP · Garage page
 - [ ] wire remaining action buttons (book / complete) to the API endpoints
 - [ ] Deferred surfaces land here: provider call/email/booking actions, roles/members UI + invite email (hono), template i18n names, viewer read-only enforcement in UI; accent-insensitive catalogue search (Postgres `unaccent`)
-- _temporary mock routes exist for design iteration — remove before shipping: `/[locale]/carcare/preview`, `/[locale]/carcare/events/preview`, `/[locale]/carcare/vehicles/preview`, `/[locale]/carcare/vehicles/new/preview`_
-  > **Review gate M14.** API done; dashboard + events/calendar + vehicle detail + onboarding built & previewed. Garage / costs next.
+- _temporary mock routes exist for design iteration — remove before shipping: `/[locale]/carcare/preview`, `/[locale]/carcare/events/preview`, `/[locale]/carcare/vehicles/preview`, `/[locale]/carcare/vehicles/new/preview`, `/[locale]/carcare/costs/preview`_
+  > **Review gate M14.** API done; dashboard + events/calendar + vehicle detail + onboarding + costs built & previewed. Garage next.
 
 ## M15 — PWA + web push
 

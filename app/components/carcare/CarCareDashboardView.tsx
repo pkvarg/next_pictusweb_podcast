@@ -8,6 +8,7 @@ import {
   Plus,
 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
+import CarCareBottomNav from './CarCareBottomNav'
 
 export interface DashOccurrence {
   id: string
@@ -152,11 +153,13 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
             value={String(counts.arranged)}
             label="Naplánovaná návšteva"
           />
-          <Kpi
-            icon={<Wallet className="w-5 h-5" />}
-            value={`${counts.costThisYear.toFixed(0)} €`}
-            label="Náklady tento rok"
-          />
+          <Link href="/carcare/costs" className="rounded-2xl hover:opacity-90 transition-opacity">
+            <Kpi
+              icon={<Wallet className="w-5 h-5" />}
+              value={`${counts.costThisYear.toFixed(0)} €`}
+              label="Náklady tento rok"
+            />
+          </Link>
         </div>
 
         <section className="mb-8">
@@ -216,26 +219,7 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
         </section>
       </div>
 
-      {/* bottom nav (mobile-first) */}
-      <nav className="fixed bottom-0 inset-x-0 bg-pictus-onyx900/95 backdrop-blur border-t border-white/[0.06]">
-        <div className="mx-auto max-w-4xl grid grid-cols-5 text-center text-[11px]">
-          {[
-            { k: 'Domov', i: <Car className="w-5 h-5" /> },
-            { k: 'Vozidlá', i: <Car className="w-5 h-5" /> },
-            { k: 'Udalosti', i: <Calendar className="w-5 h-5" /> },
-            { k: 'Náklady', i: <Wallet className="w-5 h-5" /> },
-            { k: 'Viac', i: <ChevronRight className="w-5 h-5" /> },
-          ].map((t, idx) => (
-            <div
-              key={t.k}
-              className={`py-2.5 flex flex-col items-center gap-0.5 ${idx === 0 ? 'text-pictus-lime' : 'text-gray-400'}`}
-            >
-              {t.i}
-              <span>{t.k}</span>
-            </div>
-          ))}
-        </div>
-      </nav>
+      <CarCareBottomNav current="home" />
     </div>
   )
 }
