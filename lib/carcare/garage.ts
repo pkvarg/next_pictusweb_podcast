@@ -65,6 +65,42 @@ export async function canAccessVehicle(
   return false
 }
 
+export async function resolveGarageRole(
+  tx: Prisma.TransactionClient,
+  userId: string,
+  organizationId: string,
+): Promise<{ role: GarageRole | 'ADMIN' | null; isLegacyOwner: boolean }> {
+  const user = await tx.user.findUnique({
+    where: { id: userId },
+    select: { role: true, organizationId: true },
+  })
+  if (!user) return { role: null, isLegacyOwner: false }
+  if (user.role === 'ADMIN') return { role: 'ADMIN', isLegacyOwner: false }
+
+  const membership = await tx.garageMembership.findUnique({
+    where: { organizationId_userId: { organizationId, userId } },
+  })
+  if (membership) return { role: membership.role, isLegacyOwner: false }
+
+  const membershipCount = await tx.garageMembership.count({ where: { organizationId } })
+  if (membershipCount === 0 && user.organizationId === organizationId) {
+    return { role: 'OWNER', isLegacyOwner: true }
+  }
+  return { role: null, isLegacyOwner: false }
+}
+
+export async function ensureOwnerMembership(
+  tx: Prisma.TransactionClient,
+  userId: string,
+  organizationId: string,
+): Promise<void> {
+  await tx.garageMembership.upsert({
+    where: { organizationId_userId: { organizationId, userId } },
+    create: { organizationId, userId, role: 'OWNER' },
+    update: {},
+  })
+}
+
 export async function createInvitation(
   tx: Prisma.TransactionClient,
   params: {

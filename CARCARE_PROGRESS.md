@@ -170,11 +170,11 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [x] App-wide: added root `app/not-found.tsx` (self-contained html/body) + `app/[locale]/not-found.tsx`; previously any 404 crashed with "Missing <html> and <body> tags" because the root layout has no html/body (those live in `[locale]/layout.tsx`)
 - [x] MVP · Costs: `GET /api/carcare/costs` (completed-event costs + expenses across accessible vehicles; this-year/all-time totals, by-category + by-vehicle breakdown, recent entries) + `CarCareCostsView` + `/[locale]/carcare/costs` page; KPI cards, lime breakdown bars, entries list — **visually verified**
 - [x] Bottom nav: shared `CarCareBottomNav` (Domov/Udalosti/Náklady, next-intl `Link`, active state) on dashboard/events/costs; dashboard "Náklady tento rok" KPI links to costs (nav reduced from 5 placeholder items to 3 working tabs)
-- [ ] MVP · Garage page
+- [x] MVP · Garage page: `GET /api/carcare/garage` + invite/revoke/remove/accept routes + `CarCareGarageView` + `/[locale]/carcare/garage` + accept page `/[locale]/carcare/invite/[token]`; members with role badges, owner invite form (bootstraps an explicit OWNER membership for the legacy implicit owner before others join, so access is preserved), pending invitations with copy-link + revoke, remove member — **visually verified**
 - [ ] wire remaining action buttons (book / complete) to the API endpoints
-- [ ] Deferred surfaces land here: provider call/email/booking actions, roles/members UI + invite email (hono), template i18n names, viewer read-only enforcement in UI; accent-insensitive catalogue search (Postgres `unaccent`)
-- _temporary mock routes exist for design iteration — remove before shipping: `/[locale]/carcare/preview`, `/[locale]/carcare/events/preview`, `/[locale]/carcare/vehicles/preview`, `/[locale]/carcare/vehicles/new/preview`, `/[locale]/carcare/costs/preview`_
-  > **Review gate M14.** API done; dashboard + events/calendar + vehicle detail + onboarding + costs built & previewed. Garage next.
+- [ ] Deferred surfaces land here: provider call/email/booking actions, invite **email** delivery (hono — currently owner copies the invite link), per-member **vehicle-access** grant/revoke UI, template i18n names, viewer read-only enforcement in UI; accent-insensitive catalogue search (Postgres `unaccent`)
+- _temporary mock routes exist for design iteration — remove before shipping: `/[locale]/carcare/preview`, `/[locale]/carcare/events/preview`, `/[locale]/carcare/vehicles/preview`, `/[locale]/carcare/vehicles/new/preview`, `/[locale]/carcare/costs/preview`, `/[locale]/carcare/garage/preview`_
+  > **Review gate M14.** All sub-step B pages built & previewed: dashboard, events/calendar, vehicle detail, onboarding, costs, garage (+ invite accept). Remaining: wire book/complete actions; deferred surfaces (invite email, per-member vehicle access, etc.).
 
 ## M15 — PWA + web push
 
