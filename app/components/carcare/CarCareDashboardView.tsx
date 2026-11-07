@@ -1,3 +1,5 @@
+'use client'
+
 import {
   AlertTriangle,
   Calendar,
@@ -7,8 +9,10 @@ import {
   ChevronRight,
   Plus,
 } from 'lucide-react'
+import { useState } from 'react'
 import { Link } from '@/i18n/routing'
 import CarCareBottomNav from './CarCareBottomNav'
+import CarCareActionModal, { type ActionOccurrence } from './CarCareActionModal'
 
 export interface DashOccurrence {
   id: string
@@ -100,11 +104,14 @@ function vehicleName(v: {
   return v.nickname || [v.make, v.model].filter(Boolean).join(' ') || v.registration
 }
 
-function EventRow({ o }: { o: DashOccurrence }) {
+function EventRow({ o, onAction }: { o: DashOccurrence; onAction: (o: DashOccurrence) => void }) {
   const badge = dueLabel(o)
   const actionable = o.status === 'ACTION_REQUIRED' || o.overdue
   return (
-    <div className="flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06]">
+    <button
+      onClick={() => onAction(o)}
+      className="w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors"
+    >
       <div className="min-w-0 flex-1">
         <p className="text-pictus-white font-medium truncate">{o.recurringEvent.name}</p>
         <p className="text-sm text-gray-400 truncate">
@@ -115,19 +122,26 @@ function EventRow({ o }: { o: DashOccurrence }) {
         {badge.text}
       </span>
       {actionable ? (
-        <button className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-pictus-lime600 transition-colors">
+        <span className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full">
           {ACTION_LABEL[o.recurringEvent.actionType] ?? 'Zobraziť'}
-        </button>
+        </span>
       ) : (
         <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
       )}
-    </div>
+    </button>
   )
 }
 
-export default function CarCareDashboardView({ data }: { data: DashboardData }) {
+export default function CarCareDashboardView({
+  data,
+  reload,
+}: {
+  data: DashboardData
+  reload?: () => void
+}) {
   const { counts } = data
   const events = [...data.needsAttention, ...data.upcoming]
+  const [active, setActive] = useState<ActionOccurrence | null>(null)
   return (
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
@@ -179,7 +193,11 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
           ) : (
             <div className="space-y-3">
               {events.map((o) => (
-                <EventRow key={o.id} o={o} />
+                <EventRow
+                  key={o.id}
+                  o={o}
+                  onAction={(x) => setActive({ id: x.id, name: x.recurringEvent.name })}
+                />
               ))}
             </div>
           )}
@@ -220,6 +238,17 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
       </div>
 
       <CarCareBottomNav current="home" />
+
+      {active && (
+        <CarCareActionModal
+          occurrence={active}
+          onClose={() => setActive(null)}
+          onDone={() => {
+            setActive(null)
+            reload?.()
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { use, useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from '@/i18n/routing'
 import { Loader2 } from 'lucide-react'
@@ -15,17 +15,20 @@ export default function CarCareVehicleDetailPage({ params }: { params: Promise<{
   const [data, setData] = useState<VehicleDetailData | null>(null)
   const [error, setError] = useState(false)
 
+  const load = useCallback(() => {
+    fetch(`/api/carcare/vehicles/${id}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d) => setData(d))
+      .catch(() => setError(true))
+  }, [id])
+
   useEffect(() => {
     if (status === 'unauthenticated') router.replace('/auth/login')
   }, [status, router])
 
   useEffect(() => {
-    if (status !== 'authenticated') return
-    fetch(`/api/carcare/vehicles/${id}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((d) => setData(d))
-      .catch(() => setError(true))
-  }, [status, id])
+    if (status === 'authenticated') load()
+  }, [status, load])
 
   if (status === 'loading' || (status === 'authenticated' && !data && !error)) {
     return (
@@ -42,5 +45,5 @@ export default function CarCareVehicleDetailPage({ params }: { params: Promise<{
     )
   }
   if (!data) return null
-  return <CarCareVehicleDetailView data={data} />
+  return <CarCareVehicleDetailView data={data} reload={load} />
 }

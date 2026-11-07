@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from '@/i18n/routing'
 import { Loader2 } from 'lucide-react'
@@ -12,17 +12,20 @@ export default function CarCareEventsPage() {
   const [occurrences, setOccurrences] = useState<EvOccurrence[] | null>(null)
   const [error, setError] = useState(false)
 
+  const load = useCallback(() => {
+    fetch('/api/carcare/occurrences')
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d) => setOccurrences(d.occurrences))
+      .catch(() => setError(true))
+  }, [])
+
   useEffect(() => {
     if (status === 'unauthenticated') router.replace('/auth/login')
   }, [status, router])
 
   useEffect(() => {
-    if (status !== 'authenticated') return
-    fetch('/api/carcare/occurrences')
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((d) => setOccurrences(d.occurrences))
-      .catch(() => setError(true))
-  }, [status])
+    if (status === 'authenticated') load()
+  }, [status, load])
 
   if (status === 'loading' || (status === 'authenticated' && !occurrences && !error)) {
     return (
@@ -39,5 +42,5 @@ export default function CarCareEventsPage() {
     )
   }
   if (!occurrences) return null
-  return <CarCareEventsView occurrences={occurrences} />
+  return <CarCareEventsView occurrences={occurrences} reload={load} />
 }

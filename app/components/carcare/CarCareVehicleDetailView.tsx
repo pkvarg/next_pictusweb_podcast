@@ -12,6 +12,7 @@ import {
   CalendarCheck,
 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
+import CarCareActionModal, { type ActionOccurrence } from './CarCareActionModal'
 
 export interface VdOccurrence {
   id: string
@@ -145,10 +146,17 @@ function SpecRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export default function CarCareVehicleDetailView({ data }: { data: VehicleDetailData }) {
+export default function CarCareVehicleDetailView({
+  data,
+  reload,
+}: {
+  data: VehicleDetailData
+  reload?: () => void
+}) {
   const { vehicle } = data
   const [busyKey, setBusyKey] = useState<string | null>(null)
   const [activated, setActivated] = useState<Set<string>>(new Set())
+  const [active, setActive] = useState<ActionOccurrence | null>(null)
 
   const activate = async (key: string) => {
     setBusyKey(key)
@@ -238,9 +246,10 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
                 const badge = dueBadge(o)
                 const actionable = o.status === 'ACTION_REQUIRED' || o.overdue
                 return (
-                  <div
+                  <button
                     key={o.id}
-                    className="flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06]"
+                    onClick={() => setActive({ id: o.id, name: o.recurringEvent.name })}
+                    className="w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors"
                   >
                     <div className="min-w-0 flex-1">
                       <p className="text-pictus-white font-medium truncate">
@@ -262,13 +271,13 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
                       {badge.text}
                     </span>
                     {actionable ? (
-                      <button className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-pictus-lime600 transition-colors">
+                      <span className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full">
                         {ACTION_LABEL[o.recurringEvent.actionType] ?? 'Zobraziť'}
-                      </button>
+                      </span>
                     ) : (
                       <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
                     )}
-                  </div>
+                  </button>
                 )
               })}
             </div>
@@ -362,6 +371,17 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
           </div>
         </section>
       </div>
+
+      {active && (
+        <CarCareActionModal
+          occurrence={active}
+          onClose={() => setActive(null)}
+          onDone={() => {
+            setActive(null)
+            reload?.()
+          }}
+        />
+      )}
     </div>
   )
 }

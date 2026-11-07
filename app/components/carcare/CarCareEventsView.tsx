@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { Calendar, List, ChevronRight } from 'lucide-react'
 import CarCareBottomNav from './CarCareBottomNav'
+import CarCareActionModal, { type ActionOccurrence } from './CarCareActionModal'
 
 export interface EvOccurrence {
   id: string
@@ -58,7 +59,13 @@ const MONTHS = [
 ]
 const ymd = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
 
-function EventList({ occurrences }: { occurrences: EvOccurrence[] }) {
+function EventList({
+  occurrences,
+  onSelect,
+}: {
+  occurrences: EvOccurrence[]
+  onSelect: (o: EvOccurrence) => void
+}) {
   if (occurrences.length === 0) {
     return (
       <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
@@ -71,9 +78,10 @@ function EventList({ occurrences }: { occurrences: EvOccurrence[] }) {
       {occurrences.map((o) => {
         const badge = dueBadge(o)
         return (
-          <div
+          <button
             key={o.id}
-            className="flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06]"
+            onClick={() => onSelect(o)}
+            className="w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors"
           >
             <div className="min-w-0 flex-1">
               <p className="text-pictus-white font-medium truncate">{o.recurringEvent.name}</p>
@@ -85,7 +93,7 @@ function EventList({ occurrences }: { occurrences: EvOccurrence[] }) {
               {badge.text}
             </span>
             <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
-          </div>
+          </button>
         )
       })}
     </div>
@@ -181,8 +189,15 @@ function MonthCalendar({ occurrences }: { occurrences: EvOccurrence[] }) {
   )
 }
 
-export default function CarCareEventsView({ occurrences }: { occurrences: EvOccurrence[] }) {
+export default function CarCareEventsView({
+  occurrences,
+  reload,
+}: {
+  occurrences: EvOccurrence[]
+  reload?: () => void
+}) {
   const [view, setView] = useState<'list' | 'calendar'>('list')
+  const [active, setActive] = useState<ActionOccurrence | null>(null)
   return (
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
@@ -207,12 +222,26 @@ export default function CarCareEventsView({ occurrences }: { occurrences: EvOccu
           </div>
         </header>
         {view === 'list' ? (
-          <EventList occurrences={occurrences} />
+          <EventList
+            occurrences={occurrences}
+            onSelect={(o) => setActive({ id: o.id, name: o.recurringEvent.name })}
+          />
         ) : (
           <MonthCalendar occurrences={occurrences} />
         )}
       </div>
       <CarCareBottomNav current="events" />
+
+      {active && (
+        <CarCareActionModal
+          occurrence={active}
+          onClose={() => setActive(null)}
+          onDone={() => {
+            setActive(null)
+            reload?.()
+          }}
+        />
+      )}
     </div>
   )
 }
