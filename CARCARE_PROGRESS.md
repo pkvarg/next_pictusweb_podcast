@@ -55,23 +55,22 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [x] Migration `20261107160000_carcare_notifications_m4` applied to :5434; status clean; client generated + smoke-tested; logged for prod
   > **Review gate M4.** _Snooze_ is runtime behaviour (deferred to the scheduler milestones M8–M10), not a schema field.
 
-## M5 — Recurrence math + tests
+## M5 — Recurrence math + tests ← _done on local, awaiting review_
 
-- [ ] MVP · One-time and recurring events
-- [ ] MVP · Monthly, annual and custom recurrence
-- [ ] MVP · Seasonal recurrence
-- [ ] MVP · Combined date/mileage (whichever first); due dates and mileage thresholds
-- [ ] `computeNextDue()` + unit tests T2–T6, T14
-  > **Review gate M5.**
+- [x] MVP · One-time and recurring events
+- [x] MVP · Monthly, annual, day/week and custom recurrence (FIXED_INTERVAL / AFTER_COMPLETION; `intervalDays` + `intervalMonths`, days take precedence)
+- [x] MVP · Seasonal recurrence
+- [x] MVP · Combined date/mileage (whichever first); mileage-only; due dates and mileage thresholds
+- [x] `computeNextDue()` in `lib/carcare/recurrence.ts` (pure, no deps); 13 unit tests pass incl. T2–T6, T14 (`tests/carcare/recurrence.test.ts`)
+  > **Review gate M5.** Pure function; no DB change. The DB-level "edit future schedule never rewrites past occurrences" (true T14) is enforced in M6's completion handler.
 
-## M6 — Completion, next occurrence, history & costs
+## M6 — Completion, next occurrence, history & costs ← _core done on local, awaiting review_
 
-- [ ] MVP · Automatically create next occurrence (idempotent, test T1); postpone/skip/cancel; event status management
-- [ ] MVP · Mark event completed; record completion date and mileage
-- [ ] MVP · Expected and actual cost; provider and notes
-- [ ] MVP · Chronological service history
-- [ ] MVP · Expense categories; vehicle cost totals; upcoming expected expenses
-  > **Review gate M6.**
+- [x] MVP · `completeOccurrence()` (`lib/carcare/completion.ts`): mark completed; record completion date, mileage, actual cost, provider, notes
+- [x] MVP · Automatically create next occurrence (idempotent — early-return on re-submit + `generated_from_id` unique backstop); **integration test T1 passes** (`tests/carcare/completion.itest.ts`, run via `vitest.itest.config.ts`)
+- [ ] skip / cancel / postpone status transitions → folded into **M7** (appointment-driven) / **M10** (lifecycle + suppression)
+- [ ] Chronological service history + expense categories / vehicle cost totals / upcoming expected expenses → **M14** (surfaces; builds on existing `my_vehicle_expenses`)
+  > **Review gate M6.** Core completion engine delivered; the remaining items are UI/transition surfaces deliberately deferred to M7/M10/M14 where they fit.
 
 ## M7 — Providers & appointments
 

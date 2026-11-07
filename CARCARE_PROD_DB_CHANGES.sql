@@ -89,3 +89,13 @@ COMMIT;
 --   sms_monthly_limit (default 20), sms_sent_this_month (default 0).
 -- Existing rows get the defaults. No data touched.
 -- Authoritative SQL: the migration file above / `prisma migrate deploy`.
+
+
+-- ----------------------------------------------------------------------------
+-- M5 addendum — recurrence interval_days column
+--      STATUS: APPLIED on local :5434 (2026-11-07)
+--      Prisma migration: prisma/migrations/20261107170000_recurrence_interval_days
+-- ----------------------------------------------------------------------------
+-- Additive. Enables day-granular recurrence (e.g. "every 2 weeks").
+ALTER TABLE "event_templates"  ADD COLUMN "interval_days" INTEGER;
+ALTER TABLE "recurring_events" ADD COLUMN "interval_days" INTEGER;
