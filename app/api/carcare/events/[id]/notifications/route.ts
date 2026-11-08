@@ -27,6 +27,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const body = (await request.json().catch(() => ({}))) as {
     rules?: RuleInput[]
+    excludedRecipientIds?: string[]
     quietHoursStart?: number | null
     quietHoursEnd?: number | null
   }
@@ -39,6 +40,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     })
     if (!event) return 'not-found'
     if (!(await canModifyVehicle(tx, session.userId, event.vehicleId))) return 'forbidden'
+
+    if (body.excludedRecipientIds !== undefined) {
+      const ids = [...new Set(body.excludedRecipientIds.filter((x) => typeof x === 'string'))]
+      await tx.eventRecipientExclusion.deleteMany({ where: { recurringEventId: id } })
+      for (const userId of ids) {
+        await tx.eventRecipientExclusion.create({ data: { recurringEventId: id, userId } })
+      }
+    }
 
     await tx.notificationRule.deleteMany({ where: { recurringEventId: id } })
     for (const r of rules) {

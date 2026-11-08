@@ -42,6 +42,38 @@ function scheduledFor(dueDate: Date, stage: NotificationStage, leadDays: number)
     : addDaysUTC(dueDate, -leadDays)
 }
 
+// Effective recipients for an event's notifications:
+//   - central recipient list (NotificationRecipient) ∪ the event's responsible person,
+//     minus the event's per-event exclusions (EventRecipientExclusion);
+//   - when no central list is configured, the pre-multi-recipient behaviour: the
+//     responsible person, or the garage owner as fallback (still honouring exclusions).
+export async function resolveRecipients(
+  tx: Prisma.TransactionClient,
+  def: { id: string; organizationId: string; responsibleUserId: string | null },
+): Promise<string[]> {
+  const [central, exclusionRows] = await Promise.all([
+    tx.notificationRecipient.findMany({
+      where: { organizationId: def.organizationId },
+      select: { userId: true },
+    }),
+    tx.eventRecipientExclusion.findMany({
+      where: { recurringEventId: def.id },
+      select: { userId: true },
+    }),
+  ])
+  const excluded = new Set(exclusionRows.map((e) => e.userId))
+
+  if (central.length === 0) {
+    const fallback = def.responsibleUserId ?? (await resolveGarageOwner(tx, def.organizationId))
+    if (!fallback || excluded.has(fallback)) return []
+    return [fallback]
+  }
+
+  const set = new Set(central.map((c) => c.userId))
+  if (def.responsibleUserId) set.add(def.responsibleUserId)
+  return [...set].filter((id) => !excluded.has(id))
+}
+
 // Materializes the notification_deliveries for an occurrence from its rules.
 // Idempotent: the deterministic dedupe_key means re-running never double-creates,
 // and it never resurrects a SUPPRESSED/SENT/CANCELLED row (upsert update:{}).
@@ -55,40 +87,44 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
     return []
 
   const def = occ.recurringEvent
-  // Responsible user, or the garage owner as fallback (FS owner fallback).
-  const recipientUserId =
-    def.responsibleUserId ?? (await resolveGarageOwner(tx, def.organizationId))
-  if (!recipientUserId || !occ.dueDate) return [] // no recipient or no date to anchor on
+  if (!occ.dueDate) return [] // no date to anchor on
 
-  const recipient = await tx.user.findUnique({ where: { id: recipientUserId } })
+  const recipientIds = await resolveRecipients(tx, def)
+  if (recipientIds.length === 0) return [] // no one to notify
+
+  const recipients = await tx.user.findMany({ where: { id: { in: recipientIds } } })
+  const byId = new Map(recipients.map((r) => [r.id, r]))
 
   const created = []
   for (const stage of DUE_ANCHORED) {
     const rule = await resolveRule(tx, def.organizationId, def.id, stage)
     if (!rule) continue
-    const when = applyQuietHours(
-      scheduledFor(occ.dueDate, stage, rule.leadDays),
-      recipient?.timezone ?? 'Europe/Bratislava',
-      recipient?.quietHoursStart ?? null,
-      recipient?.quietHoursEnd ?? null,
-    )
-    for (const channel of rule.channels) {
-      const dedupeKey = `${occ.id}:${stage}:${channel}:${recipientUserId}:0`
-      const row = await tx.notificationDelivery.upsert({
-        where: { dedupeKey },
-        create: {
-          occurrenceId: occ.id,
-          recurringEventId: def.id,
-          stage,
-          channel,
-          recipientUserId,
-          scheduledFor: when,
-          status: 'SCHEDULED',
-          dedupeKey,
-        },
-        update: {},
-      })
-      created.push(row)
+    for (const recipientUserId of recipientIds) {
+      const recipient = byId.get(recipientUserId)
+      const when = applyQuietHours(
+        scheduledFor(occ.dueDate, stage, rule.leadDays),
+        recipient?.timezone ?? 'Europe/Bratislava',
+        recipient?.quietHoursStart ?? null,
+        recipient?.quietHoursEnd ?? null,
+      )
+      for (const channel of rule.channels) {
+        const dedupeKey = `${occ.id}:${stage}:${channel}:${recipientUserId}:0`
+        const row = await tx.notificationDelivery.upsert({
+          where: { dedupeKey },
+          create: {
+            occurrenceId: occ.id,
+            recurringEventId: def.id,
+            stage,
+            channel,
+            recipientUserId,
+            scheduledFor: when,
+            status: 'SCHEDULED',
+            dedupeKey,
+          },
+          update: {},
+        })
+        created.push(row)
+      }
     }
   }
   return created

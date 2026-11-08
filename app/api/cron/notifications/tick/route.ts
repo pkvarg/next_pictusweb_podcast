@@ -30,7 +30,14 @@ export async function GET(request: NextRequest) {
       where: {
         status: { in: ['UPCOMING', 'ACTION_REQUIRED', 'ARRANGED'] },
         dueDate: { not: null },
-        recurringEvent: { deletedAt: null, paused: false, responsibleUserId: { not: null } },
+        recurringEvent: {
+          deletedAt: null,
+          paused: false,
+          OR: [
+            { responsibleUserId: { not: null } },
+            { organization: { notificationRecipients: { some: {} } } },
+          ],
+        },
       },
       select: { id: true },
     })

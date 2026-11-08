@@ -66,7 +66,7 @@ function dueLabel(o: DashOccurrence, t: Tr): { text: string; tone: 'red' | 'ambe
       tone: 'red',
     }
   if (o.status === 'ARRANGED') return { text: t('badge.arranged'), tone: 'neutral' }
-  if (o.status === 'ACTION_REQUIRED') return { text: t('badge.actionReq'), tone: 'amber' }
+  if (o.status === 'ACTION_REQUIRED') return { text: t('badge.actionReq'), tone: 'red' }
   if (d != null) return { text: t('badge.inDays', { d }), tone: 'neutral' }
   return { text: t('badge.upcoming'), tone: 'neutral' }
 }
@@ -82,15 +82,18 @@ function Kpi({
   value,
   label,
   accent,
+  accentTone = 'lime',
 }: {
   icon: React.ReactNode
   value: string
   label: string
   accent?: boolean
+  accentTone?: 'lime' | 'danger'
 }) {
+  const accentCls = accentTone === 'danger' ? 'text-red-500' : 'text-pictus-lime'
   return (
     <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06] flex flex-col gap-1">
-      <div className={accent ? 'text-pictus-lime' : 'text-gray-400'}>{icon}</div>
+      <div className={accent ? accentCls : 'text-gray-400'}>{icon}</div>
       <div className="text-2xl font-bold text-pictus-white">{value}</div>
       <div className="text-xs text-gray-400">{label}</div>
     </div>
@@ -120,7 +123,13 @@ function EventRow({ o, t }: { o: DashOccurrence; t: Tr }) {
           {vehicleName(o.vehicle)} · {o.vehicle.registration}
         </p>
       </div>
-      <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full ${toneClass[badge.tone]}`}>
+      <span
+        className={`shrink-0 rounded-full ${
+          badge.tone === 'red'
+            ? 'bg-red-500 text-white text-sm font-semibold px-4 py-1.5'
+            : `text-xs px-2.5 py-1 ${toneClass[badge.tone]}`
+        }`}
+      >
         {badge.text}
       </span>
       {actionable ? (
@@ -192,6 +201,7 @@ export default function CarCareDashboardView({
             value={String(counts.needsAttention)}
             label={t('dash.kpiAction')}
             accent={counts.needsAttention > 0}
+            accentTone="danger"
           />
           <Kpi
             icon={<Calendar className="w-5 h-5" />}
@@ -203,7 +213,10 @@ export default function CarCareDashboardView({
             value={String(counts.arranged)}
             label={t('dash.kpiArranged')}
           />
-          <Link href="/client/my-fleet/costs" className="rounded-2xl hover:opacity-90 transition-opacity">
+          <Link
+            href="/client/my-fleet/costs"
+            className="rounded-2xl hover:opacity-90 transition-opacity"
+          >
             <Kpi
               icon={<Wallet className="w-5 h-5" />}
               value={`${counts.costThisYear.toFixed(0)} €`}

@@ -16,6 +16,8 @@ import {
   MessageSquare,
   Smartphone,
   AppWindow,
+  User as UserIcon,
+  Check,
 } from 'lucide-react'
 
 type Channel = 'EMAIL' | 'SMS' | 'PUSH' | 'IN_APP'
@@ -72,8 +74,17 @@ export interface EventDetailData {
     repeatUntilActioned: boolean
     repeatEveryDays: number | null
   }[]
+  defaultRules: {
+    stage: string
+    leadDays: number
+    channels: Channel[]
+    repeatUntilActioned: boolean
+    repeatEveryDays: number | null
+  }[]
   members: { userId: string; name: string }[]
   providers: { id: string; name: string }[]
+  recipientIds: string[]
+  excludedRecipientIds: string[]
   quietHours: { start: number | null; end: number | null }
 }
 
@@ -132,7 +143,7 @@ const CHANNELS: { key: Channel; labelKey: string; icon: React.ReactNode }[] = [
 ]
 
 const input =
-  'w-full bg-pictus-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-pictus-white focus:border-pictus-lime/50 focus:outline-none'
+  'w-full bg-pictus-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-pictus-white focus:border-pictus-lime/50 focus:outline-none [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:hover:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer'
 const label = 'block text-sm text-gray-400 mb-1.5'
 
 function Toggle({
@@ -179,6 +190,8 @@ export default function CarCareEventDetailView({
     data.vehicle.nickname ||
     [data.vehicle.make, data.vehicle.model].filter(Boolean).join(' ') ||
     data.vehicle.registration
+  const vehLine =
+    vehName === data.vehicle.registration ? vehName : `${vehName} · ${data.vehicle.registration}`
 
   // Termín tab state
   const [recurrenceType, setRecurrenceType] = useState(data.event.recurrenceType)
@@ -192,67 +205,77 @@ export default function CarCareEventDetailView({
   )
   const [expectedCost, setExpectedCost] = useState(data.event.expectedCost?.toString() ?? '')
 
-  // Notifikácie tab state
-  const ruleFor = (stage: string) => data.rules.find((r) => r.stage === stage)
-  const [stages, setStages] = useState<Record<string, { active: boolean; leadDays: number }>>(
-    () => {
-      const init: Record<string, { active: boolean; leadDays: number }> = {}
-      for (const s of STAGE_UI) {
-        const r = ruleFor(s.stage)
-        const defaults: Record<string, number> = { BOOKING: 14, APPOINTMENT: 1, DEADLINE: 3 }
-        init[s.stage] = { active: !!r, leadDays: r?.leadDays ?? defaults[s.stage] ?? 0 }
-      }
-      return init
-    },
-  )
-  const [channels, setChannels] = useState<Set<Channel>>(() => {
+  // Notifikácie tab state. When the event has no own rules, pre-fill from the org-wide
+  // central defaults (inherited) so the tab reflects what will actually fire.
+  const STAGE_DEFAULTS: Record<string, number> = { BOOKING: 14, APPOINTMENT: 1, DEADLINE: 3 }
+  const effectiveRules = data.rules.length > 0 ? data.rules : data.defaultRules
+  const inherited = data.rules.length === 0 && data.defaultRules.length > 0
+  const ruleFor = (stage: string) => effectiveRules.find((r) => r.stage === stage)
+  const stagesFrom = (src: EventDetailData['rules']) => {
+    const init: Record<string, { active: boolean; leadDays: number }> = {}
+    for (const s of STAGE_UI) {
+      const r = src.find((x) => x.stage === s.stage)
+      init[s.stage] = { active: !!r, leadDays: r?.leadDays ?? STAGE_DEFAULTS[s.stage] ?? 0 }
+    }
+    return init
+  }
+  const channelsFrom = (src: EventDetailData['rules']) => {
     const set = new Set<Channel>()
-    data.rules.forEach((r) => r.channels.forEach((c) => set.add(c)))
+    src.forEach((r) => r.channels.forEach((c) => set.add(c)))
     if (set.size === 0) set.add('IN_APP')
     return set
-  })
+  }
+  const [stages, setStages] = useState<Record<string, { active: boolean; leadDays: number }>>(() =>
+    stagesFrom(effectiveRules),
+  )
+  const [channels, setChannels] = useState<Set<Channel>>(() => channelsFrom(effectiveRules))
   const [quietOn, setQuietOn] = useState(
     data.quietHours.start != null && data.quietHours.end != null,
   )
   const [quietStart, setQuietStart] = useState((data.quietHours.start ?? 22).toString())
   const [quietEnd, setQuietEnd] = useState((data.quietHours.end ?? 8).toString())
-  const [repeatOn, setRepeatOn] = useState(data.rules.some((r) => r.repeatUntilActioned))
+  const [repeatOn, setRepeatOn] = useState(effectiveRules.some((r) => r.repeatUntilActioned))
   const [repeatDays, setRepeatDays] = useState(
-    (data.rules.find((r) => r.repeatEveryDays)?.repeatEveryDays ?? 3).toString(),
+    (effectiveRules.find((r) => r.repeatEveryDays)?.repeatEveryDays ?? 3).toString(),
   )
-  const [notifActive, setNotifActive] = useState(data.rules.length > 0)
-  const [previewChannel, setPreviewChannel] = useState<Channel>('EMAIL')
+  const [notifActive, setNotifActive] = useState(effectiveRules.length > 0)
+  const [excluded, setExcluded] = useState<Set<string>>(() => new Set(data.excludedRecipientIds))
+  const recipientPool = (() => {
+    const ids = new Set<string>(data.recipientIds)
+    if (data.event.responsibleUserId) ids.add(data.event.responsibleUserId)
+    return [...ids].map((id) => ({
+      userId: id,
+      name: data.members.find((m) => m.userId === id)?.name ?? id,
+    }))
+  })()
 
-  const STAGE_DEFAULTS: Record<string, number> = { BOOKING: 14, APPOINTMENT: 1, DEADLINE: 3 }
   const DEFAULT_ACTIVE = new Set(['BOOKING', 'APPOINTMENT', 'DEADLINE'])
   const resetDefaults = () => {
-    const init: Record<string, { active: boolean; leadDays: number }> = {}
-    for (const s of STAGE_UI)
-      init[s.stage] = {
-        active: DEFAULT_ACTIVE.has(s.stage),
-        leadDays: STAGE_DEFAULTS[s.stage] ?? 0,
-      }
-    setStages(init)
-    setChannels(new Set<Channel>(['IN_APP', 'EMAIL']))
-    setQuietOn(false)
-    setRepeatOn(false)
-    setNotifActive(true)
+    if (data.defaultRules.length > 0) {
+      setStages(stagesFrom(data.defaultRules))
+      setChannels(channelsFrom(data.defaultRules))
+      setRepeatOn(data.defaultRules.some((r) => r.repeatUntilActioned))
+      setNotifActive(true)
+    } else {
+      const init: Record<string, { active: boolean; leadDays: number }> = {}
+      for (const s of STAGE_UI)
+        init[s.stage] = {
+          active: DEFAULT_ACTIVE.has(s.stage),
+          leadDays: STAGE_DEFAULTS[s.stage] ?? 0,
+        }
+      setStages(init)
+      setChannels(new Set<Channel>(['IN_APP', 'EMAIL']))
+      setRepeatOn(false)
+      setNotifActive(true)
+    }
     setMsg(t('ev.defaultsRestored'))
   }
   const cancelNotif = () => {
-    const init: Record<string, { active: boolean; leadDays: number }> = {}
-    for (const s of STAGE_UI) {
-      const r = ruleFor(s.stage)
-      init[s.stage] = { active: !!r, leadDays: r?.leadDays ?? STAGE_DEFAULTS[s.stage] ?? 0 }
-    }
-    setStages(init)
-    const set = new Set<Channel>()
-    data.rules.forEach((r) => r.channels.forEach((c) => set.add(c)))
-    if (set.size === 0) set.add('IN_APP')
-    setChannels(set)
+    setStages(stagesFrom(effectiveRules))
+    setChannels(channelsFrom(effectiveRules))
     setQuietOn(data.quietHours.start != null && data.quietHours.end != null)
-    setRepeatOn(data.rules.some((r) => r.repeatUntilActioned))
-    setNotifActive(data.rules.length > 0)
+    setRepeatOn(effectiveRules.some((r) => r.repeatUntilActioned))
+    setNotifActive(effectiveRules.length > 0)
     setMsg(null)
   }
 
@@ -315,6 +338,7 @@ export default function CarCareEventDetailView({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           rules,
+          excludedRecipientIds: [...excluded],
           quietHoursStart: quietOn ? Number(quietStart) : null,
           quietHoursEnd: quietOn ? Number(quietEnd) : null,
         }),
@@ -385,7 +409,9 @@ export default function CarCareEventDetailView({
     const tone =
       data.current.status === 'ARRANGED'
         ? 'bg-pictus-lime/15 text-pictus-lime border-pictus-lime/30'
-        : 'bg-white/5 text-gray-300 border-white/10'
+        : data.current.status === 'ACTION_REQUIRED'
+          ? 'bg-red-500/15 text-red-300 border-red-500/30'
+          : 'bg-white/5 text-gray-300 border-white/10'
     return (
       <span className={`text-xs px-2.5 py-1 rounded-full border ${tone}`}>
         {map[data.current.status] ? t(map[data.current.status]) : data.current.status}
@@ -424,9 +450,7 @@ export default function CarCareEventDetailView({
             <h1 className="text-3xl font-light">{data.event.name}</h1>
             {statusBadge()}
           </div>
-          <p className="text-gray-400 mt-1">
-            {vehName} · {data.vehicle.registration}
-          </p>
+          <p className="text-gray-400 mt-1">{vehLine}</p>
         </header>
 
         <div className="flex gap-1 overflow-x-auto mb-6 border-b border-white/[0.06]">
@@ -585,278 +609,241 @@ export default function CarCareEventDetailView({
 
         {tab === 'notif' && (
           <div className="space-y-5">
-            <div className="grid lg:grid-cols-3 gap-5 items-start">
-              <div className="lg:col-span-2 space-y-5">
-                <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h2 className="font-medium">{t('ev.notifTitle')}</h2>
-                      <p className="text-sm text-gray-400">{t('ev.notifSub')}</p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="hidden sm:inline text-xs text-gray-400">
-                        {t('ev.masterToggle')}
-                      </span>
+            <div className="space-y-5 max-w-3xl">
+              {inherited && (
+                <div className="flex items-start gap-2 rounded-2xl bg-pictus-lime/5 border border-pictus-lime/20 p-4 text-sm text-gray-300">
+                  <Info className="w-4 h-4 text-pictus-lime shrink-0 mt-0.5" />
+                  <p>
+                    {t('ev.inheritedNote')}{' '}
+                    <Link
+                      href="/client/my-fleet/notifications"
+                      className="text-pictus-lime hover:text-pictus-lime600"
+                    >
+                      {t('recipients.manageDefaults')}
+                    </Link>
+                  </p>
+                </div>
+              )}
+              <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h2 className="font-medium">{t('ev.notifTitle')}</h2>
+                    <p className="text-sm text-gray-400">{t('ev.notifSub')}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="hidden sm:inline text-xs text-gray-400">
+                      {t('ev.masterToggle')}
+                    </span>
+                    <Toggle
+                      on={notifActive}
+                      disabled={!canModify}
+                      onClick={() => setNotifActive((v) => !v)}
+                    />
+                  </div>
+                </div>
+                <div
+                  className={`space-y-3 mt-4 ${notifActive ? '' : 'opacity-40 pointer-events-none'}`}
+                >
+                  {STAGE_UI.map((s) => (
+                    <div
+                      key={s.stage}
+                      className="flex items-center gap-3 py-2 border-b border-white/[0.06] last:border-0"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-pictus-white text-sm font-medium inline-flex items-center gap-1.5">
+                          {t(s.labelKey)}
+                          <span title={t(s.hintKey)} className="text-gray-600">
+                            <Info className="w-3.5 h-3.5" />
+                          </span>
+                        </p>
+                        <p className="text-xs text-gray-500">{t(s.hintKey)}</p>
+                      </div>
+                      {s.lead && stages[s.stage].active && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          <input
+                            type="number"
+                            className="w-16 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1 text-sm text-pictus-white"
+                            value={stages[s.stage].leadDays}
+                            onChange={(e) =>
+                              setStages((p) => ({
+                                ...p,
+                                [s.stage]: { ...p[s.stage], leadDays: Number(e.target.value) },
+                              }))
+                            }
+                            disabled={!canModify}
+                          />
+                          <span className="text-xs text-gray-500">{t('ev.daysBefore')}</span>
+                        </div>
+                      )}
                       <Toggle
-                        on={notifActive}
+                        on={stages[s.stage].active}
                         disabled={!canModify}
-                        onClick={() => setNotifActive((v) => !v)}
+                        onClick={() =>
+                          setStages((p) => ({
+                            ...p,
+                            [s.stage]: { ...p[s.stage], active: !p[s.stage].active },
+                          }))
+                        }
                       />
                     </div>
-                  </div>
-                  <div
-                    className={`space-y-3 mt-4 ${notifActive ? '' : 'opacity-40 pointer-events-none'}`}
-                  >
-                    {STAGE_UI.map((s) => (
-                      <div
-                        key={s.stage}
-                        className="flex items-center gap-3 py-2 border-b border-white/[0.06] last:border-0"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="text-pictus-white text-sm font-medium inline-flex items-center gap-1.5">
-                            {t(s.labelKey)}
-                            <span title={t(s.hintKey)} className="text-gray-600">
-                              <Info className="w-3.5 h-3.5" />
-                            </span>
-                          </p>
-                          <p className="text-xs text-gray-500">{t(s.hintKey)}</p>
-                        </div>
-                        {s.lead && stages[s.stage].active && (
-                          <div className="flex items-center gap-1 shrink-0">
-                            <input
-                              type="number"
-                              className="w-16 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1 text-sm text-pictus-white"
-                              value={stages[s.stage].leadDays}
-                              onChange={(e) =>
-                                setStages((p) => ({
-                                  ...p,
-                                  [s.stage]: { ...p[s.stage], leadDays: Number(e.target.value) },
-                                }))
-                              }
-                              disabled={!canModify}
-                            />
-                            <span className="text-xs text-gray-500">{t('ev.daysBefore')}</span>
-                          </div>
-                        )}
-                        <Toggle
-                          on={stages[s.stage].active}
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
+                <h2 className="font-medium mb-1">{t('ev.channelsTitle')}</h2>
+                <p className="text-sm text-gray-400 mb-4">{t('ev.channelsSub')}</p>
+                <div className={notifActive ? '' : 'opacity-40 pointer-events-none'}>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {CHANNELS.map((c) => {
+                      const on = channels.has(c.key)
+                      return (
+                        <button
+                          key={c.key}
                           disabled={!canModify}
                           onClick={() =>
-                            setStages((p) => ({
-                              ...p,
-                              [s.stage]: { ...p[s.stage], active: !p[s.stage].active },
-                            }))
+                            setChannels((prev) => {
+                              const n = new Set(prev)
+                              if (n.has(c.key)) n.delete(c.key)
+                              else n.add(c.key)
+                              return n
+                            })
                           }
-                        />
-                      </div>
-                    ))}
+                          className={`inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border text-sm ${
+                            on
+                              ? 'bg-pictus-lime/15 text-pictus-lime border-pictus-lime/30'
+                              : 'bg-white/5 text-gray-300 border-white/10'
+                          } disabled:opacity-50`}
+                        >
+                          {c.icon} {t(c.labelKey)}
+                        </button>
+                      )
+                    })}
                   </div>
-                </div>
-
-                <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
-                  <h2 className="font-medium mb-1">{t('ev.channelsTitle')}</h2>
-                  <p className="text-sm text-gray-400 mb-4">{t('ev.channelsSub')}</p>
-                  <div className={notifActive ? '' : 'opacity-40 pointer-events-none'}>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {CHANNELS.map((c) => {
-                        const on = channels.has(c.key)
-                        return (
-                          <button
-                            key={c.key}
-                            disabled={!canModify}
-                            onClick={() =>
-                              setChannels((prev) => {
-                                const n = new Set(prev)
-                                if (n.has(c.key)) n.delete(c.key)
-                                else n.add(c.key)
-                                return n
-                              })
-                            }
-                            className={`inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border text-sm ${
-                              on
-                                ? 'bg-pictus-lime/15 text-pictus-lime border-pictus-lime/30'
-                                : 'bg-white/5 text-gray-300 border-white/10'
-                            } disabled:opacity-50`}
-                          >
-                            {c.icon} {t(c.labelKey)}
-                          </button>
-                        )
-                      })}
-                    </div>
-                    <div className="flex items-center justify-between gap-2 mt-3 text-xs">
-                      <span className="inline-flex items-center gap-1.5 text-gray-500">
-                        <Info className="w-3.5 h-3.5 shrink-0" /> {t('ev.verifiedContactsNote')}
-                      </span>
-                      <Link
-                        href="/client/my-fleet/garage"
-                        className="shrink-0 text-pictus-lime hover:text-pictus-lime600"
-                      >
-                        {t('ev.manageContacts')} →
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  className={`bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-4 ${notifActive ? '' : 'opacity-40 pointer-events-none'}`}
-                >
-                  <h2 className="font-medium">{t('ev.advanced')}</h2>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1">
-                      <p className="text-sm text-pictus-white">{t('ev.quietHours')}</p>
-                      <p className="text-xs text-gray-500">{t('ev.quietHoursHint')}</p>
-                    </div>
-                    {quietOn && (
-                      <div className="flex items-center gap-1 text-sm">
-                        <input
-                          type="number"
-                          min={0}
-                          max={23}
-                          className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
-                          value={quietStart}
-                          onChange={(e) => setQuietStart(e.target.value)}
-                          disabled={!canModify}
-                        />
-                        <span className="text-gray-500">–</span>
-                        <input
-                          type="number"
-                          min={0}
-                          max={23}
-                          className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
-                          value={quietEnd}
-                          onChange={(e) => setQuietEnd(e.target.value)}
-                          disabled={!canModify}
-                        />
-                      </div>
-                    )}
-                    <Toggle
-                      on={quietOn}
-                      disabled={!canModify}
-                      onClick={() => setQuietOn((v) => !v)}
-                    />
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1">
-                      <p className="text-sm text-pictus-white">{t('ev.repeatReminder')}</p>
-                      <p className="text-xs text-gray-500">{t('ev.repeatReminderHint')}</p>
-                    </div>
-                    {repeatOn && (
-                      <div className="flex items-center gap-1 text-sm">
-                        <span className="text-gray-500">{t('ev.every')}</span>
-                        <input
-                          type="number"
-                          min={1}
-                          className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
-                          value={repeatDays}
-                          onChange={(e) => setRepeatDays(e.target.value)}
-                          disabled={!canModify}
-                        />
-                        <span className="text-gray-500">{t('ev.days')}</span>
-                      </div>
-                    )}
-                    <Toggle
-                      on={repeatOn}
-                      disabled={!canModify}
-                      onClick={() => setRepeatOn((v) => !v)}
-                    />
+                  <div className="flex items-center justify-between gap-2 mt-3 text-xs">
+                    <span className="inline-flex items-center gap-1.5 text-gray-500">
+                      <Info className="w-3.5 h-3.5 shrink-0" /> {t('ev.verifiedContactsNote')}
+                    </span>
+                    <Link
+                      href="/client/my-fleet/garage"
+                      className="shrink-0 text-pictus-lime hover:text-pictus-lime600"
+                    >
+                      {t('ev.manageContacts')} →
+                    </Link>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-5">
-                <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
-                  <h2 className="font-medium mb-3">{t('ev.summaryTitle')}</h2>
-                  <Row label={t('ev.rowDue')} value={fmt(data.current?.dueDate ?? null)} />
-                  <Row
-                    label={t('ev.rowRecurrence')}
-                    value={
-                      RECURRENCE_KEYS[data.event.recurrenceType]
-                        ? t(RECURRENCE_KEYS[data.event.recurrenceType])
-                        : data.event.recurrenceType
-                    }
-                  />
-                  <Row
-                    label={t('ev.rowResponsible')}
-                    value={data.event.responsibleUser?.name ?? '—'}
-                  />
-                  <Row
-                    label={t('ev.sumActiveNotifs')}
-                    value={t('ev.sumTypesCount', {
-                      n: notifActive ? STAGE_UI.filter((s) => stages[s.stage].active).length : 0,
-                    })}
-                  />
-                  <Row
-                    label={t('ev.sumActiveChannels')}
-                    value={
-                      notifActive && channels.size
-                        ? [...channels]
-                            .map((c) => {
-                              const def = CHANNELS.find((x) => x.key === c)
-                              return def ? t(def.labelKey) : c
+              <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
+                <h2 className="font-medium mb-1">{t('recipients.title')}</h2>
+                <p className="text-sm text-gray-400 mb-4">{t('recipients.eventSubtitle')}</p>
+                {recipientPool.length === 0 ? (
+                  <p className="inline-flex items-center gap-1.5 text-sm text-gray-500">
+                    <Info className="w-4 h-4 shrink-0" /> {t('recipients.empty')}
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {recipientPool.map((m) => {
+                      const on = !excluded.has(m.userId)
+                      return (
+                        <button
+                          key={m.userId}
+                          type="button"
+                          disabled={!canModify}
+                          onClick={() =>
+                            setExcluded((prev) => {
+                              const n = new Set(prev)
+                              if (n.has(m.userId)) n.delete(m.userId)
+                              else n.add(m.userId)
+                              return n
                             })
-                            .join(', ')
-                        : '—'
-                    }
-                  />
-                </div>
-
-                <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
-                  <h2 className="font-medium mb-1">{t('ev.previewTitle')}</h2>
-                  <p className="text-sm text-gray-400 mb-4">{t('ev.previewSub')}</p>
-                  <div className="flex gap-1 mb-4 flex-wrap">
-                    {CHANNELS.map((c) => (
-                      <button
-                        key={c.key}
-                        onClick={() => setPreviewChannel(c.key)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs border ${
-                          previewChannel === c.key
-                            ? 'bg-pictus-lime/15 text-pictus-lime border-pictus-lime/30'
-                            : 'bg-white/5 text-gray-400 border-white/10'
-                        }`}
-                      >
-                        {c.icon} {t(c.labelKey)}
-                      </button>
-                    ))}
+                          }
+                          className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl border text-sm ${
+                            on
+                              ? 'bg-pictus-lime/15 text-pictus-white border-pictus-lime/30'
+                              : 'bg-white/5 text-gray-500 border-white/10'
+                          } disabled:opacity-50`}
+                        >
+                          <span className="inline-flex items-center gap-2 min-w-0">
+                            <UserIcon className="w-4 h-4 shrink-0 text-gray-400" />
+                            <span className="truncate">{m.name}</span>
+                          </span>
+                          {on && <Check className="w-4 h-4 text-pictus-lime shrink-0" />}
+                        </button>
+                      )
+                    })}
                   </div>
-                  {previewChannel === 'PUSH' || previewChannel === 'IN_APP' ? (
-                    <div className="rounded-2xl bg-pictus-black/50 border border-white/10 p-3 flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-pictus-lime/15 flex items-center justify-center shrink-0">
-                        <Bell className="w-4 h-4 text-pictus-lime" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-pictus-white">FleetSync</p>
-                        <p className="text-sm text-pictus-white truncate">{data.event.name}</p>
-                        <p className="text-xs text-gray-400">{t('ev.previewPushBody')}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl bg-pictus-black/50 border border-white/10 p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-6 h-6 rounded-md bg-pictus-lime/15 flex items-center justify-center">
-                          <Bell className="w-3.5 h-3.5 text-pictus-lime" />
-                        </div>
-                        <span className="text-sm font-semibold text-pictus-white">FleetSync</span>
-                      </div>
-                      <p className="text-base font-medium text-pictus-white mb-2">
-                        {t('ev.previewHeadline')}
-                      </p>
-                      <div className="text-xs text-gray-400 space-y-0.5 mb-3">
-                        <p>
-                          {t('ev.previewEventLabel')}: {data.event.name}
-                        </p>
-                        <p>
-                          {t('ev.previewVehicleLabel')}: {vehName} · {data.vehicle.registration}
-                        </p>
-                        <p>
-                          {t('ev.previewDueLabel')}: {fmt(data.current?.dueDate ?? null)}
-                        </p>
-                      </div>
-                      <span className="inline-block bg-pictus-lime text-pictus-black text-xs font-semibold px-3 py-1.5 rounded-lg">
-                        {t('ev.previewCta')}
-                      </span>
-                      <p className="text-[11px] text-gray-600 mt-3">{t('ev.previewAutomated')}</p>
+                )}
+                <Link
+                  href="/client/my-fleet/notifications"
+                  className="mt-3 inline-block text-xs text-pictus-lime hover:text-pictus-lime600"
+                >
+                  {t('recipients.manageDefaults')} →
+                </Link>
+              </div>
+
+              <div
+                className={`bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-4 ${notifActive ? '' : 'opacity-40 pointer-events-none'}`}
+              >
+                <h2 className="font-medium">{t('ev.advanced')}</h2>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <p className="text-sm text-pictus-white">{t('ev.quietHours')}</p>
+                    <p className="text-xs text-gray-500">{t('ev.quietHoursHint')}</p>
+                  </div>
+                  {quietOn && (
+                    <div className="flex items-center gap-1 text-sm">
+                      <input
+                        type="number"
+                        min={0}
+                        max={23}
+                        className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
+                        value={quietStart}
+                        onChange={(e) => setQuietStart(e.target.value)}
+                        disabled={!canModify}
+                      />
+                      <span className="text-gray-500">–</span>
+                      <input
+                        type="number"
+                        min={0}
+                        max={23}
+                        className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
+                        value={quietEnd}
+                        onChange={(e) => setQuietEnd(e.target.value)}
+                        disabled={!canModify}
+                      />
                     </div>
                   )}
+                  <Toggle
+                    on={quietOn}
+                    disabled={!canModify}
+                    onClick={() => setQuietOn((v) => !v)}
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <p className="text-sm text-pictus-white">{t('ev.repeatReminder')}</p>
+                    <p className="text-xs text-gray-500">{t('ev.repeatReminderHint')}</p>
+                  </div>
+                  {repeatOn && (
+                    <div className="flex items-center gap-1 text-sm">
+                      <span className="text-gray-500">{t('ev.every')}</span>
+                      <input
+                        type="number"
+                        min={1}
+                        className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
+                        value={repeatDays}
+                        onChange={(e) => setRepeatDays(e.target.value)}
+                        disabled={!canModify}
+                      />
+                      <span className="text-gray-500">{t('ev.days')}</span>
+                    </div>
+                  )}
+                  <Toggle
+                    on={repeatOn}
+                    disabled={!canModify}
+                    onClick={() => setRepeatOn((v) => !v)}
+                  />
                 </div>
               </div>
             </div>

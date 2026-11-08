@@ -103,7 +103,7 @@ function dueBadge(o: VdOccurrence, t: Tr): { text: string; tone: keyof typeof to
   if (o.overdue)
     return { text: d != null ? t('badge.overdueDays', { d }) : t('badge.overdue'), tone: 'red' }
   if (o.status === 'ARRANGED') return { text: t('badge.arranged'), tone: 'lime' }
-  if (o.status === 'ACTION_REQUIRED') return { text: t('badge.actionReq'), tone: 'amber' }
+  if (o.status === 'ACTION_REQUIRED') return { text: t('badge.actionReq'), tone: 'red' }
   if (d != null) return { text: t('badge.inDays', { d }), tone: 'neutral' }
   return { text: t('badge.upcoming'), tone: 'neutral' }
 }
@@ -281,7 +281,11 @@ export default function CarCareVehicleDetailView({
                         </p>
                       </div>
                       <span
-                        className={`shrink-0 text-xs px-2.5 py-1 rounded-full ${toneClass[badge.tone]}`}
+                        className={`shrink-0 rounded-full ${
+                          badge.tone === 'red'
+                            ? 'bg-red-500 text-white text-sm font-semibold px-4 py-1.5'
+                            : `text-xs px-2.5 py-1 ${toneClass[badge.tone]}`
+                        }`}
                       >
                         {badge.text}
                       </span>

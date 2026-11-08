@@ -1400,7 +1400,8 @@
       "home": "Domov",
       "events": "Udalosti",
       "costs": "Náklady",
-      "garage": "Garáž"
+      "garage": "Garáž",
+      "settings": "Nastavenia"
     },
     "common": {
       "back": "Späť",
@@ -1668,7 +1669,8 @@
       "estimate": "Odhad",
       "actual": "Skutočné",
       "estActualTitle": "Odhadované / skutočné náklady",
-      "defaultsRestored": "Predvolené nastavenia obnovené."
+      "defaultsRestored": "Predvolené nastavenia obnovené.",
+      "inheritedNote": "Tieto hodnoty sú prevzaté z centrálnych nastavení. Uložením ich prispôsobíte iba pre túto udalosť."
     },
     "pt": {
       "PETROL": "Benzín",
@@ -1762,6 +1764,24 @@
       "dueDate": "Termín",
       "saveFailed": "Udalosť sa nepodarilo vytvoriť.",
       "nameRequired": "Vyplňte názov a kategóriu."
+    },
+    "defaults": {
+      "title": "Notifikácie",
+      "subtitle": "Predvolené pripomienky pre všetky vozidlá",
+      "intro": "Tieto nastavenia platia pre všetky udalosti. Pri konkrétnej udalosti ich môžete upraviť.",
+      "ownerOnly": "Predvolené notifikácie môže meniť iba vlastník garáže.",
+      "save": "Uložiť nastavenia",
+      "saved": "Nastavenia uložené.",
+      "saveFailed": "Nastavenia sa nepodarilo uložiť.",
+      "loadFailed": "Nastavenia sa nepodarilo načítať."
+    },
+    "recipients": {
+      "title": "Príjemcovia",
+      "subtitle": "Kto má predvolene dostávať notifikácie",
+      "note": "Vyberte členov garáže, ktorí majú dostávať upozornenia. Pri konkrétnej udalosti ich môžete odznačiť.",
+      "eventSubtitle": "Zrušte začiarknutie pri tých, ktorí nemajú dostávať upozornenia pre túto udalosť.",
+      "empty": "Zatiaľ nie sú nastavení žiadni príjemcovia. Nastavte zodpovednú osobu alebo predvolených príjemcov.",
+      "manageDefaults": "Spravovať predvolených príjemcov"
     }
   }
 }

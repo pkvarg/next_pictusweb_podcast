@@ -118,6 +118,8 @@ model User {
   picDocsRuns            PicDocsRun[]
   responsibleEvents      RecurringEvent[]
   notificationDeliveries NotificationDelivery[]
+  notificationRecipient  NotificationRecipient[]
+  recipientExclusions    EventRecipientExclusion[]
   garageMemberships      GarageMembership[]
   pushSubscriptions      PushSubscription[]
 
@@ -441,11 +443,12 @@ model Organization {
   picDocsRuns PicDocsRun[]
 
   // CarCare event engine
-  recurringEvents   RecurringEvent[]
-  providers         Provider[]
-  notificationRules NotificationRule[]
-  garageMemberships GarageMembership[]
-  garageInvitations GarageInvitation[]
+  recurringEvents        RecurringEvent[]
+  providers              Provider[]
+  notificationRules      NotificationRule[]
+  notificationRecipients NotificationRecipient[]
+  garageMemberships      GarageMembership[]
+  garageInvitations      GarageInvitation[]
 
   @@index([tierId])
   @@index([parentOrganizationId])
@@ -742,9 +745,10 @@ model RecurringEvent {
   template          EventTemplate?         @relation(fields: [templateId], references: [id])
   responsibleUser   User?                  @relation(fields: [responsibleUserId], references: [id])
   preferredProvider Provider?              @relation(fields: [preferredProviderId], references: [id], onDelete: SetNull)
-  occurrences       EventOccurrence[]
-  rules             NotificationRule[]
-  deliveries        NotificationDelivery[]
+  occurrences         EventOccurrence[]
+  rules               NotificationRule[]
+  deliveries          NotificationDelivery[]
+  recipientExclusions EventRecipientExclusion[]
 
   @@index([organizationId])
   @@index([vehicleId])
@@ -872,6 +876,39 @@ model NotificationRule {
 
   @@index([organizationId, stage])
   @@map("notification_rules")
+}
+
+// Central recipient list: garage members who receive notifications by default for every
+// event in the org. When empty, delivery falls back to the event's responsible person
+// (or the garage owner), preserving the pre-multi-recipient behaviour.
+model NotificationRecipient {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  userId         String   @map("user_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@map("notification_recipients")
+}
+
+// Per-event opt-out: a user in the central recipient list (or the responsible person)
+// who should NOT be notified for this specific event.
+model EventRecipientExclusion {
+  id               String   @id @default(uuid())
+  recurringEventId String   @map("recurring_event_id")
+  userId           String   @map("user_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  recurringEvent RecurringEvent @relation(fields: [recurringEventId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([recurringEventId, userId])
+  @@index([recurringEventId])
+  @@map("event_recipient_exclusions")
 }
 
 model NotificationDelivery {

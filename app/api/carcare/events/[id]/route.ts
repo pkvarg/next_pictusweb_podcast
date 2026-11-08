@@ -54,15 +54,43 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     })
     const me = await tx.user.findUnique({
       where: { id: session.userId },
-      select: { quietHoursStart: true, quietHoursEnd: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        quietHoursStart: true,
+        quietHoursEnd: true,
+      },
     })
-    return { event, occurrences, members, providers, me }
+    const recipientRows = await tx.notificationRecipient.findMany({
+      where: { organizationId: session.organizationId! },
+      select: { userId: true },
+    })
+    const exclusionRows = await tx.eventRecipientExclusion.findMany({
+      where: { recurringEventId: id },
+      select: { userId: true },
+    })
+    const defaultRules = await tx.notificationRule.findMany({
+      where: { organizationId: session.organizationId!, recurringEventId: null, active: true },
+    })
+    return {
+      event,
+      occurrences,
+      members,
+      providers,
+      me,
+      recipientRows,
+      exclusionRows,
+      defaultRules,
+    }
   })
 
   if (result === null) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   if (result === 'forbidden') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const { event, occurrences, members, providers, me } = result
+  const { event, occurrences, members, providers, me, recipientRows, exclusionRows, defaultRules } =
+    result
   const now = Date.now()
   const open = occurrences.find((o) =>
     ['UPCOMING', 'ACTION_REQUIRED', 'ARRANGED'].includes(o.status),
@@ -127,8 +155,23 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       repeatUntilActioned: r.repeatUntilActioned,
       repeatEveryDays: r.repeatEveryDays,
     })),
-    members: members.map((m) => ({ userId: m.userId, name: memberName(m.user) })),
+    defaultRules: defaultRules.map((r) => ({
+      stage: r.stage,
+      leadDays: r.leadDays,
+      channels: r.channels,
+      repeatUntilActioned: r.repeatUntilActioned,
+      repeatEveryDays: r.repeatEveryDays,
+    })),
+    members: (() => {
+      const list = members.map((m) => ({ userId: m.userId, name: memberName(m.user) }))
+      if (me && !list.some((m) => m.userId === me.id)) {
+        list.unshift({ userId: me.id, name: memberName(me) })
+      }
+      return list
+    })(),
     providers,
+    recipientIds: recipientRows.map((r) => r.userId),
+    excludedRecipientIds: exclusionRows.map((r) => r.userId),
     quietHours: { start: me?.quietHoursStart ?? null, end: me?.quietHoursEnd ?? null },
   })
 }
@@ -166,7 +209,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if ('preferredProviderId' in body) data.preferredProviderId = body.preferredProviderId || null
     if ('responsibleUserId' in body) {
       const uid = (body.responsibleUserId as string) || null
-      if (uid) {
+      if (uid && uid !== session.userId) {
         const member = await tx.garageMembership.findUnique({
           where: {
             organizationId_userId: { organizationId: session.organizationId!, userId: uid },

@@ -1400,7 +1400,8 @@
       "home": "Home",
       "events": "Events",
       "costs": "Costs",
-      "garage": "Garage"
+      "garage": "Garage",
+      "settings": "Settings"
     },
     "common": {
       "back": "Back",
@@ -1668,7 +1669,8 @@
       "estimate": "Estimate",
       "actual": "Actual",
       "estActualTitle": "Estimated / actual cost",
-      "defaultsRestored": "Defaults restored."
+      "defaultsRestored": "Defaults restored.",
+      "inheritedNote": "These values are inherited from your central settings. Saving customizes them for this event only."
     },
     "pt": {
       "PETROL": "Petrol",
@@ -1762,6 +1764,24 @@
       "dueDate": "Due date",
       "saveFailed": "Couldn't create the event.",
       "nameRequired": "Fill in name and category."
+    },
+    "defaults": {
+      "title": "Notifications",
+      "subtitle": "Default reminders for all vehicles",
+      "intro": "These settings apply to every event. You can override them on an individual event.",
+      "ownerOnly": "Only the garage owner can change the default notifications.",
+      "save": "Save settings",
+      "saved": "Settings saved.",
+      "saveFailed": "Could not save settings.",
+      "loadFailed": "Could not load settings."
+    },
+    "recipients": {
+      "title": "Recipients",
+      "subtitle": "Who receives notifications by default",
+      "note": "Pick the garage members who should receive reminders. You can uncheck them on an individual event.",
+      "eventSubtitle": "Uncheck anyone who should not be notified for this event.",
+      "empty": "No recipients yet. Set a responsible person or default recipients.",
+      "manageDefaults": "Manage default recipients"
     }
   }
 }

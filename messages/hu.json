@@ -1400,7 +1400,8 @@
       "home": "Kezdőlap",
       "events": "Események",
       "costs": "Költségek",
-      "garage": "Garázs"
+      "garage": "Garázs",
+      "settings": "Beállítások"
     },
     "common": {
       "back": "Vissza",
@@ -1668,7 +1669,8 @@
       "estimate": "Becslés",
       "actual": "Tényleges",
       "estActualTitle": "Becsült / tényleges költség",
-      "defaultsRestored": "Alapértékek visszaállítva."
+      "defaultsRestored": "Alapértékek visszaállítva.",
+      "inheritedNote": "Ezek az értékek a központi beállításokból származnak. Mentéssel csak erre az eseményre szabod testre."
     },
     "pt": {
       "PETROL": "Benzin",
@@ -1762,6 +1764,24 @@
       "dueDate": "Határidő",
       "saveFailed": "Az eseményt nem sikerült létrehozni.",
       "nameRequired": "Töltse ki a nevet és a kategóriát."
+    },
+    "defaults": {
+      "title": "Értesítések",
+      "subtitle": "Alapértelmezett emlékeztetők minden járműhöz",
+      "intro": "Ezek a beállítások minden eseményre érvényesek. Egyedi eseménynél felülírhatók.",
+      "ownerOnly": "Az alapértelmezett értesítéseket csak a garázs tulajdonosa módosíthatja.",
+      "save": "Beállítások mentése",
+      "saved": "Beállítások elmentve.",
+      "saveFailed": "A beállításokat nem sikerült menteni.",
+      "loadFailed": "A beállításokat nem sikerült betölteni."
+    },
+    "recipients": {
+      "title": "Címzettek",
+      "subtitle": "Ki kapjon alapértelmezés szerint értesítést",
+      "note": "Válaszd ki a garázs tagjait, akik emlékeztetőket kapjanak. Egy adott eseménynél kiveheted a jelölést.",
+      "eventSubtitle": "Vedd ki a jelölést annál, aki ne kapjon értesítést erről az eseményről.",
+      "empty": "Még nincs beállított címzett. Állíts be felelős személyt vagy alapértelmezett címzetteket.",
+      "manageDefaults": "Alapértelmezett címzettek kezelése"
     }
   }
 }
