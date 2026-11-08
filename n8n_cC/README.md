@@ -31,4 +31,12 @@ n8n Postgres nodes query the DB directly, so these must go live **in lockstep** 
 2. Deactivate each original, activate its `fleetsync_cC_*` copy — or import these over the originals.
 3. Verify runs: Today_pdr, Reminders_pdr, Aggressive_mode, Confirm, Daily_Digest.
 
+## New: notification tick scheduler (M15+ event engine)
+
+`fleetsync_cC_notification_tick.ROlwDmAQxaUr2DxW.json` — **net-new, created inactive** in n8n (id `ROlwDmAQxaUr2DxW`). Not a copy of a published workflow; it drives the new CarCare event-engine dispatcher.
+
+- **Schedule:** hourly (`0 * * * *`, Europe/Bratislava) → **HTTP GET** `https://www.pictusweb.sk/api/cron/notifications/tick` with header `Authorization: Bearer {{ $env.PICTUSWEB_CRON_TOKEN }}` (same env var the other crons use; maps to the app's `CRON_TOKEN`). Idempotent two-pass plan + dispatch; retries 3×.
+- **Do NOT activate** until pictusweb **with the CarCare build** is deployed to that host and `CRON_TOKEN` is set there — the endpoint doesn't exist on the currently deployed version. Activating sooner just 404s.
+- Dual-run plan: keep the legacy `fleetsync_cC_*` reminder workflows running; once the tick is live and reconciled, retire the legacy ones.
+
 Source snapshot: 2026-11-07 via the n8n REST API.

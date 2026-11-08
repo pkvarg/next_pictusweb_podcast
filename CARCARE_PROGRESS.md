@@ -205,6 +205,7 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 
 ## M17 — Operational readiness & pilot (all MVP)
 
+- [x] Cron scheduler: `fleetsync_cC_notification_tick` created in n8n **inactive** (id `ROlwDmAQxaUr2DxW`) — hourly → `GET /api/cron/notifications/tick` with `Authorization: Bearer {{ $env.PICTUSWEB_CRON_TOKEN }}`; JSON saved to `n8n_cC/`. **Activate only after pictusweb+CarCare is deployed and `CRON_TOKEN` is set there.**
 - [ ] MVP · Notification delivery monitoring; audit of critical changes; user/garage support tools
 - [ ] MVP · Automated regression tests (recurrence, reminders, access, migration) in CI
 - [ ] MVP · Error monitoring + backups + restore test

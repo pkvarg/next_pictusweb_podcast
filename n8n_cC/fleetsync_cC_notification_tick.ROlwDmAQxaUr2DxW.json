@@ -1,0 +1,67 @@
+{
+  "id": "ROlwDmAQxaUr2DxW",
+  "name": "fleetsync_cC_notification_tick",
+  "active": false,
+  "nodes": [
+    {
+      "id": "schedule",
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 * * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tick",
+      "name": "Run notification tick",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "position": [240, 0],
+      "parameters": {
+        "method": "GET",
+        "url": "https://www.pictusweb.sk/api/cron/notifications/tick",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.PICTUSWEB_CRON_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every hour": {
+      "main": [
+        [
+          {
+            "node": "Run notification tick",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Europe/Bratislava",
+    "executionOrder": "v1"
+  }
+}
