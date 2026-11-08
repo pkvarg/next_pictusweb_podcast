@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { Link, useRouter } from '@/i18n/routing'
-import { ArrowLeft, Search, Car, Loader2, Check } from 'lucide-react'
+import { ArrowLeft, Search, Car, Loader2, Check, Upload, X } from 'lucide-react'
+import { uploadAuthHeaders } from '@/lib/uploadTokenClient'
 
 interface CatalogueEntry {
   id: string
@@ -44,7 +46,64 @@ export default function CarCareAddVehicleView() {
   const [year, setYear] = useState('')
   const [country, setCountry] = useState('SK')
   const [vin, setVin] = useState('')
-  const [image, setImage] = useState('')
+  const { data: authSession } = useSession()
+  const [file, setFile] = useState<File | null>(null)
+  const [filePreview, setFilePreview] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0]
+    if (!selected) return
+    const lower = selected.name.toLowerCase()
+    const looksLikeImage =
+      selected.type.startsWith('image/') ||
+      selected.type === '' ||
+      lower.endsWith('.heic') ||
+      lower.endsWith('.heif')
+    if (!looksLikeImage) {
+      setError('Prosím, nahrajte obrázok (JPG, PNG, WEBP alebo HEIC).')
+      return
+    }
+    setFile(selected)
+    setError(null)
+    const reader = new FileReader()
+    reader.onloadend = () => setFilePreview(reader.result as string)
+    reader.readAsDataURL(selected)
+  }
+
+  const removeFile = () => {
+    setFile(null)
+    setFilePreview(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const uploadImage = async (): Promise<string | null> => {
+    if (!file) return null
+    const org = (authSession?.user as { organization?: string } | undefined)?.organization
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      if (org) fd.append('organization', org)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_HONO_API_URL}/api/upload/fleetsync`, {
+        method: 'POST',
+        body: fd,
+        headers: await uploadAuthHeaders('fleetsync'),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        throw new Error(err?.message || 'Nepodarilo sa nahrať obrázok.')
+      }
+      const data = await res.json()
+      return data.imageUrl as string
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Nepodarilo sa nahrať obrázok.')
+      return null
+    } finally {
+      setUploading(false)
+    }
+  }
 
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<CatalogueEntry[]>([])
@@ -103,6 +162,14 @@ export default function CarCareAddVehicleView() {
     }
     setSubmitting(true)
     try {
+      let imageUrl: string | null = null
+      if (file) {
+        imageUrl = await uploadImage()
+        if (!imageUrl) {
+          setSubmitting(false)
+          return
+        }
+      }
       const res = await fetch('/api/carcare/vehicles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -115,7 +182,7 @@ export default function CarCareAddVehicleView() {
           country: country.trim() || null,
           vin: vin.trim() || null,
           year: year ? Number(year) : null,
-          image: image.trim() || null,
+          image: imageUrl,
         }),
       })
       if (!res.ok) {
@@ -289,12 +356,39 @@ export default function CarCareAddVehicleView() {
           </div>
 
           <div>
-            <label className={labelClass}>Odkaz na fotku (voliteľné)</label>
+            <label className={labelClass}>Fotka vozidla (voliteľné)</label>
+            {filePreview ? (
+              <div className="relative inline-block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={filePreview}
+                  alt="Náhľad"
+                  className="w-40 h-28 rounded-xl object-cover border border-white/10"
+                />
+                <button
+                  type="button"
+                  onClick={removeFile}
+                  className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-pictus-black border border-white/20 flex items-center justify-center text-gray-300 hover:text-red-400"
+                  aria-label="Odstrániť fotku"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full inline-flex items-center justify-center gap-2 bg-pictus-black/40 border border-dashed border-white/15 rounded-xl px-4 py-5 text-gray-400 hover:border-pictus-lime/40 hover:text-pictus-white"
+              >
+                <Upload className="w-5 h-5" /> Nahrať fotku
+              </button>
+            )}
             <input
-              className={inputClass}
-              placeholder="https://…"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.heic,.heif"
+              className="hidden"
+              onChange={handleFileChange}
             />
           </div>
 
