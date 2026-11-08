@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Powertrain } from '@prisma/client'
 import prisma from '@/db/db'
 import { sameOriginOk } from '@/lib/sameOrigin'
 import { resolveCarCareSession } from '@/lib/carcare/apiAuth'
@@ -217,24 +218,60 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   })
 }
 
-// PATCH /api/carcare/vehicles/[id] — update the vehicle image (URL already uploaded via hono).
-// Body: { image: string | null }
+const POWERTRAINS = new Set(Object.values(Powertrain))
+
+// PATCH /api/carcare/vehicles/[id] — update the vehicle image (URL already uploaded via
+// hono) and/or its editable details.
+// Body: { image?, registration?, nickname?, make?, model?, year?, powertrain?, vin?, country? }
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!sameOriginOk(request)) return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   const { id } = await params
   const session = await resolveCarCareSession()
   if (!session?.organizationId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = (await request.json().catch(() => ({}))) as { image?: string | null }
+  const body = (await request.json().catch(() => ({}))) as {
+    image?: string | null
+    registration?: string
+    nickname?: string | null
+    make?: string | null
+    model?: string | null
+    year?: number | null
+    powertrain?: string | null
+    vin?: string | null
+    country?: string | null
+  }
+
+  const str = (v: unknown, max: number) =>
+    typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null
 
   const result = await prisma.$transaction(async (tx) => {
     const vehicle = await tx.myVehicle.findFirst({ where: { id }, select: { id: true } })
     if (!vehicle) return 'not-found'
     if (!(await canModifyVehicle(tx, session.userId, id))) return 'forbidden'
-    if ('image' in body) {
-      const image = typeof body.image === 'string' && body.image.trim() ? body.image.trim() : null
-      await tx.myVehicle.update({ where: { id }, data: { image } })
+
+    const data: Record<string, unknown> = {}
+    if ('image' in body) data.image = str(body.image, 500)
+    if ('registration' in body) {
+      const reg = str(body.registration, 20)
+      if (reg) data.registration = reg // required — never clear
     }
+    if ('nickname' in body) data.nickname = str(body.nickname, 100)
+    if ('make' in body) data.make = str(body.make, 60)
+    if ('model' in body) data.model = str(body.model, 60)
+    if ('vin' in body) data.vin = str(body.vin, 20)
+    if ('country' in body) data.country = str(body.country, 2)
+    if ('year' in body) {
+      const y = typeof body.year === 'number' ? Math.round(body.year) : null
+      data.year = y && y >= 1900 && y <= 2100 ? y : null
+    }
+    if ('powertrain' in body) {
+      data.powertrain =
+        typeof body.powertrain === 'string' && POWERTRAINS.has(body.powertrain as Powertrain)
+          ? (body.powertrain as Powertrain)
+          : null
+    }
+
+    if (Object.keys(data).length > 0) await tx.myVehicle.update({ where: { id }, data })
     return 'ok'
   })
 

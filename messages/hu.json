@@ -1493,7 +1493,13 @@
       "addExpense": "Költség rögzítése",
       "changePhoto": "Fotó módosítása",
       "addPhoto": "Fotó hozzáadása",
-      "imageFailed": "A fotót nem sikerült feltölteni."
+      "imageFailed": "A fotót nem sikerült feltölteni.",
+      "edit": "Szerkesztés",
+      "make": "Márka",
+      "model": "Modell",
+      "nickname": "Név",
+      "plateRequired": "A rendszám kötelező.",
+      "saveFailed": "A módosításokat nem sikerült menteni."
     },
     "onboarding": {
       "title": "Jármű hozzáadása",

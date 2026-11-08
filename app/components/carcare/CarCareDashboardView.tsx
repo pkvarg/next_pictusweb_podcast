@@ -291,33 +291,31 @@ export default function CarCareDashboardView({
               </Link>
             )}
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.vehicles.map((v) => (
               <Link
                 key={v.id}
                 href={`/client/my-fleet/vehicles/${v.id}`}
-                className="p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] flex items-center gap-3 hover:border-white/20 transition-colors"
+                className="group bg-pictus-onyx900 rounded-2xl border border-white/[0.06] overflow-hidden hover:border-white/20 transition-colors"
               >
                 {v.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={v.image}
-                    alt={vehicleName(v)}
-                    className="w-10 h-10 rounded-xl object-cover shrink-0"
-                  />
+                  <img src={v.image} alt={vehicleName(v)} className="w-full h-40 object-cover" />
                 ) : (
-                  <div className="w-10 h-10 rounded-xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
-                    <Car className="w-5 h-5 text-pictus-lime" />
+                  <div className="w-full h-40 bg-pictus-lime/10 flex items-center justify-center">
+                    <Car className="w-12 h-12 text-pictus-lime/70" />
                   </div>
                 )}
-                <div className="min-w-0 flex-1">
-                  <p className="text-pictus-white font-medium truncate">{vehicleName(v)}</p>
-                  <p className="text-sm text-gray-400 truncate">
-                    {v.registration}
-                    {v.year ? ` · ${v.year}` : ''}
-                  </p>
+                <div className="flex items-center gap-2 p-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-pictus-white font-medium truncate">{vehicleName(v)}</p>
+                    <p className="text-sm text-gray-400 truncate">
+                      {v.registration}
+                      {v.year ? ` · ${v.year}` : ''}
+                    </p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-500 shrink-0 group-hover:text-gray-300" />
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
               </Link>
             ))}
           </div>

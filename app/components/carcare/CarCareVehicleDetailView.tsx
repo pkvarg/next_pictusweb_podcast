@@ -12,8 +12,10 @@ import {
   CalendarCheck,
   Camera,
   Loader2,
+  Pencil,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useSession } from 'next-auth/react'
 import { Link } from '@/i18n/routing'
 import { templateKey, powertrainKey, categoryKey } from '@/lib/carcare/labels'
 import { uploadVehicleImage } from '@/lib/carcare/vehicleImage'
@@ -111,6 +113,22 @@ function dueBadge(o: VdOccurrence, t: Tr): { text: string; tone: keyof typeof to
   return { text: t('badge.upcoming'), tone: 'neutral' }
 }
 
+const POWERTRAIN_OPTIONS = [
+  'PETROL',
+  'DIESEL',
+  'MHEV',
+  'HEV',
+  'PHEV',
+  'BEV',
+  'LPG',
+  'CNG',
+  'HYDROGEN',
+  'OTHER',
+]
+const fieldCls =
+  'w-full bg-pictus-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none'
+const fieldLabelCls = 'block text-sm text-gray-400 mb-1.5'
+
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-2 border-b border-white/[0.06] last:border-0">
@@ -128,6 +146,7 @@ export default function CarCareVehicleDetailView({
   reload?: () => void
 }) {
   const t = useTranslations('CarCare')
+  const { data: authSession } = useSession()
   const { vehicle } = data
   const canModify = data.canModify !== false
   const [tab, setTab] = useState<'prehlad' | 'udalosti' | 'historia' | 'naklady'>('prehlad')
@@ -145,7 +164,8 @@ export default function CarCareVehicleDetailView({
     setUploadingImage(true)
     setImageError(null)
     try {
-      const url = await uploadVehicleImage(file)
+      const org = (authSession?.user as { organization?: string } | undefined)?.organization
+      const url = await uploadVehicleImage(file, org)
       const res = await fetch(`/api/carcare/vehicles/${vehicle.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -159,6 +179,61 @@ export default function CarCareVehicleDetailView({
     } finally {
       setUploadingImage(false)
       if (imageInputRef.current) imageInputRef.current.value = ''
+    }
+  }
+
+  const formFromVehicle = () => ({
+    registration: vehicle.registration,
+    nickname: vehicle.nickname ?? '',
+    make: vehicle.make ?? '',
+    model: vehicle.model ?? '',
+    year: vehicle.year ? String(vehicle.year) : '',
+    powertrain: vehicle.powertrain ?? '',
+    vin: vehicle.vin ?? '',
+    country: vehicle.country ?? '',
+  })
+  const [editing, setEditing] = useState(false)
+  const [savingDetails, setSavingDetails] = useState(false)
+  const [detailsError, setDetailsError] = useState<string | null>(null)
+  const [form, setForm] = useState(formFromVehicle)
+  const setField = (k: keyof ReturnType<typeof formFromVehicle>, v: string) =>
+    setForm((p) => ({ ...p, [k]: v }))
+
+  const cancelEdit = () => {
+    setForm(formFromVehicle())
+    setDetailsError(null)
+    setEditing(false)
+  }
+
+  const saveDetails = async () => {
+    if (!form.registration.trim()) {
+      setDetailsError(t('vehicle.plateRequired'))
+      return
+    }
+    setSavingDetails(true)
+    setDetailsError(null)
+    try {
+      const res = await fetch(`/api/carcare/vehicles/${vehicle.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          registration: form.registration.trim(),
+          nickname: form.nickname.trim() || null,
+          make: form.make.trim() || null,
+          model: form.model.trim() || null,
+          year: form.year ? Number(form.year) : null,
+          powertrain: form.powertrain || null,
+          vin: form.vin.trim() || null,
+          country: form.country.trim() || null,
+        }),
+      })
+      if (!res.ok) throw new Error('save failed')
+      setEditing(false)
+      reload?.()
+    } catch {
+      setDetailsError(t('vehicle.saveFailed'))
+    } finally {
+      setSavingDetails(false)
     }
   }
 
@@ -527,11 +602,119 @@ export default function CarCareVehicleDetailView({
 
         {tab === 'prehlad' && (
           <section>
-            <h2 className="text-xl font-bold mb-3">{t('vehicle.details')}</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xl font-bold">{t('vehicle.details')}</h2>
+              {canModify && !editing && (
+                <button
+                  onClick={() => setEditing(true)}
+                  className="inline-flex items-center gap-1.5 text-sm text-pictus-lime hover:text-pictus-lime600"
+                >
+                  <Pencil className="w-4 h-4" /> {t('vehicle.edit')}
+                </button>
+              )}
+            </div>
             <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06]">
-              {specs.map((s) => (
-                <SpecRow key={s.label} label={s.label} value={s.value} />
-              ))}
+              {editing ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className={fieldLabelCls}>{t('vehicle.nickname')}</label>
+                    <input
+                      className={fieldCls}
+                      value={form.nickname}
+                      onChange={(e) => setField('nickname', e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className={fieldLabelCls}>{t('vehicle.spzPlate')}</label>
+                      <input
+                        className={fieldCls}
+                        value={form.registration}
+                        onChange={(e) => setField('registration', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className={fieldLabelCls}>{t('vehicle.year')}</label>
+                      <input
+                        type="number"
+                        className={fieldCls}
+                        value={form.year}
+                        onChange={(e) => setField('year', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className={fieldLabelCls}>{t('vehicle.make')}</label>
+                      <input
+                        className={fieldCls}
+                        value={form.make}
+                        onChange={(e) => setField('make', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className={fieldLabelCls}>{t('vehicle.model')}</label>
+                      <input
+                        className={fieldCls}
+                        value={form.model}
+                        onChange={(e) => setField('model', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className={fieldLabelCls}>{t('vehicle.powertrain')}</label>
+                      <select
+                        className={fieldCls}
+                        value={form.powertrain}
+                        onChange={(e) => setField('powertrain', e.target.value)}
+                      >
+                        <option value="">—</option>
+                        {POWERTRAIN_OPTIONS.map((p) => (
+                          <option key={p} value={p}>
+                            {powertrainKey(p) ? t(powertrainKey(p)!) : p}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className={fieldLabelCls}>{t('vehicle.country')}</label>
+                      <input
+                        className={fieldCls}
+                        maxLength={2}
+                        value={form.country}
+                        onChange={(e) => setField('country', e.target.value.toUpperCase())}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className={fieldLabelCls}>VIN</label>
+                    <input
+                      className={fieldCls}
+                      value={form.vin}
+                      onChange={(e) => setField('vin', e.target.value)}
+                    />
+                  </div>
+                  {detailsError && <p className="text-sm text-red-400">{detailsError}</p>}
+                  <div className="flex gap-2 justify-end pt-1">
+                    <button
+                      onClick={cancelEdit}
+                      className="px-4 py-2.5 rounded-xl border border-white/10 text-pictus-white hover:bg-white/5"
+                    >
+                      {t('common.cancel')}
+                    </button>
+                    <button
+                      onClick={saveDetails}
+                      disabled={savingDetails}
+                      className="inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-5 py-2.5 rounded-xl hover:bg-pictus-lime600 disabled:opacity-50"
+                    >
+                      {savingDetails ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        t('common.save')
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                specs.map((s) => <SpecRow key={s.label} label={s.label} value={s.value} />)
+              )}
             </div>
           </section>
         )}

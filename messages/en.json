@@ -1493,7 +1493,13 @@
       "addExpense": "Record a cost",
       "changePhoto": "Change photo",
       "addPhoto": "Add photo",
-      "imageFailed": "Could not upload the photo."
+      "imageFailed": "Could not upload the photo.",
+      "edit": "Edit",
+      "make": "Make",
+      "model": "Model",
+      "nickname": "Name",
+      "plateRequired": "License plate is required.",
+      "saveFailed": "Could not save changes."
     },
     "onboarding": {
       "title": "Add vehicle",

@@ -1493,7 +1493,13 @@
       "addExpense": "Zaznamenať náklady",
       "changePhoto": "Zmeniť fotku",
       "addPhoto": "Pridať fotku",
-      "imageFailed": "Fotku sa nepodarilo nahrať."
+      "imageFailed": "Fotku sa nepodarilo nahrať.",
+      "edit": "Upraviť",
+      "make": "Značka",
+      "model": "Model",
+      "nickname": "Názov",
+      "plateRequired": "ŠPZ je povinná.",
+      "saveFailed": "Zmeny sa nepodarilo uložiť."
     },
     "onboarding": {
       "title": "Pridať vozidlo",
