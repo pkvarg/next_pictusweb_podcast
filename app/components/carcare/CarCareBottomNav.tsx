@@ -1,18 +1,24 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Home, Calendar, Wallet, Users, Car } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/routing'
 
-const TABS: { key: string; label: string; href: string; icon: React.ReactNode }[] = [
-  { key: 'home', label: 'Domov', href: '/carcare', icon: <Home className="w-5 h-5" /> },
+const TABS: { key: string; tkey: string; href: string; icon: React.ReactNode }[] = [
+  { key: 'home', tkey: 'nav.home', href: '/carcare', icon: <Home className="w-5 h-5" /> },
   {
     key: 'events',
-    label: 'Udalosti',
+    tkey: 'nav.events',
     href: '/carcare/events',
     icon: <Calendar className="w-5 h-5" />,
   },
-  { key: 'costs', label: 'Náklady', href: '/carcare/costs', icon: <Wallet className="w-5 h-5" /> },
-  { key: 'garage', label: 'Garáž', href: '/carcare/garage', icon: <Users className="w-5 h-5" /> },
+  { key: 'costs', tkey: 'nav.costs', href: '/carcare/costs', icon: <Wallet className="w-5 h-5" /> },
+  {
+    key: 'garage',
+    tkey: 'nav.garage',
+    href: '/carcare/garage',
+    icon: <Users className="w-5 h-5" />,
+  },
 ]
 
 function activeTab(pathname: string): string {
@@ -24,6 +30,7 @@ function activeTab(pathname: string): string {
 
 export default function CarCareBottomNav() {
   const pathname = usePathname()
+  const tr = useTranslations('CarCare')
   if (pathname.startsWith('/carcare/invite')) return null
   const current = activeTab(pathname)
 
@@ -46,7 +53,7 @@ export default function CarCareBottomNav() {
               }`}
             >
               {t.icon}
-              {t.label}
+              {tr(t.tkey)}
             </Link>
           ))}
         </nav>
@@ -63,7 +70,7 @@ export default function CarCareBottomNav() {
               }`}
             >
               {t.icon}
-              <span>{t.label}</span>
+              <span>{tr(t.tkey)}</span>
             </Link>
           ))}
         </div>
