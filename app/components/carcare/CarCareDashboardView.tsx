@@ -8,6 +8,7 @@ import {
   Car,
   ChevronRight,
   Plus,
+  Users,
 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 
@@ -168,6 +169,34 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
         </div>
 
         <section className="mb-8">
+          <h2 className="text-xl font-bold mb-3">Rýchle akcie</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              {
+                href: '/carcare/vehicles/new',
+                icon: <Plus className="w-5 h-5" />,
+                label: 'Pridať vozidlo',
+              },
+              {
+                href: '/carcare/garage',
+                icon: <Users className="w-5 h-5" />,
+                label: 'Pozvať člena',
+              },
+              { href: '/carcare/costs', icon: <Wallet className="w-5 h-5" />, label: 'Náklady' },
+            ].map((a) => (
+              <Link
+                key={a.href}
+                href={a.href}
+                className="flex flex-col items-center gap-2 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors text-center"
+              >
+                <span className="text-pictus-lime">{a.icon}</span>
+                <span className="text-sm text-pictus-white">{a.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold">Najbližšie udalosti</h2>
             <Link
@@ -225,7 +254,6 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
           </div>
         </section>
       </div>
-
     </div>
   )
 }

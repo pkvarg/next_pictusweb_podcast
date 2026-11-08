@@ -140,9 +140,18 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
         </Link>
 
         <header className="flex items-start gap-4 mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
-            <Car className="w-7 h-7 text-pictus-lime" />
-          </div>
+          {vehicle.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={vehicle.image}
+              alt={vehicleName(vehicle)}
+              className="w-20 h-14 rounded-2xl object-cover shrink-0 border border-white/[0.06]"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-2xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
+              <Car className="w-7 h-7 text-pictus-lime" />
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <h1 className="text-3xl font-light truncate">{vehicleName(vehicle)}</h1>
             <p className="text-gray-400">

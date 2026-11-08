@@ -44,6 +44,7 @@ export default function CarCareAddVehicleView() {
   const [year, setYear] = useState('')
   const [country, setCountry] = useState('SK')
   const [vin, setVin] = useState('')
+  const [image, setImage] = useState('')
 
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<CatalogueEntry[]>([])
@@ -114,6 +115,7 @@ export default function CarCareAddVehicleView() {
           country: country.trim() || null,
           vin: vin.trim() || null,
           year: year ? Number(year) : null,
+          image: image.trim() || null,
         }),
       })
       if (!res.ok) {
@@ -284,6 +286,16 @@ export default function CarCareAddVehicleView() {
                 onChange={(e) => setVin(e.target.value.toUpperCase())}
               />
             </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>Odkaz na fotku (voliteľné)</label>
+            <input
+              className={inputClass}
+              placeholder="https://…"
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
+            />
           </div>
 
           {error && <p className="text-sm text-red-400">{error}</p>}
