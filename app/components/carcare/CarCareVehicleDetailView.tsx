@@ -101,6 +101,7 @@ function SpecRow({ label, value }: { label: string; value: string }) {
 export default function CarCareVehicleDetailView({ data }: { data: VehicleDetailData }) {
   const { vehicle } = data
   const canModify = data.canModify !== false
+  const [tab, setTab] = useState<'prehlad' | 'udalosti' | 'historia'>('prehlad')
   const [busyKey, setBusyKey] = useState<string | null>(null)
   const [activated, setActivated] = useState<Set<string>>(new Set())
 
@@ -161,86 +162,116 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
           </div>
         </header>
 
-        <div className="grid grid-cols-2 gap-3 mb-8">
-          <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06] flex flex-col gap-1">
-            <div className="text-gray-400">
-              <Gauge className="w-5 h-5" />
-            </div>
-            <div className="text-2xl font-bold text-pictus-white">
-              {data.latestMileage
-                ? `${data.latestMileage.kilometers.toLocaleString('sk-SK')}`
-                : '—'}
-              <span className="text-base font-normal text-gray-400"> km</span>
-            </div>
-            <div className="text-xs text-gray-400">
-              {data.latestMileage ? `k ${formatDate(data.latestMileage.date)}` : 'Bez záznamu'}
-            </div>
-          </div>
-          <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06] flex flex-col gap-1">
-            <div className="text-gray-400">
-              <Wallet className="w-5 h-5" />
-            </div>
-            <div className="text-2xl font-bold text-pictus-white">
-              {data.costThisYear.toFixed(0)} €
-            </div>
-            <div className="text-xs text-gray-400">Náklady tento rok</div>
-          </div>
+        <div className="flex gap-1 overflow-x-auto mb-6 border-b border-white/[0.06]">
+          {(
+            [
+              ['prehlad', 'Prehľad'],
+              ['udalosti', 'Udalosti'],
+              ['historia', 'História'],
+            ] as const
+          ).map(([k, l]) => (
+            <button
+              key={k}
+              onClick={() => setTab(k)}
+              className={`shrink-0 px-4 py-2.5 text-sm border-b-2 -mb-px ${
+                tab === k
+                  ? 'border-pictus-lime text-pictus-white'
+                  : 'border-transparent text-gray-400 hover:text-pictus-white'
+              }`}
+            >
+              {l}
+            </button>
+          ))}
         </div>
 
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-3">Udalosti</h2>
-          {data.occurrences.length === 0 ? (
-            <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
-              Žiadne otvorené udalosti.
+        {tab === 'prehlad' && (
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06] flex flex-col gap-1">
+              <div className="text-gray-400">
+                <Gauge className="w-5 h-5" />
+              </div>
+              <div className="text-2xl font-bold text-pictus-white">
+                {data.latestMileage
+                  ? `${data.latestMileage.kilometers.toLocaleString('sk-SK')}`
+                  : '—'}
+                <span className="text-base font-normal text-gray-400"> km</span>
+              </div>
+              <div className="text-xs text-gray-400">
+                {data.latestMileage ? `k ${formatDate(data.latestMileage.date)}` : 'Bez záznamu'}
+              </div>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {data.occurrences.map((o) => {
-                const badge = dueBadge(o)
-                const actionable = o.status === 'ACTION_REQUIRED' || o.overdue
-                const inner = (
-                  <>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-pictus-white font-medium truncate">
-                        {o.recurringEvent.name}
-                      </p>
-                      <p className="text-sm text-gray-400 truncate">
-                        {o.appointment
-                          ? `Návšteva ${formatDate(o.appointment.scheduledAt)}${o.appointment.provider ? ` · ${o.appointment.provider.name}` : ''}`
-                          : o.dueDate
-                            ? `Termín ${formatDate(o.dueDate)}`
-                            : o.dueMileage
-                              ? `Pri ${o.dueMileage.toLocaleString('sk-SK')} km`
-                              : 'Bez termínu'}
-                      </p>
-                    </div>
-                    <span
-                      className={`shrink-0 text-xs px-2.5 py-1 rounded-full ${toneClass[badge.tone]}`}
-                    >
-                      {badge.text}
-                    </span>
-                    {canModify && actionable ? (
-                      <span className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full">
-                        {ACTION_LABEL[o.recurringEvent.actionType] ?? 'Zobraziť'}
-                      </span>
-                    ) : (
-                      <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
-                    )}
-                  </>
-                )
-                const base =
-                  'w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors'
-                return (
-                  <Link key={o.id} href={`/carcare/events/${o.recurringEvent.id}`} className={base}>
-                    {inner}
-                  </Link>
-                )
-              })}
+            <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06] flex flex-col gap-1">
+              <div className="text-gray-400">
+                <Wallet className="w-5 h-5" />
+              </div>
+              <div className="text-2xl font-bold text-pictus-white">
+                {data.costThisYear.toFixed(0)} €
+              </div>
+              <div className="text-xs text-gray-400">Náklady tento rok</div>
             </div>
-          )}
-        </section>
+          </div>
+        )}
 
-        {canModify && data.suggestions.length > 0 && (
+        {tab === 'udalosti' && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-3">Udalosti</h2>
+            {data.occurrences.length === 0 ? (
+              <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
+                Žiadne otvorené udalosti.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {data.occurrences.map((o) => {
+                  const badge = dueBadge(o)
+                  const actionable = o.status === 'ACTION_REQUIRED' || o.overdue
+                  const inner = (
+                    <>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-pictus-white font-medium truncate">
+                          {o.recurringEvent.name}
+                        </p>
+                        <p className="text-sm text-gray-400 truncate">
+                          {o.appointment
+                            ? `Návšteva ${formatDate(o.appointment.scheduledAt)}${o.appointment.provider ? ` · ${o.appointment.provider.name}` : ''}`
+                            : o.dueDate
+                              ? `Termín ${formatDate(o.dueDate)}`
+                              : o.dueMileage
+                                ? `Pri ${o.dueMileage.toLocaleString('sk-SK')} km`
+                                : 'Bez termínu'}
+                        </p>
+                      </div>
+                      <span
+                        className={`shrink-0 text-xs px-2.5 py-1 rounded-full ${toneClass[badge.tone]}`}
+                      >
+                        {badge.text}
+                      </span>
+                      {canModify && actionable ? (
+                        <span className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full">
+                          {ACTION_LABEL[o.recurringEvent.actionType] ?? 'Zobraziť'}
+                        </span>
+                      ) : (
+                        <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
+                      )}
+                    </>
+                  )
+                  const base =
+                    'w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors'
+                  return (
+                    <Link
+                      key={o.id}
+                      href={`/carcare/events/${o.recurringEvent.id}`}
+                      className={base}
+                    >
+                      {inner}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </section>
+        )}
+
+        {tab === 'prehlad' && canModify && data.suggestions.length > 0 && (
           <section className="mb-8">
             <h2 className="text-xl font-bold mb-3">Odporúčané sledovať</h2>
             <div className="space-y-3">
@@ -279,7 +310,13 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
           </section>
         )}
 
-        {data.history.length > 0 && (
+        {tab === 'historia' && data.history.length === 0 && (
+          <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
+            Zatiaľ žiadna história.
+          </div>
+        )}
+
+        {tab === 'historia' && data.history.length > 0 && (
           <section className="mb-8">
             <h2 className="text-xl font-bold mb-3">História</h2>
             <div className="space-y-3">
@@ -309,7 +346,7 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
           </section>
         )}
 
-        {vehicle.note && (
+        {tab === 'prehlad' && vehicle.note && (
           <section className="mb-8">
             <h2 className="text-xl font-bold mb-3">Poznámka</h2>
             <div className="p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-300 whitespace-pre-wrap">
@@ -318,14 +355,16 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
           </section>
         )}
 
-        <section>
-          <h2 className="text-xl font-bold mb-3">Detaily vozidla</h2>
-          <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06]">
-            {specs.map((s) => (
-              <SpecRow key={s.label} label={s.label} value={s.value} />
-            ))}
-          </div>
-        </section>
+        {tab === 'prehlad' && (
+          <section>
+            <h2 className="text-xl font-bold mb-3">Detaily vozidla</h2>
+            <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06]">
+              {specs.map((s) => (
+                <SpecRow key={s.label} label={s.label} value={s.value} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   )
