@@ -1401,7 +1401,8 @@
       "events": "Udalosti",
       "costs": "Náklady",
       "garage": "Garáž",
-      "settings": "Nastavenia"
+      "settings": "Nastavenia",
+      "account": "Účet"
     },
     "common": {
       "back": "Späť",
@@ -1489,7 +1490,10 @@
       "noDue": "Bez termínu",
       "tabCosts": "Náklady",
       "costsEmpty": "Zatiaľ žiadne náklady.",
-      "addExpense": "Zaznamenať náklady"
+      "addExpense": "Zaznamenať náklady",
+      "changePhoto": "Zmeniť fotku",
+      "addPhoto": "Pridať fotku",
+      "imageFailed": "Fotku sa nepodarilo nahrať."
     },
     "onboarding": {
       "title": "Pridať vozidlo",
@@ -1521,7 +1525,8 @@
       "byCategory": "Podľa kategórie (tento rok)",
       "byVehicle": "Podľa vozidla (tento rok)",
       "recent": "Posledné náklady",
-      "empty": "Zatiaľ žiadne zaznamenané náklady."
+      "empty": "Zatiaľ žiadne zaznamenané náklady.",
+      "analyticsGifted": "Firemné prehľady máte ako bonus zdarma."
     },
     "garage": {
       "title": "Garáž",

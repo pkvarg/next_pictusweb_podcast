@@ -74,6 +74,7 @@ export async function GET() {
         model: true,
         year: true,
         powertrain: true,
+        image: true,
       },
       orderBy: { createdAt: 'asc' },
     })

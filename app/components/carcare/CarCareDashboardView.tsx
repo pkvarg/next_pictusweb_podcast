@@ -41,6 +41,7 @@ export interface DashVehicle {
   model: string | null
   year: number | null
   powertrain: string | null
+  image: string | null
 }
 
 export interface DashboardData {
@@ -308,9 +309,18 @@ export default function CarCareDashboardView({
                 href={`/client/my-fleet/vehicles/${v.id}`}
                 className="p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] flex items-center gap-3 hover:border-white/20 transition-colors"
               >
-                <div className="w-10 h-10 rounded-xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
-                  <Car className="w-5 h-5 text-pictus-lime" />
-                </div>
+                {v.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={v.image}
+                    alt={vehicleName(v)}
+                    className="w-10 h-10 rounded-xl object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
+                    <Car className="w-5 h-5 text-pictus-lime" />
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <p className="text-pictus-white font-medium truncate">{vehicleName(v)}</p>
                   <p className="text-sm text-gray-400 truncate">

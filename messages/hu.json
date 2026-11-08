@@ -1401,7 +1401,8 @@
       "events": "Események",
       "costs": "Költségek",
       "garage": "Garázs",
-      "settings": "Beállítások"
+      "settings": "Beállítások",
+      "account": "Fiók"
     },
     "common": {
       "back": "Vissza",
@@ -1489,7 +1490,10 @@
       "noDue": "Nincs határidő",
       "tabCosts": "Költségek",
       "costsEmpty": "Még nincsenek költségek.",
-      "addExpense": "Költség rögzítése"
+      "addExpense": "Költség rögzítése",
+      "changePhoto": "Fotó módosítása",
+      "addPhoto": "Fotó hozzáadása",
+      "imageFailed": "A fotót nem sikerült feltölteni."
     },
     "onboarding": {
       "title": "Jármű hozzáadása",
@@ -1521,7 +1525,8 @@
       "byCategory": "Kategória szerint (idén)",
       "byVehicle": "Jármű szerint (idén)",
       "recent": "Legutóbbi költségek",
-      "empty": "Még nincs rögzített költség."
+      "empty": "Még nincs rögzített költség.",
+      "analyticsGifted": "A céges irányítópultok ingyenes bónuszként járnak."
     },
     "garage": {
       "title": "Garázs",

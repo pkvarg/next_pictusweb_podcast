@@ -17,7 +17,13 @@ export async function GET() {
   const payload = await prisma.$transaction(async (tx) => {
     const ids = await listAccessibleVehicleIds(tx, session.userId, session.organizationId!)
     if (ids.length === 0) {
-      return { totals: { thisYear: 0, allTime: 0 }, byVehicle: [], byCategory: [], entries: [] }
+      return {
+        totals: { thisYear: 0, allTime: 0 },
+        byVehicle: [],
+        byCategory: [],
+        analyticsVehicles: [],
+        entries: [],
+      }
     }
 
     const vehicles = await tx.myVehicle.findMany({
@@ -109,10 +115,41 @@ export async function GET() {
       .map(([category, total]) => ({ category, total }))
       .sort((a, b) => b.total - a.total)
 
+    // Per-vehicle data for the fleet analytics dashboard, built from the SAME combined
+    // entries (completed-event costs + logged expenses) so its totals match this page.
+    const analyticsByVehicle = new Map<
+      string,
+      {
+        id: string
+        registration: string
+        type: string
+        expenses: { id: string; item: string; cost: number; date: string }[]
+      }
+    >()
+    for (const e of entries) {
+      let veh = analyticsByVehicle.get(e.vehicle.id)
+      if (!veh) {
+        veh = {
+          id: e.vehicle.id,
+          registration: e.vehicle.registration || e.vehicle.name,
+          type: '',
+          expenses: [],
+        }
+        analyticsByVehicle.set(e.vehicle.id, veh)
+      }
+      veh.expenses.push({
+        id: `${e.source}-${e.id}`,
+        item: e.title,
+        cost: e.amount,
+        date: e.date.toISOString(),
+      })
+    }
+
     return {
       totals: { thisYear, allTime },
       byVehicle,
       byCategory,
+      analyticsVehicles: [...analyticsByVehicle.values()],
       entries: entries.slice(0, 100).map((e) => ({
         id: e.id,
         source: e.source,
@@ -126,7 +163,22 @@ export async function GET() {
     }
   })
 
-  return NextResponse.json(payload)
+  const org = await prisma.organization.findUnique({
+    where: { id: session.organizationId },
+    select: { name: true, bonusBusinessDashboards: true, tierRelation: { select: { name: true } } },
+  })
+  const isBusiness = org?.tierRelation?.name === 'BUSINESS'
+  const entitled = isBusiness || !!org?.bonusBusinessDashboards
+  const gifted = !!org?.bonusBusinessDashboards && !isBusiness
+  const { analyticsVehicles, ...rest } = payload
+  const fleetAnalytics = {
+    entitled,
+    gifted,
+    orgName: org?.name ?? null,
+    vehicles: entitled ? analyticsVehicles : [],
+  }
+
+  return NextResponse.json({ ...rest, fleetAnalytics })
 }
 
 // POST /api/carcare/costs — log an expense against a vehicle

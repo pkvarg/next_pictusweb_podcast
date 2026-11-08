@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
+import { sameOriginOk } from '@/lib/sameOrigin'
 import { resolveCarCareSession } from '@/lib/carcare/apiAuth'
-import { canAccessVehicle } from '@/lib/carcare/garage'
+import { canAccessVehicle, canModifyVehicle } from '@/lib/carcare/garage'
 import { suggestTemplatesForVehicle } from '@/lib/carcare/vehicles'
 
 // GET /api/carcare/vehicles/[id]
@@ -214,4 +215,30 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       actionType: t.actionType,
     })),
   })
+}
+
+// PATCH /api/carcare/vehicles/[id] — update the vehicle image (URL already uploaded via hono).
+// Body: { image: string | null }
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!sameOriginOk(request)) return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  const { id } = await params
+  const session = await resolveCarCareSession()
+  if (!session?.organizationId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = (await request.json().catch(() => ({}))) as { image?: string | null }
+
+  const result = await prisma.$transaction(async (tx) => {
+    const vehicle = await tx.myVehicle.findFirst({ where: { id }, select: { id: true } })
+    if (!vehicle) return 'not-found'
+    if (!(await canModifyVehicle(tx, session.userId, id))) return 'forbidden'
+    if ('image' in body) {
+      const image = typeof body.image === 'string' && body.image.trim() ? body.image.trim() : null
+      await tx.myVehicle.update({ where: { id }, data: { image } })
+    }
+    return 'ok'
+  })
+
+  if (result === 'not-found') return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (result === 'forbidden') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  return NextResponse.json({ ok: true })
 }

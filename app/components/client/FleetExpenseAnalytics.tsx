@@ -21,6 +21,9 @@ interface Vehicle {
 
 interface FleetExpenseAnalyticsProps {
   organization?: string
+  // When provided, the component renders this data instead of fetching /api/my-vehicles.
+  // Used by CarCare to feed the combined event-cost + expense data so totals are consistent.
+  vehiclesData?: Vehicle[]
 }
 
 // Distinct, dark-theme-friendly line/series colors. pictus-lime first.
@@ -37,17 +40,22 @@ const ITEM_COLORS = [
 
 const normalizeItem = (item: string) => item.trim().toLowerCase()
 
-const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => {
+const FleetExpenseAnalytics = ({ organization, vehiclesData }: FleetExpenseAnalyticsProps) => {
   const t = useTranslations('Client')
   const params = useParams()
   const locale = (params?.locale as string) || 'sk'
 
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
-  const [loading, setLoading] = useState(true)
+  const [vehicles, setVehicles] = useState<Vehicle[]>(vehiclesData ?? [])
+  const [loading, setLoading] = useState(!vehiclesData)
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null)
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
 
   useEffect(() => {
+    if (vehiclesData) {
+      setVehicles(vehiclesData)
+      setLoading(false)
+      return
+    }
     const fetchData = async () => {
       try {
         setLoading(true)
@@ -68,7 +76,7 @@ const FleetExpenseAnalytics = ({ organization }: FleetExpenseAnalyticsProps) => 
       }
     }
     fetchData()
-  }, [organization])
+  }, [organization, vehiclesData])
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat(locale, {

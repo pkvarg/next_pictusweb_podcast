@@ -17,13 +17,10 @@ import {
   Check,
   X,
   Car,
-  Gift,
   Receipt,
 } from 'lucide-react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
-import FleetExpenseAnalytics from '@/app/components/client/FleetExpenseAnalytics'
-import SimpleDutyOverview from '@/app/components/client/SimpleDutyOverview'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
 import ExpiredBanner from '@/app/components/client/ExpiredBanner'
 import UpgradeBanner from '@/app/components/client/UpgradeBanner'
@@ -474,48 +471,6 @@ const ClientZone = () => {
                 →
               </span>
             </Link>
-          </section>
-        )}
-
-        {/* Fleet Expense Analytics - BUSINESS tier, or gifted "business dashboards" bonus */}
-        {organization?.name &&
-          (organization?.tierRelation?.name === 'BUSINESS' ||
-            organization?.bonusBusinessDashboards) && (
-            <section id="expense-analytics" className="mb-16">
-              {organization?.tierRelation?.name !== 'BUSINESS' &&
-                organization?.bonusBusinessDashboards && (
-                  <div className="mb-4 flex items-center gap-2 p-3 rounded-2xl bg-pictus-lime/15 border border-pictus-lime/40 text-pictus-lime">
-                    <Gift className="w-5 h-5 shrink-0" />
-                    <span className="text-sm font-medium">{t('bonusBusinessDashboards')}</span>
-                  </div>
-                )}
-              <FleetExpenseAnalytics
-                organization={
-                  organization.name === 'PICTUSACI'
-                    ? 'all'
-                    : organization.name === 'demo'
-                      ? 'demo'
-                      : organization.name
-                }
-              />
-            </section>
-          )}
-
-        {/* Upcoming Duties Overview - Show for ALL users */}
-        {organization?.name && (
-          <section id="dashboard" className="mb-16">
-            <div className="md:bg-pictus-onyx900 md:rounded-3xl p-0 md:p-8 md:border md:border-white/[0.06]">
-              <SimpleDutyOverview
-                company={
-                  organization.name === 'PICTUSACI'
-                    ? 'all'
-                    : organization.name === 'demo'
-                      ? 'demo'
-                      : organization.name
-                }
-                organizationName={organization.name}
-              />
-            </div>
           </section>
         )}
 

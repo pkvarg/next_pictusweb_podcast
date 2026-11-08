@@ -9,18 +9,25 @@ async function getSessionUser() {
   if (!session?.user?.id) return null
   return prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, organizationId: true },
+    select: { id: true, organizationId: true, role: true },
   })
 }
 
-// The organization (billing) details may only be edited by the sole member of the org, so a
-// multi-user org can't have one member silently rewrite everyone's invoicing data.
-async function isSoleOrgUser(organizationId: string | null): Promise<boolean> {
-  if (!organizationId) return false
-  const count = await prisma.user.count({
-    where: { organizationId, deletedAt: null },
+// Billing details may be edited by the org's primary account — the sole member, an ADMIN, or
+// the org's founding (oldest active) user — so an ordinary member of a multi-user org can't
+// silently rewrite everyone's invoicing data, but the owner isn't locked out.
+async function canEditOrgDetails(
+  user: { id: string; organizationId: string | null; role: string } | null,
+): Promise<boolean> {
+  if (!user?.organizationId) return false
+  if (user.role === 'ADMIN') return true
+  const users = await prisma.user.findMany({
+    where: { organizationId: user.organizationId, deletedAt: null },
+    orderBy: { createdAt: 'asc' },
+    select: { id: true },
   })
-  return count === 1
+  if (users.length <= 1) return true
+  return users[0]?.id === user.id
 }
 
 export async function GET() {
@@ -50,7 +57,7 @@ export async function GET() {
       })
     : null
 
-  const canEditOrg = await isSoleOrgUser(user.organizationId)
+  const canEditOrg = await canEditOrgDetails(user)
 
   return NextResponse.json({ account, organization, canEditOrg })
 }
@@ -84,7 +91,7 @@ export async function PATCH(request: NextRequest) {
     }
   }
 
-  if (organization && user.organizationId && (await isSoleOrgUser(user.organizationId))) {
+  if (organization && user.organizationId && (await canEditOrgDetails(user))) {
     const orgFields = [
       'name',
       'mainContact',

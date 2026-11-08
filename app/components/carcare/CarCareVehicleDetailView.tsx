@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   ArrowLeft,
   Car,
@@ -10,10 +10,13 @@ import {
   Wallet,
   CheckCircle2,
   CalendarCheck,
+  Camera,
+  Loader2,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import { templateKey, powertrainKey, categoryKey } from '@/lib/carcare/labels'
+import { uploadVehicleImage } from '@/lib/carcare/vehicleImage'
 import AddExpenseModal, { type VehicleOption } from './AddExpenseModal'
 
 type Tr = (key: string, values?: Record<string, string | number>) => string
@@ -131,6 +134,33 @@ export default function CarCareVehicleDetailView({
   const [busyKey, setBusyKey] = useState<string | null>(null)
   const [activated, setActivated] = useState<Set<string>>(new Set())
   const [showExpense, setShowExpense] = useState(false)
+  const [image, setImage] = useState<string | null>(vehicle.image)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [imageError, setImageError] = useState<string | null>(null)
+  const imageInputRef = useRef<HTMLInputElement>(null)
+
+  const onImagePicked = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingImage(true)
+    setImageError(null)
+    try {
+      const url = await uploadVehicleImage(file)
+      const res = await fetch(`/api/carcare/vehicles/${vehicle.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: url }),
+      })
+      if (!res.ok) throw new Error('save failed')
+      setImage(url)
+      reload?.()
+    } catch {
+      setImageError(t('vehicle.imageFailed'))
+    } finally {
+      setUploadingImage(false)
+      if (imageInputRef.current) imageInputRef.current.value = ''
+    }
+  }
 
   const activate = async (key: string) => {
     setBusyKey(key)
@@ -178,24 +208,49 @@ export default function CarCareVehicleDetailView({
         </Link>
 
         <header className="flex items-start gap-4 mb-8">
-          {vehicle.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={vehicle.image}
-              alt={vehicleName(vehicle)}
-              className="w-20 h-14 rounded-2xl object-cover shrink-0 border border-white/[0.06]"
+          <div className="relative shrink-0 group">
+            {image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={image}
+                alt={vehicleName(vehicle)}
+                className="w-20 h-20 rounded-2xl object-cover border border-white/[0.06]"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-2xl bg-pictus-lime/15 flex items-center justify-center">
+                <Car className="w-8 h-8 text-pictus-lime" />
+              </div>
+            )}
+            {canModify && (
+              <button
+                type="button"
+                onClick={() => imageInputRef.current?.click()}
+                disabled={uploadingImage}
+                aria-label={image ? t('vehicle.changePhoto') : t('vehicle.addPhoto')}
+                className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full bg-pictus-lime text-pictus-black flex items-center justify-center border-2 border-pictus-black hover:bg-pictus-lime600 disabled:opacity-60"
+              >
+                {uploadingImage ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4" />
+                )}
+              </button>
+            )}
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*,.heic,.heif"
+              className="hidden"
+              onChange={onImagePicked}
             />
-          ) : (
-            <div className="w-14 h-14 rounded-2xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
-              <Car className="w-7 h-7 text-pictus-lime" />
-            </div>
-          )}
+          </div>
           <div className="min-w-0 flex-1">
             <h1 className="text-3xl font-light truncate">{vehicleName(vehicle)}</h1>
             <p className="text-gray-400">
               {vehicle.registration}
               {vehicle.year ? ` · ${vehicle.year}` : ''}
             </p>
+            {imageError && <p className="text-sm text-red-400 mt-1">{imageError}</p>}
           </div>
         </header>
 

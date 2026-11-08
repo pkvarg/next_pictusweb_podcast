@@ -1401,7 +1401,8 @@
       "events": "Events",
       "costs": "Costs",
       "garage": "Garage",
-      "settings": "Settings"
+      "settings": "Settings",
+      "account": "Account"
     },
     "common": {
       "back": "Back",
@@ -1489,7 +1490,10 @@
       "noDue": "No due date",
       "tabCosts": "Costs",
       "costsEmpty": "No costs yet.",
-      "addExpense": "Record a cost"
+      "addExpense": "Record a cost",
+      "changePhoto": "Change photo",
+      "addPhoto": "Add photo",
+      "imageFailed": "Could not upload the photo."
     },
     "onboarding": {
       "title": "Add vehicle",
@@ -1521,7 +1525,8 @@
       "byCategory": "By category (this year)",
       "byVehicle": "By vehicle (this year)",
       "recent": "Recent costs",
-      "empty": "No recorded costs yet."
+      "empty": "No recorded costs yet.",
+      "analyticsGifted": "Business dashboards are included as a free bonus."
     },
     "garage": {
       "title": "Garage",

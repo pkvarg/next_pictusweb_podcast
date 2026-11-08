@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Home, Calendar, Wallet, Users, Car, Settings } from 'lucide-react'
+import { Home, Calendar, Wallet, Users, Car, Settings, UserCircle } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/routing'
 
 const TABS: { key: string; tkey: string; href: string; icon: React.ReactNode }[] = [
@@ -25,6 +25,12 @@ const TABS: { key: string; tkey: string; href: string; icon: React.ReactNode }[]
     icon: <Users className="w-5 h-5" />,
   },
   {
+    key: 'account',
+    tkey: 'nav.account',
+    href: '/client/my-fleet/account',
+    icon: <UserCircle className="w-5 h-5" />,
+  },
+  {
     key: 'settings',
     tkey: 'nav.settings',
     href: '/client/my-fleet/notifications',
@@ -36,6 +42,7 @@ function activeTab(pathname: string): string {
   if (pathname.startsWith('/client/my-fleet/events')) return 'events'
   if (pathname.startsWith('/client/my-fleet/costs')) return 'costs'
   if (pathname.startsWith('/client/my-fleet/garage')) return 'garage'
+  if (pathname.startsWith('/client/my-fleet/account')) return 'account'
   if (pathname.startsWith('/client/my-fleet/notifications')) return 'settings'
   return 'home'
 }
@@ -72,7 +79,7 @@ export default function CarCareBottomNav() {
       </aside>
 
       <nav className="md:hidden fixed bottom-0 inset-x-0 bg-pictus-onyx900/95 backdrop-blur border-t border-white/[0.06] z-40">
-        <div className="mx-auto max-w-4xl grid grid-cols-5 text-center text-[11px]">
+        <div className="mx-auto max-w-4xl grid grid-cols-6 text-center text-[11px]">
           {TABS.map((t) => (
             <Link
               key={t.key}

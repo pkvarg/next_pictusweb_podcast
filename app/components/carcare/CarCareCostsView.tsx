@@ -1,8 +1,9 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Wallet, CalendarCheck, Receipt } from 'lucide-react'
+import { Wallet, CalendarCheck, Receipt, Gift } from 'lucide-react'
 import { categoryKey } from '@/lib/carcare/labels'
+import FleetExpenseAnalytics from '@/app/components/client/FleetExpenseAnalytics'
 
 export interface CostEntry {
   id: string
@@ -20,6 +21,17 @@ export interface CostsData {
   byVehicle: { id: string; name: string; registration: string; total: number }[]
   byCategory: { category: string; total: number }[]
   entries: CostEntry[]
+  fleetAnalytics?: {
+    entitled: boolean
+    gifted: boolean
+    orgName: string | null
+    vehicles: {
+      id: string
+      registration: string
+      type: string
+      expenses: { id: string; item: string; cost: number; date: string }[]
+    }[]
+  }
 }
 
 function eur(n: number) {
@@ -143,6 +155,18 @@ export default function CarCareCostsView({ data }: { data: CostsData }) {
               </div>
             </section>
           </>
+        )}
+
+        {data.fleetAnalytics?.entitled && (
+          <section className="mt-10">
+            {data.fleetAnalytics.gifted && (
+              <div className="mb-4 flex items-center gap-2 p-3 rounded-2xl bg-pictus-lime/15 border border-pictus-lime/40 text-pictus-lime">
+                <Gift className="w-5 h-5 shrink-0" />
+                <span className="text-sm font-medium">{t('costs.analyticsGifted')}</span>
+              </div>
+            )}
+            <FleetExpenseAnalytics vehiclesData={data.fleetAnalytics.vehicles} />
+          </section>
         )}
       </div>
     </div>
