@@ -62,7 +62,7 @@ function EventList({ occurrences, t }: { occurrences: EvOccurrence[]; t: Tr }) {
         return (
           <Link
             key={o.id}
-            href={`/carcare/events/${o.recurringEvent.id}`}
+            href={`/client/my-fleet/events/${o.recurringEvent.id}`}
             className="w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors"
           >
             <div className="min-w-0 flex-1">
@@ -214,7 +214,7 @@ function MonthCalendar({ occurrences, t }: { occurrences: EvOccurrence[]; t: Tr 
               return (
                 <Link
                   key={o.id}
-                  href={`/carcare/events/${o.recurringEvent.id}`}
+                  href={`/client/my-fleet/events/${o.recurringEvent.id}`}
                   className="w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors"
                 >
                   <span

@@ -111,7 +111,7 @@ function EventRow({ o, t }: { o: DashOccurrence; t: Tr }) {
   const actionable = o.status === 'ACTION_REQUIRED' || o.overdue
   return (
     <Link
-      href={`/carcare/events/${o.recurringEvent.id}`}
+      href={`/client/my-fleet/events/${o.recurringEvent.id}`}
       className="w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors"
     >
       <div className="min-w-0 flex-1">
@@ -173,7 +173,7 @@ export default function CarCareDashboardView({
             </div>
           </div>
           <Link
-            href="/carcare/events"
+            href="/client/my-fleet/events"
             aria-label={t('dash.bellAria')}
             className="relative shrink-0 text-gray-300 hover:text-pictus-white transition-colors"
           >
@@ -203,7 +203,7 @@ export default function CarCareDashboardView({
             value={String(counts.arranged)}
             label={t('dash.kpiArranged')}
           />
-          <Link href="/carcare/costs" className="rounded-2xl hover:opacity-90 transition-opacity">
+          <Link href="/client/my-fleet/costs" className="rounded-2xl hover:opacity-90 transition-opacity">
             <Kpi
               icon={<Wallet className="w-5 h-5" />}
               value={`${counts.costThisYear.toFixed(0)} €`}
@@ -240,7 +240,7 @@ export default function CarCareDashboardView({
               </button>
             )}
             <Link
-              href="/carcare/garage"
+              href="/client/my-fleet/garage"
               className="flex flex-col items-center gap-2 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors text-center"
             >
               <span className="text-pictus-lime">
@@ -255,7 +255,7 @@ export default function CarCareDashboardView({
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold">{t('dash.upcomingEvents')}</h2>
             <Link
-              href="/carcare/events"
+              href="/client/my-fleet/events"
               className="text-sm text-pictus-lime hover:text-pictus-lime600"
             >
               {t('dash.viewAll')}
@@ -281,7 +281,7 @@ export default function CarCareDashboardView({
             </h2>
             {data.canModify !== false && (
               <Link
-                href="/carcare/vehicles/new"
+                href="/client/my-fleet/vehicles/new"
                 className="text-sm text-pictus-lime hover:text-pictus-lime600 inline-flex items-center gap-1"
               >
                 <Plus className="w-4 h-4" /> {t('dash.addVehicle')}
@@ -292,7 +292,7 @@ export default function CarCareDashboardView({
             {data.vehicles.map((v) => (
               <Link
                 key={v.id}
-                href={`/carcare/vehicles/${v.id}`}
+                href={`/client/my-fleet/vehicles/${v.id}`}
                 className="p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] flex items-center gap-3 hover:border-white/20 transition-colors"
               >
                 <div className="w-10 h-10 rounded-xl bg-pictus-lime/15 flex items-center justify-center shrink-0">

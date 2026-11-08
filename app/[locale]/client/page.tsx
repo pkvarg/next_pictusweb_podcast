@@ -22,7 +22,6 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
-import FleetOverview from '@/app/components/client/FleetOverview'
 import FleetExpenseAnalytics from '@/app/components/client/FleetExpenseAnalytics'
 import SimpleDutyOverview from '@/app/components/client/SimpleDutyOverview'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
@@ -59,6 +58,7 @@ interface Organization {
 const ClientZone = () => {
   const { data: session } = useSession()
   const t = useTranslations('Client')
+  const tcc = useTranslations('CarCare')
   const params = useParams()
   const locale = (params?.locale as string) || 'sk'
   const router = useRouter()
@@ -457,20 +457,23 @@ const ClientZone = () => {
           </section>
         )} */}
 
-        {/* Fleet Overview Section - Show for ALL users */}
         {organization?.name && (
           <section id="fleet-overview" className="mb-16">
-            <FleetOverview
-              organization={
-                organization.name === 'PICTUSACI'
-                  ? 'all'
-                  : organization.name === 'demo'
-                    ? 'demo'
-                    : organization.name
-              }
-              organizationName={organization.name}
-              isFleetManager={session?.user?.isFleetManager || false}
-            />
+            <Link
+              href="/client/my-fleet"
+              className="group flex items-center gap-4 rounded-3xl p-6 bg-pictus-onyx900 border border-white/[0.06] hover:border-pictus-lime/40 transition-colors"
+            >
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-pictus-lime/15">
+                <Car className="h-6 w-6 text-pictus-lime" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xl font-semibold text-white">FleetSync</p>
+                <p className="text-sm text-white/60">{tcc('dash.subtitle')}</p>
+              </div>
+              <span className="text-2xl text-pictus-lime transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </Link>
           </section>
         )}
 

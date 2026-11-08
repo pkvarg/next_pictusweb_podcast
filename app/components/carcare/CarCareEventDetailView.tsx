@@ -413,7 +413,7 @@ export default function CarCareEventDetailView({
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 py-8">
         <Link
-          href={`/carcare/vehicles/${data.vehicle.id}`}
+          href={`/client/my-fleet/vehicles/${data.vehicle.id}`}
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-pictus-white mb-4"
         >
           <ArrowLeft className="w-4 h-4" /> {vehName}
@@ -688,7 +688,7 @@ export default function CarCareEventDetailView({
                         <Info className="w-3.5 h-3.5 shrink-0" /> {t('ev.verifiedContactsNote')}
                       </span>
                       <Link
-                        href="/carcare/garage"
+                        href="/client/my-fleet/garage"
                         className="shrink-0 text-pictus-lime hover:text-pictus-lime600"
                       >
                         {t('ev.manageContacts')} →

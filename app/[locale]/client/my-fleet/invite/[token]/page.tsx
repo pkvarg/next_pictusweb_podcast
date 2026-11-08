@@ -70,12 +70,12 @@ export default function CarCareAcceptInvitePage({
 
   useEffect(() => {
     if (accept !== 'done') return
-    const t = setTimeout(() => router.replace('/carcare'), 1500)
+    const t = setTimeout(() => router.replace('/client/my-fleet'), 1500)
     return () => clearTimeout(t)
   }, [accept, router])
 
   const goSignIn = () =>
-    router.replace(`/auth/login?callbackUrl=${encodeURIComponent(`/carcare/invite/${token}`)}`)
+    router.replace(`/auth/login?callbackUrl=${encodeURIComponent(`/client/my-fleet/invite/${token}`)}`)
 
   const register = async () => {
     setFormError(null)
@@ -109,7 +109,7 @@ export default function CarCareAcceptInvitePage({
       }
       setMode('created')
       setTimeout(
-        () => router.replace(`/auth/login?callbackUrl=${encodeURIComponent('/carcare')}`),
+        () => router.replace(`/auth/login?callbackUrl=${encodeURIComponent('/client/my-fleet')}`),
         1800,
       )
     } finally {
@@ -151,7 +151,7 @@ export default function CarCareAcceptInvitePage({
               {mismatch ? t('invite.mismatch') : t('invite.invalidLink')}
             </p>
             <Link
-              href="/carcare"
+              href="/client/my-fleet"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-pictus-lime px-5 py-2.5 font-semibold text-pictus-black hover:bg-pictus-lime600 transition-colors"
             >
               {t('invite.goToCarCare')}

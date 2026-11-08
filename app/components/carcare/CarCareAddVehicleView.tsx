@@ -189,7 +189,7 @@ export default function CarCareAddVehicleView() {
         return
       }
       const d = await res.json()
-      router.push(`/carcare/vehicles/${d.vehicle.id}`)
+      router.push(`/client/my-fleet/vehicles/${d.vehicle.id}`)
     } catch {
       setError(t('onboarding.saveFailed'))
       setSubmitting(false)
@@ -200,7 +200,7 @@ export default function CarCareAddVehicleView() {
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-2xl px-4 sm:px-6 py-8">
         <Link
-          href="/carcare"
+          href="/client/my-fleet"
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-pictus-white mb-4"
         >
           <ArrowLeft className="w-4 h-4" /> {t('common.back')}

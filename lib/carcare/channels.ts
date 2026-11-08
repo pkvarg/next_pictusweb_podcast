@@ -53,7 +53,7 @@ export const honoChannels: Channels = {
     await sendPush(d.recipient.id, {
       title: d.occurrence.recurringEvent.name,
       body: 'Pripomienka FleetSync',
-      url: '/carcare',
+      url: '/client/my-fleet',
       tag: `occ-${d.occurrence.id}`,
     })
   },

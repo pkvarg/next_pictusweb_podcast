@@ -2,7 +2,7 @@
   "name": "FleetSync CarCare",
   "short_name": "CarCare",
   "description": "Pripomienky a správa vašich vozidiel",
-  "start_url": "/carcare",
+  "start_url": "/client/my-fleet",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

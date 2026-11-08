@@ -171,7 +171,7 @@ export default function CarCareVehicleDetailView({
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
         <Link
-          href="/carcare"
+          href="/client/my-fleet"
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-pictus-white mb-4"
         >
           <ArrowLeft className="w-4 h-4" /> {t('common.back')}
@@ -299,7 +299,7 @@ export default function CarCareVehicleDetailView({
                   return (
                     <Link
                       key={o.id}
-                      href={`/carcare/events/${o.recurringEvent.id}`}
+                      href={`/client/my-fleet/events/${o.recurringEvent.id}`}
                       className={base}
                     >
                       {inner}

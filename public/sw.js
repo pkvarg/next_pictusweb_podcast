@@ -18,7 +18,7 @@ self.addEventListener('push', (event) => {
     body: payload.body || '',
     icon: '/android-chrome-192x192.png',
     badge: '/favicon-32x32.png',
-    data: { url: payload.url || '/carcare' },
+    data: { url: payload.url || '/client/my-fleet' },
     tag: payload.tag,
   }
   event.waitUntil(self.registration.showNotification(title, options))
@@ -26,11 +26,11 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url = (event.notification.data && event.notification.data.url) || '/carcare'
+  const url = (event.notification.data && event.notification.data.url) || '/client/my-fleet'
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
       for (const client of clients) {
-        if (client.url.includes('/carcare') && 'focus' in client) return client.focus()
+        if (client.url.includes('/client/my-fleet') && 'focus' in client) return client.focus()
       }
       return self.clients.openWindow(url)
     }),

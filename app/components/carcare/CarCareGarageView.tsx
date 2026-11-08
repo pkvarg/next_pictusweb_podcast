@@ -79,8 +79,8 @@ function initials(m: GarageMember) {
 }
 function inviteUrl(token: string) {
   if (typeof window === 'undefined') return ''
-  const base = window.location.pathname.split('/carcare')[0]
-  return `${window.location.origin}${base}/carcare/invite/${token}`
+  const base = window.location.pathname.split('/client/my-fleet')[0]
+  return `${window.location.origin}${base}/client/my-fleet/invite/${token}`
 }
 
 export default function CarCareGarageView({
