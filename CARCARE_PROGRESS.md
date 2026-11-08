@@ -184,7 +184,16 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 - [x] template/label i18n: centralized SK label maps in `lib/carcare/labels.ts` (template, category, powertrain, action, role) — single source; full en/hu deferred until the CarCare UI itself is localized
 - [x] garage switcher: cookie-based active garage (`ACTIVE_GARAGE_COOKIE` honored by `resolveCarCareSession`); `GET /api/carcare/garages` + `POST /api/carcare/active-garage`; selector shown in the garage header when the user belongs to more than one garage
 - [x] removed all temporary mock preview routes and their `preview` prop scaffolding
-  > **Review gate M14.** Sub-step B complete: dashboard, events/calendar, vehicle detail, onboarding, costs, garage (+ invite accept), and book/complete action wiring. Remaining before done: remove temp preview routes; deferred surfaces (invite email via hono, per-member vehicle-access UI, provider call/email actions, template i18n names, viewer read-only UI, unaccent search).
+
+### Eva design-parity pass (gaps closed)
+
+- [x] **Event-detail page** `/[locale]/carcare/events/[id]` with tabs **Prehľad / Termín a opakovanie / Notifikácie / Návšteva / Dokončenie / História** (`GET`/`PATCH /api/carcare/events/:id`, `PUT .../notifications`); event rows across dashboard/events/vehicle link to it; interim action modal removed
+- [x] **Per-event Notifikácie** (Eva's deep screen): per-stage reminder toggles + lead days (BOOKING/APPOINTMENT/DEADLINE/OVERDUE/COMPLETION), delivery channels, quiet hours, repeat — **verified: rules persist** (stage/leadDays/channels)
+- [x] **Zodpovedná osoba** picker + preferred provider + recurrence edit (Termín tab)
+- [x] **Desktop left sidebar** + mobile bottom bar (responsive `CarCareBottomNav` in the layout, content offset)
+- [x] **Vehicle photo** (detail header + onboarding photo-URL) and dashboard **Rýchle akcie** panel
+- [x] **Tabbed vehicle detail** (Prehľad / Udalosti / História)
+  > **Review gate M14.** Sub-step B + Eva design-parity complete. Remaining (phase 2): photo file-upload (currently URL), per-vehicle Zdieľanie tab (lives in garage page), full en/hu localisation.
 
 ## M15 — PWA + web push
 
