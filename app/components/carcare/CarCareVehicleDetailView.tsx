@@ -11,8 +11,12 @@ import {
   CheckCircle2,
   CalendarCheck,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
-import { ACTION_LABEL, templateName, powertrainLabel } from '@/lib/carcare/labels'
+import { templateKey, powertrainKey, categoryKey } from '@/lib/carcare/labels'
+import AddExpenseModal, { type VehicleOption } from './AddExpenseModal'
+
+type Tr = (key: string, values?: Record<string, string | number>) => string
 
 export interface VdOccurrence {
   id: string
@@ -62,6 +66,20 @@ export interface VehicleDetailData {
   latestMileage: { kilometers: number; date: string } | null
   suggestions: VdSuggestion[]
   canModify?: boolean
+  costs?: {
+    thisYear: number
+    allTime: number
+    byCategory: { category: string; total: number }[]
+    entries: {
+      id: string
+      source: 'event' | 'expense'
+      title: string
+      category: string
+      date: string | null
+      amount: number
+      currency: string
+    }[]
+  }
 }
 
 const toneClass = {
@@ -80,13 +98,14 @@ function formatDate(iso: string | null) {
 function vehicleName(v: VehicleDetailData['vehicle']) {
   return v.nickname || [v.make, v.model].filter(Boolean).join(' ') || v.registration
 }
-function dueBadge(o: VdOccurrence): { text: string; tone: keyof typeof toneClass } {
+function dueBadge(o: VdOccurrence, t: Tr): { text: string; tone: keyof typeof toneClass } {
   const d = daysUntil(o.dueDate)
-  if (o.overdue) return { text: d != null ? `Po termíne (${d} dní)` : 'Po termíne', tone: 'red' }
-  if (o.status === 'ARRANGED') return { text: 'Naplánované', tone: 'lime' }
-  if (o.status === 'ACTION_REQUIRED') return { text: 'Vyžaduje akciu', tone: 'amber' }
-  if (d != null) return { text: `Za ${d} dní`, tone: 'neutral' }
-  return { text: 'Nadchádzajúce', tone: 'neutral' }
+  if (o.overdue)
+    return { text: d != null ? t('badge.overdueDays', { d }) : t('badge.overdue'), tone: 'red' }
+  if (o.status === 'ARRANGED') return { text: t('badge.arranged'), tone: 'lime' }
+  if (o.status === 'ACTION_REQUIRED') return { text: t('badge.actionReq'), tone: 'amber' }
+  if (d != null) return { text: t('badge.inDays', { d }), tone: 'neutral' }
+  return { text: t('badge.upcoming'), tone: 'neutral' }
 }
 
 function SpecRow({ label, value }: { label: string; value: string }) {
@@ -98,12 +117,20 @@ function SpecRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export default function CarCareVehicleDetailView({ data }: { data: VehicleDetailData }) {
+export default function CarCareVehicleDetailView({
+  data,
+  reload,
+}: {
+  data: VehicleDetailData
+  reload?: () => void
+}) {
+  const t = useTranslations('CarCare')
   const { vehicle } = data
   const canModify = data.canModify !== false
-  const [tab, setTab] = useState<'prehlad' | 'udalosti' | 'historia'>('prehlad')
+  const [tab, setTab] = useState<'prehlad' | 'udalosti' | 'historia' | 'naklady'>('prehlad')
   const [busyKey, setBusyKey] = useState<string | null>(null)
   const [activated, setActivated] = useState<Set<string>>(new Set())
+  const [showExpense, setShowExpense] = useState(false)
 
   const activate = async (key: string) => {
     setBusyKey(key)
@@ -120,14 +147,24 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
   }
 
   const specs: { label: string; value: string }[] = [
-    { label: 'ŠPZ', value: vehicle.registration },
+    { label: t('vehicle.spzPlate'), value: vehicle.registration },
     vehicle.make || vehicle.model
-      ? { label: 'Značka a model', value: [vehicle.make, vehicle.model].filter(Boolean).join(' ') }
+      ? {
+          label: t('vehicle.makeModel'),
+          value: [vehicle.make, vehicle.model].filter(Boolean).join(' '),
+        }
       : null,
-    vehicle.year ? { label: 'Rok výroby', value: String(vehicle.year) } : null,
-    vehicle.powertrain ? { label: 'Pohon', value: powertrainLabel(vehicle.powertrain) } : null,
+    vehicle.year ? { label: t('vehicle.year'), value: String(vehicle.year) } : null,
+    vehicle.powertrain
+      ? {
+          label: t('vehicle.powertrain'),
+          value: powertrainKey(vehicle.powertrain)
+            ? t(powertrainKey(vehicle.powertrain)!)
+            : (vehicle.powertrain ?? ''),
+        }
+      : null,
     vehicle.vin ? { label: 'VIN', value: vehicle.vin } : null,
-    vehicle.country ? { label: 'Krajina', value: vehicle.country } : null,
+    vehicle.country ? { label: t('vehicle.country'), value: vehicle.country } : null,
   ].filter((x): x is { label: string; value: string } => x != null)
 
   return (
@@ -137,7 +174,7 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
           href="/carcare"
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-pictus-white mb-4"
         >
-          <ArrowLeft className="w-4 h-4" /> Späť
+          <ArrowLeft className="w-4 h-4" /> {t('common.back')}
         </Link>
 
         <header className="flex items-start gap-4 mb-8">
@@ -165,9 +202,10 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
         <div className="flex gap-1 overflow-x-auto mb-6 border-b border-white/[0.06]">
           {(
             [
-              ['prehlad', 'Prehľad'],
-              ['udalosti', 'Udalosti'],
-              ['historia', 'História'],
+              ['prehlad', t('vehicle.tabOverview')],
+              ['udalosti', t('vehicle.tabEvents')],
+              ['historia', t('vehicle.tabHistory')],
+              ['naklady', t('vehicle.tabCosts')],
             ] as const
           ).map(([k, l]) => (
             <button
@@ -197,7 +235,9 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
                 <span className="text-base font-normal text-gray-400"> km</span>
               </div>
               <div className="text-xs text-gray-400">
-                {data.latestMileage ? `k ${formatDate(data.latestMileage.date)}` : 'Bez záznamu'}
+                {data.latestMileage
+                  ? t('vehicle.mileageAt', { date: formatDate(data.latestMileage.date) })
+                  : t('vehicle.mileageEmpty')}
               </div>
             </div>
             <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06] flex flex-col gap-1">
@@ -207,22 +247,22 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
               <div className="text-2xl font-bold text-pictus-white">
                 {data.costThisYear.toFixed(0)} €
               </div>
-              <div className="text-xs text-gray-400">Náklady tento rok</div>
+              <div className="text-xs text-gray-400">{t('vehicle.costThisYear')}</div>
             </div>
           </div>
         )}
 
         {tab === 'udalosti' && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-3">Udalosti</h2>
+            <h2 className="text-xl font-bold mb-3">{t('vehicle.tabEvents')}</h2>
             {data.occurrences.length === 0 ? (
               <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
-                Žiadne otvorené udalosti.
+                {t('vehicle.eventsEmpty')}
               </div>
             ) : (
               <div className="space-y-3">
                 {data.occurrences.map((o) => {
-                  const badge = dueBadge(o)
+                  const badge = dueBadge(o, t)
                   const actionable = o.status === 'ACTION_REQUIRED' || o.overdue
                   const inner = (
                     <>
@@ -232,12 +272,12 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
                         </p>
                         <p className="text-sm text-gray-400 truncate">
                           {o.appointment
-                            ? `Návšteva ${formatDate(o.appointment.scheduledAt)}${o.appointment.provider ? ` · ${o.appointment.provider.name}` : ''}`
+                            ? `${t('vehicle.visit', { date: formatDate(o.appointment.scheduledAt) })}${o.appointment.provider ? ` · ${o.appointment.provider.name}` : ''}`
                             : o.dueDate
-                              ? `Termín ${formatDate(o.dueDate)}`
+                              ? t('vehicle.due', { date: formatDate(o.dueDate) })
                               : o.dueMileage
-                                ? `Pri ${o.dueMileage.toLocaleString('sk-SK')} km`
-                                : 'Bez termínu'}
+                                ? t('vehicle.atKm', { km: o.dueMileage.toLocaleString('sk-SK') })
+                                : t('vehicle.noDue')}
                         </p>
                       </div>
                       <span
@@ -247,7 +287,7 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
                       </span>
                       {canModify && actionable ? (
                         <span className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full">
-                          {ACTION_LABEL[o.recurringEvent.actionType] ?? 'Zobraziť'}
+                          {t(`action.${o.recurringEvent.actionType}`)}
                         </span>
                       ) : (
                         <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
@@ -273,7 +313,7 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
 
         {tab === 'prehlad' && canModify && data.suggestions.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-3">Odporúčané sledovať</h2>
+            <h2 className="text-xl font-bold mb-3">{t('vehicle.suggested')}</h2>
             <div className="space-y-3">
               {data.suggestions.map((s) => {
                 const done = activated.has(s.key)
@@ -284,15 +324,15 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
                   >
                     <div className="min-w-0 flex-1">
                       <p className="text-pictus-white font-medium truncate">
-                        {templateName(s.key)}
+                        {templateKey(s.key) ? t(templateKey(s.key)!) : s.key}
                       </p>
                       <p className="text-sm text-gray-400 truncate">
-                        {s.kind === 'LEGAL' ? 'Zákonná povinnosť' : 'Odporúčané'}
+                        {s.kind === 'LEGAL' ? t('vehicle.legal') : t('vehicle.recommended')}
                       </p>
                     </div>
                     {done ? (
                       <span className="shrink-0 inline-flex items-center gap-1.5 text-sm text-pictus-lime">
-                        <CheckCircle2 className="w-4 h-4" /> Pridané
+                        <CheckCircle2 className="w-4 h-4" /> {t('vehicle.tracked')}
                       </span>
                     ) : (
                       <button
@@ -300,7 +340,7 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
                         disabled={busyKey === s.key}
                         className="shrink-0 inline-flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-pictus-white text-sm font-medium px-4 py-1.5 rounded-full border border-white/10 disabled:opacity-50"
                       >
-                        <Plus className="w-4 h-4" /> Sledovať
+                        <Plus className="w-4 h-4" /> {t('vehicle.track')}
                       </button>
                     )}
                   </div>
@@ -312,13 +352,13 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
 
         {tab === 'historia' && data.history.length === 0 && (
           <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
-            Zatiaľ žiadna história.
+            {t('vehicle.historyEmpty')}
           </div>
         )}
 
         {tab === 'historia' && data.history.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-3">História</h2>
+            <h2 className="text-xl font-bold mb-3">{t('vehicle.tabHistory')}</h2>
             <div className="space-y-3">
               {data.history.map((h) => (
                 <div
@@ -346,9 +386,80 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
           </section>
         )}
 
+        {tab === 'naklady' && (
+          <section className="mb-8 space-y-3">
+            <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <Wallet className="w-5 h-5" />
+                    <span className="text-sm">{t('costs.thisYear')}</span>
+                  </div>
+                  <div className="mt-1 text-3xl font-bold text-pictus-white">
+                    {(data.costs?.thisYear ?? 0).toFixed(0)} €
+                  </div>
+                  <div className="mt-1 text-xs text-gray-400">
+                    {t('costs.allTime')}: {(data.costs?.allTime ?? 0).toFixed(0)} €
+                  </div>
+                </div>
+                {canModify && (
+                  <button
+                    onClick={() => setShowExpense(true)}
+                    className="shrink-0 inline-flex items-center gap-1.5 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full"
+                  >
+                    <Plus className="w-4 h-4" /> {t('vehicle.addExpense')}
+                  </button>
+                )}
+              </div>
+
+              {data.costs && data.costs.byCategory.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-white/[0.06] space-y-1">
+                  {data.costs.byCategory.map((c) => (
+                    <div
+                      key={c.category}
+                      className="flex items-center justify-between py-1.5 text-sm"
+                    >
+                      <span className="text-gray-400">
+                        {categoryKey(c.category) ? t(categoryKey(c.category)!) : c.category}
+                      </span>
+                      <span className="text-gray-300">{c.total.toFixed(0)} €</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {!data.costs || data.costs.entries.length === 0 ? (
+              <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
+                {t('vehicle.costsEmpty')}
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-xl font-bold mb-3">{t('costs.recent')}</h2>
+                <div className="space-y-3">
+                  {data.costs.entries.map((e) => (
+                    <div
+                      key={e.id}
+                      className="flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06]"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-pictus-white font-medium truncate">{e.title}</p>
+                        <p className="text-sm text-gray-400 truncate">{formatDate(e.date)}</p>
+                      </div>
+                      <span className="shrink-0 text-sm text-gray-300">
+                        {e.amount.toFixed(0)} {e.currency === 'EUR' ? '€' : e.currency}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
         {tab === 'prehlad' && vehicle.note && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-3">Poznámka</h2>
+            <h2 className="text-xl font-bold mb-3">{t('vehicle.note')}</h2>
             <div className="p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-300 whitespace-pre-wrap">
               {vehicle.note}
             </div>
@@ -357,7 +468,7 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
 
         {tab === 'prehlad' && (
           <section>
-            <h2 className="text-xl font-bold mb-3">Detaily vozidla</h2>
+            <h2 className="text-xl font-bold mb-3">{t('vehicle.details')}</h2>
             <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06]">
               {specs.map((s) => (
                 <SpecRow key={s.label} label={s.label} value={s.value} />
@@ -366,6 +477,17 @@ export default function CarCareVehicleDetailView({ data }: { data: VehicleDetail
           </section>
         )}
       </div>
+
+      {showExpense && (
+        <AddExpenseModal
+          vehicles={
+            [{ id: data.vehicle.id, label: vehicleName(data.vehicle) }] satisfies VehicleOption[]
+          }
+          defaultVehicleId={data.vehicle.id}
+          onClose={() => setShowExpense(false)}
+          onSaved={() => reload?.()}
+        />
+      )}
     </div>
   )
 }

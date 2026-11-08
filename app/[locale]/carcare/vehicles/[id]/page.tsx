@@ -45,5 +45,5 @@ export default function CarCareVehicleDetailPage({ params }: { params: Promise<{
     )
   }
   if (!data) return null
-  return <CarCareVehicleDetailView data={data} />
+  return <CarCareVehicleDetailView data={data} reload={load} />
 }

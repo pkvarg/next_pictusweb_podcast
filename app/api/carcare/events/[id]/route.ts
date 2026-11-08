@@ -100,6 +100,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
           status: open.status,
           dueDate: open.dueDate,
           dueMileage: open.dueMileage,
+          actualCost: num(open.actualCost),
           overdue: !!open.dueDate && open.dueDate.getTime() < now && open.status !== 'ARRANGED',
           appointment: open.appointments[0]
             ? {

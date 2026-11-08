@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from '@/i18n/routing'
+import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import CarCareDashboardView, {
   type DashboardData,
@@ -11,6 +12,7 @@ import CarCareDashboardView, {
 export default function CarCarePage() {
   const { status } = useSession()
   const router = useRouter()
+  const t = useTranslations('CarCare')
   const [data, setData] = useState<DashboardData | null>(null)
   const [error, setError] = useState(false)
 
@@ -39,10 +41,10 @@ export default function CarCarePage() {
   if (error) {
     return (
       <div className="min-h-screen bg-pictus-black text-gray-300 flex items-center justify-center">
-        Nepodarilo sa načítať dashboard.
+        {t('dash.loadFailed')}
       </div>
     )
   }
   if (!data) return null
-  return <CarCareDashboardView data={data} />
+  return <CarCareDashboardView data={data} reload={load} />
 }

@@ -9,8 +9,14 @@ import {
   ChevronRight,
   Plus,
   Users,
+  Bell,
 } from 'lucide-react'
+import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { Link } from '@/i18n/routing'
+import { useTranslations } from 'next-intl'
+import AddEventModal from './AddEventModal'
+import AddExpenseModal, { type VehicleOption } from './AddExpenseModal'
 
 export interface DashOccurrence {
   id: string
@@ -45,27 +51,24 @@ export interface DashboardData {
   canModify?: boolean
 }
 
-const ACTION_LABEL: Record<string, string> = {
-  BOOK: 'Objednať',
-  RENEW: 'Obnoviť',
-  PAY: 'Zaplatiť',
-  PURCHASE: 'Kúpiť',
-  INSPECT: 'Objednať',
-  CUSTOM: 'Zobraziť',
-}
-
 function daysUntil(iso: string | null): number | null {
   if (!iso) return null
   return Math.round((new Date(iso).getTime() - Date.now()) / 86400000)
 }
 
-function dueLabel(o: DashOccurrence): { text: string; tone: 'red' | 'amber' | 'neutral' } {
+type Tr = (key: string, values?: Record<string, string | number>) => string
+
+function dueLabel(o: DashOccurrence, t: Tr): { text: string; tone: 'red' | 'amber' | 'neutral' } {
   const d = daysUntil(o.dueDate)
-  if (o.overdue) return { text: d != null ? `Po termíne (${d} dní)` : 'Po termíne', tone: 'red' }
-  if (o.status === 'ARRANGED') return { text: 'Naplánované', tone: 'neutral' }
-  if (o.status === 'ACTION_REQUIRED') return { text: 'Vyžaduje akciu', tone: 'amber' }
-  if (d != null) return { text: `Za ${d} dní`, tone: 'neutral' }
-  return { text: 'Nadchádzajúce', tone: 'neutral' }
+  if (o.overdue)
+    return {
+      text: d != null ? t('badge.overdueDays', { d }) : t('badge.overdue'),
+      tone: 'red',
+    }
+  if (o.status === 'ARRANGED') return { text: t('badge.arranged'), tone: 'neutral' }
+  if (o.status === 'ACTION_REQUIRED') return { text: t('badge.actionReq'), tone: 'amber' }
+  if (d != null) return { text: t('badge.inDays', { d }), tone: 'neutral' }
+  return { text: t('badge.upcoming'), tone: 'neutral' }
 }
 
 const toneClass = {
@@ -103,8 +106,8 @@ function vehicleName(v: {
   return v.nickname || [v.make, v.model].filter(Boolean).join(' ') || v.registration
 }
 
-function EventRow({ o }: { o: DashOccurrence }) {
-  const badge = dueLabel(o)
+function EventRow({ o, t }: { o: DashOccurrence; t: Tr }) {
+  const badge = dueLabel(o, t)
   const actionable = o.status === 'ACTION_REQUIRED' || o.overdue
   return (
     <Link
@@ -122,7 +125,7 @@ function EventRow({ o }: { o: DashOccurrence }) {
       </span>
       {actionable ? (
         <span className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full">
-          {ACTION_LABEL[o.recurringEvent.actionType] ?? 'Zobraziť'}
+          {t(`action.${o.recurringEvent.actionType}`)}
         </span>
       ) : (
         <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
@@ -131,89 +134,141 @@ function EventRow({ o }: { o: DashOccurrence }) {
   )
 }
 
-export default function CarCareDashboardView({ data }: { data: DashboardData }) {
+export default function CarCareDashboardView({
+  data,
+  reload,
+}: {
+  data: DashboardData
+  reload?: () => void
+}) {
+  const t = useTranslations('CarCare')
+  const { data: session } = useSession()
+  const [showEvent, setShowEvent] = useState(false)
+  const [showExpense, setShowExpense] = useState(false)
   const { counts } = data
   const events = [...data.needsAttention, ...data.upcoming]
+  const firstName = session?.user?.name?.split(' ')[0]
+  const greeting = firstName ? t('dash.greeting', { name: firstName }) : t('dash.greetingNoName')
+  const vehicleOptions: VehicleOption[] = data.vehicles.map((v) => ({
+    id: v.id,
+    label: vehicleName(v),
+  }))
   return (
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
-        <header className="mb-6">
-          <h1 className="text-3xl font-light">Domov</h1>
-          <p className="text-gray-400">Prehľad vašej garáže</p>
+        <header className="mb-6 flex items-start justify-between gap-3">
+          <div>
+            <div className="hidden md:block">
+              <h1 className="text-3xl font-light">{t('dash.title')}</h1>
+              <p className="text-gray-400">{t('dash.subtitle')}</p>
+            </div>
+            <div className="md:hidden">
+              <h1 className="text-3xl font-light">{greeting}</h1>
+              <p className="text-gray-400">
+                {t('dash.summaryLine', {
+                  vehicles: data.vehicles.length,
+                  actions: data.counts.needsAttention,
+                })}
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/carcare/events"
+            aria-label={t('dash.bellAria')}
+            className="relative shrink-0 text-gray-300 hover:text-pictus-white transition-colors"
+          >
+            <Bell className="w-6 h-6" />
+            {data.counts.needsAttention > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[0.65rem] font-bold">
+                {data.counts.needsAttention}
+              </span>
+            )}
+          </Link>
         </header>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
           <Kpi
             icon={<AlertTriangle className="w-5 h-5" />}
             value={String(counts.needsAttention)}
-            label="Vyžaduje akciu"
+            label={t('dash.kpiAction')}
             accent={counts.needsAttention > 0}
           />
           <Kpi
             icon={<Calendar className="w-5 h-5" />}
             value={String(counts.upcoming30)}
-            label="Najbližšie (30 dní)"
+            label={t('dash.kpiUpcoming')}
           />
           <Kpi
             icon={<CalendarCheck className="w-5 h-5" />}
             value={String(counts.arranged)}
-            label="Naplánovaná návšteva"
+            label={t('dash.kpiArranged')}
           />
           <Link href="/carcare/costs" className="rounded-2xl hover:opacity-90 transition-opacity">
             <Kpi
               icon={<Wallet className="w-5 h-5" />}
               value={`${counts.costThisYear.toFixed(0)} €`}
-              label="Náklady tento rok"
+              label={t('dash.kpiCost')}
             />
           </Link>
         </div>
 
         <section className="mb-8">
-          <h2 className="text-xl font-bold mb-3">Rýchle akcie</h2>
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              {
-                href: '/carcare/vehicles/new',
-                icon: <Plus className="w-5 h-5" />,
-                label: 'Pridať vozidlo',
-              },
-              {
-                href: '/carcare/garage',
-                icon: <Users className="w-5 h-5" />,
-                label: 'Pozvať člena',
-              },
-              { href: '/carcare/costs', icon: <Wallet className="w-5 h-5" />, label: 'Náklady' },
-            ].map((a) => (
-              <Link
-                key={a.href}
-                href={a.href}
+          <h2 className="text-xl font-bold mb-3">{t('dash.quickActions')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {data.canModify !== false && (
+              <button
+                type="button"
+                onClick={() => setShowEvent(true)}
                 className="flex flex-col items-center gap-2 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors text-center"
               >
-                <span className="text-pictus-lime">{a.icon}</span>
-                <span className="text-sm text-pictus-white">{a.label}</span>
-              </Link>
-            ))}
+                <span className="text-pictus-lime">
+                  <Plus className="w-5 h-5" />
+                </span>
+                <span className="text-sm text-pictus-white">{t('dash.qaAddEvent')}</span>
+              </button>
+            )}
+            {data.canModify !== false && (
+              <button
+                type="button"
+                onClick={() => setShowExpense(true)}
+                className="flex flex-col items-center gap-2 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors text-center"
+              >
+                <span className="text-pictus-lime">
+                  <Wallet className="w-5 h-5" />
+                </span>
+                <span className="text-sm text-pictus-white">{t('dash.qaLogCost')}</span>
+              </button>
+            )}
+            <Link
+              href="/carcare/garage"
+              className="flex flex-col items-center gap-2 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors text-center"
+            >
+              <span className="text-pictus-lime">
+                <Users className="w-5 h-5" />
+              </span>
+              <span className="text-sm text-pictus-white">{t('dash.inviteMember')}</span>
+            </Link>
           </div>
         </section>
 
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-bold">Najbližšie udalosti</h2>
+            <h2 className="text-xl font-bold">{t('dash.upcomingEvents')}</h2>
             <Link
               href="/carcare/events"
               className="text-sm text-pictus-lime hover:text-pictus-lime600"
             >
-              Zobraziť všetky
+              {t('dash.viewAll')}
             </Link>
           </div>
           {events.length === 0 ? (
             <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
-              Všetko je v poriadku — nič nevyžaduje vašu pozornosť.
+              {t('dash.allClear')}
             </div>
           ) : (
             <div className="space-y-3">
               {events.map((o) => (
-                <EventRow key={o.id} o={o} />
+                <EventRow key={o.id} o={o} t={t} />
               ))}
             </div>
           )}
@@ -221,13 +276,15 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
 
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-bold">Moje vozidlá ({data.vehicles.length})</h2>
+            <h2 className="text-xl font-bold">
+              {t('dash.myVehicles')} ({data.vehicles.length})
+            </h2>
             {data.canModify !== false && (
               <Link
                 href="/carcare/vehicles/new"
                 className="text-sm text-pictus-lime hover:text-pictus-lime600 inline-flex items-center gap-1"
               >
-                <Plus className="w-4 h-4" /> Pridať vozidlo
+                <Plus className="w-4 h-4" /> {t('dash.addVehicle')}
               </Link>
             )}
           </div>
@@ -253,6 +310,21 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
             ))}
           </div>
         </section>
+
+        {showEvent && (
+          <AddEventModal
+            vehicles={vehicleOptions}
+            onClose={() => setShowEvent(false)}
+            onSaved={() => reload?.()}
+          />
+        )}
+        {showExpense && (
+          <AddExpenseModal
+            vehicles={vehicleOptions}
+            onClose={() => setShowExpense(false)}
+            onSaved={() => reload?.()}
+          />
+        )}
       </div>
     </div>
   )

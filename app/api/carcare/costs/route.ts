@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
+import { sameOriginOk } from '@/lib/sameOrigin'
 import { resolveCarCareSession } from '@/lib/carcare/apiAuth'
-import { listAccessibleVehicleIds } from '@/lib/carcare/garage'
+import { canModifyVehicle, listAccessibleVehicleIds } from '@/lib/carcare/garage'
 
 // GET /api/carcare/costs
 // Spend across the user's accessible vehicles: completed-event costs + logged
@@ -126,4 +127,41 @@ export async function GET() {
   })
 
   return NextResponse.json(payload)
+}
+
+// POST /api/carcare/costs — log an expense against a vehicle
+// Body: { vehicleId, item, cost, date?, note? }
+export async function POST(request: NextRequest) {
+  if (!sameOriginOk(request)) return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  const session = await resolveCarCareSession()
+  if (!session?.organizationId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = await request.json().catch(() => ({}))
+  const cost = Number(body.cost)
+  if (!body.vehicleId || !body.item || !Number.isFinite(cost) || cost < 0) {
+    return NextResponse.json(
+      { error: 'vehicleId, item and a non-negative cost are required' },
+      { status: 400 },
+    )
+  }
+
+  const id = await prisma.$transaction(async (tx) => {
+    if (!(await canModifyVehicle(tx, session.userId, body.vehicleId))) return null
+    const created = await tx.myVehicleExpense.create({
+      data: {
+        vehicleId: body.vehicleId,
+        organizationId: session.organizationId!,
+        userId: session.userId,
+        item: String(body.item).slice(0, 200),
+        cost,
+        date: body.date ? new Date(body.date) : new Date(),
+        note: body.note ? String(body.note).slice(0, 500) : null,
+      },
+      select: { id: true },
+    })
+    return created.id
+  })
+
+  if (!id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  return NextResponse.json({ id }, { status: 201 })
 }

@@ -72,13 +72,93 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       (t) => !activatedTemplateIds.has(t.id),
     )
 
-    return { vehicle, open, history, completedCost, expenseCost, latestMileage, suggestions }
+    const costEvents = await tx.eventOccurrence.findMany({
+      where: { vehicleId: id, status: 'COMPLETED', actualCost: { not: null } },
+      select: {
+        id: true,
+        completedAt: true,
+        actualCost: true,
+        currency: true,
+        recurringEvent: { select: { name: true, category: true } },
+      },
+      orderBy: { completedAt: 'desc' },
+    })
+    const costExpenses = await tx.myVehicleExpense.findMany({
+      where: { vehicleId: id, deletedAt: null },
+      select: { id: true, item: true, cost: true, date: true },
+      orderBy: { date: 'desc' },
+    })
+
+    return {
+      vehicle,
+      open,
+      history,
+      completedCost,
+      expenseCost,
+      latestMileage,
+      suggestions,
+      costEvents,
+      costExpenses,
+    }
   })
 
   if (!result) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const { vehicle, open, history, completedCost, expenseCost, latestMileage, suggestions } = result
+  const {
+    vehicle,
+    open,
+    history,
+    completedCost,
+    expenseCost,
+    latestMileage,
+    suggestions,
+    costEvents,
+    costExpenses,
+  } = result
   const num = (d: { toNumber(): number } | null | undefined) => (d ? d.toNumber() : 0)
+
+  const yearStartMs = yearStart.getTime()
+  type CostEntry = {
+    id: string
+    source: 'event' | 'expense'
+    title: string
+    category: string
+    date: Date | null
+    amount: number
+    currency: string
+  }
+  const costEntries: CostEntry[] = [
+    ...costEvents.map((c) => ({
+      id: c.id,
+      source: 'event' as const,
+      title: c.recurringEvent.name,
+      category: c.recurringEvent.category,
+      date: c.completedAt,
+      amount: num(c.actualCost),
+      currency: c.currency ?? 'EUR',
+    })),
+    ...costExpenses.map((e) => ({
+      id: e.id,
+      source: 'expense' as const,
+      title: e.item,
+      category: 'other',
+      date: e.date,
+      amount: num(e.cost),
+      currency: 'EUR',
+    })),
+  ].sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0))
+
+  const costAllTime = costEntries.reduce((s, e) => s + e.amount, 0)
+  const costThisYearTotal = costEntries
+    .filter((e) => e.date && e.date.getTime() >= yearStartMs)
+    .reduce((s, e) => s + e.amount, 0)
+  const byCategoryMap = new Map<string, number>()
+  for (const e of costEntries.filter((x) => x.date && x.date.getTime() >= yearStartMs)) {
+    byCategoryMap.set(e.category, (byCategoryMap.get(e.category) ?? 0) + e.amount)
+  }
+  const costByCategory = [...byCategoryMap.entries()]
+    .map(([category, total]) => ({ category, total }))
+    .sort((a, b) => b.total - a.total)
 
   return NextResponse.json({
     canModify: session.canModify,
@@ -119,6 +199,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       currency: h.currency,
     })),
     costThisYear: num(completedCost._sum.actualCost) + num(expenseCost._sum.cost),
+    costs: {
+      thisYear: costThisYearTotal,
+      allTime: costAllTime,
+      byCategory: costByCategory,
+      entries: costEntries.slice(0, 50),
+    },
     latestMileage,
     suggestions: suggestions.map((t) => ({
       id: t.id,
