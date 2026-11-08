@@ -10,8 +10,6 @@ import {
   TestTube,
   RotateCcw,
   Plus,
-  Copy,
-  Settings,
   Edit,
   Trash2,
   ArrowUpDown,
@@ -19,9 +17,6 @@ import {
   ArrowDown,
   Eye,
 } from 'lucide-react'
-import NotificationBuilder from './NotificationBuilder'
-import NotificationSettings from './NotificationSettings'
-
 interface Organization {
   id: string
   name: string
@@ -96,9 +91,6 @@ export default function AllVehicleNotifications() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedNotificationId, setSelectedNotificationId] = useState<string>('')
   const [testingLoading, setTestingLoading] = useState(false)
-  const [showBuilder, setShowBuilder] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
-  const [duplicateData, setDuplicateData] = useState<VehicleNotification | null>(null)
 
   // Vehicle management state
   const [selectedOrganization, setSelectedOrganization] = useState<string>('') // Now stores organization ID
@@ -258,7 +250,8 @@ export default function AllVehicleNotifications() {
         notification.id.toString().includes(searchLower) ||
         (notification.email && notification.email.toLowerCase().includes(searchLower)) ||
         (notification.personName && notification.personName.toLowerCase().includes(searchLower)) ||
-        (notification.organization?.name && notification.organization.name.toLowerCase().includes(searchLower)) ||
+        (notification.organization?.name &&
+          notification.organization.name.toLowerCase().includes(searchLower)) ||
         (notification.vehicleRegistration &&
           notification.vehicleRegistration.toLowerCase().includes(searchLower)) ||
         (notification.notificationType &&
@@ -304,11 +297,6 @@ export default function AllVehicleNotifications() {
     }
   }
 
-  const handleDuplicate = (notification: VehicleNotification) => {
-    setDuplicateData(notification)
-    setShowBuilder(true)
-  }
-
   const handleEditNotification = (notification: VehicleNotification) => {
     setEditingNotification(notification)
     setShowEditNotificationModal(true)
@@ -345,17 +333,6 @@ export default function AllVehicleNotifications() {
       console.error('Error deleting notification:', err)
       alert('Failed to delete notification')
     }
-  }
-
-  const handleBuilderSuccess = () => {
-    setShowBuilder(false)
-    setDuplicateData(null)
-    fetchNotifications()
-  }
-
-  const handleBuilderCancel = () => {
-    setShowBuilder(false)
-    setDuplicateData(null)
   }
 
   const handleEditVehicle = (vehicle: Vehicle) => {
@@ -411,31 +388,6 @@ export default function AllVehicleNotifications() {
     )
   }
 
-  if (showBuilder) {
-    return (
-      <NotificationBuilder
-        organization={duplicateData?.organization?.name || undefined}
-        duplicateData={duplicateData || undefined}
-        onSuccess={handleBuilderSuccess}
-        onCancel={handleBuilderCancel}
-      />
-    )
-  }
-
-  if (showSettings) {
-    return (
-      <div>
-        <button
-          onClick={() => setShowSettings(false)}
-          className="mb-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
-        >
-          ← Back to Notifications
-        </button>
-        <NotificationSettings />
-      </div>
-    )
-  }
-
   const filteredVehicles = vehicles.filter((vehicle) => {
     const searchLower = vehicleSearchTerm.toLowerCase()
     return (
@@ -456,22 +408,6 @@ export default function AllVehicleNotifications() {
             {filteredNotifications.length} notification
             {filteredNotifications.length !== 1 ? 's' : ''} total
           </p>
-        </div>
-        <div className="flex flex-col xs:flex-row gap-2">
-          <button
-            onClick={() => setShowSettings(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
-          >
-            <Settings className="h-4 w-4" />
-            <span>Settings</span>
-          </button>
-          <button
-            onClick={() => setShowBuilder(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-pictus-lime to-pictus-lime600 hover:from-pictus-lime400 hover:to-pictus-lime700 text-pictus-black rounded-lg transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Create New Notification</span>
-          </button>
         </div>
       </div>
 
@@ -548,10 +484,15 @@ export default function AllVehicleNotifications() {
                   {/* Mobile Vehicle Cards */}
                   <div className="md:hidden space-y-3">
                     {filteredVehicles.map((vehicle) => (
-                      <div key={vehicle.id} className="bg-white/5 rounded-lg p-4 border border-white/10 space-y-2">
+                      <div
+                        key={vehicle.id}
+                        className="bg-white/5 rounded-lg p-4 border border-white/10 space-y-2"
+                      >
                         <div className="flex items-center justify-between">
                           <div>
-                            <span className="text-white font-medium text-sm">{vehicle.registration}</span>
+                            <span className="text-white font-medium text-sm">
+                              {vehicle.registration}
+                            </span>
                             <span className="text-gray-400 text-sm ml-2">{vehicle.type}</span>
                           </div>
                           <div className="flex gap-1">
@@ -573,10 +514,16 @@ export default function AllVehicleNotifications() {
                         </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
                           {vehicle.year && <span>Year: {vehicle.year}</span>}
-                          {vehicle.note && <span className="truncate max-w-[200px]">Note: {vehicle.note}</span>}
-                          <span>By: {vehicle.user
-                            ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim() || vehicle.user.email
-                            : 'N/A'}</span>
+                          {vehicle.note && (
+                            <span className="truncate max-w-[200px]">Note: {vehicle.note}</span>
+                          )}
+                          <span>
+                            By:{' '}
+                            {vehicle.user
+                              ? `${vehicle.user.firstName || ''} ${vehicle.user.lastName || ''}`.trim() ||
+                                vehicle.user.email
+                              : 'N/A'}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -845,7 +792,9 @@ export default function AllVehicleNotifications() {
               </div>
               <div>
                 <div className="text-xs text-gray-500">Vehicle</div>
-                <div className="text-sm text-white">{notification.vehicleRegistration || 'N/A'}</div>
+                <div className="text-sm text-white">
+                  {notification.vehicleRegistration || 'N/A'}
+                </div>
                 {notification.myVehicle?.type && (
                   <div className="text-xs text-gray-400 mt-0.5">{notification.myVehicle.type}</div>
                 )}
@@ -857,7 +806,9 @@ export default function AllVehicleNotifications() {
                 <div className="text-xs text-gray-500">Type</div>
                 <div className="text-sm text-white">{notification.notificationType || 'N/A'}</div>
                 {notification.notificationChannel && (
-                  <div className="text-xs text-gray-400 mt-0.5">{notification.notificationChannel}</div>
+                  <div className="text-xs text-gray-400 mt-0.5">
+                    {notification.notificationChannel}
+                  </div>
                 )}
               </div>
               <div>
@@ -917,14 +868,6 @@ export default function AllVehicleNotifications() {
                     <span>Edit</span>
                   </button>
                   <button
-                    onClick={() => handleDuplicate(notification)}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
-                    title="Duplicate this notification"
-                  >
-                    <Copy className="h-4 w-4" />
-                    <span>Duplicate</span>
-                  </button>
-                  <button
                     onClick={() => handleDeleteNotification(notification.id)}
                     className="flex items-center gap-1.5 px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all text-sm"
                     title="Delete this notification"
@@ -935,17 +878,7 @@ export default function AllVehicleNotifications() {
                 </>
               )}
               {notification.deletedAt && (
-                <>
-                  <button
-                    onClick={() => handleDuplicate(notification)}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
-                    title="Duplicate this notification"
-                  >
-                    <Copy className="h-4 w-4" />
-                    <span>Duplicate</span>
-                  </button>
-                  <span className="text-xs text-gray-500 italic self-center">Deleted</span>
-                </>
+                <span className="text-xs text-gray-500 italic self-center">Deleted</span>
               )}
             </div>
           </div>
@@ -1117,8 +1050,7 @@ export default function AllVehicleNotifications() {
                       )}
                       {notification.deletedAt && (
                         <div suppressHydrationWarning className="text-red-400 font-medium">
-                          Vymazané:{' '}
-                          {new Date(notification.deletedAt).toLocaleDateString('sk-SK')}
+                          Vymazané: {new Date(notification.deletedAt).toLocaleDateString('sk-SK')}
                         </div>
                       )}
                     </div>
@@ -1142,14 +1074,6 @@ export default function AllVehicleNotifications() {
                             <span>Edit</span>
                           </button>
                           <button
-                            onClick={() => handleDuplicate(notification)}
-                            className="flex items-center gap-1 px-3 py-1 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
-                            title="Duplicate this notification"
-                          >
-                            <Copy className="h-3 w-3" />
-                            <span>Duplicate</span>
-                          </button>
-                          <button
                             onClick={() => handleDeleteNotification(notification.id)}
                             className="flex items-center gap-1 px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all text-sm"
                             title="Delete this notification"
@@ -1160,17 +1084,7 @@ export default function AllVehicleNotifications() {
                         </>
                       )}
                       {notification.deletedAt && (
-                        <>
-                          <button
-                            onClick={() => handleDuplicate(notification)}
-                            className="flex items-center gap-1 px-3 py-1 bg-pictus-lime/20 hover:bg-pictus-lime/30 text-pictus-lime border border-pictus-lime/30 rounded-lg transition-all text-sm"
-                            title="Duplicate this notification"
-                          >
-                            <Copy className="h-3 w-3" />
-                            <span>Duplicate</span>
-                          </button>
-                          <span className="text-xs text-gray-500 italic">Deleted notification</span>
-                        </>
+                        <span className="text-xs text-gray-500 italic">Deleted notification</span>
                       )}
                     </div>
                   </td>
@@ -1487,7 +1401,10 @@ function EditNotificationModal({
             <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
               <div className="flex items-center gap-2 text-gray-300">
                 <Building className="h-4 w-4" />
-                <span className="text-sm">Organization: <span className="text-white font-medium">{notification.organization.name}</span></span>
+                <span className="text-sm">
+                  Organization:{' '}
+                  <span className="text-white font-medium">{notification.organization.name}</span>
+                </span>
               </div>
             </div>
           )}
@@ -1497,7 +1414,10 @@ function EditNotificationModal({
             <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
               <div className="flex items-center gap-2 text-gray-300">
                 <Car className="h-4 w-4" />
-                <span className="text-sm">Vehicle Type: <span className="text-white font-medium">{notification.myVehicle.type}</span></span>
+                <span className="text-sm">
+                  Vehicle Type:{' '}
+                  <span className="text-white font-medium">{notification.myVehicle.type}</span>
+                </span>
               </div>
             </div>
           )}
@@ -1543,9 +1463,7 @@ function EditNotificationModal({
               <input
                 type="text"
                 value={formData.vehicleRegistration}
-                onChange={(e) =>
-                  setFormData({ ...formData, vehicleRegistration: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, vehicleRegistration: e.target.value })}
                 className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                 placeholder="ABC-1234"
               />
@@ -1571,9 +1489,7 @@ function EditNotificationModal({
               <input
                 type="text"
                 value={formData.notificationChannel}
-                onChange={(e) =>
-                  setFormData({ ...formData, notificationChannel: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, notificationChannel: e.target.value })}
                 className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-pictus-lime"
                 placeholder="e.g., Email, SMS"
               />
