@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import CarCareServiceWorker from '@/app/components/carcare/CarCareServiceWorker'
+import CarCareBottomNav from '@/app/components/carcare/CarCareBottomNav'
 
 export const metadata: Metadata = {
   manifest: '/carcare.webmanifest',
@@ -13,7 +14,8 @@ export const viewport: Viewport = {
 export default function CarCareLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      {children}
+      <CarCareBottomNav />
+      <div className="md:pl-56">{children}</div>
       <CarCareServiceWorker />
     </>
   )

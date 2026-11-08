@@ -1,7 +1,6 @@
 'use client'
 
 import { Wallet, CalendarCheck, Receipt } from 'lucide-react'
-import CarCareBottomNav from './CarCareBottomNav'
 import { categoryLabel } from '@/lib/carcare/labels'
 
 export interface CostEntry {
@@ -144,7 +143,6 @@ export default function CarCareCostsView({ data }: { data: CostsData }) {
           </>
         )}
       </div>
-      <CarCareBottomNav current="costs" />
     </div>
   )
 }

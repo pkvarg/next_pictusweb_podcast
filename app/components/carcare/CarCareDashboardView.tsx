@@ -10,7 +10,6 @@ import {
   Plus,
 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
-import CarCareBottomNav from './CarCareBottomNav'
 
 export interface DashOccurrence {
   id: string
@@ -227,7 +226,6 @@ export default function CarCareDashboardView({ data }: { data: DashboardData }) 
         </section>
       </div>
 
-      <CarCareBottomNav current="home" />
     </div>
   )
 }

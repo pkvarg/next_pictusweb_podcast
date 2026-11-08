@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react'
 import { Calendar, List, ChevronRight } from 'lucide-react'
 import { Link } from '@/i18n/routing'
-import CarCareBottomNav from './CarCareBottomNav'
 
 export interface EvOccurrence {
   id: string
@@ -214,7 +213,6 @@ export default function CarCareEventsView({ occurrences }: { occurrences: EvOccu
           <MonthCalendar occurrences={occurrences} />
         )}
       </div>
-      <CarCareBottomNav current="events" />
     </div>
   )
 }

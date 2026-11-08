@@ -17,7 +17,6 @@ import {
   ExternalLink,
   Plus,
 } from 'lucide-react'
-import CarCareBottomNav from './CarCareBottomNav'
 import CarCarePushToggle from './CarCarePushToggle'
 
 export interface GarageMember {
@@ -604,7 +603,6 @@ export default function CarCareGarageView({
           )}
         </section>
       </div>
-      <CarCareBottomNav current="garage" />
     </div>
   )
 }
