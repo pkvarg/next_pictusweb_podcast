@@ -75,3 +75,13 @@ export function categoryLabel(c: string) {
 export function powertrainLabel(p: string | null | undefined) {
   return p ? (POWERTRAIN_LABEL[p] ?? p) : ''
 }
+
+export function templateKey(key: string): string | null {
+  return key in TEMPLATE_LABEL ? `tpl.${key}` : null
+}
+export function categoryKey(c: string): string | null {
+  return c in CATEGORY_LABEL ? `cat.${c}` : null
+}
+export function powertrainKey(p: string | null | undefined): string | null {
+  return p && p in POWERTRAIN_LABEL ? `pt.${p}` : null
+}

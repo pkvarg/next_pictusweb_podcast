@@ -1,7 +1,8 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Wallet, CalendarCheck, Receipt } from 'lucide-react'
-import { categoryLabel } from '@/lib/carcare/labels'
+import { categoryKey } from '@/lib/carcare/labels'
 
 export interface CostEntry {
   id: string
@@ -44,6 +45,7 @@ function Bar({ label, amount, max }: { label: string; amount: number; max: numbe
 }
 
 export default function CarCareCostsView({ data }: { data: CostsData }) {
+  const t = useTranslations('CarCare')
   const catMax = Math.max(0, ...data.byCategory.map((c) => c.total))
   const vehMax = Math.max(0, ...data.byVehicle.map((v) => v.total))
   const empty = data.entries.length === 0
@@ -52,8 +54,8 @@ export default function CarCareCostsView({ data }: { data: CostsData }) {
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
         <header className="mb-6">
-          <h1 className="text-3xl font-light">Náklady</h1>
-          <p className="text-gray-400">Výdavky na vaše vozidlá</p>
+          <h1 className="text-3xl font-light">{t('costs.title')}</h1>
+          <p className="text-gray-400">{t('costs.subtitle')}</p>
         </header>
 
         <div className="grid grid-cols-2 gap-3 mb-8">
@@ -62,31 +64,31 @@ export default function CarCareCostsView({ data }: { data: CostsData }) {
               <Wallet className="w-5 h-5" />
             </div>
             <div className="text-2xl font-bold text-pictus-white">{eur(data.totals.thisYear)}</div>
-            <div className="text-xs text-gray-400">Tento rok</div>
+            <div className="text-xs text-gray-400">{t('costs.thisYear')}</div>
           </div>
           <div className="bg-pictus-onyx900 rounded-2xl p-4 border border-white/[0.06] flex flex-col gap-1">
             <div className="text-gray-400">
               <Wallet className="w-5 h-5" />
             </div>
             <div className="text-2xl font-bold text-pictus-white">{eur(data.totals.allTime)}</div>
-            <div className="text-xs text-gray-400">Celkovo</div>
+            <div className="text-xs text-gray-400">{t('costs.allTime')}</div>
           </div>
         </div>
 
         {empty ? (
           <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
-            Zatiaľ žiadne zaznamenané náklady.
+            {t('costs.empty')}
           </div>
         ) : (
           <>
             {data.byCategory.length > 0 && (
               <section className="mb-8">
-                <h2 className="text-xl font-bold mb-3">Podľa kategórie (tento rok)</h2>
+                <h2 className="text-xl font-bold mb-3">{t('costs.byCategory')}</h2>
                 <div className="bg-pictus-onyx900 rounded-2xl p-5 border border-white/[0.06] space-y-4">
                   {data.byCategory.map((c) => (
                     <Bar
                       key={c.category}
-                      label={categoryLabel(c.category)}
+                      label={categoryKey(c.category) ? t(categoryKey(c.category)!) : c.category}
                       amount={c.total}
                       max={catMax}
                     />
@@ -97,7 +99,7 @@ export default function CarCareCostsView({ data }: { data: CostsData }) {
 
             {data.byVehicle.length > 1 && (
               <section className="mb-8">
-                <h2 className="text-xl font-bold mb-3">Podľa vozidla (tento rok)</h2>
+                <h2 className="text-xl font-bold mb-3">{t('costs.byVehicle')}</h2>
                 <div className="bg-pictus-onyx900 rounded-2xl p-5 border border-white/[0.06] space-y-4">
                   {data.byVehicle.map((v) => (
                     <Bar
@@ -112,7 +114,7 @@ export default function CarCareCostsView({ data }: { data: CostsData }) {
             )}
 
             <section>
-              <h2 className="text-xl font-bold mb-3">Posledné náklady</h2>
+              <h2 className="text-xl font-bold mb-3">{t('costs.recent')}</h2>
               <div className="space-y-3">
                 {data.entries.map((e) => (
                   <div

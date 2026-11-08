@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Bell, Loader2 } from 'lucide-react'
 
 const VAPID = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
@@ -15,6 +16,7 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
 }
 
 export default function CarCarePushToggle() {
+  const t = useTranslations('CarCare')
   const [supported, setSupported] = useState(false)
   const [enabled, setEnabled] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -40,7 +42,7 @@ export default function CarCarePushToggle() {
     try {
       const perm = await Notification.requestPermission()
       if (perm !== 'granted') {
-        setMsg('Povolenie bolo zamietnuté v prehliadači.')
+        setMsg(t('garage.permissionDenied'))
         return
       }
       const reg = await navigator.serviceWorker.ready
@@ -56,12 +58,12 @@ export default function CarCarePushToggle() {
       })
       if (res.ok) {
         setEnabled(true)
-        setMsg('Notifikácie sú zapnuté.')
+        setMsg(t('garage.pushOnMsg'))
       } else {
-        setMsg('Notifikácie sa nepodarilo uložiť.')
+        setMsg(t('common.saveFailed'))
       }
     } catch {
-      setMsg('Notifikácie sa nepodarilo zapnúť.')
+      setMsg(t('garage.enableFailed'))
     } finally {
       setBusy(false)
     }
@@ -82,9 +84,9 @@ export default function CarCarePushToggle() {
         await sub.unsubscribe()
       }
       setEnabled(false)
-      setMsg('Notifikácie sú vypnuté.')
+      setMsg(t('garage.pushOffMsg'))
     } catch {
-      setMsg('Notifikácie sa nepodarilo vypnúť.')
+      setMsg(t('garage.disableFailed'))
     } finally {
       setBusy(false)
     }
@@ -95,7 +97,7 @@ export default function CarCarePushToggle() {
     setMsg(null)
     try {
       const res = await fetch('/api/carcare/push/test', { method: 'POST' })
-      setMsg(res.ok ? 'Testovacia notifikácia odoslaná.' : 'Test zlyhal.')
+      setMsg(res.ok ? t('garage.testSent') : t('garage.testFailed'))
     } finally {
       setBusy(false)
     }
@@ -105,15 +107,15 @@ export default function CarCarePushToggle() {
 
   return (
     <section className="mb-8">
-      <h2 className="text-xl font-bold mb-3">Notifikácie</h2>
+      <h2 className="text-xl font-bold mb-3">{t('garage.pushSection')}</h2>
       <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
           <Bell className="w-5 h-5 text-pictus-lime" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-pictus-white font-medium">Push notifikácie na tomto zariadení</p>
+          <p className="text-pictus-white font-medium">{t('garage.pushTitle')}</p>
           <p className="text-sm text-gray-400">
-            {enabled ? 'Zapnuté' : 'Pripomienky aj keď máte aplikáciu zatvorenú'}
+            {enabled ? t('garage.pushOn') : t('garage.pushHint')}
           </p>
           {msg && <p className="text-sm text-pictus-lime mt-1">{msg}</p>}
         </div>
@@ -124,14 +126,14 @@ export default function CarCarePushToggle() {
               disabled={busy}
               className="shrink-0 text-sm text-gray-300 hover:text-pictus-white px-3 py-1.5 disabled:opacity-50"
             >
-              Test
+              {t('garage.test')}
             </button>
             <button
               onClick={disable}
               disabled={busy}
               className="shrink-0 inline-flex items-center gap-2 bg-white/5 text-pictus-white text-sm font-medium px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 disabled:opacity-50"
             >
-              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Vypnúť'}
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : t('garage.disable')}
             </button>
           </>
         ) : (
@@ -140,7 +142,7 @@ export default function CarCarePushToggle() {
             disabled={busy}
             className="shrink-0 inline-flex items-center gap-2 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-2 rounded-full hover:bg-pictus-lime600 disabled:opacity-50"
           >
-            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Zapnúť'}
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : t('garage.enable')}
           </button>
         )}
       </div>

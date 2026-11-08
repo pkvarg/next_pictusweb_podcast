@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   Users,
   UserPlus,
@@ -61,15 +62,11 @@ export interface GarageData {
   vehicles: GarageVehicle[]
 }
 
-const ROLE_LABEL: Record<string, string> = {
-  OWNER: 'Vlastník',
-  MEMBER: 'Člen',
-  VIEWER: 'Prehliadač',
-  ADMIN: 'Administrátor',
-}
-
-function memberLabel(m: GarageMember) {
-  return m.name || m.email || 'Používateľ'
+function memberLabel(
+  m: GarageMember,
+  t: (k: string, v?: Record<string, string | number>) => string,
+) {
+  return m.name || m.email || t('garage.memberFallback')
 }
 function initials(m: GarageMember) {
   const s = m.name || m.email || '?'
@@ -93,6 +90,7 @@ export default function CarCareGarageView({
   data: GarageData
   reload: () => void
 }) {
+  const t = useTranslations('CarCare')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<'MEMBER' | 'VIEWER'>('MEMBER')
   const [inviting, setInviting] = useState(false)
@@ -204,7 +202,7 @@ export default function CarCareGarageView({
     setNotice(null)
     const target = email.trim()
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) {
-      setError('Zadajte platný e-mail.')
+      setError(t('garage.inviteBad'))
       return
     }
     setInviting(true)
@@ -215,14 +213,12 @@ export default function CarCareGarageView({
         body: JSON.stringify({ email: target, role }),
       })
       if (!res.ok) {
-        setError('Pozvánku sa nepodarilo vytvoriť.')
+        setError(t('garage.inviteFailed'))
         return
       }
       const data = await res.json().catch(() => ({}))
       setNotice(
-        data?.emailSent
-          ? `Pozvánka odoslaná e-mailom na ${target}.`
-          : 'Pozvánka vytvorená. E-mail sa nepodarilo odoslať — skopírujte odkaz nižšie.',
+        data?.emailSent ? t('garage.inviteSent', { email: target }) : t('garage.inviteCreated'),
       )
       setEmail('')
       reload()
@@ -269,8 +265,8 @@ export default function CarCareGarageView({
             <Users className="w-7 h-7 text-pictus-lime" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-3xl font-light">Garáž</h1>
-            <p className="text-gray-400">Členovia a prístup k vozidlám</p>
+            <h1 className="text-3xl font-light">{t('garage.title')}</h1>
+            <p className="text-gray-400">{t('garage.subtitle')}</p>
             {garages.length > 1 && (
               <select
                 value={activeOrg ?? ''}
@@ -290,7 +286,9 @@ export default function CarCareGarageView({
         <CarCarePushToggle />
 
         <section className="mb-8">
-          <h2 className="text-xl font-bold mb-3">Členovia ({data.members.length})</h2>
+          <h2 className="text-xl font-bold mb-3">
+            {t('garage.members')} ({data.members.length})
+          </h2>
           <div className="space-y-3">
             {data.members.map((m) => {
               const manageable = data.canManage && m.role !== 'OWNER' && data.vehicles.length > 0
@@ -306,7 +304,8 @@ export default function CarCareGarageView({
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-pictus-white font-medium truncate">
-                        {memberLabel(m)} {m.isYou && <span className="text-gray-400">(vy)</span>}
+                        {memberLabel(m, t)}{' '}
+                        {m.isYou && <span className="text-gray-400">{t('garage.you')}</span>}
                       </p>
                       {m.email && m.name && (
                         <p className="text-sm text-gray-400 truncate">{m.email}</p>
@@ -320,17 +319,17 @@ export default function CarCareGarageView({
                       }`}
                     >
                       {m.role === 'OWNER' && <Shield className="w-3 h-3" />}
-                      {ROLE_LABEL[m.role]}
+                      {t(`role.${m.role}`)}
                     </span>
                     {manageable && (
                       <button
                         onClick={() => toggleExpanded(m.userId)}
                         className="shrink-0 inline-flex items-center gap-1 text-xs text-gray-400 hover:text-pictus-white"
-                        aria-label="Prístup k vozidlám"
+                        aria-label={t('garage.access')}
                       >
                         <Car className="w-4 h-4" />
                         {m.vehicleIds.length === 0
-                          ? 'všetky'
+                          ? t('common.all')
                           : `${m.vehicleIds.length}/${data.vehicles.length}`}
                         <ChevronDown
                           className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -342,7 +341,7 @@ export default function CarCareGarageView({
                         onClick={() => removeMember(m.userId)}
                         disabled={busyId === m.userId}
                         className="shrink-0 text-gray-500 hover:text-red-400 disabled:opacity-50"
-                        aria-label="Odobrať člena"
+                        aria-label={t('garage.removeMember')}
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -350,10 +349,7 @@ export default function CarCareGarageView({
                   </div>
                   {manageable && isOpen && (
                     <div className="border-t border-white/[0.06] px-4 py-3">
-                      <p className="text-xs text-gray-500 mb-2">
-                        Prístup k vozidlám — bez výberu vidí všetky; zaškrtnutím obmedzíte na
-                        vybrané
-                      </p>
+                      <p className="text-xs text-gray-500 mb-2">{t('garage.access')}</p>
                       <div className="space-y-1">
                         {data.vehicles.map((v) => {
                           const has = m.vehicleIds.includes(v.id)
@@ -387,14 +383,14 @@ export default function CarCareGarageView({
 
         {data.canManage && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-3">Pozvať člena</h2>
+            <h2 className="text-xl font-bold mb-3">{t('garage.inviteMember')}</h2>
             <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-4">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <input
                     className="w-full bg-pictus-black/40 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
-                    placeholder="meno@email.sk"
+                    placeholder={t('garage.inviteEmailPlaceholder')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -404,8 +400,8 @@ export default function CarCareGarageView({
                   value={role}
                   onChange={(e) => setRole(e.target.value as 'MEMBER' | 'VIEWER')}
                 >
-                  <option value="MEMBER">Člen</option>
-                  <option value="VIEWER">Prehliadač</option>
+                  <option value="MEMBER">{t('role.MEMBER')}</option>
+                  <option value="VIEWER">{t('role.VIEWER')}</option>
                 </select>
                 <button
                   onClick={invite}
@@ -416,24 +412,21 @@ export default function CarCareGarageView({
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <UserPlus className="w-4 h-4" /> Pozvať
+                      <UserPlus className="w-4 h-4" /> {t('garage.invite')}
                     </>
                   )}
                 </button>
               </div>
               {error && <p className="text-sm text-red-400">{error}</p>}
               {notice && <p className="text-sm text-pictus-lime">{notice}</p>}
-              <p className="text-xs text-gray-500">
-                Člen môže spravovať pridelené vozidlá, prehliadač ich vidí iba na čítanie. Po
-                vytvorení pozvánky skopírujte odkaz a pošlite ho pozvanému.
-              </p>
+              <p className="text-xs text-gray-500">{t('garage.inviteHint')}</p>
             </div>
           </section>
         )}
 
         {data.invitations.length > 0 && (
           <section>
-            <h2 className="text-xl font-bold mb-3">Čakajúce pozvánky</h2>
+            <h2 className="text-xl font-bold mb-3">{t('garage.pending')}</h2>
             <div className="space-y-3">
               {data.invitations.map((i) => (
                 <div
@@ -445,7 +438,9 @@ export default function CarCareGarageView({
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-pictus-white font-medium truncate">{i.email}</p>
-                    <p className="text-sm text-gray-400">{ROLE_LABEL[i.role]} · čaká na prijatie</p>
+                    <p className="text-sm text-gray-400">
+                      {t('garage.pendingMeta', { role: t(`role.${i.role}`) })}
+                    </p>
                   </div>
                   <button
                     onClick={() => copy(i.token)}
@@ -453,11 +448,11 @@ export default function CarCareGarageView({
                   >
                     {copied === i.token ? (
                       <>
-                        <Check className="w-4 h-4" /> Skopírované
+                        <Check className="w-4 h-4" /> {t('garage.copied')}
                       </>
                     ) : (
                       <>
-                        <Copy className="w-4 h-4" /> Odkaz
+                        <Copy className="w-4 h-4" /> {t('garage.link')}
                       </>
                     )}
                   </button>
@@ -466,7 +461,7 @@ export default function CarCareGarageView({
                       onClick={() => revoke(i.id)}
                       disabled={busyId === i.id}
                       className="shrink-0 text-gray-500 hover:text-red-400 disabled:opacity-50"
-                      aria-label="Zrušiť pozvánku"
+                      aria-label={t('garage.revokeInvite')}
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -479,13 +474,13 @@ export default function CarCareGarageView({
 
         <section className="mt-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-bold">Poskytovatelia</h2>
+            <h2 className="text-xl font-bold">{t('garage.providers')}</h2>
             {data.canManage && !provForm && (
               <button
                 onClick={() => setProvForm(true)}
                 className="text-sm text-pictus-lime hover:text-pictus-lime600 inline-flex items-center gap-1"
               >
-                <Plus className="w-4 h-4" /> Pridať
+                <Plus className="w-4 h-4" /> {t('common.add')}
               </button>
             )}
           </div>
@@ -494,27 +489,27 @@ export default function CarCareGarageView({
             <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-3 mb-3">
               <input
                 className="w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
-                placeholder="Názov (napr. AutoServis Nitra)"
+                placeholder={t('garage.provNamePlaceholder')}
                 value={provName}
                 onChange={(e) => setProvName(e.target.value)}
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
                   className="w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
-                  placeholder="Telefón"
+                  placeholder={t('garage.provPhone')}
                   value={provPhone}
                   onChange={(e) => setProvPhone(e.target.value)}
                 />
                 <input
                   className="w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
-                  placeholder="E-mail"
+                  placeholder={t('garage.provEmail')}
                   value={provEmail}
                   onChange={(e) => setProvEmail(e.target.value)}
                 />
               </div>
               <input
                 className="w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
-                placeholder="Odkaz na objednanie (voliteľné)"
+                placeholder={t('garage.provBooking')}
                 value={provBooking}
                 onChange={(e) => setProvBooking(e.target.value)}
               />
@@ -524,13 +519,13 @@ export default function CarCareGarageView({
                   disabled={provBusy}
                   className="inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-2 rounded-xl hover:bg-pictus-lime600 transition-colors disabled:opacity-50"
                 >
-                  {provBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Uložiť'}
+                  {provBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : t('common.save')}
                 </button>
                 <button
                   onClick={() => setProvForm(false)}
                   className="px-4 py-2 rounded-xl text-gray-400 hover:text-pictus-white"
                 >
-                  Zrušiť
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -538,7 +533,7 @@ export default function CarCareGarageView({
 
           {providers.length === 0 && !provForm ? (
             <div className="p-6 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
-              Žiadni poskytovatelia. Pridajte servis či poisťovňu a budete ich mať po ruke.
+              {t('garage.providersEmpty')}
             </div>
           ) : (
             <div className="space-y-3">
@@ -562,7 +557,7 @@ export default function CarCareGarageView({
                     <a
                       href={`tel:${p.phone}`}
                       className="shrink-0 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-pictus-lime"
-                      aria-label="Zavolať"
+                      aria-label={t('garage.callProvider')}
                     >
                       <Phone className="w-4 h-4" />
                     </a>
@@ -571,7 +566,7 @@ export default function CarCareGarageView({
                     <a
                       href={`mailto:${p.email}`}
                       className="shrink-0 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-pictus-lime"
-                      aria-label="Napísať e-mail"
+                      aria-label={t('garage.emailProvider')}
                     >
                       <Mail className="w-4 h-4" />
                     </a>
@@ -582,7 +577,7 @@ export default function CarCareGarageView({
                       target="_blank"
                       rel="noopener noreferrer"
                       className="shrink-0 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-pictus-lime"
-                      aria-label="Objednať online"
+                      aria-label={t('garage.bookOnline')}
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
@@ -592,7 +587,7 @@ export default function CarCareGarageView({
                       onClick={() => archiveProvider(p.id)}
                       disabled={provBusy}
                       className="shrink-0 text-gray-500 hover:text-red-400 disabled:opacity-50"
-                      aria-label="Odstrániť poskytovateľa"
+                      aria-label={t('garage.removeProvider')}
                     >
                       <X className="w-5 h-5" />
                     </button>

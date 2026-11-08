@@ -1,6 +1,7 @@
 'use client'
 
 import { use, useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
 import { useRouter } from '@/i18n/routing'
 import { Loader2, CheckCircle2, AlertTriangle, LogIn, UserPlus, Users } from 'lucide-react'
@@ -13,7 +14,6 @@ interface InviteInfo {
   hasAccount?: boolean
 }
 
-const ROLE_LABEL: Record<string, string> = { MEMBER: 'člen', VIEWER: 'prehliadač' }
 const inputClass =
   'w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none'
 const labelClass = 'block text-sm text-gray-400 mb-1.5'
@@ -24,6 +24,7 @@ export default function CarCareAcceptInvitePage({
   params: Promise<{ token: string }>
 }) {
   const { token } = use(params)
+  const t = useTranslations('CarCare')
   const { status } = useSession()
   const router = useRouter()
 
@@ -79,11 +80,11 @@ export default function CarCareAcceptInvitePage({
   const register = async () => {
     setFormError(null)
     if (!firstName.trim() || !lastName.trim()) {
-      setFormError('Zadajte meno a priezvisko.')
+      setFormError(t('invite.errNameRequired'))
       return
     }
     if (password.length < 8) {
-      setFormError('Heslo musí mať aspoň 8 znakov.')
+      setFormError(t('invite.errPasswordShort'))
       return
     }
     setSubmitting(true)
@@ -99,11 +100,11 @@ export default function CarCareAcceptInvitePage({
         }),
       })
       if (res.status === 409) {
-        setFormError('Pre tento e-mail už existuje účet. Prihláste sa.')
+        setFormError(t('invite.errAccountExists'))
         return
       }
       if (!res.ok) {
-        setFormError('Účet sa nepodarilo vytvoriť. Pozvánka môže byť neplatná.')
+        setFormError(t('invite.errCreateFailed'))
         return
       }
       setMode('created')
@@ -132,30 +133,28 @@ export default function CarCareAcceptInvitePage({
         {accept === 'working' && (
           <>
             <Loader2 className="w-10 h-10 text-pictus-lime animate-spin mx-auto" />
-            <p className="mt-4 text-gray-400">Spracúvam pozvánku…</p>
+            <p className="mt-4 text-gray-400">{t('invite.processing')}</p>
           </>
         )}
         {accept === 'done' && (
           <>
             <CheckCircle2 className="w-12 h-12 text-pictus-lime mx-auto" />
-            <h1 className="mt-4 text-2xl font-light">Pozvánka prijatá</h1>
-            <p className="mt-2 text-gray-400">Presmerúvam vás do garáže…</p>
+            <h1 className="mt-4 text-2xl font-light">{t('invite.accepted')}</h1>
+            <p className="mt-2 text-gray-400">{t('invite.redirectingGarage')}</p>
           </>
         )}
         {accept === 'error' && (
           <>
             <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto" />
-            <h1 className="mt-4 text-2xl font-light">Pozvánku sa nepodarilo prijať</h1>
+            <h1 className="mt-4 text-2xl font-light">{t('invite.acceptFailed')}</h1>
             <p className="mt-2 text-gray-400">
-              {mismatch
-                ? 'Táto pozvánka je určená pre iný e-mail. Odhláste sa a prihláste sa účtom, na ktorý bola pozvánka poslaná.'
-                : 'Odkaz je neplatný, už bol použitý alebo vypršal.'}
+              {mismatch ? t('invite.mismatch') : t('invite.invalidLink')}
             </p>
             <Link
               href="/carcare"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-pictus-lime px-5 py-2.5 font-semibold text-pictus-black hover:bg-pictus-lime600 transition-colors"
             >
-              Prejsť do CarCare
+              {t('invite.goToCarCare')}
             </Link>
           </>
         )}
@@ -170,8 +169,8 @@ export default function CarCareAcceptInvitePage({
     return shell(
       <>
         <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto" />
-        <h1 className="mt-4 text-2xl font-light">Neplatná pozvánka</h1>
-        <p className="mt-2 text-gray-400">Odkaz je neplatný, už bol použitý alebo vypršal.</p>
+        <h1 className="mt-4 text-2xl font-light">{t('invite.invalidTitle')}</h1>
+        <p className="mt-2 text-gray-400">{t('invite.invalidLink')}</p>
       </>,
     )
   }
@@ -180,8 +179,8 @@ export default function CarCareAcceptInvitePage({
     return shell(
       <>
         <CheckCircle2 className="w-12 h-12 text-pictus-lime mx-auto" />
-        <h1 className="mt-4 text-2xl font-light">Účet vytvorený</h1>
-        <p className="mt-2 text-gray-400">Presmerúvam vás na prihlásenie…</p>
+        <h1 className="mt-4 text-2xl font-light">{t('invite.accountCreated')}</h1>
+        <p className="mt-2 text-gray-400">{t('invite.redirectingLogin')}</p>
       </>,
     )
   }
@@ -192,32 +191,33 @@ export default function CarCareAcceptInvitePage({
         <div className="w-14 h-14 rounded-2xl bg-pictus-lime/15 flex items-center justify-center mx-auto mb-3">
           <Users className="w-7 h-7 text-pictus-lime" />
         </div>
-        <h1 className="text-2xl font-light">Pozvánka do garáže</h1>
+        <h1 className="text-2xl font-light">{t('invite.title')}</h1>
         <p className="mt-1 text-gray-400">
-          pre <span className="text-pictus-white">{info.email}</span> ako{' '}
-          {ROLE_LABEL[info.role ?? 'MEMBER']}
+          {t.rich('invite.forAs', {
+            email: info.email,
+            role: t(info.role === 'VIEWER' ? 'invite.roleViewer' : 'invite.roleMember'),
+            hl: (chunks) => <span className="text-pictus-white">{chunks}</span>,
+          })}
         </p>
       </div>
 
       {mode === 'choose' ? (
         <div className="space-y-3">
           {info.hasAccount && (
-            <p className="text-center text-sm text-gray-400">
-              Pre tento e-mail už existuje účet — prihláste sa.
-            </p>
+            <p className="text-center text-sm text-gray-400">{t('invite.alreadyAccount')}</p>
           )}
           <button
             onClick={goSignIn}
             className="w-full inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-3 rounded-xl hover:bg-pictus-lime600 transition-colors"
           >
-            <LogIn className="w-5 h-5" /> Prihlásiť sa
+            <LogIn className="w-5 h-5" /> {t('invite.signIn')}
           </button>
           {!info.hasAccount && (
             <button
               onClick={() => setMode('register')}
               className="w-full inline-flex items-center justify-center gap-2 bg-white/5 text-pictus-white font-medium px-4 py-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors"
             >
-              <UserPlus className="w-5 h-5" /> Vytvoriť účet
+              <UserPlus className="w-5 h-5" /> {t('invite.createAccount')}
             </button>
           )}
         </div>
@@ -225,7 +225,7 @@ export default function CarCareAcceptInvitePage({
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelClass}>Meno</label>
+              <label className={labelClass}>{t('invite.firstName')}</label>
               <input
                 className={inputClass}
                 value={firstName}
@@ -233,7 +233,7 @@ export default function CarCareAcceptInvitePage({
               />
             </div>
             <div>
-              <label className={labelClass}>Priezvisko</label>
+              <label className={labelClass}>{t('invite.lastName')}</label>
               <input
                 className={inputClass}
                 value={lastName}
@@ -242,7 +242,7 @@ export default function CarCareAcceptInvitePage({
             </div>
           </div>
           <div>
-            <label className={labelClass}>Heslo (min. 8 znakov)</label>
+            <label className={labelClass}>{t('invite.passwordMin')}</label>
             <input
               type="password"
               className={inputClass}
@@ -256,17 +256,13 @@ export default function CarCareAcceptInvitePage({
             disabled={submitting}
             className="w-full inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-3 rounded-xl hover:bg-pictus-lime600 transition-colors disabled:opacity-50"
           >
-            {submitting ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              'Vytvoriť účet a pripojiť sa'
-            )}
+            {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : t('invite.createAndJoin')}
           </button>
           <button
             onClick={() => setMode('choose')}
             className="w-full text-sm text-gray-400 hover:text-pictus-white"
           >
-            Späť
+            {t('common.back')}
           </button>
         </div>
       )}

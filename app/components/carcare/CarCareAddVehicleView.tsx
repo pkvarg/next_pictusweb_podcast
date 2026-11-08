@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
 import { Link, useRouter } from '@/i18n/routing'
 import { ArrowLeft, Search, Car, Loader2, Check, Upload, X } from 'lucide-react'
@@ -14,28 +15,25 @@ interface CatalogueEntry {
   yearFrom?: number | null
 }
 
-const POWERTRAIN_OPTIONS: { value: string; label: string }[] = [
-  { value: 'PETROL', label: 'Benzín' },
-  { value: 'DIESEL', label: 'Diesel' },
-  { value: 'MHEV', label: 'Mild hybrid' },
-  { value: 'HEV', label: 'Hybrid' },
-  { value: 'PHEV', label: 'Plug-in hybrid' },
-  { value: 'BEV', label: 'Elektromobil' },
-  { value: 'LPG', label: 'LPG' },
-  { value: 'CNG', label: 'CNG' },
-  { value: 'HYDROGEN', label: 'Vodík' },
-  { value: 'OTHER', label: 'Iné' },
+const POWERTRAIN_OPTIONS: string[] = [
+  'PETROL',
+  'DIESEL',
+  'MHEV',
+  'HEV',
+  'PHEV',
+  'BEV',
+  'LPG',
+  'CNG',
+  'HYDROGEN',
+  'OTHER',
 ]
-
-function powertrainLabel(v: string | null) {
-  return POWERTRAIN_OPTIONS.find((o) => o.value === v)?.label ?? ''
-}
 
 const inputClass =
   'w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none'
 const labelClass = 'block text-sm text-gray-400 mb-1.5'
 
 export default function CarCareAddVehicleView() {
+  const t = useTranslations('CarCare')
   const router = useRouter()
 
   const [registration, setRegistration] = useState('')
@@ -62,7 +60,7 @@ export default function CarCareAddVehicleView() {
       lower.endsWith('.heic') ||
       lower.endsWith('.heif')
     if (!looksLikeImage) {
-      setError('Prosím, nahrajte obrázok (JPG, PNG, WEBP alebo HEIC).')
+      setError(t('onboarding.photoInvalid'))
       return
     }
     setFile(selected)
@@ -93,12 +91,12 @@ export default function CarCareAddVehicleView() {
       })
       if (!res.ok) {
         const err = await res.json().catch(() => null)
-        throw new Error(err?.message || 'Nepodarilo sa nahrať obrázok.')
+        throw new Error(err?.message || t('onboarding.photoFailed'))
       }
       const data = await res.json()
       return data.imageUrl as string
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Nepodarilo sa nahrať obrázok.')
+      setError(err instanceof Error ? err.message : t('onboarding.photoFailed'))
       return null
     } finally {
       setUploading(false)
@@ -157,7 +155,7 @@ export default function CarCareAddVehicleView() {
   const submit = async () => {
     setError(null)
     if (!registration.trim()) {
-      setError('ŠPZ je povinná.')
+      setError(t('onboarding.spzRequired'))
       return
     }
     setSubmitting(true)
@@ -186,14 +184,14 @@ export default function CarCareAddVehicleView() {
         }),
       })
       if (!res.ok) {
-        setError('Vozidlo sa nepodarilo uložiť.')
+        setError(t('onboarding.saveFailed'))
         setSubmitting(false)
         return
       }
       const d = await res.json()
       router.push(`/carcare/vehicles/${d.vehicle.id}`)
     } catch {
-      setError('Vozidlo sa nepodarilo uložiť.')
+      setError(t('onboarding.saveFailed'))
       setSubmitting(false)
     }
   }
@@ -205,7 +203,7 @@ export default function CarCareAddVehicleView() {
           href="/carcare"
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-pictus-white mb-4"
         >
-          <ArrowLeft className="w-4 h-4" /> Späť
+          <ArrowLeft className="w-4 h-4" /> {t('common.back')}
         </Link>
 
         <header className="flex items-start gap-4 mb-8">
@@ -213,19 +211,19 @@ export default function CarCareAddVehicleView() {
             <Car className="w-7 h-7 text-pictus-lime" />
           </div>
           <div>
-            <h1 className="text-3xl font-light">Pridať vozidlo</h1>
-            <p className="text-gray-400">Vyhľadajte model alebo zadajte údaje ručne</p>
+            <h1 className="text-3xl font-light">{t('onboarding.title')}</h1>
+            <p className="text-gray-400">{t('onboarding.subtitle')}</p>
           </div>
         </header>
 
         <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-5">
           <div className="relative">
-            <label className={labelClass}>Značka a model</label>
+            <label className={labelClass}>{t('onboarding.searchLabel')}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
               <input
                 className={`${inputClass} pl-9`}
-                placeholder="napr. Škoda Octavia"
+                placeholder={t('onboarding.searchPlaceholder')}
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value)
@@ -238,7 +236,7 @@ export default function CarCareAddVehicleView() {
                   onClick={resetPick}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-pictus-lime hover:text-pictus-lime600"
                 >
-                  Zmeniť
+                  {t('onboarding.change')}
                 </button>
               )}
             </div>
@@ -254,8 +252,8 @@ export default function CarCareAddVehicleView() {
                       {e.make} {e.model}
                     </span>
                     <span className="text-xs text-gray-400">
-                      {powertrainLabel(e.powertrain)}
-                      {e.yearFrom ? ` · od ${e.yearFrom}` : ''}
+                      {e.powertrain ? t(`pt.${e.powertrain}`) : ''}
+                      {e.yearFrom ? ` · ${t('onboarding.yearFrom', { year: e.yearFrom })}` : ''}
                     </span>
                   </button>
                 ))}
@@ -265,7 +263,7 @@ export default function CarCareAddVehicleView() {
 
           <div>
             <label className={labelClass}>
-              ŠPZ <span className="text-pictus-lime">*</span>
+              {t('vehicle.spzPlate')} <span className="text-pictus-lime">*</span>
             </label>
             <input
               className={inputClass}
@@ -277,10 +275,10 @@ export default function CarCareAddVehicleView() {
           </div>
 
           <div>
-            <label className={labelClass}>Prezývka</label>
+            <label className={labelClass}>{t('onboarding.nickname')}</label>
             <input
               className={inputClass}
-              placeholder="napr. Rodinné auto"
+              placeholder={t('onboarding.nicknamePlaceholder')}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
             />
@@ -288,7 +286,7 @@ export default function CarCareAddVehicleView() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>Značka</label>
+              <label className={labelClass}>{t('onboarding.make')}</label>
               <input
                 className={inputClass}
                 value={make}
@@ -296,7 +294,7 @@ export default function CarCareAddVehicleView() {
               />
             </div>
             <div>
-              <label className={labelClass}>Model</label>
+              <label className={labelClass}>{t('onboarding.model')}</label>
               <input
                 className={inputClass}
                 value={model}
@@ -307,22 +305,22 @@ export default function CarCareAddVehicleView() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>Pohon</label>
+              <label className={labelClass}>{t('vehicle.powertrain')}</label>
               <select
                 className={inputClass}
                 value={powertrain}
                 onChange={(e) => setPowertrain(e.target.value)}
               >
                 <option value="">—</option>
-                {POWERTRAIN_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
+                {POWERTRAIN_OPTIONS.map((value) => (
+                  <option key={value} value={value}>
+                    {t(`pt.${value}`)}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className={labelClass}>Rok výroby</label>
+              <label className={labelClass}>{t('vehicle.year')}</label>
               <input
                 className={inputClass}
                 type="number"
@@ -336,7 +334,7 @@ export default function CarCareAddVehicleView() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>Krajina</label>
+              <label className={labelClass}>{t('vehicle.country')}</label>
               <input
                 className={inputClass}
                 maxLength={2}
@@ -356,20 +354,22 @@ export default function CarCareAddVehicleView() {
           </div>
 
           <div>
-            <label className={labelClass}>Fotka vozidla (voliteľné)</label>
+            <label className={labelClass}>
+              {t('onboarding.photo')} ({t('common.optional')})
+            </label>
             {filePreview ? (
               <div className="relative inline-block">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={filePreview}
-                  alt="Náhľad"
+                  alt={t('onboarding.previewAlt')}
                   className="w-40 h-28 rounded-xl object-cover border border-white/10"
                 />
                 <button
                   type="button"
                   onClick={removeFile}
                   className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-pictus-black border border-white/20 flex items-center justify-center text-gray-300 hover:text-red-400"
-                  aria-label="Odstrániť fotku"
+                  aria-label={t('onboarding.removePhoto')}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -380,7 +380,7 @@ export default function CarCareAddVehicleView() {
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full inline-flex items-center justify-center gap-2 bg-pictus-black/40 border border-dashed border-white/15 rounded-xl px-4 py-5 text-gray-400 hover:border-pictus-lime/40 hover:text-pictus-white"
               >
-                <Upload className="w-5 h-5" /> Nahrať fotku
+                <Upload className="w-5 h-5" /> {t('onboarding.uploadPhoto')}
               </button>
             )}
             <input
@@ -403,13 +403,11 @@ export default function CarCareAddVehicleView() {
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
               <>
-                <Check className="w-5 h-5" /> Uložiť vozidlo
+                <Check className="w-5 h-5" /> {t('onboarding.save')}
               </>
             )}
           </button>
-          <p className="text-center text-xs text-gray-500">
-            Po uložení vám navrhneme, čo pri tomto vozidle sledovať.
-          </p>
+          <p className="text-center text-xs text-gray-500">{t('onboarding.afterHint')}</p>
         </div>
       </div>
     </div>
