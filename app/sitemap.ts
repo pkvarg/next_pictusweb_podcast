@@ -1,21 +1,18 @@
 import { MetadataRoute } from 'next'
 import db from '@/db/db'
 
+export const dynamic = 'force-dynamic'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.pictusweb.sk'
   const locales = ['en', 'sk', 'hu']
-  
+
   // Static pages
-  const staticPages = [
-    '',
-    '/podcasts',
-    '/contact',
-    '/fleetsync',
-  ]
+  const staticPages = ['', '/podcasts', '/contact', '/fleetsync']
 
   // Generate static page URLs for all locales
   const staticUrls: MetadataRoute.Sitemap = []
-  
+
   for (const locale of locales) {
     for (const page of staticPages) {
       staticUrls.push({
@@ -34,18 +31,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Get all published podcasts from database
-  const podcasts = await db.podcast.findMany({
-    select: {
-      id: true,
-      updatedAt: true,
-    },
-    where: {
-      deleted: false,
-      published: true,
-    },
-    orderBy: { updatedAt: 'desc' },
-  })
+  // Get all published podcasts from database. Never let a DB hiccup fail the
+  // whole sitemap (and, with static export, the build) — fall back to static URLs.
+  let podcasts: { id: string; updatedAt: Date }[] = []
+  try {
+    podcasts = await db.podcast.findMany({
+      select: {
+        id: true,
+        updatedAt: true,
+      },
+      where: {
+        deleted: false,
+        published: true,
+      },
+      orderBy: { updatedAt: 'desc' },
+    })
+  } catch (error) {
+    console.error('sitemap: podcast query failed, serving static URLs only', error)
+  }
 
   // Generate podcast page URLs for all locales
   const podcastUrls: MetadataRoute.Sitemap = []
