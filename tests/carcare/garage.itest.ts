@@ -113,6 +113,26 @@ describe('garage access & sharing', () => {
     expect(await prisma.$transaction((tx) => canAccessVehicle(tx, outsiderId, v1))).toBe(false)
   })
 
+  it('default access: a member with no grants sees all; a grant then restricts', async () => {
+    const u = await prisma.user.create({
+      data: { email: `itest-g-def-${Date.now()}@example.com`, role: 'CLIENT', organizationId },
+    })
+    const m = await prisma.garageMembership.create({
+      data: { organizationId, userId: u.id, role: 'MEMBER' },
+    })
+    try {
+      expect(await prisma.$transaction((tx) => canAccessVehicle(tx, u.id, v1))).toBe(true)
+      expect(await prisma.$transaction((tx) => canAccessVehicle(tx, u.id, v2))).toBe(true)
+
+      await prisma.$transaction((tx) => grantVehicleAccess(tx, m.id, v1))
+      expect(await prisma.$transaction((tx) => canAccessVehicle(tx, u.id, v1))).toBe(true)
+      expect(await prisma.$transaction((tx) => canAccessVehicle(tx, u.id, v2))).toBe(false)
+    } finally {
+      await prisma.garageMembership.deleteMany({ where: { id: m.id } })
+      await prisma.user.deleteMany({ where: { id: u.id } })
+    }
+  })
+
   it('resolveGarageOwner returns the OWNER member', async () => {
     expect(await prisma.$transaction((tx) => resolveGarageOwner(tx, organizationId))).toBe(ownerId)
   })
@@ -133,10 +153,14 @@ describe('garage access & sharing', () => {
   })
 
   it('invitation: accept creates a membership with the invited role', async () => {
+    const invitee = await prisma.user.findUnique({
+      where: { id: outsiderId },
+      select: { email: true },
+    })
     const inv = await prisma.$transaction((tx) =>
       createInvitation(tx, {
         organizationId,
-        email: 'itest-g-invitee@example.com',
+        email: invitee!.email,
         role: 'VIEWER',
       }),
     )
@@ -146,6 +170,21 @@ describe('garage access & sharing', () => {
     expect(membership.role).toBe('VIEWER')
     const reloaded = await prisma.garageInvitation.findUnique({ where: { id: inv.id } })
     expect(reloaded?.status).toBe('ACCEPTED')
+  })
+
+  it('invitation: accept is rejected when the signed-in email does not match', async () => {
+    const inv = await prisma.$transaction((tx) =>
+      createInvitation(tx, {
+        organizationId,
+        email: `itest-g-other-${Date.now()}@example.com`,
+        role: 'MEMBER',
+      }),
+    )
+    await expect(
+      prisma.$transaction((tx) => acceptInvitation(tx, inv.token, tempId)),
+    ).rejects.toThrow('EMAIL_MISMATCH')
+    const reloaded = await prisma.garageInvitation.findUnique({ where: { id: inv.id } })
+    expect(reloaded?.status).toBe('PENDING')
   })
 
   it('removing a member detaches their events (→ owner) and suppresses their reminders', async () => {

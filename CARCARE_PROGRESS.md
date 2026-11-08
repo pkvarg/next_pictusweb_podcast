@@ -207,7 +207,7 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 
 - [x] Cron scheduler: `fleetsync_cC_notification_tick` created in n8n **inactive** (id `ROlwDmAQxaUr2DxW`) — hourly → `GET /api/cron/notifications/tick` with `Authorization: Bearer {{ $env.PICTUSWEB_CRON_TOKEN }}`; JSON saved to `n8n_cC/`. **Activate only after pictusweb+CarCare is deployed and `CRON_TOKEN` is set there.**
 - [ ] MVP · Notification delivery monitoring; audit of critical changes; user/garage support tools
-- [ ] MVP · Automated regression tests (recurrence, reminders, access, migration) in CI
+- [x] Automated regression tests + CI: unit (`recurrence`, `quiet-hours`) + integration (`scheduler`/`dispatch` reminders, `garage` access incl. new default-access + email-match, `completion`, `appointments`, `events`, `vehicles`, `lifecycle`, **new `migrate-notifications`**). GitHub Actions `.github/workflows/carcare-ci.yml`: unit+lint job, and an integration job (Postgres service → `migrate deploy` → `ci-seed.sql` → itests). All green locally (33 unit, 36 itest). _CI job itself validates on first push._
 - [ ] MVP · Error monitoring + backups + restore test
 - [ ] MVP · Staged pilot deployment; acceptance scenario passes, migrated records reconcile
   > **Review gate M17.**
