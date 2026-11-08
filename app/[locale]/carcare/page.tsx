@@ -44,5 +44,5 @@ export default function CarCarePage() {
     )
   }
   if (!data) return null
-  return <CarCareDashboardView data={data} reload={load} />
+  return <CarCareDashboardView data={data} />
 }

@@ -12,7 +12,6 @@ import {
   CalendarCheck,
 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
-import CarCareActionModal, { type ActionOccurrence } from './CarCareActionModal'
 import { ACTION_LABEL, templateName, powertrainLabel } from '@/lib/carcare/labels'
 
 export interface VdOccurrence {
@@ -99,18 +98,11 @@ function SpecRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export default function CarCareVehicleDetailView({
-  data,
-  reload,
-}: {
-  data: VehicleDetailData
-  reload?: () => void
-}) {
+export default function CarCareVehicleDetailView({ data }: { data: VehicleDetailData }) {
   const { vehicle } = data
   const canModify = data.canModify !== false
   const [busyKey, setBusyKey] = useState<string | null>(null)
   const [activated, setActivated] = useState<Set<string>>(new Set())
-  const [active, setActive] = useState<ActionOccurrence | null>(null)
 
   const activate = async (key: string) => {
     setBusyKey(key)
@@ -218,30 +210,21 @@ export default function CarCareVehicleDetailView({
                     >
                       {badge.text}
                     </span>
-                    {canModify &&
-                      (actionable ? (
-                        <span className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full">
-                          {ACTION_LABEL[o.recurringEvent.actionType] ?? 'Zobraziť'}
-                        </span>
-                      ) : (
-                        <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
-                      ))}
+                    {canModify && actionable ? (
+                      <span className="shrink-0 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-1.5 rounded-full">
+                        {ACTION_LABEL[o.recurringEvent.actionType] ?? 'Zobraziť'}
+                      </span>
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
+                    )}
                   </>
                 )
                 const base =
-                  'w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06]'
-                return canModify ? (
-                  <button
-                    key={o.id}
-                    onClick={() => setActive({ id: o.id, name: o.recurringEvent.name })}
-                    className={`${base} hover:border-white/20 transition-colors`}
-                  >
+                  'w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors'
+                return (
+                  <Link key={o.id} href={`/carcare/events/${o.recurringEvent.id}`} className={base}>
                     {inner}
-                  </button>
-                ) : (
-                  <div key={o.id} className={base}>
-                    {inner}
-                  </div>
+                  </Link>
                 )
               })}
             </div>
@@ -335,17 +318,6 @@ export default function CarCareVehicleDetailView({
           </div>
         </section>
       </div>
-
-      {active && (
-        <CarCareActionModal
-          occurrence={active}
-          onClose={() => setActive(null)}
-          onDone={() => {
-            setActive(null)
-            reload?.()
-          }}
-        />
-      )}
     </div>
   )
 }

@@ -2,15 +2,15 @@
 
 import { useMemo, useState } from 'react'
 import { Calendar, List, ChevronRight } from 'lucide-react'
+import { Link } from '@/i18n/routing'
 import CarCareBottomNav from './CarCareBottomNav'
-import CarCareActionModal, { type ActionOccurrence } from './CarCareActionModal'
 
 export interface EvOccurrence {
   id: string
   status: string
   dueDate: string | null
   overdue?: boolean
-  recurringEvent: { name: string; category: string; kind: string; actionType: string }
+  recurringEvent: { id: string; name: string; category: string; kind: string; actionType: string }
   vehicle: {
     registration: string
     nickname: string | null
@@ -59,13 +59,7 @@ const MONTHS = [
 ]
 const ymd = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
 
-function EventList({
-  occurrences,
-  onSelect,
-}: {
-  occurrences: EvOccurrence[]
-  onSelect?: (o: EvOccurrence) => void
-}) {
+function EventList({ occurrences }: { occurrences: EvOccurrence[] }) {
   if (occurrences.length === 0) {
     return (
       <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
@@ -77,8 +71,12 @@ function EventList({
     <div className="space-y-3">
       {occurrences.map((o) => {
         const badge = dueBadge(o)
-        const inner = (
-          <>
+        return (
+          <Link
+            key={o.id}
+            href={`/carcare/events/${o.recurringEvent.id}`}
+            className="w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors"
+          >
             <div className="min-w-0 flex-1">
               <p className="text-pictus-white font-medium truncate">{o.recurringEvent.name}</p>
               <p className="text-sm text-gray-400 truncate">
@@ -88,23 +86,8 @@ function EventList({
             <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full ${toneClass[badge.tone]}`}>
               {badge.text}
             </span>
-            {onSelect && <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />}
-          </>
-        )
-        const base =
-          'w-full text-left flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06]'
-        return onSelect ? (
-          <button
-            key={o.id}
-            onClick={() => onSelect(o)}
-            className={`${base} hover:border-white/20 transition-colors`}
-          >
-            {inner}
-          </button>
-        ) : (
-          <div key={o.id} className={base}>
-            {inner}
-          </div>
+            <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
+          </Link>
         )
       })}
     </div>
@@ -200,17 +183,8 @@ function MonthCalendar({ occurrences }: { occurrences: EvOccurrence[] }) {
   )
 }
 
-export default function CarCareEventsView({
-  occurrences,
-  reload,
-  canModify = true,
-}: {
-  occurrences: EvOccurrence[]
-  reload?: () => void
-  canModify?: boolean
-}) {
+export default function CarCareEventsView({ occurrences }: { occurrences: EvOccurrence[] }) {
   const [view, setView] = useState<'list' | 'calendar'>('list')
-  const [active, setActive] = useState<ActionOccurrence | null>(null)
   return (
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
@@ -235,28 +209,12 @@ export default function CarCareEventsView({
           </div>
         </header>
         {view === 'list' ? (
-          <EventList
-            occurrences={occurrences}
-            onSelect={
-              canModify ? (o) => setActive({ id: o.id, name: o.recurringEvent.name }) : undefined
-            }
-          />
+          <EventList occurrences={occurrences} />
         ) : (
           <MonthCalendar occurrences={occurrences} />
         )}
       </div>
       <CarCareBottomNav current="events" />
-
-      {active && (
-        <CarCareActionModal
-          occurrence={active}
-          onClose={() => setActive(null)}
-          onDone={() => {
-            setActive(null)
-            reload?.()
-          }}
-        />
-      )}
     </div>
   )
 }

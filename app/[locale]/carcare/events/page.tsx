@@ -10,16 +10,12 @@ export default function CarCareEventsPage() {
   const { status } = useSession()
   const router = useRouter()
   const [occurrences, setOccurrences] = useState<EvOccurrence[] | null>(null)
-  const [canModify, setCanModify] = useState(true)
   const [error, setError] = useState(false)
 
   const load = useCallback(() => {
     fetch('/api/carcare/occurrences')
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((d) => {
-        setOccurrences(d.occurrences)
-        setCanModify(d.canModify !== false)
-      })
+      .then((d) => setOccurrences(d.occurrences))
       .catch(() => setError(true))
   }, [])
 
@@ -46,5 +42,5 @@ export default function CarCareEventsPage() {
     )
   }
   if (!occurrences) return null
-  return <CarCareEventsView occurrences={occurrences} reload={load} canModify={canModify} />
+  return <CarCareEventsView occurrences={occurrences} />
 }
