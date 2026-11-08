@@ -1,4 +1,4 @@
-import webpush from 'web-push'
+import * as webpush from 'web-push'
 import prisma from '@/db/db'
 
 let configured = false

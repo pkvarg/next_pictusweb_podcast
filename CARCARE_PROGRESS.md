@@ -190,7 +190,7 @@ Feature tags: **MVP** = first release · the MVP feature checklist is nested und
 
 - [x] MVP · Installable PWA shell: CarCare-scoped `public/carcare.webmanifest` (standalone, #141511), `public/sw.js` (push + notificationclick handlers, passthrough fetch), `CarCareServiceWorker` registration, and `app/[locale]/carcare/layout.tsx` wiring the manifest/theme/apple-web-app meta — **verified: /carcare links the scoped manifest, sw.js + manifest serve 200**
 - [x] Web push (Part 2) — **code complete** (added `web-push` dep, `push_subscriptions` model + migration `20261108120000`): `lib/carcare/push.ts` (send + prune expired), `POST /api/carcare/push/subscribe|unsubscribe|test`, scheduler PUSH channel wired, `CarCarePushToggle` opt-in (+test) in the garage page. Dev VAPID keys in `.env.local`; prod needs `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT`.
-  - [ ] **Pending local verification** (Docker/DB was down): apply the migration locally + end-to-end test subscribe → test-push on a real browser
+  - [x] **Verified end-to-end on local DB + real Chrome**: migration applied, subscribe saved an FCM endpoint, test push returned 200 (web-push → FCM → service worker)
     > **Review gate M15.** PWA install done; web push code complete, awaiting DB-up to apply migration + e2e test.
 
 ---
