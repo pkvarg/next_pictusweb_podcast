@@ -48,6 +48,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec prisma generate
-      - run: pnpm exec prisma migrate deploy
+      - run: pnpm exec prisma db push --skip-generate --accept-data-loss
       - run: pnpm exec prisma db execute --schema prisma/schema.prisma --file prisma/ci-seed.sql
       - run: pnpm exec vitest run --config vitest.itest.config.ts
