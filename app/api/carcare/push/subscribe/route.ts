@@ -1,0 +1,29 @@
+import { NextRequest, NextResponse } from 'next/server'
+import prisma from '@/db/db'
+import { sameOriginOk } from '@/lib/sameOrigin'
+import { resolveCarCareSession } from '@/lib/carcare/apiAuth'
+
+// POST /api/carcare/push/subscribe — store a browser push subscription for the user.
+export async function POST(request: NextRequest) {
+  if (!sameOriginOk(request)) return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  const session = await resolveCarCareSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = (await request.json().catch(() => ({}))) as {
+    endpoint?: string
+    keys?: { p256dh?: string; auth?: string }
+  }
+  const endpoint = body.endpoint
+  const p256dh = body.keys?.p256dh
+  const auth = body.keys?.auth
+  if (!endpoint || !p256dh || !auth) {
+    return NextResponse.json({ error: 'endpoint and keys are required' }, { status: 400 })
+  }
+
+  await prisma.pushSubscription.upsert({
+    where: { endpoint },
+    create: { userId: session.userId, endpoint, p256dh, auth },
+    update: { userId: session.userId, p256dh, auth },
+  })
+  return NextResponse.json({ ok: true })
+}

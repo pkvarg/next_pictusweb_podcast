@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client'
+import { sendPush } from './push'
 
 export type DeliveryContext = Prisma.NotificationDeliveryGetPayload<{
   include: { recipient: true; occurrence: { include: { recurringEvent: true } } }
@@ -48,7 +49,12 @@ export const honoChannels: Channels = {
     })
     if (!res.ok) throw new Error(`sms send failed: ${res.status}`)
   },
-  PUSH: async () => {
-    throw new Error('push not implemented until M15')
+  PUSH: async (d) => {
+    await sendPush(d.recipient.id, {
+      title: d.occurrence.recurringEvent.name,
+      body: 'Pripomienka FleetSync',
+      url: '/carcare',
+      tag: `occ-${d.occurrence.id}`,
+    })
   },
 }
