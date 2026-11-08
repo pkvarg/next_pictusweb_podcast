@@ -65,18 +65,23 @@ const nextConfig = {
     // Permissive-but-present CSP: keeps Next.js, the hono API, Firebase/Google
     // auth, analytics, fonts and the stardust video working while satisfying the
     // audit. Tighten to a nonce-based policy later if desired.
+    // In development the hono upload API and served images are plain http://localhost:*,
+    // which the production (https-only) CSP would block. Allow local origins in dev only.
+    const isDev = process.env.NODE_ENV !== 'production'
+    const devConnect = isDev ? ' http://localhost:* ws://localhost:*' : ''
+    const devMedia = isDev ? ' http://localhost:*' : ''
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
       "object-src 'none'",
       "frame-ancestors 'self'",
       "form-action 'self'",
-      "img-src 'self' data: blob: https:",
-      "media-src 'self' data: blob: https:",
+      `img-src 'self' data: blob: https:${devMedia}`,
+      `media-src 'self' data: blob: https:${devMedia}`,
       "font-src 'self' data: https:",
       "style-src 'self' 'unsafe-inline' https:",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
-      "connect-src 'self' https: wss:",
+      `connect-src 'self' https: wss:${devConnect}`,
       // Allow embedding the Metabase analytics dashboard (admin + client pages).
       "frame-src 'self' https://metabase.pictusweb.com",
     ].join('; ')
