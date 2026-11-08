@@ -1787,6 +1787,12 @@
       "eventSubtitle": "Zrušte začiarknutie pri tých, ktorí nemajú dostávať upozornenia pre túto udalosť.",
       "empty": "Zatiaľ nie sú nastavení žiadni príjemcovia. Nastavte zodpovednú osobu alebo predvolených príjemcov.",
       "manageDefaults": "Spravovať predvolených príjemcov"
+    },
+    "inbox": {
+      "title": "Notifikácie",
+      "empty": "Žiadne notifikácie",
+      "markAllRead": "Označiť všetko",
+      "due": "Termín"
     }
   }
 }

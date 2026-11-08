@@ -923,6 +923,7 @@ model NotificationDelivery {
   attempts         Int               @default(0)
   lastError        String?           @map("last_error")
   sentAt           DateTime?         @map("sent_at")
+  readAt           DateTime?         @map("read_at")
   suppressedReason String?           @map("suppressed_reason")
   dedupeKey        String            @unique @map("dedupe_key")
   createdAt        DateTime          @default(now()) @map("created_at")
@@ -934,6 +935,7 @@ model NotificationDelivery {
 
   @@index([status, scheduledFor])
   @@index([occurrenceId, stage])
+  @@index([recipientUserId, channel, status])
   @@map("notification_deliveries")
 }
 

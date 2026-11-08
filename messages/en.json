@@ -1787,6 +1787,12 @@
       "eventSubtitle": "Uncheck anyone who should not be notified for this event.",
       "empty": "No recipients yet. Set a responsible person or default recipients.",
       "manageDefaults": "Manage default recipients"
+    },
+    "inbox": {
+      "title": "Notifications",
+      "empty": "No notifications",
+      "markAllRead": "Mark all read",
+      "due": "Due"
     }
   }
 }

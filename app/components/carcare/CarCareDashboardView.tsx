@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Plus,
   Users,
-  Bell,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
@@ -17,6 +16,7 @@ import { Link } from '@/i18n/routing'
 import { useTranslations } from 'next-intl'
 import AddEventModal from './AddEventModal'
 import AddExpenseModal, { type VehicleOption } from './AddExpenseModal'
+import CarCareNotificationBell from './CarCareNotificationBell'
 
 export interface DashOccurrence {
   id: string
@@ -182,18 +182,7 @@ export default function CarCareDashboardView({
               </p>
             </div>
           </div>
-          <Link
-            href="/client/my-fleet/events"
-            aria-label={t('dash.bellAria')}
-            className="relative shrink-0 text-gray-300 hover:text-pictus-white transition-colors"
-          >
-            <Bell className="w-6 h-6" />
-            {data.counts.needsAttention > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[0.65rem] font-bold">
-                {data.counts.needsAttention}
-              </span>
-            )}
-          </Link>
+          <CarCareNotificationBell />
         </header>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">

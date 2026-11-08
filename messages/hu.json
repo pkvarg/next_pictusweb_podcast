@@ -1787,6 +1787,12 @@
       "eventSubtitle": "Vedd ki a jelölést annál, aki ne kapjon értesítést erről az eseményről.",
       "empty": "Még nincs beállított címzett. Állíts be felelős személyt vagy alapértelmezett címzetteket.",
       "manageDefaults": "Alapértelmezett címzettek kezelése"
+    },
+    "inbox": {
+      "title": "Értesítések",
+      "empty": "Nincsenek értesítések",
+      "markAllRead": "Mind olvasott",
+      "due": "Határidő"
     }
   }
 }
