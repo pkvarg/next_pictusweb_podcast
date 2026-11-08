@@ -16,7 +16,7 @@ export default function CarCareLayout({ children }: { children: React.ReactNode 
   return (
     <>
       <CarCareBottomNav />
-      <div className="fixed top-3 right-3 z-50">
+      <div className="fixed right-3 z-50 bottom-20 md:bottom-auto md:top-3">
         <CarCareLangSwitcher />
       </div>
       <div className="md:pl-56">{children}</div>
