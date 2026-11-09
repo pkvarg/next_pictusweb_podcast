@@ -1534,6 +1534,67 @@
       "empty": "No recorded costs yet.",
       "analyticsGifted": "Business dashboards are included as a free bonus."
     },
+    "getStarted": {
+      "button": "How to start",
+      "back": "Back to settings",
+      "krok": "Step",
+      "title": "How to start",
+      "subtitle": "A short guide to setting up FleetSync and how the reminders work — step by step.",
+      "intro": "First you set up once <b>who</b>, <b>how</b> and <b>when</b> should get notifications. After that you just add vehicles and events — the app takes care of the reminders.",
+      "s1": {
+        "title": "Open Settings",
+        "body": "In the bottom bar tap the <b>gear</b> icon (Settings). Here you prepare, once, how you want to be informed.",
+        "shot": "Settings screen (the gear icon in the bottom bar)"
+      },
+      "s2": {
+        "title": "Add recipients",
+        "body": "Choose <b>who</b> should receive notifications. You can add yourself and colleagues from the garage. You can later turn someone off for a specific event.",
+        "shot": "Recipients section — the list of people who get notifications"
+      },
+      "s3": {
+        "title": "Choose how you want to be notified",
+        "body": "For each reminder type you turn on channels: <b>in-app</b> (the bell) and <b>e-mail</b> are always available, <b>SMS</b> and <b>push</b> can be turned on as needed.",
+        "note": "Note: SMS is available on paid plans (BASIC and BUSINESS).",
+        "shot": "Channel toggles: in-app, e-mail, SMS, push"
+      },
+      "s4": {
+        "title": "Set the send time",
+        "body": "Choose <b>when</b> notifications should go out — for example at 08:30 in the morning. This time applies to all reminders.",
+        "shot": "Send-time selector (e.g. 08:30)"
+      },
+      "s5": {
+        "title": "Turn on push notifications on your device",
+        "body": "In settings turn on <b>Push notifications on this device</b> and confirm the permission in your browser. You will get notifications even when the app is closed.",
+        "shot": "“Push notifications on this device” toggle + browser permission"
+      },
+      "bannerSettings": "Done with settings? Go back to <b>Home</b> and add your first vehicle and event.",
+      "s6": {
+        "title": "Add a vehicle",
+        "body": "On the home screen, under <b>My vehicles</b>, add a vehicle. You can also upload a photo so you recognise it easily.",
+        "shot": "My vehicles → Add vehicle (with photo)"
+      },
+      "s7": {
+        "title": "Create your first event — just for booking for now",
+        "body": "Create an event (e.g. <b>inspection</b>, oil change, insurance) and enter its due date. For now it is enough to know <b>by when</b> it has to be done.",
+        "body2": "The app will remind you in time (14 days ahead by default) that you should <b>book</b>. You do not need to deal with the visit details yet.",
+        "shot": "Creating an event (e.g. inspection) with a due date"
+      },
+      "s8": {
+        "title": "Once you book, add the details",
+        "body": "When you have arranged a slot at the service, open the event, tap <b>Book</b> and enter the date and time of the visit.",
+        "body2": "Only <b>now</b>, once you know all the details, does the <b>visit</b> reminder turn on (e.g. a day before). The “book now” reminders stop automatically.",
+        "shot": "Marking “Booked” + entering the visit date and time"
+      },
+      "s9": {
+        "title": "After the visit, mark it done",
+        "body": "After the maintenance is done, mark the event as <b>completed</b>. The app automatically schedules the next cycle, so you do not have to think about the next due date.",
+        "shot": "Marking the event as Done"
+      },
+      "doneTitle": "That is it 🎉",
+      "doneBody": "You only set things up once. After that you just add vehicles and events and FleetSync reminds you itself — to book, to show up, and to get it done on time.",
+      "toSettings": "To settings",
+      "toHome": "To home"
+    },
     "push": {
       "section": "This device",
       "title": "Push notifications on this device",
@@ -1767,6 +1828,8 @@
       "itemRequired": "Enter an item and amount."
     },
     "addEvent": {
+      "shortLeadWarning": "The due date is only {days} days away — sooner than the first reminder ({lead} days ahead). Some reminders may not go out with their usual head start; they will be sent at the next check.",
+      "saveAnyway": "Save anyway",
       "title": "Add event",
       "vehicle": "Vehicle",
       "pickVehicle": "Select a vehicle",

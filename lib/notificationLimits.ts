@@ -11,22 +11,29 @@ const messages: Record<string, Record<string, string>> = {
   sk: {
     orgNotFound: 'Organizácia nebola nájdená',
     orgDeactivated: 'Organizácia bola deaktivovaná',
-    freeLimitReached: 'Dosiahli ste limit {limit} notifikácií pre FREE tier. Organizácia bola deaktivovaná.',
-    paidLimitBlocked: 'Dosiahli ste ročný limit {limit} notifikácií pre {tier} tier. Limit sa obnoví {date}.',
+    freeLimitReached:
+      'Dosiahli ste limit {limit} notifikácií pre FREE tier. Organizácia bola deaktivovaná.',
+    paidLimitBlocked:
+      'Dosiahli ste ročný limit {limit} notifikácií pre {tier} tier. Limit sa obnoví {date}.',
     paidLimitReached: 'Dosiahli ste ročný limit {limit} notifikácií pre {tier} tier.',
   },
   en: {
     orgNotFound: 'Organization not found',
     orgDeactivated: 'Organization has been deactivated',
-    freeLimitReached: 'You have reached the limit of {limit} notifications for the FREE tier. Organization has been deactivated.',
-    paidLimitBlocked: 'You have reached the yearly limit of {limit} notifications for the {tier} tier. Limit resets on {date}.',
-    paidLimitReached: 'You have reached the yearly limit of {limit} notifications for the {tier} tier.',
+    freeLimitReached:
+      'You have reached the limit of {limit} notifications for the FREE tier. Organization has been deactivated.',
+    paidLimitBlocked:
+      'You have reached the yearly limit of {limit} notifications for the {tier} tier. Limit resets on {date}.',
+    paidLimitReached:
+      'You have reached the yearly limit of {limit} notifications for the {tier} tier.',
   },
   hu: {
     orgNotFound: 'A szervezet nem található',
     orgDeactivated: 'A szervezet deaktiválva lett',
-    freeLimitReached: 'Elérte a FREE szint {limit} értesítési limitjét. A szervezet deaktiválva lett.',
-    paidLimitBlocked: 'Elérte a(z) {tier} szint éves {limit} értesítési limitjét. A limit {date}-kor újul meg.',
+    freeLimitReached:
+      'Elérte a FREE szint {limit} értesítési limitjét. A szervezet deaktiválva lett.',
+    paidLimitBlocked:
+      'Elérte a(z) {tier} szint éves {limit} értesítési limitjét. A limit {date}-kor újul meg.',
     paidLimitReached: 'Elérte a(z) {tier} szint éves {limit} értesítési limitjét.',
   },
 }
@@ -62,7 +69,9 @@ async function sendLimitReachedEmail(params: {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     })
-    console.log(`[NOTIFICATION-LIMIT] Limit reached email sent for org "${params.organizationName}"`)
+    console.log(
+      `[NOTIFICATION-LIMIT] Limit reached email sent for org "${params.organizationName}"`,
+    )
   } catch (error) {
     console.error('[NOTIFICATION-LIMIT] Failed to send limit reached email:', error)
   }
@@ -93,6 +102,7 @@ export async function checkNotificationLimit(
         select: {
           name: true,
           notificationsLimit: true,
+          notificationsPerVehicle: true,
         },
       },
     },
@@ -113,7 +123,28 @@ export async function checkNotificationLimit(
   }
 
   const tierName = org.tierRelation.name.toUpperCase()
-  const limit = org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? 0
+  // Org-level yearly allowance: an explicit org override, else the tier's per-vehicle
+  // rate × the org's vehicle count, else the tier's flat limit (e.g. the FREE trial).
+  const perVehicle = org.tierRelation.notificationsPerVehicle ?? 0
+  const limit =
+    org.notificationsLimit ??
+    (perVehicle > 0
+      ? perVehicle * org.currentVehiclesCount
+      : (org.tierRelation.notificationsLimit ?? 0))
+
+  // Keep the org's stored total fresh so admin can see spend / allowance.
+  if (org.notificationsAllowance !== limit) {
+    await prisma.organization.update({
+      where: { id: org.id },
+      data: { notificationsAllowance: limit },
+    })
+  }
+
+  if (tierName === 'FREE') {
+    return handleFreeTier(org, limit, countToAdd, loc)
+  }
+
+  // BASIC and BUSINESS - yearly tracking
 
   if (tierName === 'FREE') {
     return handleFreeTier(org, limit, countToAdd, loc)

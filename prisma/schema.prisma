@@ -331,6 +331,9 @@ model Tier {
   usersLimit             Int       @map("users_limit")
   vehiclesLimit          Int       @map("vehicles_limit")
   notificationsLimit     Int       @map("notifications_limit")
+  // Yearly notification allowance granted per vehicle (0 = use the flat notificationsLimit,
+  // e.g. the FREE trial). BASIC/BUSINESS use this × the org's vehicle count.
+  notificationsPerVehicle Int      @default(0) @map("notifications_per_vehicle")
   pricePerVehicle        Decimal?  @map("price_per_vehicle") @db.Decimal(10, 2)
   pricePerVehicleYearly  Decimal?  @map("price_per_vehicle_yearly") @db.Decimal(10, 2)
   yearlyDiscount         Decimal?  @map("yearly_discount") @db.Decimal(4, 2)
@@ -364,6 +367,9 @@ model Organization {
   currentUsersCount             Int @default(0) @map("current_users_count")
   currentVehiclesCount          Int @default(0) @map("current_vehicles_count")
   currentNotificationsCount     Int @default(0) @map("current_notifications_count")
+  // Org's total yearly notification allowance (tier rate × vehicles, or the flat trial),
+  // refreshed by the limit check. currentNotificationsCount is the spend against it.
+  notificationsAllowance        Int @default(0) @map("notifications_allowance")
 
   // Notification usage tracking
   notificationPeriodStart DateTime? @map("notification_period_start")

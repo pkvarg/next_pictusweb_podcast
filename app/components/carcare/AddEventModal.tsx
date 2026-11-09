@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2, X } from 'lucide-react'
+import { Loader2, X, AlertTriangle } from 'lucide-react'
 import type { VehicleOption } from './AddExpenseModal'
+
+const DAY_MS = 24 * 60 * 60 * 1000
 
 const input =
   'w-full bg-pictus-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:hover:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer'
@@ -57,10 +59,36 @@ export default function AddEventModal({
   const [dueDate, setDueDate] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Longest reminder lead among the org's enabled default rules (the earliest reminder).
+  const [maxLeadDays, setMaxLeadDays] = useState(14)
+  const [ackShort, setAckShort] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/carcare/notifications/defaults')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const leads = (d?.rules ?? [])
+          .filter((r: { channels?: string[] }) => (r.channels?.length ?? 0) > 0)
+          .map((r: { leadDays?: number }) => r.leadDays ?? 0)
+        if (leads.length) setMaxLeadDays(Math.max(...leads))
+      })
+      .catch(() => {})
+  }, [])
+
+  const daysUntilDue = dueDate
+    ? Math.ceil((new Date(dueDate).getTime() - Date.now()) / DAY_MS)
+    : null
+  const isShortLead = daysUntilDue !== null && daysUntilDue < maxLeadDays
 
   const submit = async () => {
     if (!vehicleId || !name.trim() || !category) {
       setError(t('addEvent.nameRequired'))
+      return
+    }
+    // Heads-up: the due date is sooner than the earliest reminder's lead, so reminders
+    // can't go out with their usual head start. Require one acknowledgement.
+    if (isShortLead && !ackShort) {
+      setAckShort(true)
       return
     }
     setBusy(true)
@@ -193,10 +221,20 @@ export default function AddEventModal({
               type="date"
               className={input}
               value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
+              onChange={(e) => {
+                setDueDate(e.target.value)
+                setAckShort(false)
+              }}
             />
           </div>
         </div>
+
+        {isShortLead && ackShort && (
+          <div className="flex items-start gap-2 rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-sm text-amber-200">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+            <p>{t('addEvent.shortLeadWarning', { days: daysUntilDue ?? 0, lead: maxLeadDays })}</p>
+          </div>
+        )}
 
         {error && <p className="text-sm text-red-400">{error}</p>}
 
@@ -212,7 +250,13 @@ export default function AddEventModal({
             disabled={busy}
             className="flex-1 inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-3 rounded-xl hover:bg-pictus-lime600 disabled:opacity-50"
           >
-            {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : t('common.save')}
+            {busy ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : isShortLead && ackShort ? (
+              t('addEvent.saveAnyway')
+            ) : (
+              t('common.save')
+            )}
           </button>
         </div>
       </div>

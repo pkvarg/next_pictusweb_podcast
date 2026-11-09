@@ -1534,6 +1534,67 @@
       "empty": "Még nincs rögzített költség.",
       "analyticsGifted": "A céges irányítópultok ingyenes bónuszként járnak."
     },
+    "getStarted": {
+      "button": "Hogyan kezdjem",
+      "back": "Vissza a beállításokhoz",
+      "krok": "Lépés",
+      "title": "Hogyan kezdjem",
+      "subtitle": "Rövid útmutató a FleetSync beállításához és ahhoz, hogyan működnek az emlékeztetők — lépésről lépésre.",
+      "intro": "Először egyszer beállítja, <b>ki</b>, <b>hogyan</b> és <b>mikor</b> kapjon értesítéseket. Utána már csak járműveket és eseményeket ad hozzá — az emlékeztetőkről az alkalmazás gondoskodik.",
+      "s1": {
+        "title": "Nyissa meg a Beállításokat",
+        "body": "Az alsó sávban koppintson a <b>fogaskerék</b> ikonra (Beállítások). Itt egyszer előkészíti, hogyan szeretne értesülni.",
+        "shot": "Beállítások képernyő (fogaskerék ikon az alsó sávban)"
+      },
+      "s2": {
+        "title": "Adjon hozzá címzetteket",
+        "body": "Válassza ki, <b>ki</b> kapjon értesítéseket. Hozzáadhatja magát és a garázs kollégáit is. Egy adott eseményhez később valakit külön kikapcsolhat.",
+        "shot": "Címzettek szakasz — az értesítést kapók listája"
+      },
+      "s3": {
+        "title": "Válassza ki, hogyan szeretne értesülni",
+        "body": "Minden emlékeztetőtípusnál bekapcsolhatja a csatornákat: az <b>alkalmazásban</b> (csengő) és az <b>e-mail</b> mindig elérhető, az <b>SMS</b> és a <b>push</b> igény szerint kapcsolható be.",
+        "note": "Megjegyzés: az SMS a fizetős csomagokban érhető el (BASIC és BUSINESS).",
+        "shot": "Csatorna kapcsolók: alkalmazásban, e-mail, SMS, push"
+      },
+      "s4": {
+        "title": "Állítsa be a küldés időpontját",
+        "body": "Válassza ki, <b>mikor</b> menjenek az értesítések — például reggel 08:30-kor. Ez az időpont minden emlékeztetőre érvényes.",
+        "shot": "Küldési idő választó (pl. 08:30)"
+      },
+      "s5": {
+        "title": "Kapcsolja be a push értesítéseket az eszközön",
+        "body": "A beállításokban kapcsolja be a <b>Push értesítések ezen az eszközön</b> opciót, és engedélyezze a böngészőben. Akkor is kap értesítést, ha az alkalmazás be van zárva.",
+        "shot": "„Push ezen az eszközön” kapcsoló + böngésző engedély"
+      },
+      "bannerSettings": "Kész a beállításokkal? Térjen vissza a <b>Főoldalra</b>, és adja hozzá az első járművet és eseményt.",
+      "s6": {
+        "title": "Adjon hozzá járművet",
+        "body": "A főképernyőn a <b>Járműveim</b> részben adjon hozzá járművet. Fotót is feltölthet, hogy könnyen felismerje.",
+        "shot": "Járműveim → Jármű hozzáadása (fotóval)"
+      },
+      "s7": {
+        "title": "Hozza létre az első eseményt — egyelőre csak a foglaláshoz",
+        "body": "Hozzon létre eseményt (pl. <b>műszaki vizsga</b>, olajcsere, biztosítás), és adja meg a határidőt. Egyelőre elég tudni, <b>meddig</b> kell elvégezni.",
+        "body2": "Az alkalmazás időben (alapértelmezés szerint 14 nappal előre) emlékezteti, hogy <b>foglaljon</b>. A látogatás részleteivel egyelőre nem kell foglalkoznia.",
+        "shot": "Esemény létrehozása (pl. műszaki) határidővel"
+      },
+      "s8": {
+        "title": "Amikor lefoglalta, adja meg a részleteket",
+        "body": "Ha egyeztetett időpontot a szervizben, nyissa meg az eseményt, koppintson a <b>Foglalás</b> gombra, és adja meg a látogatás dátumát és idejét.",
+        "body2": "Csak <b>most</b>, amikor minden részletet ismer, kapcsol be a <b>látogatás</b> emlékeztető (pl. egy nappal előtte). A „foglaljon” emlékeztetők automatikusan leállnak.",
+        "shot": "„Lefoglalva” jelölés + a látogatás dátuma és ideje"
+      },
+      "s9": {
+        "title": "A látogatás után jelölje késznek",
+        "body": "A karbantartás elvégzése után jelölje az eseményt <b>késznek</b>. Az alkalmazás automatikusan ütemezi a következő ciklust, így a következő határidővel nem kell foglalkoznia.",
+        "shot": "Az esemény megjelölése Késznek"
+      },
+      "doneTitle": "Ennyi 🎉",
+      "doneBody": "A beállításokat csak egyszer kell elvégezni. Utána már csak járműveket és eseményeket ad hozzá, és a FleetSync magától emlékezteti — foglalásra, megjelenésre és időben elvégzésre.",
+      "toSettings": "A beállításokhoz",
+      "toHome": "A főoldalra"
+    },
     "push": {
       "section": "Ez az eszköz",
       "title": "Push értesítések ezen az eszközön",
@@ -1767,6 +1828,8 @@
       "itemRequired": "Adjon meg tételt és összeget."
     },
     "addEvent": {
+      "shortLeadWarning": "A határidő már csak {days} nap múlva van — hamarabb, mint az első emlékeztető ({lead} nappal előtte). Egyes emlékeztetők nem a szokásos előnnyel mennek ki; a következő ellenőrzéskor kerülnek elküldésre.",
+      "saveAnyway": "Mentés mégis",
       "title": "Esemény hozzáadása",
       "vehicle": "Jármű",
       "pickVehicle": "Válasszon járművet",

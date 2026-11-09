@@ -35,6 +35,14 @@ export function limitMessage(err: TierLimitError, locale = 'sk'): string {
   return MESSAGES[loc][err.resource].replace('{limit}', String(err.limit))
 }
 
+// SMS is a paid-plan channel: BASIC and BUSINESS only (FREE is blocked). Untiered
+// organizations (legacy / tests) keep their previous behaviour.
+const SMS_TIERS = new Set(['BASIC', 'BUSINESS'])
+export function smsAllowedForTier(tierName: string | null | undefined): boolean {
+  if (!tierName) return true
+  return SMS_TIERS.has(tierName.toUpperCase())
+}
+
 // Effective limit = org override ?? tier limit; null means unlimited (no tier, no override).
 export async function assertVehicleCapacity(
   tx: Prisma.TransactionClient,

@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
             usersLimit: true,
             vehiclesLimit: true,
             notificationsLimit: true,
+            notificationsPerVehicle: true,
             pricePerVehicle: true,
             pricePerVehicleYearly: true,
           },
@@ -166,6 +167,7 @@ export async function POST(request: NextRequest) {
             usersLimit: true,
             vehiclesLimit: true,
             notificationsLimit: true,
+            notificationsPerVehicle: true,
           },
         },
         parentOrganization: {

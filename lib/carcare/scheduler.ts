@@ -2,6 +2,7 @@ import { Prisma, NotificationStage, type PrismaClient, type Channel } from '@pri
 import { addDaysUTC } from './recurrence'
 import { resolveGarageOwner } from './garage'
 import { checkNotificationLimit } from '@/lib/notificationLimits'
+import { smsAllowedForTier } from './limits'
 import type { Channels } from './channels'
 
 export const BOOKING_STAGES: NotificationStage[] = [
@@ -159,10 +160,15 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
   // target day, instead of at the due date's midnight. Minute is 0 or 30.
   const org = await tx.organization.findUnique({
     where: { id: def.organizationId },
-    select: { notificationSendHour: true, notificationSendMinute: true },
+    select: {
+      notificationSendHour: true,
+      notificationSendMinute: true,
+      tierRelation: { select: { name: true } },
+    },
   })
   const sendHour = org?.notificationSendHour ?? 8
   const sendMinute = org?.notificationSendMinute ?? 30
+  const canSms = smsAllowedForTier(org?.tierRelation?.name)
 
   const now = new Date()
   const created = []
@@ -181,6 +187,7 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
       if (i > 0 && when.getTime() < now.getTime()) continue
       for (const recipientUserId of recipientIds) {
         for (const channel of rule.channels) {
+          if (channel === 'SMS' && !canSms) continue // SMS is a paid-plan channel
           const dedupeKey = `${occ.id}:${stage}:${channel}:${recipientUserId}:${i}`
           const row = await tx.notificationDelivery.upsert({
             where: { dedupeKey },
@@ -228,15 +235,21 @@ export async function planAppointmentReminder(
 
   const org = await tx.organization.findUnique({
     where: { id: def.organizationId },
-    select: { notificationSendHour: true, notificationSendMinute: true },
+    select: {
+      notificationSendHour: true,
+      notificationSendMinute: true,
+      tierRelation: { select: { name: true } },
+    },
   })
   const sendHour = org?.notificationSendHour ?? 8
   const sendMinute = org?.notificationSendMinute ?? 30
+  const canSms = smsAllowedForTier(org?.tierRelation?.name)
   const when = atLocalTime(addDaysUTC(scheduledAt, -rule.leadDays), sendHour, sendMinute, SEND_TZ)
 
   const created = []
   for (const recipientUserId of recipientIds) {
     for (const channel of rule.channels) {
+      if (channel === 'SMS' && !canSms) continue // SMS is a paid-plan channel
       const dedupeKey = `${occ.id}:${NotificationStage.APPOINTMENT}:${channel}:${recipientUserId}:0`
       const row = await tx.notificationDelivery.upsert({
         where: { dedupeKey },
@@ -350,6 +363,7 @@ export async function dispatchDue(
                     notificationLocale: true,
                     notificationsBlocked: true,
                     deletedAt: true,
+                    tierRelation: { select: { name: true } },
                   },
                 },
               },
@@ -381,6 +395,15 @@ export async function dispatchDue(
       await db.notificationDelivery.update({
         where: { id },
         data: { status: 'SUPPRESSED', suppressedReason: 'channel not opted in' },
+      })
+      suppressed++
+      continue
+    }
+
+    if (d.channel === 'SMS' && !smsAllowedForTier(org.tierRelation?.name)) {
+      await db.notificationDelivery.update({
+        where: { id },
+        data: { status: 'SUPPRESSED', suppressedReason: 'sms not in plan' },
       })
       suppressed++
       continue

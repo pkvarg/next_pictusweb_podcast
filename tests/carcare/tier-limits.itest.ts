@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import type { NotificationStage } from '@prisma/client'
 import prisma from '@/db/db'
-import { dispatchDue } from '@/lib/carcare/scheduler'
+import { dispatchDue, planDeliveries } from '@/lib/carcare/scheduler'
 import { createVehicle } from '@/lib/carcare/vehicles'
 import { assertUserCapacity, TierLimitError } from '@/lib/carcare/limits'
 import type { Channels, DeliveryContext } from '@/lib/carcare/channels'
@@ -120,6 +120,7 @@ afterAll(async () => {
       where: { recurringEvent: { name: `${tag}-ev` } },
     })
     await prisma.eventOccurrence.deleteMany({ where: { recurringEvent: { name: `${tag}-ev` } } })
+    await prisma.notificationRule.deleteMany({ where: { recurringEvent: { name: `${tag}-ev` } } })
     await prisma.recurringEvent.deleteMany({ where: { name: `${tag}-ev` } })
     await prisma.myVehicle.deleteMany({ where: { organizationId: { in: createdOrgIds } } })
     await prisma.user.deleteMany({ where: { organizationId: { in: createdOrgIds } } })
@@ -234,5 +235,70 @@ describe('notification metering', () => {
     expect(d?.status).toBe('SUPPRESSED')
     const after = await prisma.organization.findUnique({ where: { id: org.id } })
     expect(after?.deletedAt).not.toBeNull()
+  })
+})
+
+describe('SMS is a paid-plan channel', () => {
+  async function planWithSmsRule(tierId: string) {
+    const org = await makeOrg({ tierId })
+    const u = await prisma.user.create({
+      data: {
+        email: `${tag}-sms-${Math.random()}@e.com`,
+        role: 'CLIENT',
+        organizationId: org.id,
+        phoneNumber: '+421900000009',
+        channelOptIns: ['EMAIL', 'SMS'],
+      },
+    })
+    regSeq += 1
+    const vehicle = await prisma.myVehicle.create({
+      data: {
+        organizationId: org.id,
+        userId: u.id,
+        type: 'ITEST',
+        registration: `S${Date.now() % 100000}${regSeq}`,
+      },
+    })
+    const re = await prisma.recurringEvent.create({
+      data: {
+        organizationId: org.id,
+        vehicleId: vehicle.id,
+        name: `${tag}-ev`,
+        category: 'inspection',
+        recurrenceType: 'ONE_TIME',
+        responsibleUserId: u.id,
+      },
+    })
+    await prisma.notificationRule.create({
+      data: {
+        organizationId: org.id,
+        recurringEventId: re.id,
+        stage: 'BOOKING',
+        leadDays: 0,
+        channels: ['SMS', 'EMAIL', 'IN_APP'],
+      },
+    })
+    const occ = await prisma.eventOccurrence.create({
+      data: {
+        recurringEventId: re.id,
+        vehicleId: vehicle.id,
+        sequenceNo: regSeq,
+        status: 'UPCOMING',
+        dueDate: new Date(Date.now() + 40 * 24 * 60 * 60 * 1000),
+      },
+    })
+    await prisma.$transaction((tx) => planDeliveries(tx, occ.id))
+    return prisma.notificationDelivery.findMany({ where: { occurrenceId: occ.id } })
+  }
+
+  it('FREE: SMS is not planned, EMAIL is', async () => {
+    const dels = await planWithSmsRule(freeTierId)
+    expect(dels.some((d) => d.channel === 'SMS')).toBe(false)
+    expect(dels.some((d) => d.channel === 'EMAIL')).toBe(true)
+  })
+
+  it('BASIC: SMS is planned', async () => {
+    const dels = await planWithSmsRule(paidTierId)
+    expect(dels.some((d) => d.channel === 'SMS')).toBe(true)
   })
 })

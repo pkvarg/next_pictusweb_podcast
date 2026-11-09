@@ -18,6 +18,7 @@ interface TierInfo {
   usersLimit: number
   vehiclesLimit: number
   notificationsLimit: number
+  notificationsPerVehicle: number
   pricePerVehicle?: number | null
 }
 
@@ -30,6 +31,7 @@ interface Organization {
   currentUsersCount: number
   currentVehiclesCount: number
   currentNotificationsCount: number
+  notificationsAllowance: number
   usersLimit: number | null
   vehiclesLimit: number | null
   notificationsLimit: number | null
@@ -674,7 +676,13 @@ export default function OrganizationManager() {
                             <span className="text-pictus-lime">
                               {org.currentNotificationsCount}
                             </span>
-                            /{org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}
+                            /
+                            {org.notificationsLimit ??
+                              (org.notificationsAllowance ||
+                                ((org.tierRelation?.notificationsPerVehicle ?? 0) > 0
+                                  ? (org.tierRelation!.notificationsPerVehicle ?? 0) *
+                                    org.currentVehiclesCount
+                                  : (org.tierRelation?.notificationsLimit ?? '—')))}
                           </span>
                           {org.purchasedVehicles != null && (
                             <span className="text-gray-400">

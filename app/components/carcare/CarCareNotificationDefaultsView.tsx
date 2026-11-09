@@ -11,6 +11,7 @@ import {
   AppWindow,
   User as UserIcon,
   Check,
+  BookOpen,
 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import type { Channel } from '@prisma/client'
@@ -177,9 +178,17 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
   return (
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 py-8 space-y-5">
-        <header>
-          <h1 className="text-3xl font-light">{t('defaults.title')}</h1>
-          <p className="text-gray-400">{t('defaults.subtitle')}</p>
+        <header className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-3xl font-light">{t('defaults.title')}</h1>
+            <p className="text-gray-400">{t('defaults.subtitle')}</p>
+          </div>
+          <Link
+            href="/client/my-fleet/get-started"
+            className="shrink-0 inline-flex items-center gap-2 bg-pictus-lime/15 text-pictus-lime border border-pictus-lime/30 text-sm font-medium px-4 py-2 rounded-full hover:bg-pictus-lime/25"
+          >
+            <BookOpen className="w-4 h-4" /> {t('getStarted.button')}
+          </Link>
         </header>
 
         <div className="flex items-start gap-2 rounded-2xl bg-pictus-lime/5 border border-pictus-lime/20 p-4 text-sm text-gray-300">

@@ -1534,6 +1534,67 @@
       "empty": "Zatiaľ žiadne zaznamenané náklady.",
       "analyticsGifted": "Firemné prehľady máte ako bonus zdarma."
     },
+    "getStarted": {
+      "button": "Ako začať",
+      "back": "Späť na nastavenia",
+      "krok": "Krok",
+      "title": "Ako začať",
+      "subtitle": "Stručný návod, ako si FleetSync nastavíte a ako funguje pripomínanie termínov — krok za krokom.",
+      "intro": "Najprv si raz nastavíte, <b>kto</b>, <b>ako</b> a <b>kedy</b> má dostávať upozornenia. Potom už len pridávate vozidlá a udalosti — o pripomienky sa postará aplikácia.",
+      "s1": {
+        "title": "Otvorte Nastavenia",
+        "body": "V spodnej lište ťuknite na ikonu <b>ozubeného kolieska</b> (Nastavenia). Tu si raz pripravíte, ako chcete byť informovaní.",
+        "shot": "Obrazovka Nastavenia (ikona ozubeného kolieska v spodnej lište)"
+      },
+      "s2": {
+        "title": "Pridajte príjemcov",
+        "body": "Zvoľte, <b>kto</b> má dostávať upozornenia. Môžete pridať seba aj kolegov z garáže. Pre konkrétnu udalosť viete neskôr niekoho jednotlivo vypnúť.",
+        "shot": "Sekcia Príjemcovia — zoznam ľudí, ktorí dostávajú upozornenia"
+      },
+      "s3": {
+        "title": "Zvoľte, ako chcete byť upozorňovaní",
+        "body": "Pri každom type pripomienky si zapnete kanály: <b>v aplikácii</b> (zvonček) a <b>e-mail</b> sú k dispozícii vždy, <b>SMS</b> a <b>push</b> sa dajú zapnúť podľa potreby.",
+        "note": "Pozn.: SMS je dostupné v platených programoch (BASIC a BUSINESS).",
+        "shot": "Prepínače kanálov: v aplikácii, e-mail, SMS, push"
+      },
+      "s4": {
+        "title": "Nastavte čas odosielania",
+        "body": "Vyberte, <b>kedy</b> majú upozornenia chodiť — napríklad ráno o 08:30. Tento čas platí pre všetky pripomienky.",
+        "shot": "Výber času odoslania (napr. 08:30)"
+      },
+      "s5": {
+        "title": "Zapnite push notifikácie na zariadení",
+        "body": "V nastaveniach zapnite <b>Push notifikácie na tomto zariadení</b> a potvrďte povolenie v prehliadači. Dostanete upozornenia aj keď máte aplikáciu zatvorenú.",
+        "shot": "Prepínač „Push notifikácie na tomto zariadení“ + povolenie v prehliadači"
+      },
+      "bannerSettings": "Hotovo s nastaveniami? Vráťte sa na <b>Domov</b> a pridajte prvé vozidlo a udalosť.",
+      "s6": {
+        "title": "Pridajte vozidlo",
+        "body": "Na domovskej obrazovke v časti <b>Moje vozidlá</b> pridajte vozidlo. Môžete nahrať aj fotku, aby ste ho ľahko rozoznali.",
+        "shot": "Moje vozidlá → Pridať vozidlo (s fotkou)"
+      },
+      "s7": {
+        "title": "Vytvorte prvú udalosť — zatiaľ len na objednanie",
+        "body": "Vytvorte udalosť (napr. <b>STK</b>, výmena oleja, PZP) a zadajte termín platnosti. V tejto chvíli stačí vedieť <b>dokedy</b> to treba stihnúť.",
+        "body2": "Aplikácia vám včas (štandardne 14 dní vopred) pripomenie, že sa máte <b>objednať</b>. Zvyšné detaily návštevy zatiaľ riešiť nemusíte.",
+        "shot": "Vytvorenie udalosti (napr. STK) s termínom"
+      },
+      "s8": {
+        "title": "Keď sa objednáte, doplňte detaily",
+        "body": "Keď máte v servise dohodnutý termín, v udalosti ťuknite na <b>Objednať</b> a zadajte dátum a čas návštevy.",
+        "body2": "Až <b>teraz</b>, keď poznáte všetky detaily, sa zapne pripomienka <b>návštevy</b> (napr. deň vopred). Pripomienky „objednajte sa“ sa automaticky prestanú posielať.",
+        "shot": "Označenie „Objednané“ + zadanie dátumu a času návštevy"
+      },
+      "s9": {
+        "title": "Po návšteve označte ako dokončené",
+        "body": "Po vykonaní údržby udalosť označte ako <b>dokončenú</b>. Aplikácia automaticky naplánuje ďalší cyklus, takže na ďalší termín už myslieť nemusíte.",
+        "shot": "Označenie udalosti ako Dokončené"
+      },
+      "doneTitle": "To je všetko 🎉",
+      "doneBody": "Nastavenia stačí spraviť raz. Potom len pridávate vozidlá a udalosti a FleetSync vás sám upozorní — objednať sa, prísť na termín aj vykonať úkon načas.",
+      "toSettings": "Na nastavenia",
+      "toHome": "Na domov"
+    },
     "push": {
       "section": "Toto zariadenie",
       "title": "Push notifikácie na tomto zariadení",
@@ -1767,6 +1828,8 @@
       "itemRequired": "Zadajte položku a sumu."
     },
     "addEvent": {
+      "shortLeadWarning": "Termín je už o {days} dní — skôr ako prvá pripomienka ({lead} dní vopred). Niektoré pripomienky sa nemusia stihnúť poslať v obvyklom predstihu; pošlú sa pri najbližšej kontrole.",
+      "saveAnyway": "Uložiť aj tak",
       "title": "Pridať udalosť",
       "vehicle": "Vozidlo",
       "pickVehicle": "Vyberte vozidlo",
