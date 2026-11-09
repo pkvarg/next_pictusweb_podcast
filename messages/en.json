@@ -1784,7 +1784,9 @@
       "save": "Save settings",
       "saved": "Settings saved.",
       "saveFailed": "Could not save settings.",
-      "loadFailed": "Could not load settings."
+      "loadFailed": "Could not load settings.",
+      "sendTime": "Send time",
+      "sendTimeHint": "When during the day reminders are sent."
     },
     "recipients": {
       "title": "Recipients",

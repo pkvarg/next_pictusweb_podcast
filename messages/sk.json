@@ -1784,7 +1784,9 @@
       "save": "Uložiť nastavenia",
       "saved": "Nastavenia uložené.",
       "saveFailed": "Nastavenia sa nepodarilo uložiť.",
-      "loadFailed": "Nastavenia sa nepodarilo načítať."
+      "loadFailed": "Nastavenia sa nepodarilo načítať.",
+      "sendTime": "Čas odoslania",
+      "sendTimeHint": "Kedy sa počas dňa odosielajú pripomienky."
     },
     "recipients": {
       "title": "Príjemcovia",

@@ -85,7 +85,6 @@ export interface EventDetailData {
   providers: { id: string; name: string }[]
   recipientIds: string[]
   excludedRecipientIds: string[]
-  quietHours: { start: number | null; end: number | null }
 }
 
 const RECURRENCE_KEYS: Record<string, string> = {
@@ -229,11 +228,6 @@ export default function CarCareEventDetailView({
     stagesFrom(effectiveRules),
   )
   const [channels, setChannels] = useState<Set<Channel>>(() => channelsFrom(effectiveRules))
-  const [quietOn, setQuietOn] = useState(
-    data.quietHours.start != null && data.quietHours.end != null,
-  )
-  const [quietStart, setQuietStart] = useState((data.quietHours.start ?? 22).toString())
-  const [quietEnd, setQuietEnd] = useState((data.quietHours.end ?? 8).toString())
   const [repeatOn, setRepeatOn] = useState(effectiveRules.some((r) => r.repeatUntilActioned))
   const [repeatDays, setRepeatDays] = useState(
     (effectiveRules.find((r) => r.repeatEveryDays)?.repeatEveryDays ?? 3).toString(),
@@ -273,7 +267,6 @@ export default function CarCareEventDetailView({
   const cancelNotif = () => {
     setStages(stagesFrom(effectiveRules))
     setChannels(channelsFrom(effectiveRules))
-    setQuietOn(data.quietHours.start != null && data.quietHours.end != null)
     setRepeatOn(effectiveRules.some((r) => r.repeatUntilActioned))
     setNotifActive(effectiveRules.length > 0)
     setMsg(null)
@@ -323,7 +316,8 @@ export default function CarCareEventDetailView({
     setBusy(true)
     setMsg(null)
     try {
-      const chans = [...channels]
+      // IN_APP is the always-on baseline channel (not shown as a toggle), so always include it.
+      const chans = [...new Set<Channel>([...channels, 'IN_APP'])]
       const rules = notifActive
         ? STAGE_UI.filter((s) => stages[s.stage].active).map((s) => ({
             stage: s.stage,
@@ -339,8 +333,6 @@ export default function CarCareEventDetailView({
         body: JSON.stringify({
           rules,
           excludedRecipientIds: [...excluded],
-          quietHoursStart: quietOn ? Number(quietStart) : null,
-          quietHoursEnd: quietOn ? Number(quietEnd) : null,
         }),
       })
       after(res, t('ev.notifSaved'))
@@ -694,8 +686,8 @@ export default function CarCareEventDetailView({
                 <h2 className="font-medium mb-1">{t('ev.channelsTitle')}</h2>
                 <p className="text-sm text-gray-400 mb-4">{t('ev.channelsSub')}</p>
                 <div className={notifActive ? '' : 'opacity-40 pointer-events-none'}>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {CHANNELS.map((c) => {
+                  <div className="grid grid-cols-3 gap-2">
+                    {CHANNELS.filter((c) => c.key !== 'IN_APP').map((c) => {
                       const on = channels.has(c.key)
                       return (
                         <button
@@ -786,40 +778,6 @@ export default function CarCareEventDetailView({
                 className={`bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-4 ${notifActive ? '' : 'opacity-40 pointer-events-none'}`}
               >
                 <h2 className="font-medium">{t('ev.advanced')}</h2>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <p className="text-sm text-pictus-white">{t('ev.quietHours')}</p>
-                    <p className="text-xs text-gray-500">{t('ev.quietHoursHint')}</p>
-                  </div>
-                  {quietOn && (
-                    <div className="flex items-center gap-1 text-sm">
-                      <input
-                        type="number"
-                        min={0}
-                        max={23}
-                        className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
-                        value={quietStart}
-                        onChange={(e) => setQuietStart(e.target.value)}
-                        disabled={!canModify}
-                      />
-                      <span className="text-gray-500">–</span>
-                      <input
-                        type="number"
-                        min={0}
-                        max={23}
-                        className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
-                        value={quietEnd}
-                        onChange={(e) => setQuietEnd(e.target.value)}
-                        disabled={!canModify}
-                      />
-                    </div>
-                  )}
-                  <Toggle
-                    on={quietOn}
-                    disabled={!canModify}
-                    onClick={() => setQuietOn((v) => !v)}
-                  />
-                </div>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
                     <p className="text-sm text-pictus-white">{t('ev.repeatReminder')}</p>

@@ -84,7 +84,8 @@ describe('scheduler — planner & booking suppression', () => {
     expect(deliveries[0].stage).toBe('BOOKING')
     expect(deliveries[0].channel).toBe('IN_APP')
     expect(deliveries[0].status).toBe('SCHEDULED')
-    expect(deliveries[0].scheduledFor.toISOString()).toBe('2026-01-23T00:00:00.000Z') // 14 days before DUE
+    // 14 days before DUE, at the default account send time 08:30 Europe/Bratislava (CET = 07:30 UTC)
+    expect(deliveries[0].scheduledFor.toISOString()).toBe('2026-01-23T07:30:00.000Z')
   })
 
   it('T7: booking an appointment suppresses the booking reminder', async () => {

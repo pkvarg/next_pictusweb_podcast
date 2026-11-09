@@ -1784,7 +1784,9 @@
       "save": "Beállítások mentése",
       "saved": "Beállítások elmentve.",
       "saveFailed": "A beállításokat nem sikerült menteni.",
-      "loadFailed": "A beállításokat nem sikerült betölteni."
+      "loadFailed": "A beállításokat nem sikerült betölteni.",
+      "sendTime": "Küldés ideje",
+      "sendTimeHint": "A nap folyamán mikor menjenek ki az emlékeztetők."
     },
     "recipients": {
       "title": "Címzettek",

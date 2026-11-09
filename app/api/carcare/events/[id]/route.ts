@@ -54,14 +54,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     })
     const me = await tx.user.findUnique({
       where: { id: session.userId },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        quietHoursStart: true,
-        quietHoursEnd: true,
-      },
+      select: { id: true, firstName: true, lastName: true, email: true },
     })
     const recipientRows = await tx.notificationRecipient.findMany({
       where: { organizationId: session.organizationId! },
@@ -172,7 +165,6 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     providers,
     recipientIds: recipientRows.map((r) => r.userId),
     excludedRecipientIds: exclusionRows.map((r) => r.userId),
-    quietHours: { start: me?.quietHoursStart ?? null, end: me?.quietHoursEnd ?? null },
   })
 }
 

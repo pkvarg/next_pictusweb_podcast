@@ -16,9 +16,9 @@ interface RuleInput {
   repeatEveryDays?: number | null
 }
 
-// PUT /api/carcare/events/[id]/notifications — replace the per-event notification
-// rules, and optionally the user's (account-wide) quiet hours.
-// Body: { rules: RuleInput[], quietHoursStart?: number|null, quietHoursEnd?: number|null }
+// PUT /api/carcare/events/[id]/notifications — replace the per-event notification rules
+// and the per-event recipient exclusions.
+// Body: { rules: RuleInput[], excludedRecipientIds?: string[] }
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!sameOriginOk(request)) return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   const { id } = await params
@@ -28,8 +28,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   const body = (await request.json().catch(() => ({}))) as {
     rules?: RuleInput[]
     excludedRecipientIds?: string[]
-    quietHoursStart?: number | null
-    quietHoursEnd?: number | null
   }
   const rules = (body.rules ?? []).filter((r) => STAGES.has(r.stage))
 
@@ -64,15 +62,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       })
     }
 
-    if (body.quietHoursStart !== undefined || body.quietHoursEnd !== undefined) {
-      await tx.user.update({
-        where: { id: session.userId },
-        data: {
-          quietHoursStart: body.quietHoursStart ?? null,
-          quietHoursEnd: body.quietHoursEnd ?? null,
-        },
-      })
-    }
     return 'ok'
   })
 

@@ -42,6 +42,37 @@ function scheduledFor(dueDate: Date, stage: NotificationStage, leadDays: number)
     : addDaysUTC(dueDate, -leadDays)
 }
 
+// Timezone reminders are anchored to (the garage's locale).
+const SEND_TZ = 'Europe/Bratislava'
+
+// Offset of `tz` from UTC, in minutes, at the given instant (handles DST).
+function tzOffsetMinutes(date: Date, tz: string): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(date)
+  const p: Record<string, string> = {}
+  for (const x of parts) p[x.type] = x.value
+  const asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second)
+  return (asUTC - date.getTime()) / 60000
+}
+
+// Returns the UTC instant for `hour:minute` local time in `tz`, on the calendar date of `day`
+// (day's UTC date components). Used to send reminders at the account's chosen wall-clock time.
+function atLocalTime(day: Date, hour: number, minute: number, tz: string): Date {
+  const guess = new Date(
+    Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate(), hour, minute, 0),
+  )
+  const offset = tzOffsetMinutes(guess, tz)
+  return new Date(guess.getTime() - offset * 60000)
+}
+
 // Effective recipients for an event's notifications:
 //   - central recipient list (NotificationRecipient) ∪ the event's responsible person,
 //     minus the event's per-event exclusions (EventRecipientExclusion);
@@ -92,21 +123,26 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
   const recipientIds = await resolveRecipients(tx, def)
   if (recipientIds.length === 0) return [] // no one to notify
 
-  const recipients = await tx.user.findMany({ where: { id: { in: recipientIds } } })
-  const byId = new Map(recipients.map((r) => [r.id, r]))
+  // Account-level send time: reminders go out at this wall-clock time (SEND_TZ) on the
+  // target day, instead of at the due date's midnight. Minute is 0 or 30.
+  const org = await tx.organization.findUnique({
+    where: { id: def.organizationId },
+    select: { notificationSendHour: true, notificationSendMinute: true },
+  })
+  const sendHour = org?.notificationSendHour ?? 8
+  const sendMinute = org?.notificationSendMinute ?? 30
 
   const created = []
   for (const stage of DUE_ANCHORED) {
     const rule = await resolveRule(tx, def.organizationId, def.id, stage)
     if (!rule) continue
+    const when = atLocalTime(
+      scheduledFor(occ.dueDate, stage, rule.leadDays),
+      sendHour,
+      sendMinute,
+      SEND_TZ,
+    )
     for (const recipientUserId of recipientIds) {
-      const recipient = byId.get(recipientUserId)
-      const when = applyQuietHours(
-        scheduledFor(occ.dueDate, stage, rule.leadDays),
-        recipient?.timezone ?? 'Europe/Bratislava',
-        recipient?.quietHoursStart ?? null,
-        recipient?.quietHoursEnd ?? null,
-      )
       for (const channel of rule.channels) {
         const dedupeKey = `${occ.id}:${stage}:${channel}:${recipientUserId}:0`
         const row = await tx.notificationDelivery.upsert({
@@ -255,38 +291,6 @@ export async function dispatchDue(
   }
 
   return { claimed: claimed.length, sent, suppressed, failed }
-}
-
-// Returns the local hour (0-23) of a UTC instant in the given IANA timezone.
-function localHour(d: Date, timeZone: string): number {
-  const s = new Intl.DateTimeFormat('en-GB', {
-    timeZone,
-    hour: '2-digit',
-    hourCycle: 'h23',
-  }).format(d)
-  return Number(s) % 24
-}
-
-function inQuiet(hour: number, start: number, end: number): boolean {
-  return start < end ? hour >= start && hour < end : hour >= start || hour < end
-}
-
-// Shifts a send time out of the recipient's quiet-hours window to the first allowed hour.
-// Steps forward one hour at a time (quiet windows are short); DST within the window is
-// an acceptable MVP imprecision. Returns the input unchanged when quiet hours are unset.
-export function applyQuietHours(
-  when: Date,
-  timeZone: string,
-  startHour: number | null,
-  endHour: number | null,
-): Date {
-  if (startHour == null || endHour == null || startHour === endHour) return when
-  let d = when
-  for (let i = 0; i < 24; i++) {
-    if (!inQuiet(localHour(d, timeZone), startHour, endHour)) return d
-    d = new Date(d.getTime() + 60 * 60 * 1000)
-  }
-  return d
 }
 
 // BR-06: completing (or cancelling/skipping) an occurrence suppresses all its remaining

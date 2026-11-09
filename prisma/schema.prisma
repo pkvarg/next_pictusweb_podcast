@@ -424,6 +424,10 @@ model Organization {
   newsletterOptOut            Boolean @default(false) @map("newsletter_opt_out")
   useCustomTemplates          Boolean @default(false) @map("use_custom_templates")
   confirmNotificationCreation Boolean @default(false) @map("confirm_notification_creation")
+
+  // CarCare: account-level time of day reminders are sent (minute is 0 or 30).
+  notificationSendHour   Int @default(8) @map("notification_send_hour")
+  notificationSendMinute Int @default(30) @map("notification_send_minute")
   bonusBusinessDashboards     Boolean @default(false) @map("bonus_business_dashboards")
   manuallyPaid                Boolean @default(false) @map("manually_paid")
 

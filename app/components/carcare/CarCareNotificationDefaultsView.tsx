@@ -23,12 +23,21 @@ interface RuleData {
   repeatEveryDays: number | null
 }
 
+const TIME_OPTIONS: { value: string; label: string }[] = Array.from({ length: 48 }, (_, i) => {
+  const h = Math.floor(i / 2)
+  const m = i % 2 === 0 ? 0 : 30
+  return {
+    value: `${h}:${m}`,
+    label: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
+  }
+})
+
 export interface DefaultsData {
   canModify: boolean
   rules: RuleData[]
   members: { userId: string; name: string }[]
   recipientIds: string[]
-  quietHours: { start: number | null; end: number | null }
+  sendTime: { hour: number; minute: number }
 }
 
 const STAGE_UI: { stage: string; labelKey: string; hintKey: string; lead?: boolean }[] = [
@@ -111,11 +120,9 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
     if (set.size === 0) set.add('IN_APP')
     return set
   })
-  const [quietOn, setQuietOn] = useState(
-    data.quietHours.start != null && data.quietHours.end != null,
+  const [sendTime, setSendTime] = useState(
+    `${data.sendTime.hour}:${data.sendTime.minute === 30 ? 30 : 0}`,
   )
-  const [quietStart, setQuietStart] = useState((data.quietHours.start ?? 22).toString())
-  const [quietEnd, setQuietEnd] = useState((data.quietHours.end ?? 8).toString())
   const [repeatOn, setRepeatOn] = useState(data.rules.some((r) => r.repeatUntilActioned))
   const [repeatDays, setRepeatDays] = useState(
     (data.rules.find((r) => r.repeatEveryDays)?.repeatEveryDays ?? 3).toString(),
@@ -128,7 +135,8 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
     setBusy(true)
     setMsg(null)
     try {
-      const chans = [...channels]
+      // IN_APP is the always-on baseline channel (not shown as a toggle), so always include it.
+      const chans = [...new Set<Channel>([...channels, 'IN_APP'])]
       const rules = STAGE_UI.filter((s) => stages[s.stage].active).map((s) => ({
         stage: s.stage,
         leadDays: s.lead ? stages[s.stage].leadDays : 0,
@@ -142,8 +150,8 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
         body: JSON.stringify({
           rules,
           recipients: [...recipients],
-          quietHoursStart: quietOn ? Number(quietStart) : null,
-          quietHoursEnd: quietOn ? Number(quietEnd) : null,
+          sendHour: Number(sendTime.split(':')[0]),
+          sendMinute: Number(sendTime.split(':')[1]),
         }),
       })
       setMsg(res.ok ? t('defaults.saved') : t('defaults.saveFailed'))
@@ -228,8 +236,8 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
         <div className={card}>
           <h2 className="font-medium mb-1">{t('ev.channelsTitle')}</h2>
           <p className="text-sm text-gray-400 mb-4">{t('ev.channelsSub')}</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {CHANNELS.map((c) => {
+          <div className="grid grid-cols-3 gap-2">
+            {CHANNELS.filter((c) => c.key !== 'IN_APP').map((c) => {
               const on = channels.has(c.key)
               return (
                 <button
@@ -310,33 +318,21 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
           <h2 className="font-medium">{t('ev.advanced')}</h2>
           <div className="flex items-center gap-3">
             <div className="flex-1">
-              <p className="text-sm text-pictus-white">{t('ev.quietHours')}</p>
-              <p className="text-xs text-gray-500">{t('ev.quietHoursHint')}</p>
+              <p className="text-sm text-pictus-white">{t('defaults.sendTime')}</p>
+              <p className="text-xs text-gray-500">{t('defaults.sendTimeHint')}</p>
             </div>
-            {quietOn && (
-              <div className="flex items-center gap-1 text-sm">
-                <input
-                  type="number"
-                  min={0}
-                  max={23}
-                  className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
-                  value={quietStart}
-                  onChange={(e) => setQuietStart(e.target.value)}
-                  disabled={!canModify}
-                />
-                <span className="text-gray-500">–</span>
-                <input
-                  type="number"
-                  min={0}
-                  max={23}
-                  className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
-                  value={quietEnd}
-                  onChange={(e) => setQuietEnd(e.target.value)}
-                  disabled={!canModify}
-                />
-              </div>
-            )}
-            <Toggle on={quietOn} disabled={!canModify} onClick={() => setQuietOn((v) => !v)} />
+            <select
+              className="bg-pictus-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-pictus-white"
+              value={sendTime}
+              onChange={(e) => setSendTime(e.target.value)}
+              disabled={!canModify}
+            >
+              {TIME_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex-1">

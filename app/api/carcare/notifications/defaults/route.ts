@@ -25,7 +25,7 @@ export async function GET() {
   const session = await resolveCarCareSession()
   if (!session?.organizationId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const [rules, recipients, memberships, me] = await Promise.all([
+  const [rules, recipients, memberships, me, org] = await Promise.all([
     prisma.notificationRule.findMany({
       where: { organizationId: session.organizationId, recurringEventId: null },
       orderBy: { stage: 'asc' },
@@ -40,14 +40,11 @@ export async function GET() {
     }),
     prisma.user.findUnique({
       where: { id: session.userId },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        quietHoursStart: true,
-        quietHoursEnd: true,
-      },
+      select: { id: true, firstName: true, lastName: true, email: true },
+    }),
+    prisma.organization.findUnique({
+      where: { id: session.organizationId },
+      select: { notificationSendHour: true, notificationSendMinute: true },
     }),
   ])
 
@@ -67,13 +64,16 @@ export async function GET() {
     })),
     members,
     recipientIds: recipients.map((r) => r.userId),
-    quietHours: { start: me?.quietHoursStart ?? null, end: me?.quietHoursEnd ?? null },
+    sendTime: {
+      hour: org?.notificationSendHour ?? 8,
+      minute: org?.notificationSendMinute ?? 30,
+    },
   })
 }
 
-// PUT /api/carcare/notifications/defaults — replace the org-wide default rules, and
-// optionally the user's account-wide quiet hours. Owner-only (org-wide settings).
-// Body: { rules: RuleInput[], quietHoursStart?: number|null, quietHoursEnd?: number|null }
+// PUT /api/carcare/notifications/defaults — replace the org-wide default rules, the central
+// recipient list, and the account-level send time. Owner-only (org-wide settings).
+// Body: { rules: RuleInput[], recipients?: string[], sendHour?: number, sendMinute?: number }
 export async function PUT(request: NextRequest) {
   if (!sameOriginOk(request)) return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   const session = await resolveCarCareSession()
@@ -84,8 +84,8 @@ export async function PUT(request: NextRequest) {
   const body = (await request.json().catch(() => ({}))) as {
     rules?: RuleInput[]
     recipients?: string[]
-    quietHoursStart?: number | null
-    quietHoursEnd?: number | null
+    sendHour?: number
+    sendMinute?: number
   }
   const rules = (body.rules ?? []).filter((r) => STAGES.has(r.stage))
 
@@ -137,13 +137,12 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    if (body.quietHoursStart !== undefined || body.quietHoursEnd !== undefined) {
-      await tx.user.update({
-        where: { id: session.userId },
-        data: {
-          quietHoursStart: body.quietHoursStart ?? null,
-          quietHoursEnd: body.quietHoursEnd ?? null,
-        },
+    if (body.sendHour !== undefined || body.sendMinute !== undefined) {
+      const hour = Math.min(23, Math.max(0, Math.round(body.sendHour ?? 8)))
+      const minute = body.sendMinute === 30 ? 30 : 0 // whole or half hours only
+      await tx.organization.update({
+        where: { id: session.organizationId! },
+        data: { notificationSendHour: hour, notificationSendMinute: minute },
       })
     }
   })
