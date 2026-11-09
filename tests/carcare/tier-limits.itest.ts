@@ -100,8 +100,6 @@ beforeAll(async () => {
       usersLimit: 50,
       vehiclesLimit: 50,
       notificationsLimit: 1,
-      templatesLimit: 0,
-      notificationTypesLimit: 0,
     },
   })
   freeTierId = free.id
@@ -111,8 +109,6 @@ beforeAll(async () => {
       usersLimit: 50,
       vehiclesLimit: 50,
       notificationsLimit: 2,
-      templatesLimit: 0,
-      notificationTypesLimit: 0,
     },
   })
   paidTierId = paid.id

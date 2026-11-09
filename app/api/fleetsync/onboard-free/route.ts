@@ -83,8 +83,6 @@ export async function POST(request: NextRequest) {
           usersLimit: freeTier.usersLimit,
           vehiclesLimit: 1,
           notificationsLimit: freeTier.notificationsLimit,
-          templatesLimit: freeTier.templatesLimit,
-          notificationTypesLimit: freeTier.notificationTypesLimit,
         },
       })
 

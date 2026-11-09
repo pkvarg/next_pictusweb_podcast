@@ -74,8 +74,6 @@ export async function POST(request: NextRequest) {
           usersLimit: tierRecord.usersLimit,
           vehiclesLimit: vehicles,
           notificationsLimit: tierRecord.notificationsLimit,
-          templatesLimit: tierRecord.templatesLimit,
-          notificationTypesLimit: tierRecord.notificationTypesLimit,
         },
       })
 

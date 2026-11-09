@@ -32,8 +32,6 @@ interface TierInfo {
   usersLimit: number
   vehiclesLimit: number
   notificationsLimit: number
-  templatesLimit: number
-  notificationTypesLimit: number
 }
 
 interface Organization {

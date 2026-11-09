@@ -18,8 +18,6 @@ interface TierInfo {
   usersLimit: number
   vehiclesLimit: number
   notificationsLimit: number
-  templatesLimit: number
-  notificationTypesLimit: number
   pricePerVehicle?: number | null
 }
 
@@ -32,13 +30,9 @@ interface Organization {
   currentUsersCount: number
   currentVehiclesCount: number
   currentNotificationsCount: number
-  currentTemplatesCount: number
-  currentNotificationTypesCount: number
   usersLimit: number | null
   vehiclesLimit: number | null
   notificationsLimit: number | null
-  templatesLimit: number | null
-  notificationTypesLimit: number | null
   purchasedVehicles: number | null
   hiddenFromPictusaci: boolean
   canCreateBenefit: boolean
@@ -191,8 +185,6 @@ export default function OrganizationManager() {
       usersLimit: organization.usersLimit ?? '',
       vehiclesLimit: organization.vehiclesLimit ?? '',
       notificationsLimit: organization.notificationsLimit ?? '',
-      templatesLimit: organization.templatesLimit ?? '',
-      notificationTypesLimit: organization.notificationTypesLimit ?? '',
       purchasedVehicles: organization.purchasedVehicles ?? '',
       hiddenFromPictusaci: organization.hiddenFromPictusaci || false,
       canCreateBenefit: organization.canCreateBenefit || false,
@@ -220,9 +212,6 @@ export default function OrganizationManager() {
           vehiclesLimit: editingItem.vehiclesLimit === '' ? null : editingItem.vehiclesLimit,
           notificationsLimit:
             editingItem.notificationsLimit === '' ? null : editingItem.notificationsLimit,
-          templatesLimit: editingItem.templatesLimit === '' ? null : editingItem.templatesLimit,
-          notificationTypesLimit:
-            editingItem.notificationTypesLimit === '' ? null : editingItem.notificationTypesLimit,
           purchasedVehicles:
             editingItem.purchasedVehicles === '' ? null : editingItem.purchasedVehicles,
           hiddenFromPictusaci: editingItem.hiddenFromPictusaci,
@@ -449,33 +438,6 @@ export default function OrganizationManager() {
                             setEditingItem({ ...editingItem, notificationsLimit: e.target.value })
                           }
                           placeholder={org.tierRelation?.notificationsLimit?.toString() || '—'}
-                          className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs text-gray-400">Templates</label>
-                        <input
-                          type="number"
-                          value={editingItem.templatesLimit}
-                          onChange={(e) =>
-                            setEditingItem({ ...editingItem, templatesLimit: e.target.value })
-                          }
-                          placeholder={org.tierRelation?.templatesLimit?.toString() || '—'}
-                          className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs text-gray-400">Notif. Types</label>
-                        <input
-                          type="number"
-                          value={editingItem.notificationTypesLimit}
-                          onChange={(e) =>
-                            setEditingItem({
-                              ...editingItem,
-                              notificationTypesLimit: e.target.value,
-                            })
-                          }
-                          placeholder={org.tierRelation?.notificationTypesLimit?.toString() || '—'}
                           className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm"
                         />
                       </div>
@@ -713,11 +675,6 @@ export default function OrganizationManager() {
                               {org.currentNotificationsCount}
                             </span>
                             /{org.notificationsLimit ?? org.tierRelation?.notificationsLimit ?? '—'}
-                          </span>
-                          <span className="text-gray-400">
-                            Templates:{' '}
-                            <span className="text-pictus-lime">{org.currentTemplatesCount}</span>/
-                            {org.templatesLimit ?? org.tierRelation?.templatesLimit ?? '—'}
                           </span>
                           {org.purchasedVehicles != null && (
                             <span className="text-gray-400">

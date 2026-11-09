@@ -331,8 +331,6 @@ model Tier {
   usersLimit             Int       @map("users_limit")
   vehiclesLimit          Int       @map("vehicles_limit")
   notificationsLimit     Int       @map("notifications_limit")
-  templatesLimit         Int       @map("templates_limit")
-  notificationTypesLimit Int       @map("notification_types_limit")
   pricePerVehicle        Decimal?  @map("price_per_vehicle") @db.Decimal(10, 2)
   pricePerVehicleYearly  Decimal?  @map("price_per_vehicle_yearly") @db.Decimal(10, 2)
   yearlyDiscount         Decimal?  @map("yearly_discount") @db.Decimal(4, 2)
@@ -366,8 +364,6 @@ model Organization {
   currentUsersCount             Int @default(0) @map("current_users_count")
   currentVehiclesCount          Int @default(0) @map("current_vehicles_count")
   currentNotificationsCount     Int @default(0) @map("current_notifications_count")
-  currentTemplatesCount         Int @default(0) @map("current_templates_count")
-  currentNotificationTypesCount Int @default(0) @map("current_notification_types_count")
 
   // Notification usage tracking
   notificationPeriodStart DateTime? @map("notification_period_start")
@@ -377,8 +373,6 @@ model Organization {
   usersLimit             Int?    @map("users_limit")
   vehiclesLimit          Int?    @map("vehicles_limit")
   notificationsLimit     Int?    @map("notifications_limit")
-  templatesLimit         Int?    @map("templates_limit")
-  notificationTypesLimit Int?    @map("notification_types_limit")
   purchasedVehicles      Int?    @map("purchased_vehicles")
   hiddenFromPictusaci    Boolean @default(false) @map("hidden_from_pictusaci")
 
@@ -439,8 +433,6 @@ model Organization {
   vehicles                   MyVehicle[]
   expenses                   MyVehicleExpense[]
   mileageRecords             MyVehicleMileage[]
-  templates                  NotificationTemplate[]
-  notificationTypeOptions    NotificationTypeOption[]
   notificationChannelOptions NotificationChannelOption[]
   vehicleNotifications       VehicleNotification[]
   dutyRenewalPresets         DutyRenewalPreset[]
@@ -460,41 +452,6 @@ model Organization {
   @@index([tierId])
   @@index([parentOrganizationId])
   @@map("organizations")
-}
-
-model NotificationTemplate {
-  id                   String       @id @default(uuid())
-  organizationId       String       @map("organization_id")
-  organizationRelation Organization @relation(fields: [organizationId], references: [id])
-  name                 String       @db.VarChar(100)
-  notificationType     String       @db.VarChar(50)
-  notificationChannel  String       @db.VarChar(50)
-  reminderIntervals    Json? // Array of integers: e.g., [-30, -14, -7, 0, 1, 2]
-  emailMessage         String?      @db.Text
-  smsMessage           String?      @db.Text
-  isActive             Boolean      @default(true)
-  createdAt            DateTime     @default(now()) @map("created_at")
-  updatedAt            DateTime     @updatedAt @map("updated_at")
-  deletedAt            DateTime?    @map("deleted_at")
-
-  @@index([organizationId])
-  @@map("notification_templates")
-}
-
-model NotificationTypeOption {
-  id                   String       @id @default(uuid())
-  organizationId       String       @map("organization_id")
-  organizationRelation Organization @relation(fields: [organizationId], references: [id])
-  label                String       @db.VarChar(100)
-  isActive             Boolean      @default(true)
-  isPdr                Boolean      @default(false) @map("is_pdr")
-  sortOrder            Int          @default(0)
-  createdAt            DateTime     @default(now()) @map("created_at")
-  updatedAt            DateTime     @updatedAt @map("updated_at")
-  deletedAt            DateTime?    @map("deleted_at")
-
-  @@index([organizationId])
-  @@map("notification_type_options")
 }
 
 model NotificationChannelOption {

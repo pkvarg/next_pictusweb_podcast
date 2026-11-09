@@ -180,8 +180,6 @@ export async function POST(request: NextRequest) {
         vehiclesLimit: newVehicles,
         usersLimit: targetTierRecord.usersLimit,
         notificationsLimit: targetTierRecord.notificationsLimit,
-        templatesLimit: targetTierRecord.templatesLimit,
-        notificationTypesLimit: targetTierRecord.notificationTypesLimit,
         currentNotificationsCount: 0,
         notificationPeriodStart: new Date(),
         notificationsBlocked: false,

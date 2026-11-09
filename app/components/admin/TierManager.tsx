@@ -14,8 +14,6 @@ interface Tier {
   usersLimit: number
   vehiclesLimit: number
   notificationsLimit: number
-  templatesLimit: number
-  notificationTypesLimit: number
 }
 
 export default function TierManager() {
@@ -96,19 +94,27 @@ export default function TierManager() {
 
   const tierColor = (name: string) => {
     switch (name) {
-      case 'FREE': return 'border-gray-500/30 bg-gray-500/5'
-      case 'BASIC': return 'border-purple-500/30 bg-purple-500/5'
-      case 'BUSINESS': return 'border-pictus-lime/30 bg-pictus-lime/5'
-      default: return 'border-white/10 bg-white/5'
+      case 'FREE':
+        return 'border-gray-500/30 bg-gray-500/5'
+      case 'BASIC':
+        return 'border-purple-500/30 bg-purple-500/5'
+      case 'BUSINESS':
+        return 'border-pictus-lime/30 bg-pictus-lime/5'
+      default:
+        return 'border-white/10 bg-white/5'
     }
   }
 
   const tierBadgeColor = (name: string) => {
     switch (name) {
-      case 'FREE': return 'bg-gray-600 text-gray-100'
-      case 'BASIC': return 'bg-purple-600 text-purple-100'
-      case 'BUSINESS': return 'bg-pictus-lime/80 text-pictus-black'
-      default: return 'bg-white/20 text-white'
+      case 'FREE':
+        return 'bg-gray-600 text-gray-100'
+      case 'BASIC':
+        return 'bg-purple-600 text-purple-100'
+      case 'BUSINESS':
+        return 'bg-pictus-lime/80 text-pictus-black'
+      default:
+        return 'bg-white/20 text-white'
     }
   }
 
@@ -133,7 +139,8 @@ export default function TierManager() {
       </div>
 
       <p className="text-gray-400 font-light text-sm">
-        Manage pricing per vehicle, yearly discount, and Stripe price IDs for each tier. Changes here are reflected on the public pricing page.
+        Manage pricing per vehicle, yearly discount, and Stripe price IDs for each tier. Changes
+        here are reflected on the public pricing page.
       </p>
 
       {/* Messages */}
@@ -162,11 +169,14 @@ export default function TierManager() {
               {/* Tier Header */}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${tierBadgeColor(tier.name)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${tierBadgeColor(tier.name)}`}
+                  >
                     {tier.name}
                   </span>
                   <span className="text-gray-400 text-sm font-light">
-                    Limits: {tier.usersLimit} users, {tier.vehiclesLimit} vehicles, {tier.notificationsLimit} notifications
+                    Limits: {tier.usersLimit} users, {tier.vehiclesLimit} vehicles,{' '}
+                    {tier.notificationsLimit} notifications
                   </span>
                 </div>
                 {!isEditing ? (
@@ -184,7 +194,11 @@ export default function TierManager() {
                       disabled={saving}
                       className="flex items-center gap-2 px-3 py-1.5 bg-pictus-lime/20 hover:bg-pictus-lime/30 border border-pictus-lime/30 rounded-lg text-sm font-light text-pictus-lime transition-colors disabled:opacity-50"
                     >
-                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      {saving ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}
                       Save
                     </button>
                     <button
@@ -210,25 +224,33 @@ export default function TierManager() {
                   <div>
                     <div className="text-xs text-gray-500 mb-1">Yearly price / vehicle</div>
                     <div className="text-lg font-light text-white">
-                      {tier.pricePerVehicleYearly != null ? `€${Number(tier.pricePerVehicleYearly)}` : '–'}
+                      {tier.pricePerVehicleYearly != null
+                        ? `€${Number(tier.pricePerVehicleYearly)}`
+                        : '–'}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 mb-1">Yearly discount</div>
                     <div className="text-lg font-light text-white">
-                      {tier.yearlyDiscount != null ? `${((1 - Number(tier.yearlyDiscount)) * 100).toFixed(0)}% (×${Number(tier.yearlyDiscount)})` : '–'}
+                      {tier.yearlyDiscount != null
+                        ? `${((1 - Number(tier.yearlyDiscount)) * 100).toFixed(0)}% (×${Number(tier.yearlyDiscount)})`
+                        : '–'}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 mb-1">Stripe Monthly ID</div>
                     <div className="text-sm font-mono text-gray-300 truncate">
-                      {tier.stripePriceMonthly || <span className="text-gray-600 italic">not set</span>}
+                      {tier.stripePriceMonthly || (
+                        <span className="text-gray-600 italic">not set</span>
+                      )}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 mb-1">Stripe Yearly ID</div>
                     <div className="text-sm font-mono text-gray-300 truncate">
-                      {tier.stripePriceYearly || <span className="text-gray-600 italic">not set</span>}
+                      {tier.stripePriceYearly || (
+                        <span className="text-gray-600 italic">not set</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -246,7 +268,10 @@ export default function TierManager() {
                       className={inputClass}
                       value={editForm.pricePerVehicle ?? ''}
                       onChange={(e) =>
-                        setEditForm((prev) => ({ ...prev, pricePerVehicle: e.target.value ? parseFloat(e.target.value) : null }))
+                        setEditForm((prev) => ({
+                          ...prev,
+                          pricePerVehicle: e.target.value ? parseFloat(e.target.value) : null,
+                        }))
                       }
                       placeholder="e.g. 2.00"
                     />
@@ -260,13 +285,18 @@ export default function TierManager() {
                       className={inputClass}
                       value={editForm.pricePerVehicleYearly ?? ''}
                       onChange={(e) =>
-                        setEditForm((prev) => ({ ...prev, pricePerVehicleYearly: e.target.value ? parseFloat(e.target.value) : null }))
+                        setEditForm((prev) => ({
+                          ...prev,
+                          pricePerVehicleYearly: e.target.value ? parseFloat(e.target.value) : null,
+                        }))
                       }
                       placeholder="e.g. 29.88"
                     />
                   </div>
                   <div>
-                    <label className={labelClass}>Yearly discount multiplier (e.g. 0.83 = 17% off)</label>
+                    <label className={labelClass}>
+                      Yearly discount multiplier (e.g. 0.83 = 17% off)
+                    </label>
                     <input
                       type="number"
                       step="0.01"
@@ -275,7 +305,10 @@ export default function TierManager() {
                       className={inputClass}
                       value={editForm.yearlyDiscount ?? ''}
                       onChange={(e) =>
-                        setEditForm((prev) => ({ ...prev, yearlyDiscount: e.target.value ? parseFloat(e.target.value) : null }))
+                        setEditForm((prev) => ({
+                          ...prev,
+                          yearlyDiscount: e.target.value ? parseFloat(e.target.value) : null,
+                        }))
                       }
                       placeholder="e.g. 0.83"
                     />

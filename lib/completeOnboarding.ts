@@ -78,8 +78,6 @@ export async function completePaidOnboarding(
             usersLimit: tier.usersLimit,
             vehiclesLimit: pending.purchasedVehicles,
             notificationsLimit: tier.notificationsLimit,
-            templatesLimit: tier.templatesLimit,
-            notificationTypesLimit: tier.notificationTypesLimit,
             stripeCustomerId: stripeCustomerId,
             stripeSubscriptionId: stripeSubscriptionId,
             stripeSubscriptionStatus: 'active',
