@@ -34,6 +34,8 @@ const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL ||
 
 const appLink = (d: DeliveryContext) => `${APP_BASE}/${orgLocale(d)}/client/my-fleet`
 
+const appLogo = () => (APP_BASE ? `${APP_BASE}/pictus/pictus-icon.png` : undefined)
+
 const PUSH_BODY: Record<string, string> = {
   sk: 'Pripomienka FleetSync',
   en: 'FleetSync reminder',
@@ -61,6 +63,7 @@ export const honoChannels: Channels = {
         event: d.occurrence.recurringEvent.name,
         locale: orgLocale(d),
         link: appLink(d),
+        logo: appLogo(),
       }),
     })
     if (!res.ok) throw new Error(`email send failed: ${res.status}`)
