@@ -163,6 +163,7 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
   const sendHour = org?.notificationSendHour ?? 8
   const sendMinute = org?.notificationSendMinute ?? 30
 
+  const now = new Date()
   const created = []
   for (const stage of DUE_ANCHORED) {
     const rule = await resolveRule(tx, def.organizationId, def.id, stage)
@@ -173,6 +174,10 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
     const instants = repeatInstances(stage, base, occ.dueDate, rule)
     for (let i = 0; i < instants.length; i++) {
       const when = atLocalTime(instants[i], sendHour, sendMinute, SEND_TZ)
+      // The primary reminder (i=0) always materializes, but never backfill a repeat
+      // instance whose time already passed — enabling repeat must not dump a catch-up
+      // burst of historical reminders.
+      if (i > 0 && when.getTime() < now.getTime()) continue
       for (const recipientUserId of recipientIds) {
         for (const channel of rule.channels) {
           const dedupeKey = `${occ.id}:${stage}:${channel}:${recipientUserId}:${i}`
