@@ -26,6 +26,13 @@ const HONO = process.env.NEXT_PUBLIC_HONO_API_URL
 const orgLocale = (d: DeliveryContext) =>
   d.occurrence.recurringEvent.organization.notificationLocale
 
+const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || '').replace(
+  /\/$/,
+  '',
+)
+
+const appLink = (d: DeliveryContext) => `${APP_BASE}/${orgLocale(d)}/client/my-fleet`
+
 const PUSH_BODY: Record<string, string> = {
   sk: 'Pripomienka FleetSync',
   en: 'FleetSync reminder',
@@ -52,6 +59,7 @@ export const honoChannels: Channels = {
         stage: d.stage,
         event: d.occurrence.recurringEvent.name,
         locale: orgLocale(d),
+        link: appLink(d),
       }),
     })
     if (!res.ok) throw new Error(`email send failed: ${res.status}`)
@@ -69,6 +77,7 @@ export const honoChannels: Channels = {
         stage: d.stage,
         event: d.occurrence.recurringEvent.name,
         locale: orgLocale(d),
+        link: appLink(d),
       }),
     })
     if (!res.ok) throw new Error(`sms send failed: ${res.status}`)
