@@ -247,9 +247,37 @@ export async function dispatchDue(
   for (const { id } of claimed) {
     const d = await db.notificationDelivery.findUnique({
       where: { id },
-      include: { recipient: true, occurrence: { include: { recurringEvent: true } } },
+      include: {
+        recipient: true,
+        occurrence: {
+          include: {
+            recurringEvent: {
+              include: {
+                organization: { select: { notificationsBlocked: true, deletedAt: true } },
+              },
+            },
+          },
+        },
+      },
     })
     if (!d) continue
+
+    // Never send EMAIL/SMS for a blocked (billing/quota) or deleted organization.
+    const org = d.occurrence.recurringEvent.organization
+    if (
+      (d.channel === 'EMAIL' || d.channel === 'SMS') &&
+      (org.notificationsBlocked || org.deletedAt)
+    ) {
+      await db.notificationDelivery.update({
+        where: { id },
+        data: {
+          status: 'SUPPRESSED',
+          suppressedReason: org.deletedAt ? 'organization deleted' : 'notifications blocked',
+        },
+      })
+      suppressed++
+      continue
+    }
 
     if (!isChannelAllowed(d.recipient.channelOptIns, d.channel)) {
       await db.notificationDelivery.update({
