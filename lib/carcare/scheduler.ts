@@ -105,6 +105,37 @@ export async function resolveRecipients(
   return [...set].filter((id) => !excluded.has(id))
 }
 
+const MAX_REPEAT_INSTANCES = 8
+const OVERDUE_REPEAT_HORIZON_DAYS = 30
+
+// The send days for a stage: a single day by default, or a repeating series (every
+// repeatEveryDays) when the rule opts in — the "repeat until actioned" setting.
+// Before-deadline stages repeat up to the due date; OVERDUE repeats forward past it.
+// A booked appointment (BOOKING_STAGES) or a completion stops the series by suppressing
+// the remaining SCHEDULED rows, so the horizon here is only an upper bound.
+function repeatInstances(
+  stage: NotificationStage,
+  base: Date,
+  dueDate: Date,
+  rule: { repeatUntilActioned: boolean; repeatEveryDays: number | null },
+): Date[] {
+  if (!rule.repeatUntilActioned || !rule.repeatEveryDays || rule.repeatEveryDays < 1) {
+    return [base]
+  }
+  const step = Math.round(rule.repeatEveryDays)
+  const end =
+    stage === NotificationStage.OVERDUE ? addDaysUTC(dueDate, OVERDUE_REPEAT_HORIZON_DAYS) : dueDate
+  const out: Date[] = []
+  for (
+    let d = base;
+    d.getTime() <= end.getTime() && out.length < MAX_REPEAT_INSTANCES;
+    d = addDaysUTC(d, step)
+  ) {
+    out.push(d)
+  }
+  return out.length > 0 ? out : [base]
+}
+
 // Materializes the notification_deliveries for an occurrence from its rules.
 // Idempotent: the deterministic dedupe_key means re-running never double-creates,
 // and it never resurrects a SUPPRESSED/SENT/CANCELLED row (upsert update:{}).
@@ -136,31 +167,86 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
   for (const stage of DUE_ANCHORED) {
     const rule = await resolveRule(tx, def.organizationId, def.id, stage)
     if (!rule) continue
-    const when = atLocalTime(
-      scheduledFor(occ.dueDate, stage, rule.leadDays),
-      sendHour,
-      sendMinute,
-      SEND_TZ,
-    )
-    for (const recipientUserId of recipientIds) {
-      for (const channel of rule.channels) {
-        const dedupeKey = `${occ.id}:${stage}:${channel}:${recipientUserId}:0`
-        const row = await tx.notificationDelivery.upsert({
-          where: { dedupeKey },
-          create: {
-            occurrenceId: occ.id,
-            recurringEventId: def.id,
-            stage,
-            channel,
-            recipientUserId,
-            scheduledFor: when,
-            status: 'SCHEDULED',
-            dedupeKey,
-          },
-          update: {},
-        })
-        created.push(row)
+    // A booked appointment stops the "arrange it" nags (BR-04); don't re-create them.
+    if (BOOKING_STAGES.includes(stage) && occ.status === 'ARRANGED') continue
+    const base = scheduledFor(occ.dueDate, stage, rule.leadDays)
+    const instants = repeatInstances(stage, base, occ.dueDate, rule)
+    for (let i = 0; i < instants.length; i++) {
+      const when = atLocalTime(instants[i], sendHour, sendMinute, SEND_TZ)
+      for (const recipientUserId of recipientIds) {
+        for (const channel of rule.channels) {
+          const dedupeKey = `${occ.id}:${stage}:${channel}:${recipientUserId}:${i}`
+          const row = await tx.notificationDelivery.upsert({
+            where: { dedupeKey },
+            create: {
+              occurrenceId: occ.id,
+              recurringEventId: def.id,
+              stage,
+              channel,
+              recipientUserId,
+              scheduledFor: when,
+              status: 'SCHEDULED',
+              dedupeKey,
+            },
+            update: {},
+          })
+          created.push(row)
+        }
       }
+    }
+  }
+  return created
+}
+
+// Appointment-anchored reminder (NotificationStage.APPOINTMENT). Unlike the due-anchored
+// stages this is scheduled relative to the booked appointment time, so it is planned when
+// an appointment is booked/rescheduled rather than by the due-date planner. Re-arming
+// (update path) lets a reschedule move the reminder, and a later booking re-send it.
+export async function planAppointmentReminder(
+  tx: Prisma.TransactionClient,
+  occurrenceId: string,
+  scheduledAt: Date,
+) {
+  const occ = await tx.eventOccurrence.findUnique({
+    where: { id: occurrenceId },
+    include: { recurringEvent: true },
+  })
+  if (!occ) throw new Error(`occurrence not found: ${occurrenceId}`)
+  const def = occ.recurringEvent
+
+  const rule = await resolveRule(tx, def.organizationId, def.id, NotificationStage.APPOINTMENT)
+  if (!rule) return []
+
+  const recipientIds = await resolveRecipients(tx, def)
+  if (recipientIds.length === 0) return []
+
+  const org = await tx.organization.findUnique({
+    where: { id: def.organizationId },
+    select: { notificationSendHour: true, notificationSendMinute: true },
+  })
+  const sendHour = org?.notificationSendHour ?? 8
+  const sendMinute = org?.notificationSendMinute ?? 30
+  const when = atLocalTime(addDaysUTC(scheduledAt, -rule.leadDays), sendHour, sendMinute, SEND_TZ)
+
+  const created = []
+  for (const recipientUserId of recipientIds) {
+    for (const channel of rule.channels) {
+      const dedupeKey = `${occ.id}:${NotificationStage.APPOINTMENT}:${channel}:${recipientUserId}:0`
+      const row = await tx.notificationDelivery.upsert({
+        where: { dedupeKey },
+        create: {
+          occurrenceId: occ.id,
+          recurringEventId: def.id,
+          stage: NotificationStage.APPOINTMENT,
+          channel,
+          recipientUserId,
+          scheduledFor: when,
+          status: 'SCHEDULED',
+          dedupeKey,
+        },
+        update: { scheduledFor: when, status: 'SCHEDULED', suppressedReason: null },
+      })
+      created.push(row)
     }
   }
   return created

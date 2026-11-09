@@ -1,5 +1,10 @@
-import { Prisma } from '@prisma/client'
-import { suppressBookingReminders, reactivateBookingReminders } from './scheduler'
+import { NotificationStage, Prisma } from '@prisma/client'
+import {
+  suppressBookingReminders,
+  reactivateBookingReminders,
+  planAppointmentReminder,
+  cancelDeliveries,
+} from './scheduler'
 
 export interface BookAppointmentInput {
   providerId?: string | null
@@ -35,6 +40,7 @@ export async function bookAppointment(
 
   await tx.eventOccurrence.update({ where: { id: occurrenceId }, data: { status: 'ARRANGED' } })
   await suppressBookingReminders(tx, occurrenceId) // BR-04
+  await planAppointmentReminder(tx, occurrenceId, input.scheduledAt) // remind before the visit
   return appt
 }
 
@@ -50,10 +56,12 @@ export async function rescheduleAppointment(
   if (appt.status !== 'BOOKED') {
     throw new Error(`cannot reschedule a ${appt.status} appointment`)
   }
-  return tx.appointment.update({
+  const updated = await tx.appointment.update({
     where: { id: appointmentId },
     data: { scheduledAt: newScheduledAt },
   })
+  await planAppointmentReminder(tx, appt.occurrenceId, newScheduledAt) // move the reminder
+  return updated
 }
 
 // Cancels the appointment. BR-05: this does NOT cancel the underlying obligation —
@@ -83,6 +91,8 @@ export async function cancelAppointment(tx: Prisma.TransactionClient, appointmen
         data: { status: 'ACTION_REQUIRED' },
       })
       await reactivateBookingReminders(tx, occ.id) // BR-05: obligation still open
+      // No appointment remains, so drop its pre-visit reminder.
+      await cancelDeliveries(tx, occ.id, [NotificationStage.APPOINTMENT], 'appointment cancelled')
     }
   }
   return updated
