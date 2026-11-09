@@ -1,6 +1,7 @@
 import { Prisma, NotificationStage, type PrismaClient, type Channel } from '@prisma/client'
 import { addDaysUTC } from './recurrence'
 import { resolveGarageOwner } from './garage'
+import { checkNotificationLimit } from '@/lib/notificationLimits'
 import type { Channels } from './channels'
 
 export const BOOKING_STAGES: NotificationStage[] = [
@@ -394,6 +395,39 @@ export async function dispatchDue(
       continue
     }
 
+    // Tier notification quota. One reminder bills once: SMS when the reminder uses SMS,
+    // otherwise EMAIL (PUSH / IN_APP never count). checkNotificationLimit enforces the
+    // tier limit (FREE soft-deletes the org, paid blocks with a yearly reset).
+    const organizationId = d.occurrence.recurringEvent.organizationId
+    const metered =
+      d.channel === 'SMS' ||
+      (d.channel === 'EMAIL' &&
+        (await db.notificationDelivery.count({
+          where: {
+            occurrenceId: d.occurrenceId,
+            stage: d.stage,
+            recipientUserId: d.recipientUserId,
+            channel: 'SMS',
+          },
+        })) === 0)
+
+    if (metered) {
+      const check = await checkNotificationLimit(
+        organizationId,
+        1,
+        d.recipient.email ?? undefined,
+        org.notificationLocale,
+      )
+      if (!check.allowed) {
+        await db.notificationDelivery.update({
+          where: { id },
+          data: { status: 'SUPPRESSED', suppressedReason: 'notification limit reached' },
+        })
+        suppressed++
+        continue
+      }
+    }
+
     try {
       await channels[d.channel](d)
       await db.notificationDelivery.update({ where: { id }, data: { sentAt: now } })
@@ -401,6 +435,12 @@ export async function dispatchDue(
         await db.user.update({
           where: { id: d.recipientUserId },
           data: { smsSentThisMonth: { increment: 1 } },
+        })
+      }
+      if (metered) {
+        await db.organization.update({
+          where: { id: organizationId },
+          data: { currentNotificationsCount: { increment: 1 } },
         })
       }
       sent++

@@ -4,6 +4,7 @@ import prisma from '@/db/db'
 import { sameOriginOk } from '@/lib/sameOrigin'
 import { resolveCarCareSession } from '@/lib/carcare/apiAuth'
 import { resolveGarageRole, ensureOwnerMembership, createInvitation } from '@/lib/carcare/garage'
+import { assertUserCapacity, TierLimitError, limitMessage } from '@/lib/carcare/limits'
 
 const ROLES: GarageRole[] = ['MEMBER', 'VIEWER']
 
@@ -56,28 +57,39 @@ export async function POST(request: NextRequest) {
   }
   const role: GarageRole = body.role && ROLES.includes(body.role) ? body.role : 'MEMBER'
 
-  const result = await prisma.$transaction(async (tx) => {
-    const { role: callerRole, isLegacyOwner } = await resolveGarageRole(
-      tx,
-      session.userId,
-      session.organizationId!,
-    )
-    if (callerRole !== 'OWNER' && callerRole !== 'ADMIN') return null
+  let result
+  try {
+    result = await prisma.$transaction(async (tx) => {
+      const { role: callerRole, isLegacyOwner } = await resolveGarageRole(
+        tx,
+        session.userId,
+        session.organizationId!,
+      )
+      if (callerRole !== 'OWNER' && callerRole !== 'ADMIN') return null
 
-    if (isLegacyOwner) await ensureOwnerMembership(tx, session.userId, session.organizationId!)
+      if (isLegacyOwner) await ensureOwnerMembership(tx, session.userId, session.organizationId!)
 
-    const invitation = await createInvitation(tx, {
-      organizationId: session.organizationId!,
-      email,
-      role,
-      invitedByUserId: session.userId,
+      await assertUserCapacity(tx, session.organizationId!)
+
+      const invitation = await createInvitation(tx, {
+        organizationId: session.organizationId!,
+        email,
+        role,
+        invitedByUserId: session.userId,
+      })
+      const inviter = await tx.user.findUnique({
+        where: { id: session.userId },
+        select: { firstName: true, lastName: true },
+      })
+      return { invitation, inviter }
     })
-    const inviter = await tx.user.findUnique({
-      where: { id: session.userId },
-      select: { firstName: true, lastName: true },
-    })
-    return { invitation, inviter }
-  })
+  } catch (e) {
+    if (e instanceof TierLimitError) {
+      const locale = localeFromReferer(request.headers.get('referer'))
+      return NextResponse.json({ error: limitMessage(e, locale), limit: e.limit }, { status: 409 })
+    }
+    throw e
+  }
 
   if (!result) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 

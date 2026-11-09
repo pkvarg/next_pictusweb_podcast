@@ -1,4 +1,5 @@
 import { Prisma, Powertrain } from '@prisma/client'
+import { assertVehicleCapacity } from './limits'
 
 export interface VehicleInput {
   registration: string
@@ -22,6 +23,7 @@ export async function createVehicle(
   userId: string,
   input: VehicleInput,
 ) {
+  await assertVehicleCapacity(tx, organizationId)
   const type = input.type ?? ([input.make, input.model].filter(Boolean).join(' ') || 'Vehicle')
   return tx.myVehicle.create({
     data: {
