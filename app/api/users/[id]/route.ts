@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { toE164 } from '@/lib/phone'
 import prisma from '@/db/db'
 import { hashPassword } from '../../../../lib/isValidPassword'
 import { sameOriginOk } from '@/lib/sameOrigin'
@@ -82,7 +83,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (email) updateData.email = email
     if (firstName !== undefined) updateData.firstName = firstName
     if (lastName !== undefined) updateData.lastName = lastName
-    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber
+    if (phoneNumber !== undefined) updateData.phoneNumber = toE164(phoneNumber)
 
     // Only admins may move a user to another organization
     if (organizationId !== undefined && access.isAdmin) {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { toE164 } from '@/lib/phone'
 import prisma from '@/db/db'
 import bcrypt from 'bcryptjs'
 import { rateLimit, rateLimitResponse, getClientIP } from '@/lib/rateLimit'
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
       password,
       phoneNumber: rawPhone,
     } = body
-    const phoneNumber = rawPhone ? rawPhone.replace(/\s+/g, '') : null
+    const phoneNumber = toE164(rawPhone)
     const locale = body.locale || 'sk'
 
     // Validate required fields

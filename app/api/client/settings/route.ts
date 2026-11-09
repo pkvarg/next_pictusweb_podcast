@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { toE164 } from '@/lib/phone'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/db/db'
@@ -85,7 +86,7 @@ export async function PATCH(request: NextRequest) {
     if (account.firstName !== undefined) accountData.firstName = str(account.firstName) || null
     if (account.lastName !== undefined) accountData.lastName = str(account.lastName) || null
     if (account.phoneNumber !== undefined)
-      accountData.phoneNumber = str(account.phoneNumber) || null
+      accountData.phoneNumber = toE164(str(account.phoneNumber))
     if (Object.keys(accountData).length > 0) {
       await prisma.user.update({ where: { id: user.id }, data: accountData })
     }

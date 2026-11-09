@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client'
 import { sendPush } from './push'
+import { toE164 } from '@/lib/phone'
 
 export type DeliveryContext = Prisma.NotificationDeliveryGetPayload<{
   include: {
@@ -66,7 +67,7 @@ export const honoChannels: Channels = {
   },
   SMS: async (d) => {
     if (!HONO) throw new Error('NEXT_PUBLIC_HONO_API_URL not set')
-    const to = d.recipient.phoneNumber
+    const to = toE164(d.recipient.phoneNumber)
     if (!to) throw new Error('recipient has no phone number')
     const res = await fetch(`${HONO}/api/pictusweb/client/send-reminder`, {
       method: 'POST',

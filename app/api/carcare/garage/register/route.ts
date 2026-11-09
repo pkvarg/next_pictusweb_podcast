@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { toE164 } from '@/lib/phone'
 import bcrypt from 'bcryptjs'
 import prisma from '@/db/db'
 import { sameOriginOk } from '@/lib/sameOrigin'
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10)
-  const phoneNumber = body.phoneNumber ? body.phoneNumber.replace(/\s+/g, '') : null
+  const phoneNumber = toE164(body.phoneNumber)
 
   await prisma.$transaction(async (tx) => {
     const fresh = await tx.garageInvitation.findUnique({ where: { token } })

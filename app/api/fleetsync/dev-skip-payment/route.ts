@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { toE164 } from '@/lib/phone'
 import prisma from '@/db/db'
 import bcrypt from 'bcryptjs'
 
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
       billing,
       numberOfVehicles,
     } = body
-    const phoneNumber = rawPhone ? rawPhone.replace(/\s+/g, '') : null
+    const phoneNumber = toE164(rawPhone)
 
     if (!organizationName || !firstName || !lastName || !email || !password || !tier) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })

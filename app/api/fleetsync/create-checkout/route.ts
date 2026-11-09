@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { toE164 } from '@/lib/phone'
 import prisma from '@/db/db'
 import bcrypt from 'bcryptjs'
 import { stripe, getStripePriceId } from '@/lib/stripe'
@@ -60,8 +61,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Tier not found' }, { status: 400 })
     }
 
-    // Normalize phone number — strip all whitespace
-    const normalizedPhone = phoneNumber ? phoneNumber.replace(/\s+/g, '') : null
+    const normalizedPhone = toE164(phoneNumber)
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)

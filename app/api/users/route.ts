@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { toE164 } from '@/lib/phone'
 import prisma from '@/db/db'
 import { hashPassword } from '../../../lib/isValidPassword'
 import { checkIPBan } from '@/lib/checkIPBan'
@@ -187,7 +188,7 @@ export async function POST(request: NextRequest) {
             email,
             firstName,
             lastName,
-            phoneNumber: phoneNumber || null,
+            phoneNumber: toE164(phoneNumber),
             organizationId: subOrg.id,
             active: false, // pending GDPR acceptance
             isFleetManager: isFleetManager || false,
@@ -268,7 +269,7 @@ export async function POST(request: NextRequest) {
         email,
         firstName,
         lastName,
-        phoneNumber: phoneNumber || null,
+        phoneNumber: toE164(phoneNumber),
         organizationId: organizationId || null,
         active: active !== undefined ? active : true,
         isFleetManager: isFleetManager || false,
