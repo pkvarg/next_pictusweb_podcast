@@ -1058,7 +1058,8 @@
     "vehAll": "All",
     "vehPageOf": "Page {page} of {pages}",
     "vehPrev": "Previous",
-    "vehNext": "Next"
+    "vehNext": "Next",
+    "changePasswordHint": "For better security, we recommend changing your password from time to time."
   },
   "Benefit": {
     "activateTitle": "Activate Your Benefit Account",
@@ -1403,7 +1404,8 @@
       "costs": "Costs",
       "garage": "Garage",
       "settings": "Settings",
-      "account": "Account"
+      "account": "Account",
+      "backToClient": "Client area"
     },
     "common": {
       "back": "Back",

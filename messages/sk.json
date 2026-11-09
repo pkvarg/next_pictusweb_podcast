@@ -1058,7 +1058,8 @@
     "vehAll": "Všetky",
     "vehPageOf": "Strana {page} z {pages}",
     "vehPrev": "Predchádzajúce",
-    "vehNext": "Ďalšie"
+    "vehNext": "Ďalšie",
+    "changePasswordHint": "Pre vyššiu bezpečnosť odporúčame heslo z času na čas zmeniť."
   },
   "Benefit": {
     "activateTitle": "Aktivujte svoj Benefit účet",
@@ -1403,7 +1404,8 @@
       "costs": "Náklady",
       "garage": "Garáž",
       "settings": "Nastavenia",
-      "account": "Účet"
+      "account": "Účet",
+      "backToClient": "Klientská zóna"
     },
     "common": {
       "back": "Späť",

@@ -18,6 +18,7 @@ import {
   X,
   Car,
   Receipt,
+  BookOpen,
 } from 'lucide-react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
@@ -469,6 +470,22 @@ const ClientZone = () => {
                 →
               </span>
             </Link>
+
+            <Link
+              href="/client/my-fleet/get-started"
+              className="group mt-4 flex items-center gap-4 rounded-3xl p-6 bg-pictus-onyx900 border border-white/[0.06] hover:border-pictus-lime/40 transition-colors"
+            >
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-pictus-lime/15">
+                <BookOpen className="h-6 w-6 text-pictus-lime" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xl font-semibold text-white">{tcc('getStarted.title')}</p>
+                <p className="text-sm text-white/60">{tcc('getStarted.subtitle')}</p>
+              </div>
+              <span className="text-2xl text-pictus-lime transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </Link>
           </section>
         )}
 
@@ -499,16 +516,15 @@ const ClientZone = () => {
         {/* User Info Section */}
         <section className="py-8">
           <div className="bg-pictus-onyx900 rounded-3xl p-6 sm:p-8 border border-white/[0.06]">
-            <div className="flex items-center gap-3 mb-6">
-              <User className="w-6 h-6 text-pictus-lime" />
+            <div className="mb-6">
               <h2 className="text-2xl sm:text-3xl font-bold text-pictus-white">
                 {t('accountInfo')}
               </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               {/* User Profile */}
-              <div className="">
-                <div className="flex items-center justify-between gap-2 mb-3">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-4">
                   <div className="flex items-center gap-2">
                     <User className="w-5 h-5 text-pictus-lime" />
                     <h3 className="text-xl font-bold text-pictus-white">{t('userProfile')}</h3>
@@ -528,31 +544,38 @@ const ClientZone = () => {
                 </div>
 
                 {!editingProfile ? (
-                  <div className="space-y-2">
-                    <div>
-                      <label className="text-pictus-white text-sm font-light">
-                        {t('nameLabel')}
-                      </label>
-                      <p className="text-pictus-white text-base">
-                        {profileLoaded
-                          ? `${profile.firstName} ${profile.lastName}`.trim() || session?.user?.name
-                          : session?.user?.name}
-                      </p>
-                    </div>
-                    {profileLoaded && profile.phoneNumber && (
-                      <div>
-                        <label className="text-pictus-white text-sm font-light">
-                          {t('phoneLabel')}
-                        </label>
-                        <p className="text-pictus-white text-base">{profile.phoneNumber}</p>
+                  <div className="space-y-3">
+                    <dl className="divide-y divide-white/[0.06]">
+                      <div className="flex items-start justify-between gap-4 py-2.5">
+                        <dt className="text-xs uppercase tracking-wide text-gray-500 pt-0.5">
+                          {t('nameLabel')}
+                        </dt>
+                        <dd className="text-pictus-white text-sm font-medium text-right">
+                          {profileLoaded
+                            ? `${profile.firstName} ${profile.lastName}`.trim() ||
+                              session?.user?.name
+                            : session?.user?.name}
+                        </dd>
                       </div>
-                    )}
-                    <div>
-                      <label className="text-pictus-white text-sm font-light">
-                        {t('emailLabel')}
-                      </label>
-                      <p className="text-pictus-white text-base">{session?.user?.email}</p>
-                    </div>
+                      {profileLoaded && profile.phoneNumber && (
+                        <div className="flex items-start justify-between gap-4 py-2.5">
+                          <dt className="text-xs uppercase tracking-wide text-gray-500 pt-0.5">
+                            {t('phoneLabel')}
+                          </dt>
+                          <dd className="text-pictus-white text-sm font-medium text-right">
+                            {profile.phoneNumber}
+                          </dd>
+                        </div>
+                      )}
+                      <div className="flex items-start justify-between gap-4 py-2.5">
+                        <dt className="text-xs uppercase tracking-wide text-gray-500 pt-0.5">
+                          {t('emailLabel')}
+                        </dt>
+                        <dd className="text-pictus-white text-sm font-medium text-right break-all">
+                          {session?.user?.email}
+                        </dd>
+                      </div>
+                    </dl>
                     {profileMsg && (
                       <div
                         className={`mt-2 px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 ${
@@ -745,19 +768,22 @@ const ClientZone = () => {
               </div>
 
               {/* Password Change */}
-              <div className="">
-                <div className="flex items-center gap-2 mb-3">
+              <div>
+                <div className="flex items-center gap-2 mb-4">
                   <Lock className="w-5 h-5 text-pictus-lime" />
                   <h3 className="text-xl font-bold text-pictus-white">{t('changePassword')}</h3>
                 </div>
 
                 {!showPasswordChange ? (
-                  <button
-                    onClick={() => setShowPasswordChange(true)}
-                    className="bg-pictus-lime text-pictus-black px-6 py-3 rounded-full font-semibold hover:bg-pictus-lime600 transition-all text-sm"
-                  >
-                    {t('changePasswordButton')}
-                  </button>
+                  <>
+                    <p className="text-sm text-gray-400 mb-4">{t('changePasswordHint')}</p>
+                    <button
+                      onClick={() => setShowPasswordChange(true)}
+                      className="bg-pictus-lime text-pictus-black px-6 py-3 rounded-full font-semibold hover:bg-pictus-lime600 transition-all text-sm"
+                    >
+                      {t('changePasswordButton')}
+                    </button>
+                  </>
                 ) : (
                   <form onSubmit={handlePasswordChange} className="space-y-4 mt-4">
                     {/* Old Password */}
@@ -887,7 +913,7 @@ const ClientZone = () => {
             {organization &&
               organization.tierRelation?.name !== 'FREE' &&
               organization.billingInterval && (
-                <div className="md:col-span-2 border-t border-white/[0.06] pt-6">
+                <div className="md:col-span-2 mt-8">
                   <div className="flex items-center gap-2 mb-4">
                     <Car className="w-5 h-5 text-pictus-lime" />
                     <h3 className="text-xl font-bold text-pictus-white">{t('subscriptionInfo')}</h3>
@@ -990,7 +1016,7 @@ const ClientZone = () => {
               )}
 
             {/* Contact Verification */}
-            <div className="md:col-span-2 border-t border-white/[0.06] pt-6">
+            <div className="md:col-span-2 mt-8">
               <VerifyContactInfo />
             </div>
           </div>

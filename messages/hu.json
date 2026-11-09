@@ -1058,7 +1058,8 @@
     "vehAll": "Összes",
     "vehPageOf": "{page}. oldal / {pages}",
     "vehPrev": "Előző",
-    "vehNext": "Következő"
+    "vehNext": "Következő",
+    "changePasswordHint": "A nagyobb biztonság érdekében javasoljuk, hogy időnként változtassa meg jelszavát."
   },
   "Benefit": {
     "activateTitle": "Aktiválja a Benefit fiókját",
@@ -1403,7 +1404,8 @@
       "costs": "Költségek",
       "garage": "Garázs",
       "settings": "Beállítások",
-      "account": "Fiók"
+      "account": "Fiók",
+      "backToClient": "Ügyfélzóna"
     },
     "common": {
       "back": "Vissza",

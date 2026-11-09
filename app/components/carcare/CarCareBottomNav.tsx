@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Home, Calendar, Wallet, Users, Car, Settings, UserCircle } from 'lucide-react'
+import { Home, Calendar, Wallet, Users, Car, Settings, UserCircle, ArrowLeft } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/routing'
 
 const TABS: { key: string; tkey: string; href: string; icon: React.ReactNode }[] = [
@@ -76,6 +76,13 @@ export default function CarCareBottomNav() {
             </Link>
           ))}
         </nav>
+        <Link
+          href="/client"
+          className="mt-auto inline-flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-pictus-white hover:bg-white/5"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          {tr('nav.backToClient')}
+        </Link>
       </aside>
 
       <nav className="md:hidden fixed bottom-0 inset-x-0 bg-pictus-onyx900/95 backdrop-blur border-t border-white/[0.06] z-40">
@@ -94,6 +101,15 @@ export default function CarCareBottomNav() {
           ))}
         </div>
       </nav>
+
+      <Link
+        href="/client"
+        aria-label={tr('nav.backToClient')}
+        className="md:hidden fixed left-3 bottom-20 z-50 inline-flex items-center gap-1.5 rounded-full bg-pictus-onyx900/95 border border-white/[0.06] px-3 py-2 text-xs text-gray-300 hover:text-pictus-white"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        {tr('nav.backToClient')}
+      </Link>
     </>
   )
 }
