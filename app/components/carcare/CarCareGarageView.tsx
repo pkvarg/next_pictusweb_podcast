@@ -18,7 +18,6 @@ import {
   ExternalLink,
   Plus,
 } from 'lucide-react'
-import CarCarePushToggle from './CarCarePushToggle'
 
 export interface GarageMember {
   userId: string
@@ -282,8 +281,6 @@ export default function CarCareGarageView({
             )}
           </div>
         </header>
-
-        <CarCarePushToggle />
 
         <section className="mb-8">
           <h2 className="text-xl font-bold mb-3">

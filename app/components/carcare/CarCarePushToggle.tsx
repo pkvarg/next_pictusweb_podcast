@@ -42,7 +42,7 @@ export default function CarCarePushToggle() {
     try {
       const perm = await Notification.requestPermission()
       if (perm !== 'granted') {
-        setMsg(t('garage.permissionDenied'))
+        setMsg(t('push.permissionDenied'))
         return
       }
       const reg = await navigator.serviceWorker.ready
@@ -58,12 +58,12 @@ export default function CarCarePushToggle() {
       })
       if (res.ok) {
         setEnabled(true)
-        setMsg(t('garage.pushOnMsg'))
+        setMsg(t('push.onMsg'))
       } else {
         setMsg(t('common.saveFailed'))
       }
     } catch {
-      setMsg(t('garage.enableFailed'))
+      setMsg(t('push.enableFailed'))
     } finally {
       setBusy(false)
     }
@@ -84,9 +84,9 @@ export default function CarCarePushToggle() {
         await sub.unsubscribe()
       }
       setEnabled(false)
-      setMsg(t('garage.pushOffMsg'))
+      setMsg(t('push.offMsg'))
     } catch {
-      setMsg(t('garage.disableFailed'))
+      setMsg(t('push.disableFailed'))
     } finally {
       setBusy(false)
     }
@@ -97,7 +97,7 @@ export default function CarCarePushToggle() {
     setMsg(null)
     try {
       const res = await fetch('/api/carcare/push/test', { method: 'POST' })
-      setMsg(res.ok ? t('garage.testSent') : t('garage.testFailed'))
+      setMsg(res.ok ? t('push.testSent') : t('push.testFailed'))
     } finally {
       setBusy(false)
     }
@@ -107,15 +107,15 @@ export default function CarCarePushToggle() {
 
   return (
     <section className="mb-8">
-      <h2 className="text-xl font-bold mb-3">{t('garage.pushSection')}</h2>
+      <h2 className="text-xl font-bold mb-3">{t('push.section')}</h2>
       <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
           <Bell className="w-5 h-5 text-pictus-lime" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-pictus-white font-medium">{t('garage.pushTitle')}</p>
+          <p className="text-pictus-white font-medium">{t('push.title')}</p>
           <p className="text-sm text-gray-400">
-            {enabled ? t('garage.pushOn') : t('garage.pushHint')}
+            {enabled ? t('push.on') : t('push.hint')}
           </p>
           {msg && <p className="text-sm text-pictus-lime mt-1">{msg}</p>}
         </div>
@@ -126,14 +126,14 @@ export default function CarCarePushToggle() {
               disabled={busy}
               className="shrink-0 text-sm text-gray-300 hover:text-pictus-white px-3 py-1.5 disabled:opacity-50"
             >
-              {t('garage.test')}
+              {t('push.test')}
             </button>
             <button
               onClick={disable}
               disabled={busy}
               className="shrink-0 inline-flex items-center gap-2 bg-white/5 text-pictus-white text-sm font-medium px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 disabled:opacity-50"
             >
-              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : t('garage.disable')}
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : t('push.disable')}
             </button>
           </>
         ) : (
@@ -142,7 +142,7 @@ export default function CarCarePushToggle() {
             disabled={busy}
             className="shrink-0 inline-flex items-center gap-2 bg-pictus-lime text-pictus-black text-sm font-semibold px-4 py-2 rounded-full hover:bg-pictus-lime600 disabled:opacity-50"
           >
-            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : t('garage.enable')}
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : t('push.enable')}
           </button>
         )}
       </div>

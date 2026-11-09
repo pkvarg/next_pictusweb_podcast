@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import type { Channel } from '@prisma/client'
+import CarCarePushToggle from './CarCarePushToggle'
 
 interface RuleData {
   stage: string
@@ -383,6 +384,8 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
             <Toggle on={repeatOn} disabled={!canModify} onClick={() => setRepeatOn((v) => !v)} />
           </div>
         </div>
+
+        <CarCarePushToggle />
 
         {msg && <p className="text-sm text-pictus-lime">{msg}</p>}
 
