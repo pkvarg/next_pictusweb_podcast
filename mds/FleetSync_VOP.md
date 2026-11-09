@@ -54,7 +54,7 @@ Zapísaná: Okresný súd Nitra, oddiel: Sro, vložka č. 57457/N
 
 - Počet vozidiel: 1–3
 - Počet používateľov: 1
-- Notifikácie: iba e-mail, limit 10 notifikácií
+- Notifikácie: iba e-mail, limit 15 notifikácií
 - Základné dashboardy
 - Po vyčerpaní limitu notifikácií sa účet deaktivuje
 
@@ -63,7 +63,7 @@ Zapísaná: Okresný súd Nitra, oddiel: Sro, vložka č. 57457/N
 - Cena: 2 €/vozidlo/mesiac (pri ročnej platbe zľava cca 17 %)
 - Počet vozidiel: 1–3
 - Počet používateľov: 2
-- Notifikácie: e-mail + SMS, limit 200 notifikácií/rok
+- Notifikácie: e-mail + SMS, limit 50 notifikácií na vozidlo ročne
 - Sledovanie nákladov a kilometrov
 - Základné dashboardy
 
@@ -72,10 +72,8 @@ Zapísaná: Okresný súd Nitra, oddiel: Sro, vložka č. 57457/N
 - Cena: 3 €/vozidlo/mesiac (pri ročnej platbe zľava)
 - Počet vozidiel: 4+ (podľa limitu tarifu)
 - Počet používateľov: až 50
-- Notifikácie: e-mail + SMS, limit 1 000 notifikácií/rok
-- Neobmedzené vlastné typy notifikácií
+- Notifikácie: e-mail + SMS, limit 100 notifikácií na vozidlo ročne
 - Pokročilé dashboardy a štatistiky
-- Vlastné šablóny notifikácií
 - Možnosť evidencie súkromných vozidiel zamestnancov
 
   3.3. Poskytovateľ si vyhradzuje právo upraviť rozsah funkcionalít, limity a ceny jednotlivých tarifov. O takejto zmene bude Používateľ informovaný v súlade s čl. 1.4.

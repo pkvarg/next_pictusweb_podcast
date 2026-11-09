@@ -2,8 +2,6 @@ import PictusPagesHeader from '@/app/components/home/pictus/PictusPagesHeader'
 import PictusFooter from '@/app/components/home/pictus/PictusFooter'
 import FleetSyncPricing from '@/app/components/FleetSyncPricing'
 import FleetAnalyticsShowcase from '@/app/components/FleetAnalyticsShowcase'
-import HeroVehicleCard from '@/app/components/HeroVehicleCard'
-import HeroTaskOverview from '@/app/components/HeroTaskOverview'
 import { Check } from 'lucide-react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
@@ -141,11 +139,6 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
                     {t('ctaButton2')} <span aria-hidden="true">→</span>
                   </Link>
                 </div>
-              </div>
-
-              <div className="fs-hero-visual">
-                <HeroVehicleCard />
-                <HeroTaskOverview />
               </div>
             </div>
           </div>
