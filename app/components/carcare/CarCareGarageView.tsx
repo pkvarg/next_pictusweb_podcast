@@ -300,7 +300,7 @@ export default function CarCareGarageView({
                       {initials(m)}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-pictus-white font-medium truncate">
+                      <p className="text-pictus-white font-medium break-words">
                         {memberLabel(m, t)}{' '}
                         {m.isYou && <span className="text-gray-400">{t('garage.you')}</span>}
                       </p>
@@ -510,17 +510,17 @@ export default function CarCareGarageView({
                 value={provBooking}
                 onChange={(e) => setProvBooking(e.target.value)}
               />
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <button
                   onClick={addProvider}
                   disabled={provBusy}
-                  className="inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-2 rounded-xl hover:bg-pictus-lime600 transition-colors disabled:opacity-50"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-2 rounded-xl hover:bg-pictus-lime600 transition-colors disabled:opacity-50"
                 >
                   {provBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : t('common.save')}
                 </button>
                 <button
                   onClick={() => setProvForm(false)}
-                  className="px-4 py-2 rounded-xl text-gray-400 hover:text-pictus-white"
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl text-center text-gray-400 hover:text-pictus-white"
                 >
                   {t('common.cancel')}
                 </button>

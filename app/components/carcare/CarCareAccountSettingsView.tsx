@@ -276,11 +276,11 @@ export default function CarCareAccountSettingsView() {
           </div>
         )}
 
-        <div className="flex justify-end">
+        <div className="flex justify-stretch sm:justify-end">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-6 py-3 rounded-xl hover:bg-pictus-lime600 disabled:opacity-50"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-6 py-3 rounded-xl hover:bg-pictus-lime600 disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
             {saving ? t('settingsSaving') : t('settingsSave')}

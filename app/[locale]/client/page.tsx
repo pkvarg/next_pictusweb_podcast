@@ -343,16 +343,6 @@ const ClientZone = () => {
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4">
-              {organization?.tierRelation?.name &&
-                organization.tierRelation.name !== 'BUSINESS' && (
-                  <Link
-                    href="/client/upgrade"
-                    className="flex items-center gap-1.5 px-4 py-1.5 text-sm bg-pictus-lime text-pictus-black rounded-full hover:bg-pictus-lime600 transition-all font-semibold shrink-0"
-                  >
-                    <ArrowUp size={14} />
-                    <span className="hidden sm:inline">{t('upgrade')}</span>
-                  </Link>
-                )}
               <div className="flex items-center gap-0.5 shrink-0">
                 {(['sk', 'en', 'hu'] as const).map((loc) => (
                   <button
@@ -368,9 +358,20 @@ const ClientZone = () => {
                   </button>
                 ))}
               </div>
+              {organization?.tierRelation?.name &&
+                organization.tierRelation.name !== 'BUSINESS' && (
+                  <Link
+                    href="/client/upgrade"
+                    className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 text-sm bg-pictus-lime text-pictus-black rounded-full hover:bg-pictus-lime600 transition-all font-semibold shrink-0"
+                    title={t('upgrade')}
+                  >
+                    <ArrowUp size={14} />
+                    <span className="hidden sm:inline">{t('upgrade')}</span>
+                  </Link>
+                )}
               <Link
                 href="/client/settings"
-                className="flex items-center text-pictus-white hover:text-pictus-lime transition-colors p-2 rounded-full hover:bg-white/10 shrink-0"
+                className="hidden sm:flex items-center text-pictus-white hover:text-pictus-lime transition-colors p-2 rounded-full hover:bg-white/10 shrink-0"
                 title={t('settings')}
               >
                 <Settings className="h-4 w-4" />
