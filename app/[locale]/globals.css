@@ -165,10 +165,14 @@ body {
   }
 }
 
-/* Make native date input calendar icon visible on dark backgrounds */
+/* With color-scheme: dark the native calendar icon already renders light on
+   dark; just make it a pointer and slightly dim until hover. */
 input[type='date']::-webkit-calendar-picker-indicator {
-  filter: invert(1);
   cursor: pointer;
+  opacity: 0.7;
+}
+input[type='date']::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
 }
 
 @keyframes float {
