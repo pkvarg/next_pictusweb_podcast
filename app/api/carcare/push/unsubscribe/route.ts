@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Channel } from '@prisma/client'
 import prisma from '@/db/db'
 import { sameOriginOk } from '@/lib/sameOrigin'
 import { resolveCarCareSession } from '@/lib/carcare/apiAuth'
@@ -15,5 +16,21 @@ export async function POST(request: NextRequest) {
   await prisma.pushSubscription.deleteMany({
     where: { endpoint: body.endpoint, userId: session.userId },
   })
+
+  // No devices left → drop the push opt-in so dispatch won't keep trying.
+  const remaining = await prisma.pushSubscription.count({ where: { userId: session.userId } })
+  if (remaining === 0) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId },
+      select: { channelOptIns: true },
+    })
+    if (user?.channelOptIns.includes(Channel.PUSH)) {
+      await prisma.user.update({
+        where: { id: session.userId },
+        data: { channelOptIns: { set: user.channelOptIns.filter((c) => c !== Channel.PUSH) } },
+      })
+    }
+  }
+
   return NextResponse.json({ ok: true })
 }
