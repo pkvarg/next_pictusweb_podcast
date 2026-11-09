@@ -253,7 +253,13 @@ export async function dispatchDue(
           include: {
             recurringEvent: {
               include: {
-                organization: { select: { notificationsBlocked: true, deletedAt: true } },
+                organization: {
+                  select: {
+                    notificationLocale: true,
+                    notificationsBlocked: true,
+                    deletedAt: true,
+                  },
+                },
               },
             },
           },

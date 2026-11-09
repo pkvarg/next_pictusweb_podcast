@@ -38,7 +38,14 @@ export interface DefaultsData {
   members: { userId: string; name: string }[]
   recipientIds: string[]
   sendTime: { hour: number; minute: number }
+  locale: string
 }
+
+const LOCALE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'sk', label: 'Slovenčina' },
+  { value: 'en', label: 'English' },
+  { value: 'hu', label: 'Magyar' },
+]
 
 const STAGE_UI: { stage: string; labelKey: string; hintKey: string; lead?: boolean }[] = [
   {
@@ -123,6 +130,7 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
   const [sendTime, setSendTime] = useState(
     `${data.sendTime.hour}:${data.sendTime.minute === 30 ? 30 : 0}`,
   )
+  const [locale, setLocale] = useState(data.locale || 'sk')
   const [repeatOn, setRepeatOn] = useState(data.rules.some((r) => r.repeatUntilActioned))
   const [repeatDays, setRepeatDays] = useState(
     (data.rules.find((r) => r.repeatEveryDays)?.repeatEveryDays ?? 3).toString(),
@@ -152,6 +160,7 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
           recipients: [...recipients],
           sendHour: Number(sendTime.split(':')[0]),
           sendMinute: Number(sendTime.split(':')[1]),
+          locale,
         }),
       })
       setMsg(res.ok ? t('defaults.saved') : t('defaults.saveFailed'))
@@ -328,6 +337,24 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
               disabled={!canModify}
             >
               {TIME_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <p className="text-sm text-pictus-white">{t('defaults.language')}</p>
+              <p className="text-xs text-gray-500">{t('defaults.languageHint')}</p>
+            </div>
+            <select
+              className="bg-pictus-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-pictus-white"
+              value={locale}
+              onChange={(e) => setLocale(e.target.value)}
+              disabled={!canModify}
+            >
+              {LOCALE_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>

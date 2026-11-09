@@ -428,6 +428,9 @@ model Organization {
   // CarCare: account-level time of day reminders are sent (minute is 0 or 30).
   notificationSendHour   Int @default(8) @map("notification_send_hour")
   notificationSendMinute Int @default(30) @map("notification_send_minute")
+
+  // CarCare: account-level language for notification content (sk | en | hu).
+  notificationLocale String @default("sk") @map("notification_locale")
   bonusBusinessDashboards     Boolean @default(false) @map("bonus_business_dashboards")
   manuallyPaid                Boolean @default(false) @map("manually_paid")
 

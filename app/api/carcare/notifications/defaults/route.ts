@@ -44,7 +44,11 @@ export async function GET() {
     }),
     prisma.organization.findUnique({
       where: { id: session.organizationId },
-      select: { notificationSendHour: true, notificationSendMinute: true },
+      select: {
+        notificationSendHour: true,
+        notificationSendMinute: true,
+        notificationLocale: true,
+      },
     }),
   ])
 
@@ -68,6 +72,7 @@ export async function GET() {
       hour: org?.notificationSendHour ?? 8,
       minute: org?.notificationSendMinute ?? 30,
     },
+    locale: org?.notificationLocale ?? 'sk',
   })
 }
 
@@ -86,6 +91,7 @@ export async function PUT(request: NextRequest) {
     recipients?: string[]
     sendHour?: number
     sendMinute?: number
+    locale?: string
   }
   const rules = (body.rules ?? []).filter((r) => STAGES.has(r.stage))
 
@@ -137,13 +143,20 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    const orgData: {
+      notificationSendHour?: number
+      notificationSendMinute?: number
+      notificationLocale?: string
+    } = {}
     if (body.sendHour !== undefined || body.sendMinute !== undefined) {
-      const hour = Math.min(23, Math.max(0, Math.round(body.sendHour ?? 8)))
-      const minute = body.sendMinute === 30 ? 30 : 0 // whole or half hours only
-      await tx.organization.update({
-        where: { id: session.organizationId! },
-        data: { notificationSendHour: hour, notificationSendMinute: minute },
-      })
+      orgData.notificationSendHour = Math.min(23, Math.max(0, Math.round(body.sendHour ?? 8)))
+      orgData.notificationSendMinute = body.sendMinute === 30 ? 30 : 0 // whole or half hours only
+    }
+    if (body.locale !== undefined) {
+      orgData.notificationLocale = ['sk', 'en', 'hu'].includes(body.locale) ? body.locale : 'sk'
+    }
+    if (Object.keys(orgData).length > 0) {
+      await tx.organization.update({ where: { id: session.organizationId! }, data: orgData })
     }
   })
 

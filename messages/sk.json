@@ -1786,7 +1786,9 @@
       "saveFailed": "Nastavenia sa nepodarilo uložiť.",
       "loadFailed": "Nastavenia sa nepodarilo načítať.",
       "sendTime": "Čas odoslania",
-      "sendTimeHint": "Kedy sa počas dňa odosielajú pripomienky."
+      "sendTimeHint": "Kedy sa počas dňa odosielajú pripomienky.",
+      "language": "Jazyk notifikácií",
+      "languageHint": "V akom jazyku sa posielajú e-maily, SMS a push."
     },
     "recipients": {
       "title": "Príjemcovia",

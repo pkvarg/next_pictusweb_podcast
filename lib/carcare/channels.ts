@@ -2,13 +2,35 @@ import type { Prisma } from '@prisma/client'
 import { sendPush } from './push'
 
 export type DeliveryContext = Prisma.NotificationDeliveryGetPayload<{
-  include: { recipient: true; occurrence: { include: { recurringEvent: true } } }
+  include: {
+    recipient: true
+    occurrence: {
+      include: {
+        recurringEvent: {
+          include: {
+            organization: {
+              select: { notificationLocale: true; notificationsBlocked: true; deletedAt: true }
+            }
+          }
+        }
+      }
+    }
+  }
 }>
 
 export type SendFn = (d: DeliveryContext) => Promise<void>
 export type Channels = Record<'EMAIL' | 'SMS' | 'PUSH' | 'IN_APP', SendFn>
 
 const HONO = process.env.NEXT_PUBLIC_HONO_API_URL
+
+const orgLocale = (d: DeliveryContext) =>
+  d.occurrence.recurringEvent.organization.notificationLocale
+
+const PUSH_BODY: Record<string, string> = {
+  sk: 'Pripomienka FleetSync',
+  en: 'FleetSync reminder',
+  hu: 'FleetSync emlékeztető',
+}
 
 // Real senders. Email and SMS go through the hono_bun service (the prepared delivery
 // infrastructure) at POST /api/pictusweb/client/send-reminder. IN_APP needs no transport
@@ -29,6 +51,7 @@ export const honoChannels: Channels = {
         to,
         stage: d.stage,
         event: d.occurrence.recurringEvent.name,
+        locale: orgLocale(d),
       }),
     })
     if (!res.ok) throw new Error(`email send failed: ${res.status}`)
@@ -45,6 +68,7 @@ export const honoChannels: Channels = {
         to,
         stage: d.stage,
         event: d.occurrence.recurringEvent.name,
+        locale: orgLocale(d),
       }),
     })
     if (!res.ok) throw new Error(`sms send failed: ${res.status}`)
@@ -52,7 +76,7 @@ export const honoChannels: Channels = {
   PUSH: async (d) => {
     await sendPush(d.recipient.id, {
       title: d.occurrence.recurringEvent.name,
-      body: 'Pripomienka FleetSync',
+      body: PUSH_BODY[orgLocale(d)] ?? PUSH_BODY.sk,
       url: '/client/my-fleet',
       tag: `occ-${d.occurrence.id}`,
     })

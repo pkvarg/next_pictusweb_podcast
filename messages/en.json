@@ -1786,7 +1786,9 @@
       "saveFailed": "Could not save settings.",
       "loadFailed": "Could not load settings.",
       "sendTime": "Send time",
-      "sendTimeHint": "When during the day reminders are sent."
+      "sendTimeHint": "When during the day reminders are sent.",
+      "language": "Notification language",
+      "languageHint": "The language emails, SMS and push are sent in."
     },
     "recipients": {
       "title": "Recipients",

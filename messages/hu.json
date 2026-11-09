@@ -1786,7 +1786,9 @@
       "saveFailed": "A beállításokat nem sikerült menteni.",
       "loadFailed": "A beállításokat nem sikerült betölteni.",
       "sendTime": "Küldés ideje",
-      "sendTimeHint": "A nap folyamán mikor menjenek ki az emlékeztetők."
+      "sendTimeHint": "A nap folyamán mikor menjenek ki az emlékeztetők.",
+      "language": "Értesítések nyelve",
+      "languageHint": "Milyen nyelven menjenek az e-mailek, SMS-ek és push üzenetek."
     },
     "recipients": {
       "title": "Címzettek",
