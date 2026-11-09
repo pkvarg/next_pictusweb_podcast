@@ -3834,19 +3834,7 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
   background: var(--graphite-0);
 }
 .pl .pl-sky-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.6;
-}
-.pl .pl-sky::after {
-  /* subtle vignette so stars fade toward edges */
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(14, 15, 16, 0.5) 100%);
+  display: none;
 }
 
 /* Content sits above the starfield */

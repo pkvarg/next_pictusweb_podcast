@@ -21,6 +21,7 @@ const PictusFooter = ({ homeBase = '' }: { homeBase?: string }) => {
     { href: `${homeBase}#services`, label: t('footer.service2') },
     { href: `${homeBase}#services`, label: t('footer.service3') },
     { href: `${homeBase}/fleetsync`, label: t('footer.service4') },
+    { href: `${homeBase}/picdocs`, label: t('footer.service5') },
   ]
 
   return (
