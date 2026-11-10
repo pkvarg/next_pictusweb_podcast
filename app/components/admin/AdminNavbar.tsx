@@ -73,6 +73,9 @@ const AdminNavbar = () => {
                 <li>
                   <Link href={`/admin/users`}>Users</Link>
                 </li>
+                <li>
+                  <Link href={`/admin/carcare-notifications`}>Notifications</Link>
+                </li>
 
                 {/* <li>
                   <Link href={`/admin/video`}>Video</Link>

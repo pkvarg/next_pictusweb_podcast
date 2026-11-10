@@ -22,6 +22,7 @@ import {
   FileText,
   Newspaper,
   Mail,
+  Bell,
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -71,6 +72,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       name: 'Users',
       href: '/admin/users',
       icon: User,
+    },
+    {
+      name: 'FleetSync Notifications',
+      href: '/admin/carcare-notifications',
+      icon: Bell,
     },
     {
       name: 'Tiers & Pricing',

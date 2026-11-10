@@ -12,6 +12,7 @@ import {
   Building,
   User,
   FileText,
+  Bell,
 } from 'lucide-react'
 import Counter from './Counter'
 import RefreshButton from './RefreshButton'
@@ -49,6 +50,14 @@ const AdminDashboard = () => {
       icon: FileText,
       color: 'from-cyan-500 to-cyan-600',
       bgColor: 'bg-cyan-500/10 hover:bg-cyan-500/20',
+    },
+    {
+      title: 'FleetSync Notifications',
+      description: 'View CarCare notification deliveries',
+      href: '/admin/carcare-notifications',
+      icon: Bell,
+      color: 'from-orange-500 to-orange-600',
+      bgColor: 'bg-orange-500/10 hover:bg-orange-500/20',
     },
     {
       title: 'Upload Files',
