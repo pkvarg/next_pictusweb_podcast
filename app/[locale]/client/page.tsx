@@ -21,7 +21,6 @@ import {
   BookOpen,
 } from 'lucide-react'
 import { useEffect, useRef, useState, useCallback } from 'react'
-import VehicleNotificationsDashboard from '@/app/components/client/VehicleNotificationsDashboard'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
 import ExpiredBanner from '@/app/components/client/ExpiredBanner'
 import UpgradeBanner from '@/app/components/client/UpgradeBanner'
@@ -496,9 +495,6 @@ const ClientZone = () => {
             <div className="text-center mb-8">
               <h2 className="text-6xl font-light text-white mb-4">Demo PV Dashboard</h2>
             </div>
-            <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
-              <VehicleNotificationsDashboard translations={{ aggressiveBadge: t('aggressiveBadge'), aggressiveBadgeDay: t('aggressiveBadgeDay', { day: '{day}' }), pdrBadge: t('pdrBadge') }} company="DEMO-PV" />
-            </div>
           </section>
         )}
 
@@ -507,9 +503,6 @@ const ClientZone = () => {
           <section id="firma1" className="mb-16">
             <div className="text-center mb-8">
               <h2 className="text-6xl font-light text-white mb-4">Firma1 Dashboard</h2>
-            </div>
-            <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-3xl p-8 backdrop-blur-sm border border-purple-500/30">
-              <VehicleNotificationsDashboard translations={{ aggressiveBadge: t('aggressiveBadge'), aggressiveBadgeDay: t('aggressiveBadgeDay', { day: '{day}' }), pdrBadge: t('pdrBadge') }} company="FIRMA1" />
             </div>
           </section>
         )} */}

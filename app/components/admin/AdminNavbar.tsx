@@ -74,7 +74,7 @@ const AdminNavbar = () => {
                   <Link href={`/admin/users`}>Users</Link>
                 </li>
                 <li>
-                  <Link href={`/admin/vehicle-notifications`}>Vehicle Notifications</Link>
+                  <Link href={`/admin/carcare-notifications`}>Notifications</Link>
                 </li>
 
                 {/* <li>

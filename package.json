@@ -16,9 +16,9 @@
     ]
   },
   "scripts": {
-    "dev": "next dev -p 4099",
+    "dev": "next dev -p 4010",
     "build": "prisma generate && next build",
-    "start": "next start -p 4099",
+    "start": "next start -p 4010",
     "lint": "next lint",
     "test": "vitest run",
     "prepush": "vitest run && next lint",

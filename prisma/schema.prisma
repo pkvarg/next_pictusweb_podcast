@@ -114,7 +114,6 @@ model User {
   vehicles               MyVehicle[]
   vehicleExpenses        MyVehicleExpense[]
   vehicleMileage         MyVehicleMileage[]
-  vehicleNotifications   VehicleNotification[]
   picDocsRuns            PicDocsRun[]
   responsibleEvents      RecurringEvent[]
   notificationDeliveries NotificationDelivery[]
@@ -124,54 +123,6 @@ model User {
   pushSubscriptions      PushSubscription[]
 
   @@map("users")
-}
-
-model VehicleNotification {
-  id                   Int           @id @default(autoincrement())
-  dutyBatchId          String?       @map("duty_batch_id") @db.VarChar(50)
-  isPdr                Boolean       @default(false) @map("is_pdr")
-  pdrReminderFor       String?       @map("pdr_reminder_for") @db.VarChar(50) // For PDR reminder: which batch it reminds about
-  renewedFromBatchId   String?       @map("renewed_from_batch_id") @db.VarChar(50) // Tracks renewal lineage
-  isAggressiveMode     Boolean       @default(false) @map("is_aggressive_mode")
-  aggressiveStart      DateTime?     @map("aggressive_start")
-  aggressiveEnd        DateTime?     @map("aggressive_end")
-  aggressiveDaysSent   Int           @default(0) @map("aggressive_days_sent")
-  organizationId       String?       @map("organization_id") // TEXT to match organizations.id
-  organization         Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  personName           String?       @db.VarChar(100)
-  email                String?       @db.VarChar(150)
-  phoneNumber          String?       @db.VarChar(150)
-  vehicleRegistration  String?       @db.VarChar(20)
-  notificationType     String?       @db.VarChar(50)
-  notificationChannel  String?       @db.VarChar(50)
-  notificationDate     DateTime?
-  dutyDate             DateTime?
-  emailMessage         String?
-  status               String        @default("pending") @db.VarChar(20)
-  emailSentAt          DateTime?
-  smsSentAt            DateTime?
-  createdAt            DateTime      @default(now())
-  confirmationToken    String?       @unique @map("confirmation_token") @db.VarChar(64)
-  tokenExpiresAt       DateTime?     @map("token_expires_at")
-  confirmationAttempts Int           @default(0)
-  confirmedAt          DateTime?
-  lastReminderSent     DateTime?
-  finalStatusUpdated   DateTime?
-  deletedAt            DateTime?     @map("deleted_at")
-  userId               String?       @map("user_id")
-  user                 User?         @relation(fields: [userId], references: [id])
-  myVehicleId          String?       @map("my_vehicle_id")
-  myVehicle            MyVehicle?    @relation(fields: [myVehicleId], references: [id])
-
-  @@index([userId])
-  @@index([myVehicleId])
-  @@index([dutyBatchId])
-  @@index([isPdr])
-  @@index([pdrReminderFor])
-  @@index([renewedFromBatchId])
-  @@index([isAggressiveMode])
-  @@index([organizationId])
-  @@map("vehicle_notifications")
 }
 
 model BotLog {
@@ -240,28 +191,27 @@ model ConfirmationLog {
 }
 
 model MyVehicle {
-  id                   String                @id @default(uuid())
-  organizationId       String                @map("organization_id")
-  organizationRelation Organization          @relation(fields: [organizationId], references: [id])
-  type                 String                @db.VarChar(100)
-  registration         String                @db.VarChar(20)
-  nickname             String?               @db.VarChar(100)
-  make                 String?               @db.VarChar(60)
-  model                String?               @db.VarChar(60)
+  id                   String             @id @default(uuid())
+  organizationId       String             @map("organization_id")
+  organizationRelation Organization       @relation(fields: [organizationId], references: [id])
+  type                 String             @db.VarChar(100)
+  registration         String             @db.VarChar(20)
+  nickname             String?            @db.VarChar(100)
+  make                 String?            @db.VarChar(60)
+  model                String?            @db.VarChar(60)
   powertrain           Powertrain?
-  country              String?               @db.VarChar(2)
-  vin                  String?               @db.VarChar(20)
+  country              String?            @db.VarChar(2)
+  vin                  String?            @db.VarChar(20)
   year                 Int?
   image                String?
-  note                 String?               @db.Text
-  createdAt            DateTime              @default(now()) @map("created_at")
-  updatedAt            DateTime              @updatedAt @map("updated_at")
-  deletedAt            DateTime?             @map("deleted_at")
-  userId               String                @map("user_id")
-  user                 User                  @relation(fields: [userId], references: [id])
+  note                 String?            @db.Text
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+  deletedAt            DateTime?          @map("deleted_at")
+  userId               String             @map("user_id")
+  user                 User               @relation(fields: [userId], references: [id])
   expenses             MyVehicleExpense[]
   mileageRecords       MyVehicleMileage[]
-  vehicleNotifications VehicleNotification[]
   recurringEvents      RecurringEvent[]
   eventOccurrences     EventOccurrence[]
   vehicleAccess        VehicleAccess[]
@@ -326,22 +276,22 @@ enum Product {
 }
 
 model Tier {
-  id                     String    @id @default(uuid())
-  name                   String    @unique @db.VarChar(50)
-  usersLimit             Int       @map("users_limit")
-  vehiclesLimit          Int       @map("vehicles_limit")
-  notificationsLimit     Int       @map("notifications_limit")
+  id                      String    @id @default(uuid())
+  name                    String    @unique @db.VarChar(50)
+  usersLimit              Int       @map("users_limit")
+  vehiclesLimit           Int       @map("vehicles_limit")
+  notificationsLimit      Int       @map("notifications_limit")
   // Yearly notification allowance granted per vehicle (0 = use the flat notificationsLimit,
   // e.g. the FREE trial). BASIC/BUSINESS use this × the org's vehicle count.
-  notificationsPerVehicle Int      @default(0) @map("notifications_per_vehicle")
-  pricePerVehicle        Decimal?  @map("price_per_vehicle") @db.Decimal(10, 2)
-  pricePerVehicleYearly  Decimal?  @map("price_per_vehicle_yearly") @db.Decimal(10, 2)
-  yearlyDiscount         Decimal?  @map("yearly_discount") @db.Decimal(4, 2)
-  stripePriceMonthly     String?   @map("stripe_price_monthly") @db.VarChar(100)
-  stripePriceYearly      String?   @map("stripe_price_yearly") @db.VarChar(100)
-  createdAt              DateTime  @default(now()) @map("created_at")
-  updatedAt              DateTime  @updatedAt @map("updated_at")
-  deletedAt              DateTime? @map("deleted_at")
+  notificationsPerVehicle Int       @default(0) @map("notifications_per_vehicle")
+  pricePerVehicle         Decimal?  @map("price_per_vehicle") @db.Decimal(10, 2)
+  pricePerVehicleYearly   Decimal?  @map("price_per_vehicle_yearly") @db.Decimal(10, 2)
+  yearlyDiscount          Decimal?  @map("yearly_discount") @db.Decimal(4, 2)
+  stripePriceMonthly      String?   @map("stripe_price_monthly") @db.VarChar(100)
+  stripePriceYearly       String?   @map("stripe_price_yearly") @db.VarChar(100)
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  deletedAt               DateTime? @map("deleted_at")
 
   // Note: This relation field is required by Prisma ORM for querying.
   // It does NOT create a database column - only Organization has tier_id FK.
@@ -364,23 +314,23 @@ model Organization {
   tierRelation Tier?   @relation(fields: [tierId], references: [id])
 
   // Live tracking columns (count of rows with deletedAt = NULL)
-  currentUsersCount             Int @default(0) @map("current_users_count")
-  currentVehiclesCount          Int @default(0) @map("current_vehicles_count")
-  currentNotificationsCount     Int @default(0) @map("current_notifications_count")
+  currentUsersCount         Int @default(0) @map("current_users_count")
+  currentVehiclesCount      Int @default(0) @map("current_vehicles_count")
+  currentNotificationsCount Int @default(0) @map("current_notifications_count")
   // Org's total yearly notification allowance (tier rate × vehicles, or the flat trial),
   // refreshed by the limit check. currentNotificationsCount is the spend against it.
-  notificationsAllowance        Int @default(0) @map("notifications_allowance")
+  notificationsAllowance    Int @default(0) @map("notifications_allowance")
 
   // Notification usage tracking
   notificationPeriodStart DateTime? @map("notification_period_start")
   notificationsBlocked    Boolean   @default(false) @map("notifications_blocked")
 
   // Org-level limit overrides (fallback to tier if null)
-  usersLimit             Int?    @map("users_limit")
-  vehiclesLimit          Int?    @map("vehicles_limit")
-  notificationsLimit     Int?    @map("notifications_limit")
-  purchasedVehicles      Int?    @map("purchased_vehicles")
-  hiddenFromPictusaci    Boolean @default(false) @map("hidden_from_pictusaci")
+  usersLimit          Int?    @map("users_limit")
+  vehiclesLimit       Int?    @map("vehicles_limit")
+  notificationsLimit  Int?    @map("notifications_limit")
+  purchasedVehicles   Int?    @map("purchased_vehicles")
+  hiddenFromPictusaci Boolean @default(false) @map("hidden_from_pictusaci")
 
   // Stripe billing
   stripeCustomerId         String?   @unique @map("stripe_customer_id") @db.VarChar(100)
@@ -430,18 +380,15 @@ model Organization {
   notificationSendMinute Int @default(30) @map("notification_send_minute")
 
   // CarCare: account-level language for notification content (sk | en | hu).
-  notificationLocale String @default("sk") @map("notification_locale")
-  bonusBusinessDashboards     Boolean @default(false) @map("bonus_business_dashboards")
-  manuallyPaid                Boolean @default(false) @map("manually_paid")
+  notificationLocale      String  @default("sk") @map("notification_locale")
+  bonusBusinessDashboards Boolean @default(false) @map("bonus_business_dashboards")
+  manuallyPaid            Boolean @default(false) @map("manually_paid")
 
   // Relations
-  users                      User[]
-  vehicles                   MyVehicle[]
-  expenses                   MyVehicleExpense[]
-  mileageRecords             MyVehicleMileage[]
-  notificationChannelOptions NotificationChannelOption[]
-  vehicleNotifications       VehicleNotification[]
-  dutyRenewalPresets         DutyRenewalPreset[]
+  users          User[]
+  vehicles       MyVehicle[]
+  expenses       MyVehicleExpense[]
+  mileageRecords MyVehicleMileage[]
 
   // PicDocs (only populated when product = PICDOCS)
   picDocsOrg  PicDocsOrg?
@@ -458,39 +405,6 @@ model Organization {
   @@index([tierId])
   @@index([parentOrganizationId])
   @@map("organizations")
-}
-
-model NotificationChannelOption {
-  id                   String       @id @default(uuid())
-  organizationId       String       @map("organization_id")
-  organizationRelation Organization @relation(fields: [organizationId], references: [id])
-  label                String       @db.VarChar(50)
-  isActive             Boolean      @default(true)
-  sortOrder            Int          @default(0)
-  createdAt            DateTime     @default(now()) @map("created_at")
-
-  @@index([organizationId])
-  @@map("notification_channel_options")
-}
-
-model DutyRenewalPreset {
-  id                    String       @id @default(uuid())
-  notificationTypeId    String?      @map("notification_type_id")
-  notificationTypeLabel String?      @map("notification_type_label") @db.VarChar(50)
-  organizationId        String       @map("organization_id")
-  organizationRelation  Organization @relation(fields: [organizationId], references: [id])
-
-  // Preset options - stored as comma-separated or JSON
-  presetMonths       String @map("preset_months") @db.VarChar(100) // e.g., "6,12,24"
-  presetLabels       String @map("preset_labels") @db.VarChar(255) // e.g., "+6 mesiacov,+1 rok,+2 roky"
-  defaultPresetIndex Int    @default(0) @map("default_preset_index")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([organizationId])
-  @@index([notificationTypeId])
-  @@map("duty_renewal_presets")
 }
 
 model VerificationCode {
@@ -710,11 +624,11 @@ model RecurringEvent {
   updatedAt           DateTime       @updatedAt @map("updated_at")
   deletedAt           DateTime?      @map("deleted_at")
 
-  organization      Organization           @relation(fields: [organizationId], references: [id])
-  vehicle           MyVehicle              @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  template          EventTemplate?         @relation(fields: [templateId], references: [id])
-  responsibleUser   User?                  @relation(fields: [responsibleUserId], references: [id])
-  preferredProvider Provider?              @relation(fields: [preferredProviderId], references: [id], onDelete: SetNull)
+  organization        Organization              @relation(fields: [organizationId], references: [id])
+  vehicle             MyVehicle                 @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  template            EventTemplate?            @relation(fields: [templateId], references: [id])
+  responsibleUser     User?                     @relation(fields: [responsibleUserId], references: [id])
+  preferredProvider   Provider?                 @relation(fields: [preferredProviderId], references: [id], onDelete: SetNull)
   occurrences         EventOccurrence[]
   rules               NotificationRule[]
   deliveries          NotificationDelivery[]
