@@ -385,12 +385,10 @@ model Organization {
   manuallyPaid            Boolean @default(false) @map("manually_paid")
 
   // Relations
-  users                      User[]
-  vehicles                   MyVehicle[]
-  expenses                   MyVehicleExpense[]
-  mileageRecords             MyVehicleMileage[]
-  notificationChannelOptions NotificationChannelOption[]
-  dutyRenewalPresets         DutyRenewalPreset[]
+  users          User[]
+  vehicles       MyVehicle[]
+  expenses       MyVehicleExpense[]
+  mileageRecords MyVehicleMileage[]
 
   // PicDocs (only populated when product = PICDOCS)
   picDocsOrg  PicDocsOrg?
@@ -407,39 +405,6 @@ model Organization {
   @@index([tierId])
   @@index([parentOrganizationId])
   @@map("organizations")
-}
-
-model NotificationChannelOption {
-  id                   String       @id @default(uuid())
-  organizationId       String       @map("organization_id")
-  organizationRelation Organization @relation(fields: [organizationId], references: [id])
-  label                String       @db.VarChar(50)
-  isActive             Boolean      @default(true)
-  sortOrder            Int          @default(0)
-  createdAt            DateTime     @default(now()) @map("created_at")
-
-  @@index([organizationId])
-  @@map("notification_channel_options")
-}
-
-model DutyRenewalPreset {
-  id                    String       @id @default(uuid())
-  notificationTypeId    String?      @map("notification_type_id")
-  notificationTypeLabel String?      @map("notification_type_label") @db.VarChar(50)
-  organizationId        String       @map("organization_id")
-  organizationRelation  Organization @relation(fields: [organizationId], references: [id])
-
-  // Preset options - stored as comma-separated or JSON
-  presetMonths       String @map("preset_months") @db.VarChar(100) // e.g., "6,12,24"
-  presetLabels       String @map("preset_labels") @db.VarChar(255) // e.g., "+6 mesiacov,+1 rok,+2 roky"
-  defaultPresetIndex Int    @default(0) @map("default_preset_index")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([organizationId])
-  @@index([notificationTypeId])
-  @@map("duty_renewal_presets")
 }
 
 model VerificationCode {
