@@ -11,9 +11,7 @@ import {
   Mic,
   Building,
   User,
-  Car,
   FileText,
-  RotateCcw,
 } from 'lucide-react'
 import Counter from './Counter'
 import RefreshButton from './RefreshButton'
@@ -51,22 +49,6 @@ const AdminDashboard = () => {
       icon: FileText,
       color: 'from-cyan-500 to-cyan-600',
       bgColor: 'bg-cyan-500/10 hover:bg-cyan-500/20',
-    },
-    {
-      title: 'Vehicle Notifications',
-      description: 'Manage fleet notifications',
-      href: '/admin/vehicle-notifications',
-      icon: Car,
-      color: 'from-orange-500 to-orange-600',
-      bgColor: 'bg-orange-500/10 hover:bg-orange-500/20',
-    },
-    {
-      title: 'Dismissed Renewals',
-      description: 'Restore dismissed renewal suggestions',
-      href: '/admin/dismissed-renewals',
-      icon: RotateCcw,
-      color: 'from-amber-500 to-orange-600',
-      bgColor: 'bg-amber-500/10 hover:bg-amber-500/20',
     },
     {
       title: 'Upload Files',

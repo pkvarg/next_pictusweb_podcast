@@ -14,7 +14,6 @@ import {
   Headphones,
   LogOut,
   User,
-  Car,
   Building,
   ChevronDown,
   Truck,
@@ -23,7 +22,6 @@ import {
   FileText,
   Newspaper,
   Mail,
-  RotateCcw,
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -73,16 +71,6 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       name: 'Users',
       href: '/admin/users',
       icon: User,
-    },
-    {
-      name: 'Vehicle Notifications',
-      href: '/admin/vehicle-notifications',
-      icon: Car,
-    },
-    {
-      name: 'Dismissed Renewals',
-      href: '/admin/dismissed-renewals',
-      icon: RotateCcw,
     },
     {
       name: 'Tiers & Pricing',
