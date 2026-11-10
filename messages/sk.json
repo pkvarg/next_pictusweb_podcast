@@ -1502,7 +1502,11 @@
       "model": "Model",
       "nickname": "Názov",
       "plateRequired": "ŠPZ je povinná.",
-      "saveFailed": "Zmeny sa nepodarilo uložiť."
+      "saveFailed": "Zmeny sa nepodarilo uložiť.",
+      "delete": "Vymazať vozidlo",
+      "deleteConfirm": "Naozaj chcete vymazať toto vozidlo? Jeho pripomienky sa zrušia. Túto akciu nie je možné vrátiť.",
+      "deleteConfirmBtn": "Vymazať",
+      "deleteFailed": "Vozidlo sa nepodarilo vymazať."
     },
     "onboarding": {
       "title": "Pridať vozidlo",

@@ -13,10 +13,11 @@ import {
   Camera,
   Loader2,
   Pencil,
+  Trash2,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
-import { Link } from '@/i18n/routing'
+import { Link, useRouter } from '@/i18n/routing'
 import { templateKey, powertrainKey, categoryKey } from '@/lib/carcare/labels'
 import { uploadVehicleImage } from '@/lib/carcare/vehicleImage'
 import AddExpenseModal, { type VehicleOption } from './AddExpenseModal'
@@ -234,6 +235,24 @@ export default function CarCareVehicleDetailView({
       setDetailsError(t('vehicle.saveFailed'))
     } finally {
       setSavingDetails(false)
+    }
+  }
+
+  const router = useRouter()
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const deleteVehicle = async () => {
+    setDeleting(true)
+    setDetailsError(null)
+    try {
+      const res = await fetch(`/api/carcare/vehicles/${vehicle.id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('delete failed')
+      router.push('/client/my-fleet')
+    } catch {
+      setDetailsError(t('vehicle.deleteFailed'))
+      setDeleting(false)
+      setConfirmDelete(false)
     }
   }
 
@@ -711,6 +730,43 @@ export default function CarCareVehicleDetailView({
                       )}
                     </button>
                   </div>
+                  {canModify && (
+                    <div className="border-t border-white/[0.06] pt-4 mt-2">
+                      {confirmDelete ? (
+                        <div className="space-y-2">
+                          <p className="text-sm text-gray-300">{t('vehicle.deleteConfirm')}</p>
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={() => setConfirmDelete(false)}
+                              className="px-4 py-2.5 rounded-xl border border-white/10 text-pictus-white hover:bg-white/5"
+                            >
+                              {t('common.cancel')}
+                            </button>
+                            <button
+                              onClick={deleteVehicle}
+                              disabled={deleting}
+                              className="inline-flex items-center justify-center gap-2 bg-red-500/90 text-white font-semibold px-5 py-2.5 rounded-xl hover:bg-red-500 disabled:opacity-50"
+                            >
+                              {deleting ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                              ) : (
+                                <>
+                                  <Trash2 className="w-4 h-4" /> {t('vehicle.deleteConfirmBtn')}
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmDelete(true)}
+                          className="inline-flex items-center gap-2 text-sm text-red-400 hover:text-red-300"
+                        >
+                          <Trash2 className="w-4 h-4" /> {t('vehicle.delete')}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : (
                 specs.map((s) => <SpecRow key={s.label} label={s.label} value={s.value} />)

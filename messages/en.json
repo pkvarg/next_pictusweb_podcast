@@ -1502,7 +1502,11 @@
       "model": "Model",
       "nickname": "Name",
       "plateRequired": "License plate is required.",
-      "saveFailed": "Could not save changes."
+      "saveFailed": "Could not save changes.",
+      "delete": "Delete vehicle",
+      "deleteConfirm": "Delete this vehicle? Its reminders will be cancelled. This cannot be undone.",
+      "deleteConfirmBtn": "Delete",
+      "deleteFailed": "Could not delete the vehicle."
     },
     "onboarding": {
       "title": "Add vehicle",

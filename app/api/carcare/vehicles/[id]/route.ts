@@ -279,3 +279,49 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (result === 'forbidden') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   return NextResponse.json({ ok: true })
 }
+
+// DELETE /api/carcare/vehicles/[id] — soft-delete the vehicle and stop its reminders:
+// soft-delete its recurring events (so the scheduler ignores them) and cancel any
+// still-scheduled deliveries. The vehicle-count trigger recomputes on the update.
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!sameOriginOk(request)) return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  const { id } = await params
+  const session = await resolveCarCareSession()
+  if (!session?.organizationId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const result = await prisma.$transaction(async (tx) => {
+    const vehicle = await tx.myVehicle.findFirst({
+      where: { id, deletedAt: null },
+      select: { id: true },
+    })
+    if (!vehicle) return 'not-found'
+    if (!(await canModifyVehicle(tx, session.userId, id))) return 'forbidden'
+
+    const now = new Date()
+    const events = await tx.recurringEvent.findMany({
+      where: { vehicleId: id },
+      select: { id: true },
+    })
+    const eventIds = events.map((e) => e.id)
+
+    if (eventIds.length > 0) {
+      await tx.notificationDelivery.updateMany({
+        where: { recurringEventId: { in: eventIds }, status: 'SCHEDULED' },
+        data: { status: 'CANCELLED', suppressedReason: 'vehicle deleted' },
+      })
+      await tx.recurringEvent.updateMany({
+        where: { id: { in: eventIds }, deletedAt: null },
+        data: { deletedAt: now },
+      })
+    }
+    await tx.myVehicle.update({ where: { id }, data: { deletedAt: now } })
+    return 'ok'
+  })
+
+  if (result === 'not-found') return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (result === 'forbidden') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  return NextResponse.json({ ok: true })
+}

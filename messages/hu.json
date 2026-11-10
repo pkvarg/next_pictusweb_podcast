@@ -1502,7 +1502,11 @@
       "model": "Modell",
       "nickname": "Név",
       "plateRequired": "A rendszám kötelező.",
-      "saveFailed": "A módosításokat nem sikerült menteni."
+      "saveFailed": "A módosításokat nem sikerült menteni.",
+      "delete": "Jármű törlése",
+      "deleteConfirm": "Biztosan törli ezt a járművet? Az emlékeztetői törlődnek. A művelet nem vonható vissza.",
+      "deleteConfirmBtn": "Törlés",
+      "deleteFailed": "A járművet nem sikerült törölni."
     },
     "onboarding": {
       "title": "Jármű hozzáadása",
