@@ -740,6 +740,7 @@ enum DeliveryStatus {
   FAILED
   SUPPRESSED
   CANCELLED
+  SENDING
 }
 
 model NotificationRule {

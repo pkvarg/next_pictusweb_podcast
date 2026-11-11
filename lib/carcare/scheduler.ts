@@ -307,7 +307,7 @@ export async function listInAppNotifications(
   recipientUserId: string,
 ) {
   return tx.notificationDelivery.findMany({
-    where: { recipientUserId, channel: 'IN_APP', status: { in: ['SCHEDULED', 'SENT'] } },
+    where: { recipientUserId, channel: 'IN_APP', status: { in: ['SCHEDULED', 'SENDING', 'SENT'] } },
     orderBy: { scheduledFor: 'asc' },
   })
 }
@@ -321,6 +321,9 @@ export function isChannelAllowed(optIns: Channel[], channel: Channel): boolean {
 }
 
 const MAX_ATTEMPTS = 5
+// A delivery stuck in 'SENDING' longer than this was claimed by a run that died before the
+// channel confirmed; the next dispatch re-queues it. Must exceed a normal dispatch batch.
+const STALE_SENDING_MS = 15 * 60 * 1000
 
 // Dispatches due deliveries. Claims with FOR UPDATE SKIP LOCKED so overlapping ticks
 // never send the same row twice (T11). Enforces channel opt-ins and the SMS monthly cap,
@@ -331,6 +334,16 @@ export async function dispatchDue(
   now: Date = new Date(),
   batch = 100,
 ) {
+  // Crash recovery: a delivery left 'SENDING' beyond the stale window belongs to a run that
+  // claimed it but died before the channel confirmed — re-queue it so this run retries it.
+  await db.$executeRaw(Prisma.sql`
+    UPDATE notification_deliveries
+    SET status = 'SCHEDULED', updated_at = now()
+    WHERE status = 'SENDING' AND updated_at < ${new Date(now.getTime() - STALE_SENDING_MS)}
+  `)
+
+  // Claim due rows into the transient 'SENDING' state (NOT 'SENT') so a crash between the
+  // claim and the actual send never silently marks a reminder as delivered.
   const claimed = await db.$queryRaw<Array<{ id: string }>>(Prisma.sql`
     WITH due AS (
       SELECT id FROM notification_deliveries
@@ -340,7 +353,7 @@ export async function dispatchDue(
       FOR UPDATE SKIP LOCKED
     )
     UPDATE notification_deliveries d
-    SET status = 'SENT', attempts = attempts + 1, updated_at = now()
+    SET status = 'SENDING', attempts = attempts + 1, updated_at = now()
     FROM due WHERE d.id = due.id
     RETURNING d.id
   `)
@@ -453,7 +466,10 @@ export async function dispatchDue(
 
     try {
       await channels[d.channel](d)
-      await db.notificationDelivery.update({ where: { id }, data: { sentAt: now } })
+      await db.notificationDelivery.update({
+        where: { id },
+        data: { status: 'SENT', sentAt: now },
+      })
       if (d.channel === 'SMS') {
         await db.user.update({
           where: { id: d.recipientUserId },
