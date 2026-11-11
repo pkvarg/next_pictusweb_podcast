@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/routing'
 import {
   Users,
   UserPlus,
@@ -13,9 +14,11 @@ import {
   Mail,
   Car,
   ChevronDown,
+  ChevronRight,
   Wrench,
   Phone,
   ExternalLink,
+  MapPin,
   Plus,
 } from 'lucide-react'
 
@@ -42,6 +45,7 @@ export interface GarageProvider {
   phone: string | null
   email: string | null
   bookingUrl: string | null
+  address: string | null
 }
 
 export interface GarageInvitationItem {
@@ -106,6 +110,7 @@ export default function CarCareGarageView({
   const [provPhone, setProvPhone] = useState('')
   const [provEmail, setProvEmail] = useState('')
   const [provBooking, setProvBooking] = useState('')
+  const [provAddress, setProvAddress] = useState('')
   const [provBusy, setProvBusy] = useState(false)
 
   const loadProviders = () => {
@@ -149,6 +154,7 @@ export default function CarCareGarageView({
           phone: provPhone.trim() || null,
           email: provEmail.trim() || null,
           bookingUrl: provBooking.trim() || null,
+          address: provAddress.trim() || null,
         }),
       })
       if (res.ok) {
@@ -156,6 +162,7 @@ export default function CarCareGarageView({
         setProvPhone('')
         setProvEmail('')
         setProvBooking('')
+        setProvAddress('')
         setProvForm(false)
         loadProviders()
       }
@@ -281,6 +288,32 @@ export default function CarCareGarageView({
             )}
           </div>
         </header>
+
+        {data.vehicles.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-3">
+              {t('garage.vehicles')} ({data.vehicles.length})
+            </h2>
+            <div className="space-y-3">
+              {data.vehicles.map((v) => (
+                <Link
+                  key={v.id}
+                  href={`/client/my-fleet/vehicles/${v.id}`}
+                  className="flex items-center gap-3 p-4 bg-pictus-onyx900 rounded-2xl border border-white/[0.06] hover:border-white/20 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 text-gray-400">
+                    <Car className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-pictus-white font-medium truncate">{v.name}</p>
+                    <p className="text-sm text-gray-400 truncate">{v.registration}</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="mb-8">
           <h2 className="text-xl font-bold mb-3">
@@ -513,6 +546,12 @@ export default function CarCareGarageView({
                 value={provBooking}
                 onChange={(e) => setProvBooking(e.target.value)}
               />
+              <input
+                className="w-full bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none"
+                placeholder={t('garage.provAddress')}
+                value={provAddress}
+                onChange={(e) => setProvAddress(e.target.value)}
+              />
               <div className="flex flex-col sm:flex-row gap-2">
                 <button
                   onClick={addProvider}
@@ -552,7 +591,24 @@ export default function CarCareGarageView({
                         {[p.phone, p.email].filter(Boolean).join(' · ')}
                       </p>
                     )}
+                    {p.address && (
+                      <p className="text-sm text-gray-500 truncate flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 shrink-0" />
+                        {p.address}
+                      </p>
+                    )}
                   </div>
+                  {p.address && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-pictus-lime"
+                      aria-label={t('garage.provMap')}
+                    >
+                      <MapPin className="w-4 h-4" />
+                    </a>
+                  )}
                   {p.phone && (
                     <a
                       href={`tel:${p.phone}`}

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import CarCareServiceWorker from '@/app/components/carcare/CarCareServiceWorker'
 import CarCareBottomNav from '@/app/components/carcare/CarCareBottomNav'
 import CarCareLangSwitcher from '@/app/components/carcare/CarCareLangSwitcher'
+import CarCareThemeToggle from '@/app/components/carcare/CarCareThemeToggle'
 
 export const metadata: Metadata = {
   manifest: '/carcare.webmanifest',
@@ -16,10 +17,21 @@ export default function CarCareLayout({ children }: { children: React.ReactNode 
   return (
     <>
       <CarCareBottomNav />
-      <div className="hidden md:block fixed right-3 z-50 md:top-3">
-        <CarCareLangSwitcher />
+      <div className="fixed right-3 top-3 z-50 flex items-center gap-2">
+        <CarCareThemeToggle />
+        <div className="hidden md:block">
+          <CarCareLangSwitcher />
+        </div>
       </div>
-      <div className="md:pl-56">{children}</div>
+      <div id="fs-scope" className="fs-scope fs-light md:pl-56">
+        {children}
+      </div>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(localStorage.getItem('fs-theme')==='dark'){document.getElementById('fs-scope')&&document.getElementById('fs-scope').classList.remove('fs-light')}}catch(e){}",
+        }}
+      />
       <CarCareServiceWorker />
     </>
   )

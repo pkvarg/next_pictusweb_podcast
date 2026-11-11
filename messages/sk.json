@@ -1473,6 +1473,7 @@
       "costThisYear": "Náklady tento rok",
       "tabOverview": "Prehľad",
       "tabEvents": "Udalosti",
+      "addEvent": "Vlastná udalosť",
       "tabHistory": "História",
       "eventsEmpty": "Žiadne otvorené udalosti.",
       "suggested": "Odporúčané sledovať",
@@ -1642,6 +1643,9 @@
       "provPhone": "Telefón",
       "provEmail": "E-mail",
       "provBooking": "Odkaz na objednanie (voliteľné)",
+      "provAddress": "Adresa (voliteľné)",
+      "provMap": "Zobraziť na mape",
+      "vehicles": "Vozidlá",
       "access": "Prístup k vozidlám — bez výberu vidí všetky; zaškrtnutím obmedzíte na vybrané",
       "notifications": "Notifikácie",
       "removeMember": "Odobrať člena",
@@ -1839,6 +1843,9 @@
       "saveFailed": "Náklad sa nepodarilo uložiť.",
       "itemRequired": "Zadajte položku a sumu."
     },
+    "theme": {
+      "toggle": "Prepnúť svetlý/tmavý režim"
+    },
     "addEvent": {
       "shortLeadWarning": "Termín je už o {days} dní — skôr ako prvá pripomienka ({lead} dní vopred). Niektoré pripomienky sa nemusia stihnúť poslať v obvyklom predstihu; pošlú sa pri najbližšej kontrole.",
       "saveAnyway": "Uložiť aj tak",
@@ -1857,6 +1864,8 @@
       "title": "Notifikácie",
       "subtitle": "Predvolené pripomienky pre všetky vozidlá",
       "intro": "Tieto nastavenia platia pre všetky udalosti. Pri konkrétnej udalosti ich môžete upraviť.",
+      "rulesTitle": "Predvolené pripomienky",
+      "rulesSub": "Nastavte, kedy a ako máme pripomínať povinnosti. Platí pre všetky udalosti.",
       "ownerOnly": "Predvolené notifikácie môže meniť iba vlastník garáže.",
       "save": "Uložiť nastavenia",
       "saved": "Nastavenia uložené.",

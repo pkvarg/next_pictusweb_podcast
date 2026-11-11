@@ -21,6 +21,7 @@ import { Link, useRouter } from '@/i18n/routing'
 import { templateKey, powertrainKey, categoryKey } from '@/lib/carcare/labels'
 import { uploadVehicleImage } from '@/lib/carcare/vehicleImage'
 import AddExpenseModal, { type VehicleOption } from './AddExpenseModal'
+import AddEventModal from './AddEventModal'
 
 type Tr = (key: string, values?: Record<string, string | number>) => string
 
@@ -154,6 +155,7 @@ export default function CarCareVehicleDetailView({
   const [busyKey, setBusyKey] = useState<string | null>(null)
   const [activated, setActivated] = useState<Set<string>>(new Set())
   const [showExpense, setShowExpense] = useState(false)
+  const [showAddEvent, setShowAddEvent] = useState(false)
   const [image, setImage] = useState<string | null>(vehicle.image)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imageError, setImageError] = useState<string | null>(null)
@@ -409,7 +411,17 @@ export default function CarCareVehicleDetailView({
 
         {tab === 'udalosti' && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-3">{t('vehicle.tabEvents')}</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xl font-bold">{t('vehicle.tabEvents')}</h2>
+              {canModify && (
+                <button
+                  onClick={() => setShowAddEvent(true)}
+                  className="shrink-0 inline-flex items-center gap-1.5 text-sm font-medium bg-pictus-lime text-pictus-black px-4 py-2 rounded-full hover:bg-pictus-lime600 transition-colors"
+                >
+                  <Plus className="w-4 h-4" /> {t('vehicle.addEvent')}
+                </button>
+              )}
+            </div>
             {data.occurrences.length === 0 ? (
               <div className="p-8 text-center bg-pictus-onyx900 rounded-2xl border border-white/[0.06] text-gray-400">
                 {t('vehicle.eventsEmpty')}
@@ -789,6 +801,17 @@ export default function CarCareVehicleDetailView({
           }
           defaultVehicleId={data.vehicle.id}
           onClose={() => setShowExpense(false)}
+          onSaved={() => reload?.()}
+        />
+      )}
+
+      {showAddEvent && (
+        <AddEventModal
+          vehicles={
+            [{ id: data.vehicle.id, label: vehicleName(data.vehicle) }] satisfies VehicleOption[]
+          }
+          defaultVehicleId={data.vehicle.id}
+          onClose={() => setShowAddEvent(false)}
           onSaved={() => reload?.()}
         />
       )}

@@ -26,14 +26,7 @@ interface RuleData {
   repeatEveryDays: number | null
 }
 
-const TIME_OPTIONS: { value: string; label: string }[] = Array.from({ length: 48 }, (_, i) => {
-  const h = Math.floor(i / 2)
-  const m = i % 2 === 0 ? 0 : 30
-  return {
-    value: `${h}:${m}`,
-    label: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
-  }
-})
+const pad2 = (n: number) => String(n).padStart(2, '0')
 
 export interface DefaultsData {
   canModify: boolean
@@ -131,7 +124,7 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
     return set
   })
   const [sendTime, setSendTime] = useState(
-    `${data.sendTime.hour}:${data.sendTime.minute === 30 ? 30 : 0}`,
+    `${pad2(data.sendTime.hour)}:${pad2(data.sendTime.minute === 30 ? 30 : 0)}`,
   )
   const [locale, setLocale] = useState(data.locale || 'sk')
   const [repeatOn, setRepeatOn] = useState(data.rules.some((r) => r.repeatUntilActioned))
@@ -161,8 +154,8 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
         body: JSON.stringify({
           rules,
           recipients: [...recipients],
-          sendHour: Number(sendTime.split(':')[0]),
-          sendMinute: Number(sendTime.split(':')[1]),
+          sendHour: Number(sendTime.split(':')[0]) || 0,
+          sendMinute: Number(sendTime.split(':')[1]) >= 30 ? 30 : 0,
           locale,
         }),
       })
@@ -204,8 +197,8 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
         )}
 
         <div className={card}>
-          <h2 className="font-medium mb-1">{t('ev.notifTitle')}</h2>
-          <p className="text-sm text-gray-400 mb-4">{t('ev.notifSub')}</p>
+          <h2 className="font-medium mb-1">{t('defaults.rulesTitle')}</h2>
+          <p className="text-sm text-gray-400 mb-4">{t('defaults.rulesSub')}</p>
           <div className="space-y-3">
             {STAGE_UI.map((s) => (
               <div
@@ -339,18 +332,14 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
               <p className="text-sm text-pictus-white">{t('defaults.sendTime')}</p>
               <p className="text-xs text-gray-500">{t('defaults.sendTimeHint')}</p>
             </div>
-            <select
-              className="bg-pictus-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-pictus-white"
+            <input
+              type="time"
+              step={1800}
+              className="bg-pictus-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-pictus-white [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:hover:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:invert"
               value={sendTime}
               onChange={(e) => setSendTime(e.target.value)}
               disabled={!canModify}
-            >
-              {TIME_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div className="flex items-center gap-3">
             <div className="flex-1">

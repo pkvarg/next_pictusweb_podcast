@@ -1473,6 +1473,7 @@
       "costThisYear": "Costs this year",
       "tabOverview": "Overview",
       "tabEvents": "Events",
+      "addEvent": "Custom event",
       "tabHistory": "History",
       "eventsEmpty": "No open events.",
       "suggested": "Suggested to track",
@@ -1642,6 +1643,9 @@
       "provPhone": "Phone",
       "provEmail": "Email",
       "provBooking": "Booking link (optional)",
+      "provAddress": "Address (optional)",
+      "provMap": "Show on map",
+      "vehicles": "Vehicles",
       "access": "Vehicle access — no selection = all; tick to restrict",
       "notifications": "Notifications",
       "removeMember": "Remove member",
@@ -1839,6 +1843,9 @@
       "saveFailed": "Couldn't save the cost.",
       "itemRequired": "Enter an item and amount."
     },
+    "theme": {
+      "toggle": "Toggle light/dark mode"
+    },
     "addEvent": {
       "shortLeadWarning": "The due date is only {days} days away — sooner than the first reminder ({lead} days ahead). Some reminders may not go out with their usual head start; they will be sent at the next check.",
       "saveAnyway": "Save anyway",
@@ -1857,6 +1864,8 @@
       "title": "Notifications",
       "subtitle": "Default reminders for all vehicles",
       "intro": "These settings apply to every event. You can override them on an individual event.",
+      "rulesTitle": "Default reminders",
+      "rulesSub": "Set when and how we remind you about obligations. Applies to all events.",
       "ownerOnly": "Only the garage owner can change the default notifications.",
       "save": "Save settings",
       "saved": "Settings saved.",

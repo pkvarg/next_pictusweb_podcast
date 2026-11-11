@@ -174,7 +174,7 @@ function MonthCalendar({ occurrences, t }: { occurrences: EvOccurrence[]; t: Tr 
                 key={key}
                 role="button"
                 onClick={() => setSelectedDay((prev) => (prev === key ? null : key))}
-                className={`aspect-square rounded-lg flex flex-col items-center justify-center text-sm cursor-pointer hover:bg-white/5 ${inMonth ? 'text-pictus-white' : 'text-gray-600'} ${isToday ? 'bg-white/10' : ''} ${isSelected ? 'ring-2 ring-pictus-lime' : ''}`}
+                className={`h-11 sm:h-12 rounded-lg flex flex-col items-center justify-center text-sm cursor-pointer hover:bg-white/5 ${inMonth ? 'text-pictus-white' : 'text-gray-600'} ${isToday ? 'bg-white/10' : ''} ${isSelected ? 'ring-2 ring-pictus-lime' : ''}`}
               >
                 <span>{day.getDate()}</span>
                 <div className="flex gap-0.5 mt-0.5 h-1.5">

@@ -1473,6 +1473,7 @@
       "costThisYear": "Idei költségek",
       "tabOverview": "Áttekintés",
       "tabEvents": "Események",
+      "addEvent": "Egyéni esemény",
       "tabHistory": "Előzmények",
       "eventsEmpty": "Nincs nyitott esemény.",
       "suggested": "Ajánlott követni",
@@ -1642,6 +1643,9 @@
       "provPhone": "Telefon",
       "provEmail": "E-mail",
       "provBooking": "Foglalási link (opcionális)",
+      "provAddress": "Cím (opcionális)",
+      "provMap": "Megjelenítés a térképen",
+      "vehicles": "Járművek",
       "access": "Jármű-hozzáférés — kijelölés nélkül mind; pipálja a korlátozáshoz",
       "notifications": "Értesítések",
       "removeMember": "Tag eltávolítása",
@@ -1839,6 +1843,9 @@
       "saveFailed": "A költséget nem sikerült menteni.",
       "itemRequired": "Adjon meg tételt és összeget."
     },
+    "theme": {
+      "toggle": "Világos/sötét mód váltása"
+    },
     "addEvent": {
       "shortLeadWarning": "A határidő már csak {days} nap múlva van — hamarabb, mint az első emlékeztető ({lead} nappal előtte). Egyes emlékeztetők nem a szokásos előnnyel mennek ki; a következő ellenőrzéskor kerülnek elküldésre.",
       "saveAnyway": "Mentés mégis",
@@ -1857,6 +1864,8 @@
       "title": "Értesítések",
       "subtitle": "Alapértelmezett emlékeztetők minden járműhöz",
       "intro": "Ezek a beállítások minden eseményre érvényesek. Egyedi eseménynél felülírhatók.",
+      "rulesTitle": "Alapértelmezett emlékeztetők",
+      "rulesSub": "Állítsa be, mikor és hogyan emlékeztessünk a teendőkre. Minden eseményre érvényes.",
       "ownerOnly": "Az alapértelmezett értesítéseket csak a garázs tulajdonosa módosíthatja.",
       "save": "Beállítások mentése",
       "saved": "Beállítások elmentve.",
