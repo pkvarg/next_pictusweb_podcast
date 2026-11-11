@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import InfoTip from './InfoTip'
 import {
   Loader2,
   Info,
@@ -214,9 +215,7 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
                 <div className="min-w-0 flex-1">
                   <p className="text-pictus-white text-sm font-medium inline-flex items-center gap-1.5">
                     {t(s.labelKey)}
-                    <span title={t(s.hintKey)} className="text-gray-600">
-                      <Info className="w-3.5 h-3.5" />
-                    </span>
+                    <InfoTip text={t(s.hintKey)} />
                   </p>
                   <p className="text-xs text-gray-500">{t(s.hintKey)}</p>
                 </div>

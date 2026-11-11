@@ -1424,7 +1424,8 @@
       "arranged": "Ütemezve",
       "actionReq": "Teendő szükséges",
       "upcoming": "Közelgő",
-      "inDays": "{d} nap múlva"
+      "inDays": "{d} nap múlva",
+      "noDate": "Nincs dátum"
     },
     "action": {
       "BOOK": "Foglalás",
@@ -1510,7 +1511,7 @@
     },
     "onboarding": {
       "title": "Jármű hozzáadása",
-      "subtitle": "Keressen modellt vagy adja meg kézzel",
+      "subtitle": "Adja meg a jármű adatait",
       "searchLabel": "Márka és modell",
       "searchPlaceholder": "pl. Škoda Octavia",
       "change": "Módosítás",
@@ -1700,6 +1701,10 @@
       "fieldIntervalMonths": "Időköz (hónap)",
       "fieldPreferredProvider": "Preferált szolgáltató",
       "fieldExpectedCostEur": "Várható költség (€)",
+      "fieldTyreSize": "Gumiabroncs méret",
+      "tyreSizePlaceholder": "pl. 205/55 R16",
+      "fieldNotes": "Megjegyzés",
+      "notesPlaceholder": "pl. venni kell még 2 nyári gumit",
       "notifTitle": "Értesítések ehhez az eseményhez",
       "notifSub": "Állítsa be, mikor és hogyan emlékeztessük erre a kötelezettségre.",
       "daysBefore": "nappal előtte",

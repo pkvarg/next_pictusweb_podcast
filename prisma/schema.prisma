@@ -619,6 +619,7 @@ model RecurringEvent {
   preferredProviderId String?        @map("preferred_provider_id")
   expectedCost        Decimal?       @map("expected_cost") @db.Decimal(10, 2)
   currency            String         @default("EUR") @db.VarChar(3)
+  tyreSize            String?        @map("tyre_size") @db.VarChar(40)
   paused              Boolean        @default(false)
   createdAt           DateTime       @default(now()) @map("created_at")
   updatedAt           DateTime       @updatedAt @map("updated_at")

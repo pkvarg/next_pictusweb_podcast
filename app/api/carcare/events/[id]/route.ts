@@ -107,6 +107,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       seasonalDay: event.seasonalDay,
       expectedCost: num(event.expectedCost),
       currency: event.currency,
+      tyreSize: event.tyreSize,
       paused: event.paused,
       responsibleUserId: event.responsibleUserId,
       preferredProviderId: event.preferredProviderId,
@@ -122,6 +123,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
           dueDate: open.dueDate,
           dueMileage: open.dueMileage,
           actualCost: num(open.actualCost),
+          notes: open.notes,
           overdue: !!open.dueDate && open.dueDate.getTime() < now && open.status !== 'ARRANGED',
           appointment: open.appointments[0]
             ? {
@@ -197,6 +199,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if ('seasonalMonth' in body) data.seasonalMonth = body.seasonalMonth ?? null
     if ('seasonalDay' in body) data.seasonalDay = body.seasonalDay ?? null
     if ('expectedCost' in body) data.expectedCost = body.expectedCost ?? null
+    if ('tyreSize' in body)
+      data.tyreSize =
+        typeof body.tyreSize === 'string' && body.tyreSize.trim()
+          ? body.tyreSize.trim().slice(0, 40)
+          : null
     if ('paused' in body) data.paused = !!body.paused
     if ('preferredProviderId' in body) data.preferredProviderId = body.preferredProviderId || null
     if ('responsibleUserId' in body) {
@@ -213,7 +220,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
     if (Object.keys(data).length > 0) await tx.recurringEvent.update({ where: { id }, data })
 
-    if ('dueDate' in body) {
+    if ('dueDate' in body || 'notes' in body) {
       const open = await tx.eventOccurrence.findFirst({
         where: {
           recurringEventId: id,
@@ -223,10 +230,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         select: { id: true },
       })
       if (open) {
-        await tx.eventOccurrence.update({
-          where: { id: open.id },
-          data: { dueDate: body.dueDate ? new Date(body.dueDate as string) : null },
-        })
+        const occData: Record<string, unknown> = {}
+        if ('dueDate' in body)
+          occData.dueDate = body.dueDate ? new Date(body.dueDate as string) : null
+        if ('notes' in body)
+          occData.notes =
+            typeof body.notes === 'string' && body.notes.trim() ? body.notes.trim() : null
+        await tx.eventOccurrence.update({ where: { id: open.id }, data: occData })
       }
     }
     return 'ok'

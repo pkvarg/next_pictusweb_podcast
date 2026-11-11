@@ -392,14 +392,17 @@ export default function CarCareGarageView({
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                <select
-                  className="bg-pictus-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-pictus-white focus:border-pictus-lime/50 focus:outline-none"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as 'MEMBER' | 'VIEWER')}
-                >
-                  <option value="MEMBER">{t('role.MEMBER')}</option>
-                  <option value="VIEWER">{t('role.VIEWER')}</option>
-                </select>
+                <div className="relative w-full sm:w-auto">
+                  <select
+                    className="appearance-none w-full sm:w-auto bg-pictus-black/40 border border-white/10 rounded-xl pl-4 pr-9 py-2.5 text-pictus-white focus:border-pictus-lime/50 focus:outline-none"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value as 'MEMBER' | 'VIEWER')}
+                  >
+                    <option value="MEMBER">{t('role.MEMBER')}</option>
+                    <option value="VIEWER">{t('role.VIEWER')}</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                </div>
                 <button
                   onClick={invite}
                   disabled={inviting}

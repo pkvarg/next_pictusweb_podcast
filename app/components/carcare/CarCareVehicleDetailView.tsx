@@ -262,7 +262,13 @@ export default function CarCareVehicleDetailView({
       const res = await fetch('/api/carcare/events/activate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vehicleId: vehicle.id, templateKey: key }),
+        body: JSON.stringify({
+          vehicleId: vehicle.id,
+          templateKey: key,
+          // Send the localized template name so the event isn't created as the English
+          // humanized key (e.g. "Winter Tyres" instead of "Prezutie na zimné pneumatiky").
+          name: templateKey(key) ? t(templateKey(key)!) : key,
+        }),
       })
       if (res.ok) setActivated((prev) => new Set(prev).add(key))
     } finally {

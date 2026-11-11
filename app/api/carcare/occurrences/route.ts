@@ -35,7 +35,9 @@ export async function GET(request: NextRequest) {
         },
         appointments: { where: { status: 'BOOKED' }, orderBy: { scheduledAt: 'asc' }, take: 1 },
       },
-      orderBy: { dueDate: 'asc' },
+      // No-date events (freshly added from suggestions) sort to the TOP so they're visible
+      // and the user is nudged to set a date — not buried below every dated event.
+      orderBy: { dueDate: { sort: 'asc', nulls: 'first' } },
       take: 500,
     })
   })

@@ -1424,7 +1424,8 @@
       "arranged": "Scheduled",
       "actionReq": "Action required",
       "upcoming": "Upcoming",
-      "inDays": "In {d} days"
+      "inDays": "In {d} days",
+      "noDate": "No date"
     },
     "action": {
       "BOOK": "Book",
@@ -1510,7 +1511,7 @@
     },
     "onboarding": {
       "title": "Add vehicle",
-      "subtitle": "Search a model or enter details manually",
+      "subtitle": "Enter your vehicle details",
       "searchLabel": "Make & model",
       "searchPlaceholder": "e.g. Škoda Octavia",
       "change": "Change",
@@ -1700,6 +1701,10 @@
       "fieldIntervalMonths": "Interval (months)",
       "fieldPreferredProvider": "Preferred provider",
       "fieldExpectedCostEur": "Expected cost (€)",
+      "fieldTyreSize": "Tyre size",
+      "tyreSizePlaceholder": "e.g. 205/55 R16",
+      "fieldNotes": "Note",
+      "notesPlaceholder": "e.g. buy 2 more summer tyres",
       "notifTitle": "Notifications for this event",
       "notifSub": "Set when and how we should remind you of this obligation.",
       "daysBefore": "days before",

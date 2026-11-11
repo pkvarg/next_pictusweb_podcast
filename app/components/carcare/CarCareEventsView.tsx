@@ -42,7 +42,7 @@ function dueBadge(o: EvOccurrence, t: Tr): { text: string; tone: keyof typeof to
   if (o.status === 'ARRANGED') return { text: t('badge.arranged'), tone: 'lime' }
   if (o.status === 'ACTION_REQUIRED') return { text: t('badge.actionReq'), tone: 'red' }
   if (d != null) return { text: t('badge.inDays', { d }), tone: 'neutral' }
-  return { text: t('badge.upcoming'), tone: 'neutral' }
+  return { text: t('badge.noDate'), tone: 'amber' }
 }
 
 const ymd = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`

@@ -1,19 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
 import { Link, useRouter } from '@/i18n/routing'
-import { ArrowLeft, Search, Car, Loader2, Check, Upload, X } from 'lucide-react'
+import { ArrowLeft, Car, Loader2, Check, Upload, X } from 'lucide-react'
 import { uploadAuthHeaders } from '@/lib/uploadTokenClient'
-
-interface CatalogueEntry {
-  id: string
-  make: string
-  model: string
-  powertrain: string | null
-  yearFrom?: number | null
-}
 
 const POWERTRAIN_OPTIONS: string[] = [
   'PETROL',
@@ -103,54 +95,8 @@ export default function CarCareAddVehicleView() {
     }
   }
 
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<CatalogueEntry[]>([])
-  const [showResults, setShowResults] = useState(false)
-  const [picked, setPicked] = useState(false)
-
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    if (picked || query.trim().length < 2) {
-      setResults([])
-      return
-    }
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/carcare/catalogue?q=${encodeURIComponent(query.trim())}`)
-        if (res.ok) {
-          const d = await res.json()
-          setResults(d.results ?? [])
-          setShowResults(true)
-        }
-      } catch {
-        setResults([])
-      }
-    }, 250)
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
-  }, [query, picked])
-
-  const pick = (e: CatalogueEntry) => {
-    setMake(e.make)
-    setModel(e.model)
-    if (e.powertrain) setPowertrain(e.powertrain)
-    setQuery(`${e.make} ${e.model}`)
-    setPicked(true)
-    setShowResults(false)
-  }
-
-  const resetPick = () => {
-    setPicked(false)
-    setQuery('')
-    setMake('')
-    setModel('')
-    setPowertrain('')
-  }
 
   const submit = async () => {
     setError(null)
@@ -217,50 +163,6 @@ export default function CarCareAddVehicleView() {
         </header>
 
         <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-5">
-          <div className="relative">
-            <label className={labelClass}>{t('onboarding.searchLabel')}</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input
-                className={`${inputClass} pl-9`}
-                placeholder={t('onboarding.searchPlaceholder')}
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value)
-                  if (picked) setPicked(false)
-                }}
-                onFocus={() => results.length > 0 && setShowResults(true)}
-              />
-              {picked && (
-                <button
-                  onClick={resetPick}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-pictus-lime hover:text-pictus-lime600"
-                >
-                  {t('onboarding.change')}
-                </button>
-              )}
-            </div>
-            {showResults && results.length > 0 && (
-              <div className="absolute z-10 mt-1 w-full bg-pictus-onyx900 border border-white/10 rounded-xl overflow-hidden shadow-xl">
-                {results.map((e) => (
-                  <button
-                    key={e.id}
-                    onClick={() => pick(e)}
-                    className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-white/5"
-                  >
-                    <span className="text-pictus-white">
-                      {e.make} {e.model}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {e.powertrain ? t(`pt.${e.powertrain}`) : ''}
-                      {e.yearFrom ? ` · ${t('onboarding.yearFrom', { year: e.yearFrom })}` : ''}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
           <div>
             <label className={labelClass}>
               {t('vehicle.spzPlate')} <span className="text-pictus-lime">*</span>

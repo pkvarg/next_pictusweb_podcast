@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Link } from '@/i18n/routing'
+import InfoTip from './InfoTip'
 import {
   ArrowLeft,
   Info,
@@ -18,6 +19,7 @@ import {
   AppWindow,
   User as UserIcon,
   Check,
+  X,
 } from 'lucide-react'
 
 type Channel = 'EMAIL' | 'SMS' | 'PUSH' | 'IN_APP'
@@ -38,6 +40,7 @@ export interface EventDetailData {
     seasonalDay: number | null
     expectedCost: number | null
     currency: string | null
+    tyreSize: string | null
     paused: boolean
     responsibleUserId: string | null
     preferredProviderId: string | null
@@ -56,6 +59,7 @@ export interface EventDetailData {
     dueDate: string | null
     dueMileage: number | null
     actualCost: number | null
+    notes: string | null
     overdue: boolean
     appointment: { scheduledAt: string; provider: { id: string; name: string } | null } | null
   } | null
@@ -203,6 +207,9 @@ export default function CarCareEventDetailView({
     data.event.preferredProviderId ?? '',
   )
   const [expectedCost, setExpectedCost] = useState(data.event.expectedCost?.toString() ?? '')
+  const isTyres = data.event.category === 'tyres'
+  const [tyreSize, setTyreSize] = useState(data.event.tyreSize ?? '')
+  const [notes, setNotes] = useState(data.current?.notes ?? '')
 
   // Notifikácie tab state. When the event has no own rules, pre-fill from the org-wide
   // central defaults (inherited) so the tab reflects what will actually fire.
@@ -285,10 +292,24 @@ export default function CarCareEventDetailView({
     if (res.ok) {
       setMsg(okMsg)
       reload?.()
+      // Return to the overview so the editing form doesn't linger after a save — the
+      // tiny inline "Saved" over an unchanged form read as "did it save?".
+      setTab('prehlad')
     } else {
       setMsg(t('ev.saveFailed'))
     }
   }
+
+  // Number fields: select the current value on focus so typing replaces it, instead of the
+  // typed digits piling up next to a leading 0 (e.g. "0" + "1" showing "01").
+  const selectOnFocus = (e: React.FocusEvent<HTMLInputElement>) => e.currentTarget.select()
+
+  // When a save message appears, scroll the banner into view — on a long form (Notifikácie)
+  // the user is usually at the bottom by the save button, so otherwise it flashes off-screen.
+  const msgRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (msg) msgRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [msg])
 
   const saveTermin = async () => {
     setBusy(true)
@@ -304,6 +325,8 @@ export default function CarCareEventDetailView({
           responsibleUserId: responsibleUserId || null,
           preferredProviderId: preferredProviderId || null,
           expectedCost: expectedCost ? Number(expectedCost) : null,
+          ...(isTyres ? { tyreSize: tyreSize.trim() || null } : {}),
+          notes: notes.trim() || null,
         }),
       })
       after(res, t('ev.saved'))
@@ -464,7 +487,23 @@ export default function CarCareEventDetailView({
           ))}
         </div>
 
-        {msg && <p className="mb-4 text-sm text-pictus-lime">{msg}</p>}
+        {msg && (
+          <div
+            ref={msgRef}
+            className={`mb-4 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm ${
+              msg === t('ev.saveFailed')
+                ? 'bg-red-500/15 border border-red-500/30 text-red-200'
+                : 'bg-pictus-lime/15 border border-pictus-lime/30 text-pictus-lime'
+            }`}
+          >
+            {msg === t('ev.saveFailed') ? (
+              <X className="w-4 h-4 shrink-0" />
+            ) : (
+              <Check className="w-4 h-4 shrink-0" />
+            )}
+            {msg}
+          </div>
+        )}
 
         {tab === 'prehlad' && (
           <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
@@ -501,6 +540,15 @@ export default function CarCareEventDetailView({
               label={t('ev.rowType')}
               value={data.event.kind === 'LEGAL' ? t('ev.typeLegal') : t('ev.typeRecommended')}
             />
+            {isTyres && <Row label={t('ev.fieldTyreSize')} value={data.event.tyreSize || '—'} />}
+            {data.current?.notes && (
+              <div className="pt-3 mt-1 border-t border-white/[0.06]">
+                <p className="text-sm text-gray-400 mb-1">{t('ev.fieldNotes')}</p>
+                <p className="text-sm text-pictus-white whitespace-pre-wrap">
+                  {data.current.notes}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -536,6 +584,7 @@ export default function CarCareEventDetailView({
                 <label className={label}>{t('ev.fieldIntervalMonths')}</label>
                 <input
                   type="number"
+                  onFocus={selectOnFocus}
                   className={input}
                   value={intervalMonths}
                   onChange={(e) => setIntervalMonths(e.target.value)}
@@ -580,12 +629,42 @@ export default function CarCareEventDetailView({
                 <label className={label}>{t('ev.fieldExpectedCostEur')}</label>
                 <input
                   type="number"
+                  onFocus={selectOnFocus}
                   className={input}
                   value={expectedCost}
                   onChange={(e) => setExpectedCost(e.target.value)}
                   disabled={!canModify}
                 />
               </div>
+            </div>
+            {isTyres && (
+              <div>
+                <label className={label}>
+                  {t('ev.fieldTyreSize')}
+                  <span className="ml-1 text-gray-500">({t('common.optional')})</span>
+                </label>
+                <input
+                  className={input}
+                  placeholder={t('ev.tyreSizePlaceholder')}
+                  maxLength={40}
+                  value={tyreSize}
+                  onChange={(e) => setTyreSize(e.target.value)}
+                  disabled={!canModify}
+                />
+              </div>
+            )}
+            <div>
+              <label className={label}>
+                {t('ev.fieldNotes')}
+                <span className="ml-1 text-gray-500">({t('common.optional')})</span>
+              </label>
+              <textarea
+                className={`${input} min-h-[80px] resize-y`}
+                placeholder={t('ev.notesPlaceholder')}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                disabled={!canModify}
+              />
             </div>
             {canModify && (
               <button
@@ -644,9 +723,7 @@ export default function CarCareEventDetailView({
                       <div className="min-w-0 flex-1">
                         <p className="text-pictus-white text-sm font-medium inline-flex items-center gap-1.5">
                           {t(s.labelKey)}
-                          <span title={t(s.hintKey)} className="text-gray-600">
-                            <Info className="w-3.5 h-3.5" />
-                          </span>
+                          <InfoTip text={t(s.hintKey)} />
                         </p>
                         <p className="text-xs text-gray-500">{t(s.hintKey)}</p>
                       </div>
@@ -654,6 +731,7 @@ export default function CarCareEventDetailView({
                         <div className="flex items-center gap-1 shrink-0">
                           <input
                             type="number"
+                            onFocus={selectOnFocus}
                             className="w-16 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1 text-sm text-pictus-white"
                             value={stages[s.stage].leadDays}
                             onChange={(e) =>
@@ -788,6 +866,7 @@ export default function CarCareEventDetailView({
                       <span className="text-gray-500">{t('ev.every')}</span>
                       <input
                         type="number"
+                        onFocus={selectOnFocus}
                         min={1}
                         className="w-14 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1"
                         value={repeatDays}
@@ -876,6 +955,7 @@ export default function CarCareEventDetailView({
                 <label className={label}>{t('ev.fieldEstCostEur')}</label>
                 <input
                   type="number"
+                  onFocus={selectOnFocus}
                   className={input}
                   value={apptCost}
                   onChange={(e) => setApptCost(e.target.value)}
@@ -912,6 +992,7 @@ export default function CarCareEventDetailView({
                 <label className={label}>{t('ev.fieldMileageState')}</label>
                 <input
                   type="number"
+                  onFocus={selectOnFocus}
                   className={input}
                   value={doneMileage}
                   onChange={(e) => setDoneMileage(e.target.value)}
@@ -924,6 +1005,7 @@ export default function CarCareEventDetailView({
                 <label className={label}>{t('ev.fieldPriceEur')}</label>
                 <input
                   type="number"
+                  onFocus={selectOnFocus}
                   className={input}
                   value={doneCost}
                   onChange={(e) => setDoneCost(e.target.value)}
