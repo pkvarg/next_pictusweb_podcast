@@ -209,9 +209,10 @@ export default function AddEventModal({
               <label className={labelCls}>{t('ev.fieldIntervalMonths')}</label>
               <input
                 type="number"
+                min={1}
                 className={input}
                 value={intervalMonths}
-                onChange={(e) => setIntervalMonths(e.target.value)}
+                onChange={(e) => setIntervalMonths(e.target.value.replace(/[^0-9]/g, ''))}
               />
             </div>
           )}

@@ -322,7 +322,8 @@ export default function CarCareEventDetailView({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           recurrenceType,
-          intervalMonths: intervalMonths ? Number(intervalMonths) : null,
+          intervalMonths:
+            recurrenceType === 'FIXED_INTERVAL' && intervalMonths ? Number(intervalMonths) : null,
           dueDate: dueDate ? new Date(dueDate).toISOString() : null,
           responsibleUserId: responsibleUserId || null,
           preferredProviderId: preferredProviderId || null,
@@ -566,7 +567,7 @@ export default function CarCareEventDetailView({
                 disabled={!canModify}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className={recurrenceType === 'FIXED_INTERVAL' ? 'grid grid-cols-2 gap-3' : ''}>
               <div>
                 <label className={label}>{t('ev.rowRecurrence')}</label>
                 <select
@@ -582,17 +583,20 @@ export default function CarCareEventDetailView({
                   ))}
                 </select>
               </div>
-              <div>
-                <label className={label}>{t('ev.fieldIntervalMonths')}</label>
-                <input
-                  type="number"
-                  onFocus={selectOnFocus}
-                  className={input}
-                  value={intervalMonths}
-                  onChange={(e) => setIntervalMonths(e.target.value)}
-                  disabled={!canModify}
-                />
-              </div>
+              {recurrenceType === 'FIXED_INTERVAL' && (
+                <div>
+                  <label className={label}>{t('ev.fieldIntervalMonths')}</label>
+                  <input
+                    type="number"
+                    min={1}
+                    onFocus={selectOnFocus}
+                    className={input}
+                    value={intervalMonths}
+                    onChange={(e) => setIntervalMonths(e.target.value.replace(/[^0-9]/g, ''))}
+                    disabled={!canModify}
+                  />
+                </div>
+              )}
             </div>
             <div>
               <label className={label}>{t('ev.rowResponsible')}</label>

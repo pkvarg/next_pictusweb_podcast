@@ -4127,6 +4127,12 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
    text-pictus-black (dark text on lime buttons) and pictus-lime are left alone.
    ========================================================================== */
 
+/* Light color-scheme so native controls (date/time picker icons, scrollbars)
+   render dark-on-light and stay visible — the app sets color-scheme: dark globally. */
+.fs-light {
+  color-scheme: light;
+}
+
 /* Surfaces */
 .fs-light.bg-pictus-black,
 .fs-light .bg-pictus-black {
