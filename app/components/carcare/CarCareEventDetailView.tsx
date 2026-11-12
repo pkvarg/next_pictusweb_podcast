@@ -202,7 +202,9 @@ export default function CarCareEventDetailView({
   const [dueDate, setDueDate] = useState(
     data.current?.dueDate ? data.current.dueDate.slice(0, 10) : '',
   )
-  const [responsibleUserId, setResponsibleUserId] = useState(data.event.responsibleUserId ?? '')
+  const [responsibleUserId, setResponsibleUserId] = useState(
+    data.event.responsibleUserId ?? (data.members.length === 1 ? data.members[0].userId : ''),
+  )
   const [preferredProviderId, setPreferredProviderId] = useState(
     data.event.preferredProviderId ?? '',
   )

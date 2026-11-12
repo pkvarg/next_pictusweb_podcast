@@ -128,29 +128,20 @@ describe('dispatcher', () => {
     expect(r2.claimed).toBe(0)
   })
 
-  it('T12: SMS over the monthly limit is suppressed; other channels still send', async () => {
+  it('T12: SMS is not capped per user — the tier notification quota governs it', async () => {
+    // The legacy per-user SMS monthly cap was removed; SMS now shares the org's
+    // per-vehicle-per-year tier quota with email, so a high per-user counter no longer blocks it.
     await prisma.user.update({
       where: { id: userId },
-      data: { smsMonthlyLimit: 2, smsSentThisMonth: 2 },
+      data: { smsMonthlyLimit: 2, smsSentThisMonth: 99 },
     })
     const sms = await makeDelivery('SMS', PAST)
-    const email = await makeDelivery('EMAIL', PAST)
 
     await dispatchDue(prisma, fakeChannels)
     expect((await prisma.notificationDelivery.findUnique({ where: { id: sms.id } }))?.status).toBe(
-      'SUPPRESSED',
+      'SENT',
     )
-    expect(
-      (await prisma.notificationDelivery.findUnique({ where: { id: email.id } }))?.status,
-    ).toBe('SENT')
-    expect(sends.filter((s) => s.channel === 'SMS')).toHaveLength(0)
-  })
-
-  it('SMS success increments the monthly counter', async () => {
-    await makeDelivery('SMS', PAST)
-    await dispatchDue(prisma, fakeChannels)
-    const u = await prisma.user.findUnique({ where: { id: userId } })
-    expect(u?.smsSentThisMonth).toBe(1)
+    expect(sends.filter((s) => s.channel === 'SMS')).toHaveLength(1)
   })
 
   it('T13: a send failure is retried (back to SCHEDULED) with the error recorded', async () => {

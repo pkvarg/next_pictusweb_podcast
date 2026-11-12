@@ -1,6 +1,6 @@
 import { Prisma, NotificationStage, type PrismaClient, type Channel } from '@prisma/client'
 import { addDaysUTC } from './recurrence'
-import { resolveGarageOwner } from './garage'
+import { resolveGarageOwner, orgMemberIds } from './garage'
 import { checkNotificationLimit } from '@/lib/notificationLimits'
 import { smsAllowedForTier } from './limits'
 import type { Channels } from './channels'
@@ -84,6 +84,12 @@ export async function resolveRecipients(
   tx: Prisma.TransactionClient,
   def: { id: string; organizationId: string; responsibleUserId: string | null },
 ): Promise<string[]> {
+  // A single-person garage has no one to choose between: always notify that person,
+  // regardless of the recipient checkbox or per-event exclusions. Picking recipients
+  // only makes sense once there are at least two people.
+  const members = await orgMemberIds(tx, def.organizationId)
+  if (members.length === 1) return members
+
   const [central, exclusionRows] = await Promise.all([
     tx.notificationRecipient.findMany({
       where: { organizationId: def.organizationId },
@@ -422,15 +428,6 @@ export async function dispatchDue(
       continue
     }
 
-    if (d.channel === 'SMS' && d.recipient.smsSentThisMonth >= d.recipient.smsMonthlyLimit) {
-      await db.notificationDelivery.update({
-        where: { id },
-        data: { status: 'SUPPRESSED', suppressedReason: 'sms monthly limit reached' },
-      })
-      suppressed++
-      continue
-    }
-
     // Tier notification quota. One reminder bills once: SMS when the reminder uses SMS,
     // otherwise EMAIL (PUSH / IN_APP never count). checkNotificationLimit enforces the
     // tier limit (FREE soft-deletes the org, paid blocks with a yearly reset).
@@ -470,12 +467,6 @@ export async function dispatchDue(
         where: { id },
         data: { status: 'SENT', sentAt: now },
       })
-      if (d.channel === 'SMS') {
-        await db.user.update({
-          where: { id: d.recipientUserId },
-          data: { smsSentThisMonth: { increment: 1 } },
-        })
-      }
       if (metered) {
         await db.organization.update({
           where: { id: organizationId },

@@ -1,7 +1,20 @@
 import { Prisma, RecurrenceType, EventKind, ActionType } from '@prisma/client'
+import { orgMemberIds } from './garage'
 
 function humanize(key: string): string {
   return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+// Default responsible person: an explicit choice wins; otherwise, when the org has exactly
+// one person, prefill them automatically — there is no one else to assign it to.
+async function defaultResponsibleUserId(
+  tx: Prisma.TransactionClient,
+  organizationId: string,
+  explicit?: string | null,
+): Promise<string | null> {
+  if (explicit) return explicit
+  const members = await orgMemberIds(tx, organizationId)
+  return members.length === 1 ? members[0] : null
 }
 
 // Activate a catalogue template for a vehicle: creates a RecurringEvent (copying the
@@ -47,7 +60,11 @@ export async function activateTemplate(
       intervalKm: template.intervalKm,
       seasonalMonth: template.seasonalMonth,
       seasonalDay: template.seasonalDay,
-      responsibleUserId: params.responsibleUserId ?? null,
+      responsibleUserId: await defaultResponsibleUserId(
+        tx,
+        vehicle.organizationId,
+        params.responsibleUserId,
+      ),
     },
   })
   const occurrence = await tx.eventOccurrence.create({
@@ -106,7 +123,11 @@ export async function createCustomEvent(
       intervalKm: input.intervalKm ?? null,
       seasonalMonth: input.seasonalMonth ?? null,
       seasonalDay: input.seasonalDay ?? null,
-      responsibleUserId: input.responsibleUserId ?? null,
+      responsibleUserId: await defaultResponsibleUserId(
+        tx,
+        vehicle.organizationId,
+        input.responsibleUserId,
+      ),
     },
   })
   const occurrence = await tx.eventOccurrence.create({

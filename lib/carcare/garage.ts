@@ -26,6 +26,26 @@ export async function resolveGarageOwner(
   return anyUser?.id ?? null
 }
 
+// The people who can receive notifications in a garage: its memberships, or — before any
+// membership exists (legacy single-org bridge) — the organization's own users. Used to
+// detect the "only one person" case, where there is no one to choose between.
+export async function orgMemberIds(
+  tx: Prisma.TransactionClient,
+  organizationId: string,
+): Promise<string[]> {
+  const memberships = await tx.garageMembership.findMany({
+    where: { organizationId },
+    select: { userId: true },
+  })
+  if (memberships.length > 0) return [...new Set(memberships.map((m) => m.userId))]
+
+  const users = await tx.user.findMany({
+    where: { organizationId, deletedAt: null },
+    select: { id: true },
+  })
+  return users.map((u) => u.id)
+}
+
 // Backend access check. Global ADMIN sees everything; a garage OWNER sees all vehicles
 // in the garage; MEMBER/VIEWER see only vehicles explicitly granted to them. Legacy
 // bridge: while a garage has no memberships yet, the original single-org rule applies.
