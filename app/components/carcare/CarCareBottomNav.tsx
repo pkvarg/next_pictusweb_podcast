@@ -3,6 +3,8 @@
 import { useTranslations } from 'next-intl'
 import { Home, Calendar, Wallet, Users, Car, Settings, UserCircle, ArrowLeft } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/routing'
+import CarCareThemeToggle from './CarCareThemeToggle'
+import CarCareLangSwitcher from './CarCareLangSwitcher'
 
 const TABS: { key: string; tkey: string; href: string; icon: React.ReactNode }[] = [
   { key: 'home', tkey: 'nav.home', href: '/client/my-fleet', icon: <Home className="w-5 h-5" /> },
@@ -56,10 +58,13 @@ export default function CarCareBottomNav() {
   return (
     <>
       <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-56 flex-col bg-pictus-onyx900/95 border-r border-white/[0.06] py-6 px-3 z-40">
-        <Link href="/client/my-fleet" className="flex items-center gap-2 px-3 mb-8">
-          <Car className="w-6 h-6 text-pictus-lime" />
-          <span className="font-brutal-milk text-lg text-pictus-white">FleetSync</span>
-        </Link>
+        <div className="flex items-center justify-between gap-2 px-3 mb-8">
+          <Link href="/client/my-fleet" className="flex items-center gap-2">
+            <Car className="w-6 h-6 text-pictus-lime" />
+            <span className="font-brutal-milk text-lg text-pictus-white">FleetSync</span>
+          </Link>
+          <CarCareThemeToggle />
+        </div>
         <nav className="flex flex-col gap-1">
           {TABS.map((t) => (
             <Link
@@ -76,16 +81,25 @@ export default function CarCareBottomNav() {
             </Link>
           ))}
         </nav>
-        <Link
-          href="/client"
-          className="mt-auto inline-flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-pictus-white hover:bg-white/5"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          {tr('nav.backToClient')}
-        </Link>
+        <div className="mt-auto flex flex-col gap-3">
+          <div className="px-3">
+            <CarCareLangSwitcher />
+          </div>
+          <Link
+            href="/client"
+            className="inline-flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-pictus-white hover:bg-white/5"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            {tr('nav.backToClient')}
+          </Link>
+        </div>
       </aside>
 
       <nav className="md:hidden fixed bottom-0 inset-x-0 bg-pictus-onyx900/95 backdrop-blur border-t border-white/[0.06] z-40">
+        <div className="flex items-center justify-center gap-2 py-1.5 border-b border-white/[0.06]">
+          <CarCareThemeToggle />
+          <CarCareLangSwitcher />
+        </div>
         <div className="mx-auto max-w-4xl grid grid-cols-6 text-center text-[11px]">
           {TABS.map((t) => (
             <Link
@@ -105,7 +119,7 @@ export default function CarCareBottomNav() {
       <Link
         href="/client"
         aria-label={tr('nav.backToClient')}
-        className="md:hidden fixed left-3 bottom-20 z-50 inline-flex items-center gap-1.5 rounded-full bg-pictus-onyx900/95 border border-white/[0.06] px-3 py-2 text-xs text-gray-300 hover:text-pictus-white"
+        className="md:hidden fixed left-3 bottom-28 z-50 inline-flex items-center gap-1.5 rounded-full bg-pictus-onyx900/95 border border-white/[0.06] px-3 py-2 text-xs text-gray-300 hover:text-pictus-white"
       >
         <ArrowLeft className="w-4 h-4" />
         {tr('nav.backToClient')}

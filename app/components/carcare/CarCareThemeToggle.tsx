@@ -34,14 +34,16 @@ export default function CarCareThemeToggle() {
   }
 
   return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-label={t('theme.toggle')}
-      title={t('theme.toggle')}
-      className="w-9 h-9 rounded-full bg-pictus-onyx900 border border-white/10 flex items-center justify-center text-pictus-white hover:border-white/25 transition-colors"
-    >
-      {light ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-    </button>
+    <div className="inline-flex items-center rounded-full border border-white/10 bg-pictus-onyx900/80 p-0.5">
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={t('theme.toggle')}
+        title={t('theme.toggle')}
+        className="flex items-center justify-center px-2.5 py-1 rounded-full text-gray-400 hover:text-pictus-white transition-colors"
+      >
+        {light ? <Moon size={16} /> : <Sun size={16} />}
+      </button>
+    </div>
   )
 }
