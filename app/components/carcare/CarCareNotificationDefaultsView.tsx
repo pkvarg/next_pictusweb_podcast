@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import InfoTip from './InfoTip'
 import {
@@ -13,6 +13,8 @@ import {
   User as UserIcon,
   Check,
   BookOpen,
+  Undo2,
+  AlertTriangle,
 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import type { Channel } from '@prisma/client'
@@ -75,6 +77,18 @@ const CHANNELS: { key: Channel; labelKey: string; icon: React.ReactNode }[] = [
 
 const STAGE_DEFAULTS: Record<string, number> = { BOOKING: 14, APPOINTMENT: 1, DEADLINE: 3 }
 
+const DEFAULTS_URL = '/api/carcare/notifications/defaults'
+
+type Snapshot = {
+  stages: Record<string, { active: boolean; leadDays: number }>
+  channels: Channel[]
+  sendTime: string
+  locale: string
+  repeatOn: boolean
+  repeatDays: string
+  recipients: string[]
+}
+
 function Toggle({
   on,
   disabled,
@@ -132,39 +146,148 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
     (data.rules.find((r) => r.repeatEveryDays)?.repeatEveryDays ?? 3).toString(),
   )
   const [recipients, setRecipients] = useState<Set<string>>(() => new Set(data.recipientIds))
-  const [busy, setBusy] = useState(false)
-  const [msg, setMsg] = useState<string | null>(null)
+  const [autoStatus, setAutoStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
-  const save = async () => {
-    setBusy(true)
-    setMsg(null)
+  const buildPayload = (s: Snapshot) => {
+    // IN_APP is the always-on baseline channel (not shown as a toggle), so always include it.
+    const chans = [...new Set<Channel>([...s.channels, 'IN_APP'])]
+    const rules = STAGE_UI.filter((st) => s.stages[st.stage].active).map((st) => ({
+      stage: st.stage,
+      leadDays: st.lead ? s.stages[st.stage].leadDays : 0,
+      channels: chans,
+      repeatUntilActioned: s.repeatOn && (st.stage === 'OVERDUE' || st.stage === 'BOOKING'),
+      repeatEveryDays: s.repeatOn ? Number(s.repeatDays) : null,
+    }))
+    return {
+      rules,
+      recipients: s.recipients,
+      sendHour: Number(s.sendTime.split(':')[0]) || 0,
+      sendMinute: Number(s.sendTime.split(':')[1]) >= 30 ? 30 : 0,
+      locale: s.locale,
+    }
+  }
+
+  const serialize = (s: Snapshot) => JSON.stringify(s)
+
+  const snapshot: Snapshot = {
+    stages,
+    channels: [...channels].sort(),
+    sendTime,
+    locale,
+    repeatOn,
+    repeatDays,
+    recipients: [...recipients].sort(),
+  }
+  const serial = serialize(snapshot)
+
+  // The snapshot currently persisted on the server (seeded from the loaded data).
+  const savedSerialRef = useRef(serial)
+  const undoRef = useRef<Snapshot | null>(null)
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Latest editable payload, read on unmount to flush a still-pending change.
+  const latestRef = useRef({ serial, payload: buildPayload(snapshot) })
+  latestRef.current = { serial, payload: buildPayload(snapshot) }
+
+  const persist = async (payload: ReturnType<typeof buildPayload>) => {
     try {
-      // IN_APP is the always-on baseline channel (not shown as a toggle), so always include it.
-      const chans = [...new Set<Channel>([...channels, 'IN_APP'])]
-      const rules = STAGE_UI.filter((s) => stages[s.stage].active).map((s) => ({
-        stage: s.stage,
-        leadDays: s.lead ? stages[s.stage].leadDays : 0,
-        channels: chans,
-        repeatUntilActioned: repeatOn && (s.stage === 'OVERDUE' || s.stage === 'BOOKING'),
-        repeatEveryDays: repeatOn ? Number(repeatDays) : null,
-      }))
-      const res = await fetch('/api/carcare/notifications/defaults', {
+      const res = await fetch(DEFAULTS_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rules,
-          recipients: [...recipients],
-          sendHour: Number(sendTime.split(':')[0]) || 0,
-          sendMinute: Number(sendTime.split(':')[1]) >= 30 ? 30 : 0,
-          locale,
-        }),
+        body: JSON.stringify(payload),
       })
-      setMsg(res.ok ? t('defaults.saved') : t('defaults.saveFailed'))
+      return res.ok
     } catch {
-      setMsg(t('defaults.saveFailed'))
-    } finally {
-      setBusy(false)
+      return false
     }
+  }
+
+  const clearHide = () => {
+    if (hideTimer.current) clearTimeout(hideTimer.current)
+    hideTimer.current = null
+  }
+
+  const commit = async (target: Snapshot, undoTo: Snapshot | null) => {
+    clearHide()
+    setAutoStatus('saving')
+    const ok = await persist(buildPayload(target))
+    if (ok) {
+      savedSerialRef.current = serialize(target)
+      undoRef.current = undoTo
+      setAutoStatus('saved')
+      hideTimer.current = setTimeout(() => {
+        setAutoStatus('idle')
+        undoRef.current = null
+      }, 6000)
+    } else {
+      setAutoStatus('error')
+    }
+  }
+
+  // Debounced autosave: persist whenever the editable state differs from what's saved.
+  useEffect(() => {
+    if (!canModify) return
+    if (serial === savedSerialRef.current) return
+    const undoTo = JSON.parse(savedSerialRef.current) as Snapshot
+    const id = setTimeout(() => {
+      void commit(JSON.parse(serial) as Snapshot, undoTo)
+    }, 900)
+    return () => clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serial, canModify])
+
+  // Flush a still-pending change on unmount (e.g. navigating to "manage contacts"),
+  // using keepalive so the request completes after the component is gone.
+  useEffect(() => {
+    return () => {
+      clearHide()
+      if (!canModify) return
+      if (latestRef.current.serial === savedSerialRef.current) return
+      try {
+        fetch(DEFAULTS_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(latestRef.current.payload),
+          keepalive: true,
+        }).catch(() => {})
+      } catch {
+        // ignore
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const applySnapshot = (s: Snapshot) => {
+    setStages(s.stages)
+    setChannels(new Set(s.channels))
+    setSendTime(s.sendTime)
+    setLocale(s.locale)
+    setRepeatOn(s.repeatOn)
+    setRepeatDays(s.repeatDays)
+    setRecipients(new Set(s.recipients))
+  }
+
+  const undo = async () => {
+    const target = undoRef.current
+    if (!target) return
+    applySnapshot(target)
+    // Pre-set the saved ref so the autosave effect doesn't re-fire for this revert.
+    savedSerialRef.current = serialize(target)
+    undoRef.current = null
+    clearHide()
+    setAutoStatus('saving')
+    const ok = await persist(buildPayload(target))
+    setAutoStatus(ok ? 'saved' : 'error')
+    if (ok) hideTimer.current = setTimeout(() => setAutoStatus('idle'), 4000)
+  }
+
+  const saveNow = () => {
+    if (serial === savedSerialRef.current) {
+      clearHide()
+      setAutoStatus('saved')
+      hideTimer.current = setTimeout(() => setAutoStatus('idle'), 3000)
+      return
+    }
+    void commit(snapshot, JSON.parse(savedSerialRef.current) as Snapshot)
   }
 
   const card = 'bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5'
@@ -384,20 +507,68 @@ export default function CarCareNotificationDefaultsView({ data }: { data: Defaul
 
         <CarCarePushToggle />
 
-        {msg && <p className="text-sm text-pictus-lime">{msg}</p>}
-
         {canModify && (
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-3">
+            <span className="text-xs text-gray-500">{t('defaults.autoSaveHint')}</span>
             <button
-              onClick={save}
-              disabled={busy}
+              onClick={saveNow}
+              disabled={autoStatus === 'saving'}
               className="bg-pictus-lime text-pictus-black font-semibold px-6 py-3 rounded-xl hover:bg-pictus-lime600 disabled:opacity-50 inline-flex items-center justify-center gap-2"
             >
-              {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : t('defaults.save')}
+              {autoStatus === 'saving' ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                t('defaults.save')
+              )}
             </button>
           </div>
         )}
       </div>
+
+      {canModify && autoStatus !== 'idle' && (
+        <div className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 pointer-events-none">
+          <div
+            className={`mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border px-4 py-3 text-sm shadow-xl pointer-events-auto ${
+              autoStatus === 'error'
+                ? 'bg-red-500/15 border-red-500/30 text-red-200'
+                : 'bg-pictus-onyx900/95 border-pictus-lime/30 text-pictus-white'
+            }`}
+          >
+            {autoStatus === 'saving' && (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-pictus-lime shrink-0" />
+                <span>{t('defaults.autoSaving')}</span>
+              </>
+            )}
+            {autoStatus === 'saved' && (
+              <>
+                <Check className="w-4 h-4 text-pictus-lime shrink-0" />
+                <span>{t('defaults.autoSaved')}</span>
+                {undoRef.current && (
+                  <button
+                    onClick={undo}
+                    className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-1.5 text-pictus-white hover:bg-white/10"
+                  >
+                    <Undo2 className="w-3.5 h-3.5" /> {t('defaults.undo')}
+                  </button>
+                )}
+              </>
+            )}
+            {autoStatus === 'error' && (
+              <>
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{t('defaults.saveFailed')}</span>
+                <button
+                  onClick={saveNow}
+                  className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-red-400/40 px-3 py-1.5 text-red-100 hover:bg-red-500/20"
+                >
+                  {t('defaults.retry')}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

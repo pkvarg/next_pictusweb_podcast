@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import {
+  ArrowLeft,
   Users,
   UserPlus,
   X,
@@ -266,6 +267,13 @@ export default function CarCareGarageView({
   return (
     <div className="min-h-screen bg-pictus-black text-pictus-white font-brutal-milk pb-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
+        <Link
+          href="/client/my-fleet"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-pictus-white mb-4"
+        >
+          <ArrowLeft className="w-4 h-4" /> {t('common.back')}
+        </Link>
+
         <header className="flex items-start gap-4 mb-8">
           <div className="w-14 h-14 rounded-2xl bg-pictus-lime/15 flex items-center justify-center shrink-0">
             <Users className="w-7 h-7 text-pictus-lime" />

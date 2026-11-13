@@ -14,6 +14,7 @@ import {
   Loader2,
   Pencil,
   Trash2,
+  Bell,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
@@ -21,6 +22,7 @@ import { Link, useRouter } from '@/i18n/routing'
 import { templateKey, powertrainKey, categoryKey } from '@/lib/carcare/labels'
 import { uploadVehicleImage } from '@/lib/carcare/vehicleImage'
 import AddExpenseModal, { type VehicleOption } from './AddExpenseModal'
+import { formatDate, formatDateTime } from '@/lib/carcare/datetime'
 import AddEventModal from './AddEventModal'
 
 type Tr = (key: string, values?: Record<string, string | number>) => string
@@ -31,6 +33,7 @@ export interface VdOccurrence {
   dueDate: string | null
   dueMileage: number | null
   overdue?: boolean
+  nextNotificationAt?: string | null
   recurringEvent: { id: string; name: string; category: string; kind: string; actionType: string }
   appointment: { scheduledAt: string; provider: { id: string; name: string } | null } | null
 }
@@ -98,9 +101,6 @@ const toneClass = {
 
 function daysUntil(iso: string | null) {
   return iso == null ? null : Math.round((new Date(iso).getTime() - Date.now()) / 86400000)
-}
-function formatDate(iso: string | null) {
-  return iso == null ? '—' : new Date(iso).toLocaleDateString('sk-SK')
 }
 function vehicleName(v: VehicleDetailData['vehicle']) {
   return v.nickname || [v.make, v.model].filter(Boolean).join(' ') || v.registration
@@ -439,13 +439,21 @@ export default function CarCareVehicleDetailView({
                         </p>
                         <p className="text-sm text-gray-400 truncate">
                           {o.appointment
-                            ? `${t('vehicle.visit', { date: formatDate(o.appointment.scheduledAt) })}${o.appointment.provider ? ` · ${o.appointment.provider.name}` : ''}`
+                            ? `${t('vehicle.visit', { date: formatDateTime(o.appointment.scheduledAt) })}${o.appointment.provider ? ` · ${o.appointment.provider.name}` : ''}`
                             : o.dueDate
                               ? t('vehicle.due', { date: formatDate(o.dueDate) })
                               : o.dueMileage
                                 ? t('vehicle.atKm', { km: o.dueMileage.toLocaleString('sk-SK') })
                                 : t('vehicle.noDue')}
                         </p>
+                        {o.nextNotificationAt && (
+                          <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-pictus-lime truncate">
+                            <Bell className="w-3 h-3 shrink-0" />
+                            {t('vehicle.nextNotification', {
+                              datetime: formatDateTime(o.nextNotificationAt),
+                            })}
+                          </p>
+                        )}
                       </div>
                       <span
                         className={`shrink-0 rounded-full ${

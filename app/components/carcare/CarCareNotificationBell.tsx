@@ -1,9 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
-import { Bell, Loader2, Inbox } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { Bell, Loader2, Inbox, Trash2 } from 'lucide-react'
 import { useRouter } from '@/i18n/routing'
+import { formatDate, formatDateTime } from '@/lib/carcare/datetime'
 
 interface InboxItem {
   id: string
@@ -19,7 +20,6 @@ interface InboxItem {
 
 export default function CarCareNotificationBell() {
   const t = useTranslations('CarCare')
-  const locale = useLocale()
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<InboxItem[]>([])
@@ -87,8 +87,40 @@ export default function CarCareNotificationBell() {
     router.push(`/client/my-fleet/events/${item.eventId}`)
   }
 
-  const fmt = (iso: string | null) =>
-    iso ? new Date(iso).toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : ''
+  const removeFromState = (id: string) => {
+    setItems((prev) => prev.filter((i) => i.id !== id))
+    setUnread((u) => {
+      const wasUnread = items.find((i) => i.id === id && !i.readAt)
+      return wasUnread ? Math.max(0, u - 1) : u
+    })
+  }
+
+  const deleteItem = async (id: string) => {
+    removeFromState(id)
+    try {
+      await fetch('/api/carcare/notifications/inbox', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: [id] }),
+      })
+    } catch {
+      /* ignore — optimistic removal */
+    }
+  }
+
+  const clearAll = async () => {
+    setItems([])
+    setUnread(0)
+    try {
+      await fetch('/api/carcare/notifications/inbox', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ all: true }),
+      })
+    } catch {
+      /* ignore */
+    }
+  }
 
   return (
     <div ref={wrapRef} className="relative shrink-0">
@@ -108,16 +140,23 @@ export default function CarCareNotificationBell() {
 
       {open && (
         <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-pictus-onyx900 border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/[0.06]">
             <span className="font-medium text-pictus-white">{t('inbox.title')}</span>
-            {unread > 0 && (
-              <button
-                onClick={markAllRead}
-                className="text-xs text-pictus-lime hover:text-pictus-lime600"
-              >
-                {t('inbox.markAllRead')}
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {unread > 0 && (
+                <button
+                  onClick={markAllRead}
+                  className="text-xs text-pictus-lime hover:text-pictus-lime600"
+                >
+                  {t('inbox.markAllRead')}
+                </button>
+              )}
+              {items.length > 0 && (
+                <button onClick={clearAll} className="text-xs text-gray-400 hover:text-red-400">
+                  {t('inbox.clearAll')}
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="max-h-96 overflow-y-auto">
@@ -132,35 +171,49 @@ export default function CarCareNotificationBell() {
               </div>
             ) : (
               items.map((item) => (
-                <button
+                <div
                   key={item.id}
-                  onClick={() => openItem(item)}
-                  className={`w-full text-left px-4 py-3 border-b border-white/[0.04] last:border-0 hover:bg-white/5 flex gap-3 ${
+                  className={`group relative border-b border-white/[0.04] last:border-0 hover:bg-white/5 ${
                     item.readAt ? 'opacity-60' : ''
                   }`}
                 >
-                  <span
-                    className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
-                      item.readAt ? 'bg-transparent' : 'bg-pictus-lime'
-                    }`}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm text-pictus-white font-medium truncate">
-                      {item.eventName}
-                    </span>
-                    <span className="block text-xs text-gray-400 truncate">
-                      {item.vehicle} · {item.registration}
-                    </span>
-                    {item.dueDate && (
-                      <span className="block text-xs text-gray-500">
-                        {t('inbox.due')}: {fmt(item.dueDate)}
+                  <button
+                    onClick={() => openItem(item)}
+                    className="w-full text-left px-4 py-3 flex gap-3"
+                  >
+                    <span
+                      className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
+                        item.readAt ? 'bg-transparent' : 'bg-pictus-lime'
+                      }`}
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm text-pictus-white font-medium truncate pr-6">
+                        {item.eventName}
                       </span>
-                    )}
-                  </span>
-                  {item.sentAt && (
-                    <span className="text-[11px] text-gray-500 shrink-0">{fmt(item.sentAt)}</span>
-                  )}
-                </button>
+                      <span className="block text-xs text-gray-400 truncate">
+                        {item.vehicle} · {item.registration}
+                      </span>
+                      {item.dueDate && (
+                        <span className="block text-xs text-gray-500">
+                          {t('inbox.due')}: {formatDate(item.dueDate)}
+                        </span>
+                      )}
+                      {item.sentAt && (
+                        <span className="block text-[11px] text-gray-500">
+                          {formatDateTime(item.sentAt)}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteItem(item.id)}
+                    aria-label={t('inbox.delete')}
+                    className="absolute top-2 right-2 p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-white/5"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               ))
             )}
           </div>

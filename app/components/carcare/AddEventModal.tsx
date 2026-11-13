@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2, X, AlertTriangle } from 'lucide-react'
+import { Loader2, X, AlertTriangle, Car, Plus } from 'lucide-react'
+import { Link } from '@/i18n/routing'
 import type { VehicleOption } from './AddExpenseModal'
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -81,7 +82,11 @@ export default function AddEventModal({
   const isShortLead = daysUntilDue !== null && daysUntilDue < maxLeadDays
 
   const submit = async () => {
-    if (!vehicleId || !name.trim() || !category) {
+    if (!vehicleId) {
+      setError(t('addEvent.vehicleRequired'))
+      return
+    }
+    if (!name.trim() || !category) {
       setError(t('addEvent.nameRequired'))
       return
     }
@@ -122,7 +127,8 @@ export default function AddEventModal({
     }
   }
 
-  const single = vehicles.length <= 1
+  const single = vehicles.length === 1
+  const noVehicles = vehicles.length === 0
 
   return (
     <div
@@ -144,122 +150,152 @@ export default function AddEventModal({
           </button>
         </div>
 
-        {!single && (
-          <div>
-            <label className={labelCls}>{t('addEvent.vehicle')}</label>
-            <select
-              className={input}
-              value={vehicleId}
-              onChange={(e) => setVehicleId(e.target.value)}
-            >
-              <option value="">{t('addEvent.pickVehicle')}</option>
-              {vehicles.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.label}
-                </option>
-              ))}
-            </select>
+        {noVehicles ? (
+          <div className="space-y-4">
+            <div className="flex flex-col items-center text-center gap-3 py-6">
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-pictus-lime/10 text-pictus-lime">
+                <Car className="w-6 h-6" />
+              </span>
+              <p className="text-sm text-gray-300 max-w-xs">{t('addEvent.noVehicles')}</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={onClose}
+                className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-pictus-white hover:bg-white/5"
+              >
+                {t('common.cancel')}
+              </button>
+              <Link
+                href="/client/my-fleet/vehicles/new"
+                onClick={onClose}
+                className="flex-1 inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-3 rounded-xl hover:bg-pictus-lime600"
+              >
+                <Plus className="w-4 h-4" /> {t('dash.addVehicle')}
+              </Link>
+            </div>
           </div>
-        )}
+        ) : (
+          <>
+            {!single && (
+              <div>
+                <label className={labelCls}>{t('addEvent.vehicle')}</label>
+                <select
+                  className={input}
+                  value={vehicleId}
+                  onChange={(e) => setVehicleId(e.target.value)}
+                >
+                  <option value="">{t('addEvent.pickVehicle')}</option>
+                  {vehicles.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-        <div>
-          <label className={labelCls}>{t('addEvent.name')}</label>
-          <input
-            className={input}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={t('addEvent.namePlaceholder')}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className={labelCls}>{t('addEvent.category')}</label>
-            <select
-              className={input}
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              {CATEGORY_KEYS.map((c) => (
-                <option key={c} value={c}>
-                  {t(`cat.${c}`)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className={labelCls}>{t('addEvent.recurrence')}</label>
-            <select
-              className={input}
-              value={recurrenceType}
-              onChange={(e) => setRecurrenceType(e.target.value)}
-            >
-              {RECURRENCE_KEYS.map((r) => (
-                <option key={r} value={r}>
-                  {t(RECURRENCE_LABEL_KEY[r])}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          {recurrenceType === 'FIXED_INTERVAL' && (
             <div>
-              <label className={labelCls}>{t('ev.fieldIntervalMonths')}</label>
+              <label className={labelCls}>{t('addEvent.name')}</label>
               <input
-                type="number"
-                min={1}
                 className={input}
-                value={intervalMonths}
-                onChange={(e) => setIntervalMonths(e.target.value.replace(/[^0-9]/g, ''))}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t('addEvent.namePlaceholder')}
               />
             </div>
-          )}
-          <div>
-            <label className={labelCls}>{t('addEvent.dueDate')}</label>
-            <input
-              type="date"
-              className={input}
-              value={dueDate}
-              onChange={(e) => {
-                setDueDate(e.target.value)
-                setAckShort(false)
-              }}
-            />
-          </div>
-        </div>
 
-        {isShortLead && ackShort && (
-          <div className="flex items-start gap-2 rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-sm text-amber-200">
-            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-            <p>{t('addEvent.shortLeadWarning', { days: daysUntilDue ?? 0, lead: maxLeadDays })}</p>
-          </div>
-        )}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls}>{t('addEvent.category')}</label>
+                <select
+                  className={input}
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  {CATEGORY_KEYS.map((c) => (
+                    <option key={c} value={c}>
+                      {t(`cat.${c}`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>{t('addEvent.recurrence')}</label>
+                <select
+                  className={input}
+                  value={recurrenceType}
+                  onChange={(e) => setRecurrenceType(e.target.value)}
+                >
+                  {RECURRENCE_KEYS.map((r) => (
+                    <option key={r} value={r}>
+                      {t(RECURRENCE_LABEL_KEY[r])}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+            <div className="grid grid-cols-2 gap-3">
+              {recurrenceType === 'FIXED_INTERVAL' && (
+                <div>
+                  <label className={labelCls}>{t('ev.fieldIntervalMonths')}</label>
+                  <input
+                    type="number"
+                    min={1}
+                    className={input}
+                    value={intervalMonths}
+                    onChange={(e) => setIntervalMonths(e.target.value.replace(/[^0-9]/g, ''))}
+                  />
+                </div>
+              )}
+              <div>
+                <label className={labelCls}>{t('addEvent.dueDate')}</label>
+                <input
+                  type="date"
+                  className={input}
+                  value={dueDate}
+                  onChange={(e) => {
+                    setDueDate(e.target.value)
+                    setAckShort(false)
+                  }}
+                />
+              </div>
+            </div>
 
-        <div className="flex gap-2 pt-1">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-pictus-white hover:bg-white/5"
-          >
-            {t('common.cancel')}
-          </button>
-          <button
-            onClick={submit}
-            disabled={busy}
-            className="flex-1 inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-3 rounded-xl hover:bg-pictus-lime600 disabled:opacity-50"
-          >
-            {busy ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : isShortLead && ackShort ? (
-              t('addEvent.saveAnyway')
-            ) : (
-              t('common.save')
+            {isShortLead && ackShort && (
+              <div className="flex items-start gap-2 rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-sm text-amber-200">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <p>
+                  {t('addEvent.shortLeadWarning', { days: daysUntilDue ?? 0, lead: maxLeadDays })}
+                </p>
+              </div>
             )}
-          </button>
-        </div>
+
+            {error && <p className="text-sm text-red-400">{error}</p>}
+
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={onClose}
+                className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-pictus-white hover:bg-white/5"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={submit}
+                disabled={busy}
+                className="flex-1 inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-4 py-3 rounded-xl hover:bg-pictus-lime600 disabled:opacity-50"
+              >
+                {busy ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : isShortLead && ackShort ? (
+                  t('addEvent.saveAnyway')
+                ) : (
+                  t('common.save')
+                )}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
-import { Link } from '@/i18n/routing'
+import { Link, useRouter } from '@/i18n/routing'
+import { formatDate, formatDateTime } from '@/lib/carcare/datetime'
 import InfoTip from './InfoTip'
 import {
   ArrowLeft,
@@ -20,6 +21,8 @@ import {
   User as UserIcon,
   Check,
   X,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react'
 
 type Channel = 'EMAIL' | 'SMS' | 'PUSH' | 'IN_APP'
@@ -89,6 +92,7 @@ export interface EventDetailData {
   providers: { id: string; name: string }[]
   recipientIds: string[]
   excludedRecipientIds: string[]
+  upcomingNotifications: { at: string; stages: string[]; channels: Channel[] }[]
 }
 
 const RECURRENCE_KEYS: Record<string, string> = {
@@ -181,13 +185,35 @@ export default function CarCareEventDetailView({
 }) {
   const t = useTranslations('CarCare')
   const locale = useLocale()
-  const fmt = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(locale) : '—')
+  const router = useRouter()
+  const fmt = (iso: string | null) => formatDate(iso)
+  const fmtDateTime = (iso: string) => formatDateTime(iso)
+  const stageLabel = (stage: string) => {
+    const s = STAGE_UI.find((x) => x.stage === stage)
+    return s ? t(s.labelKey) : stage
+  }
   const canModify = data.canModify !== false
   const [tab, setTab] = useState<
     'prehlad' | 'termin' | 'notif' | 'navsteva' | 'dokoncenie' | 'historia'
   >('prehlad')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const deleteEvent = async () => {
+    setDeleting(true)
+    setMsg(null)
+    try {
+      const res = await fetch(`/api/carcare/events/${data.event.id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('delete failed')
+      router.push(`/client/my-fleet/vehicles/${data.vehicle.id}`)
+    } catch {
+      setMsg(t('ev.deleteFailed'))
+      setDeleting(false)
+      setConfirmDelete(false)
+    }
+  }
 
   const vehName =
     data.vehicle.nickname ||
@@ -199,6 +225,9 @@ export default function CarCareEventDetailView({
   // Termín tab state
   const [recurrenceType, setRecurrenceType] = useState(data.event.recurrenceType)
   const [intervalMonths, setIntervalMonths] = useState(data.event.intervalMonths?.toString() ?? '')
+  const [intervalKm, setIntervalKm] = useState(data.event.intervalKm?.toString() ?? '')
+  const [seasonalMonth, setSeasonalMonth] = useState(data.event.seasonalMonth?.toString() ?? '')
+  const [seasonalDay, setSeasonalDay] = useState(data.event.seasonalDay?.toString() ?? '')
   const [dueDate, setDueDate] = useState(
     data.current?.dueDate ? data.current.dueDate.slice(0, 10) : '',
   )
@@ -285,6 +314,7 @@ export default function CarCareEventDetailView({
   const [apptAt, setApptAt] = useState('')
   const [apptProvider, setApptProvider] = useState(data.event.preferredProviderId ?? '')
   const [apptCost, setApptCost] = useState('')
+  const [confirmOverwrite, setConfirmOverwrite] = useState(false)
   const [doneDate, setDoneDate] = useState(new Date().toISOString().slice(0, 10))
   const [doneMileage, setDoneMileage] = useState('')
   const [doneCost, setDoneCost] = useState('')
@@ -313,7 +343,42 @@ export default function CarCareEventDetailView({
     if (msg) msgRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [msg])
 
+  const needsMonths = ['FIXED_INTERVAL', 'AFTER_COMPLETION', 'DATE_OR_MILEAGE'].includes(
+    recurrenceType,
+  )
+  const needsKm = ['MILEAGE', 'DATE_OR_MILEAGE'].includes(recurrenceType)
+  const needsSeasonal = recurrenceType === 'SEASONAL'
+  // MILEAGE recurs on odometer, not a date; everything else needs a due date to drive reminders.
+  const needsDueDate = recurrenceType !== 'MILEAGE'
+  const hasIntervalDays = data.event.intervalDays != null
+
   const saveTermin = async () => {
+    // Guard the fields the scheduler and recurrence engine depend on: without them reminders
+    // never fire, and rolling to the next occurrence would throw.
+    if (needsDueDate && !dueDate) {
+      setMsg(t('ev.dueDateRequired'))
+      return
+    }
+    if (needsMonths && !hasIntervalDays && !(Number(intervalMonths) >= 1)) {
+      setMsg(t('ev.intervalMonthsRequired'))
+      return
+    }
+    if (needsKm && !(Number(intervalKm) >= 1)) {
+      setMsg(t('ev.intervalKmRequired'))
+      return
+    }
+    if (
+      needsSeasonal &&
+      !(
+        Number(seasonalMonth) >= 1 &&
+        Number(seasonalMonth) <= 12 &&
+        Number(seasonalDay) >= 1 &&
+        Number(seasonalDay) <= 31
+      )
+    ) {
+      setMsg(t('ev.seasonalRequired'))
+      return
+    }
     setBusy(true)
     setMsg(null)
     try {
@@ -322,8 +387,10 @@ export default function CarCareEventDetailView({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           recurrenceType,
-          intervalMonths:
-            recurrenceType === 'FIXED_INTERVAL' && intervalMonths ? Number(intervalMonths) : null,
+          intervalMonths: needsMonths && intervalMonths ? Number(intervalMonths) : null,
+          intervalKm: needsKm && intervalKm ? Number(intervalKm) : null,
+          seasonalMonth: needsSeasonal && seasonalMonth ? Number(seasonalMonth) : null,
+          seasonalDay: needsSeasonal && seasonalDay ? Number(seasonalDay) : null,
           dueDate: dueDate ? new Date(dueDate).toISOString() : null,
           responsibleUserId: responsibleUserId || null,
           preferredProviderId: preferredProviderId || null,
@@ -339,6 +406,10 @@ export default function CarCareEventDetailView({
   }
 
   const saveNotif = async () => {
+    if (notifActive && repeatOn && !(Number(repeatDays) >= 1)) {
+      setMsg(t('ev.repeatDaysRequired'))
+      return
+    }
     setBusy(true)
     setMsg(null)
     try {
@@ -372,6 +443,11 @@ export default function CarCareEventDetailView({
       setMsg(t('ev.enterVisit'))
       return
     }
+    // Booking replaces any existing booking — ask first so a visit isn't overwritten silently.
+    if (data.current?.appointment && !confirmOverwrite) {
+      setConfirmOverwrite(true)
+      return
+    }
     setBusy(true)
     setMsg(null)
     try {
@@ -388,6 +464,7 @@ export default function CarCareEventDetailView({
       after(res, t('ev.visitScheduled'))
     } finally {
       setBusy(false)
+      setConfirmOverwrite(false)
     }
   }
 
@@ -509,50 +586,95 @@ export default function CarCareEventDetailView({
         )}
 
         {tab === 'prehlad' && (
-          <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
-            <Row label={t('ev.rowDue')} value={fmt(data.current?.dueDate ?? null)} />
-            <Row
-              label={t('ev.rowRecurrence')}
-              value={
-                (RECURRENCE_KEYS[data.event.recurrenceType]
-                  ? t(RECURRENCE_KEYS[data.event.recurrenceType])
-                  : data.event.recurrenceType) +
-                (data.event.intervalMonths
-                  ? ` · ${t('ev.monthsSuffix', { n: data.event.intervalMonths })}`
-                  : '')
-              }
-            />
-            <Row label={t('ev.rowResponsible')} value={data.event.responsibleUser?.name ?? '—'} />
-            <Row
-              label={t('ev.rowVisit')}
-              value={
-                data.current?.appointment
-                  ? `${fmt(data.current.appointment.scheduledAt)}${data.current.appointment.provider ? ` · ${data.current.appointment.provider.name}` : ''}`
-                  : '—'
-              }
-            />
-            <Row
-              label={t('ev.estimate')}
-              value={data.event.expectedCost != null ? `${data.event.expectedCost} €` : '—'}
-            />
-            <Row
-              label={t('ev.actual')}
-              value={data.current?.actualCost != null ? `${data.current.actualCost} €` : '—'}
-            />
-            <Row
-              label={t('ev.rowType')}
-              value={data.event.kind === 'LEGAL' ? t('ev.typeLegal') : t('ev.typeRecommended')}
-            />
-            {isTyres && <Row label={t('ev.fieldTyreSize')} value={data.event.tyreSize || '—'} />}
-            {data.current?.notes && (
-              <div className="pt-3 mt-1 border-t border-white/[0.06]">
-                <p className="text-sm text-gray-400 mb-1">{t('ev.fieldNotes')}</p>
-                <p className="text-sm text-pictus-white whitespace-pre-wrap">
-                  {data.current.notes}
-                </p>
+          <>
+            <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5">
+              <Row label={t('ev.rowDue')} value={fmt(data.current?.dueDate ?? null)} />
+              <Row
+                label={t('ev.rowRecurrence')}
+                value={
+                  (RECURRENCE_KEYS[data.event.recurrenceType]
+                    ? t(RECURRENCE_KEYS[data.event.recurrenceType])
+                    : data.event.recurrenceType) +
+                  (data.event.intervalMonths
+                    ? ` · ${t('ev.monthsSuffix', { n: data.event.intervalMonths })}`
+                    : '')
+                }
+              />
+              <Row label={t('ev.rowResponsible')} value={data.event.responsibleUser?.name ?? '—'} />
+              <Row
+                label={t('ev.rowVisit')}
+                value={
+                  data.current?.appointment
+                    ? `${fmtDateTime(data.current.appointment.scheduledAt)}${data.current.appointment.provider ? ` · ${data.current.appointment.provider.name}` : ''}`
+                    : '—'
+                }
+              />
+              <Row
+                label={t('ev.estimate')}
+                value={data.event.expectedCost != null ? `${data.event.expectedCost} €` : '—'}
+              />
+              <Row
+                label={t('ev.actual')}
+                value={data.current?.actualCost != null ? `${data.current.actualCost} €` : '—'}
+              />
+              <Row
+                label={t('ev.rowType')}
+                value={data.event.kind === 'LEGAL' ? t('ev.typeLegal') : t('ev.typeRecommended')}
+              />
+              {isTyres && <Row label={t('ev.fieldTyreSize')} value={data.event.tyreSize || '—'} />}
+              {data.current?.notes && (
+                <div className="pt-3 mt-1 border-t border-white/[0.06]">
+                  <p className="text-sm text-gray-400 mb-1">{t('ev.fieldNotes')}</p>
+                  <p className="text-sm text-pictus-white whitespace-pre-wrap">
+                    {data.current.notes}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {data.current && (
+              <div className="mt-4 bg-pictus-lime/5 rounded-2xl border border-pictus-lime/20 p-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <Bell className="w-4 h-4 text-pictus-lime" />
+                  <h3 className="text-sm font-medium text-pictus-lime">
+                    {t('ev.upcomingNotifications')}
+                  </h3>
+                </div>
+                <p className="text-xs text-gray-400 mb-3">{t('ev.upcomingNotificationsHint')}</p>
+                {data.upcomingNotifications.length > 0 ? (
+                  <ul className="space-y-2">
+                    {data.upcomingNotifications.map((n, i) => (
+                      <li
+                        key={i}
+                        className="flex items-center justify-between gap-3 py-1.5 border-b border-white/[0.06] last:border-0"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-pictus-lime">
+                            {fmtDateTime(n.at)}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {n.stages.map(stageLabel).join(' · ')}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-gray-400 shrink-0">
+                          {n.channels.map((c) => {
+                            const ch = CHANNELS.find((x) => x.key === c)
+                            return (
+                              <span key={c} title={ch ? t(ch.labelKey) : c}>
+                                {ch?.icon ?? c}
+                              </span>
+                            )
+                          })}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-400">{t('ev.upcomingNotificationsNone')}</p>
+                )}
               </div>
             )}
-          </div>
+          </>
         )}
 
         {tab === 'termin' && (
@@ -567,37 +689,79 @@ export default function CarCareEventDetailView({
                 disabled={!canModify}
               />
             </div>
-            <div className={recurrenceType === 'FIXED_INTERVAL' ? 'grid grid-cols-2 gap-3' : ''}>
+            <div>
+              <label className={label}>{t('ev.rowRecurrence')}</label>
+              <select
+                className={input}
+                value={recurrenceType}
+                onChange={(e) => setRecurrenceType(e.target.value)}
+                disabled={!canModify}
+              >
+                {Object.entries(RECURRENCE_KEYS).map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {t(v)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {needsMonths && !hasIntervalDays && (
               <div>
-                <label className={label}>{t('ev.rowRecurrence')}</label>
-                <select
+                <label className={label}>{t('ev.fieldIntervalMonths')}</label>
+                <input
+                  type="number"
+                  min={1}
+                  onFocus={selectOnFocus}
                   className={input}
-                  value={recurrenceType}
-                  onChange={(e) => setRecurrenceType(e.target.value)}
+                  value={intervalMonths}
+                  onChange={(e) => setIntervalMonths(e.target.value.replace(/[^0-9]/g, ''))}
                   disabled={!canModify}
-                >
-                  {Object.entries(RECURRENCE_KEYS).map(([k, v]) => (
-                    <option key={k} value={k}>
-                      {t(v)}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
-              {recurrenceType === 'FIXED_INTERVAL' && (
+            )}
+            {needsKm && (
+              <div>
+                <label className={label}>{t('ev.fieldIntervalKm')}</label>
+                <input
+                  type="number"
+                  min={1}
+                  onFocus={selectOnFocus}
+                  className={input}
+                  value={intervalKm}
+                  onChange={(e) => setIntervalKm(e.target.value.replace(/[^0-9]/g, ''))}
+                  disabled={!canModify}
+                />
+              </div>
+            )}
+            {needsSeasonal && (
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={label}>{t('ev.fieldIntervalMonths')}</label>
+                  <label className={label}>{t('ev.fieldSeasonalMonth')}</label>
                   <input
                     type="number"
                     min={1}
+                    max={12}
                     onFocus={selectOnFocus}
                     className={input}
-                    value={intervalMonths}
-                    onChange={(e) => setIntervalMonths(e.target.value.replace(/[^0-9]/g, ''))}
+                    value={seasonalMonth}
+                    onChange={(e) => setSeasonalMonth(e.target.value.replace(/[^0-9]/g, ''))}
                     disabled={!canModify}
                   />
                 </div>
-              )}
-            </div>
+                <div>
+                  <label className={label}>{t('ev.fieldSeasonalDay')}</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={31}
+                    onFocus={selectOnFocus}
+                    className={input}
+                    value={seasonalDay}
+                    onChange={(e) => setSeasonalDay(e.target.value.replace(/[^0-9]/g, ''))}
+                    disabled={!canModify}
+                  />
+                </div>
+              </div>
+            )}
             <div>
               <label className={label}>{t('ev.rowResponsible')}</label>
               <select
@@ -680,6 +844,44 @@ export default function CarCareEventDetailView({
               >
                 {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : t('common.save')}
               </button>
+            )}
+
+            {canModify && (
+              <div className="border-t border-white/[0.06] pt-4 mt-2">
+                {confirmDelete ? (
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-300">{t('ev.deleteConfirm')}</p>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => setConfirmDelete(false)}
+                        className="px-4 py-2.5 rounded-xl border border-white/10 text-pictus-white hover:bg-white/5"
+                      >
+                        {t('common.cancel')}
+                      </button>
+                      <button
+                        onClick={deleteEvent}
+                        disabled={deleting}
+                        className="inline-flex items-center justify-center gap-2 bg-red-500/90 text-white font-semibold px-5 py-2.5 rounded-xl hover:bg-red-500 disabled:opacity-50"
+                      >
+                        {deleting ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <>
+                            <Trash2 className="w-4 h-4" /> {t('ev.deleteConfirmBtn')}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmDelete(true)}
+                    className="inline-flex items-center gap-2 text-sm text-red-400 hover:text-red-300"
+                  >
+                    <Trash2 className="w-4 h-4" /> {t('ev.delete')}
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}
@@ -924,7 +1126,7 @@ export default function CarCareEventDetailView({
           <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-4">
             {data.current?.appointment && (
               <div className="rounded-xl bg-pictus-lime/10 border border-pictus-lime/30 p-3 text-sm text-pictus-lime">
-                {t('ev.scheduledFor', { date: fmt(data.current.appointment.scheduledAt) })}
+                {t('ev.scheduledFor', { date: fmtDateTime(data.current.appointment.scheduledAt) })}
                 {data.current.appointment.provider
                   ? ` · ${data.current.appointment.provider.name}`
                   : ''}
@@ -969,15 +1171,49 @@ export default function CarCareEventDetailView({
                 />
               </div>
             </div>
-            {canModify && (
-              <button
-                onClick={book}
-                disabled={busy || !data.current}
-                className="w-full bg-pictus-lime text-pictus-black font-semibold px-4 py-3 rounded-xl hover:bg-pictus-lime600 disabled:opacity-50 inline-flex items-center justify-center gap-2"
-              >
-                {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : t('ev.confirmBooking')}
-              </button>
-            )}
+            {canModify &&
+              (confirmOverwrite ? (
+                <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 space-y-3">
+                  <div className="flex items-start gap-2 text-sm text-amber-200">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <p>
+                      {t('ev.overwriteBookingWarning', {
+                        date: data.current?.appointment
+                          ? fmtDateTime(data.current.appointment.scheduledAt)
+                          : '',
+                      })}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      onClick={() => setConfirmOverwrite(false)}
+                      disabled={busy}
+                      className="px-4 py-2.5 rounded-xl border border-white/10 text-pictus-white hover:bg-white/5 disabled:opacity-50"
+                    >
+                      {t('common.cancel')}
+                    </button>
+                    <button
+                      onClick={book}
+                      disabled={busy}
+                      className="inline-flex items-center justify-center gap-2 bg-amber-500 text-pictus-black font-semibold px-5 py-2.5 rounded-xl hover:bg-amber-400 disabled:opacity-50"
+                    >
+                      {busy ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        t('ev.overwriteBookingConfirm')
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={book}
+                  disabled={busy || !data.current}
+                  className="w-full bg-pictus-lime text-pictus-black font-semibold px-4 py-3 rounded-xl hover:bg-pictus-lime600 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                >
+                  {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : t('ev.confirmBooking')}
+                </button>
+              ))}
           </div>
         )}
 
