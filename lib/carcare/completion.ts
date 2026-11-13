@@ -57,11 +57,20 @@ export async function completeOccurrence(
     seasonalMonth: def.seasonalMonth,
     seasonalDay: def.seasonalDay,
   }
-  const next = computeNextDue(recurrence, {
-    dueDate: occ.dueDate,
-    completedAt: updated.completedAt,
-    completedMileage: updated.completedMileage,
-  })
+  // A misconfigured recurrence (e.g. FIXED_INTERVAL with no interval, SEASONAL with no
+  // month/day) makes computeNextDue throw. Never let that fail the completion itself — log
+  // it for a Loki query and skip rolling to the next occurrence.
+  let next
+  try {
+    next = computeNextDue(recurrence, {
+      dueDate: occ.dueDate,
+      completedAt: updated.completedAt,
+      completedMileage: updated.completedMileage,
+    })
+  } catch (e) {
+    console.error(`CARCARE_RECURRENCE_INCOMPLETE event=${def.id} occurrence=${occ.id}`, e)
+    return updated
+  }
   if (next.dueDate === null && next.dueMileage === null) return updated
 
   try {

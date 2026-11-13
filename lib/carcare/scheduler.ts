@@ -144,15 +144,28 @@ function repeatInstances(
   return out.length > 0 ? out : [base]
 }
 
-// Materializes the notification_deliveries for an occurrence from its rules.
-// Idempotent: the deterministic dedupe_key means re-running never double-creates,
-// and it never resurrects a SUPPRESSED/SENT/CANCELLED row (upsert update:{}).
-export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId: string) {
+export type PlannedDelivery = {
+  recurringEventId: string
+  stage: NotificationStage
+  channel: Channel
+  recipientUserId: string
+  scheduledFor: Date
+  index: number
+}
+
+// Computes the notification deliveries an occurrence's rules imply, WITHOUT writing
+// anything. planDeliveries persists exactly these; the UI uses it to preview the
+// reminders that are (or will be) scheduled, even before the cron has materialized them.
+export async function computePlannedDeliveries(
+  tx: Prisma.TransactionClient,
+  occurrenceId: string,
+  includeAppointment = false,
+): Promise<PlannedDelivery[]> {
   const occ = await tx.eventOccurrence.findUnique({
     where: { id: occurrenceId },
     include: { recurringEvent: true },
   })
-  if (!occ) throw new Error(`occurrence not found: ${occurrenceId}`)
+  if (!occ) return []
   if (occ.status === 'COMPLETED' || occ.status === 'CANCELLED' || occ.status === 'SKIPPED')
     return []
 
@@ -177,7 +190,7 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
   const canSms = smsAllowedForTier(org?.tierRelation?.name)
 
   const now = new Date()
-  const created = []
+  const planned: PlannedDelivery[] = []
   for (const stage of DUE_ANCHORED) {
     const rule = await resolveRule(tx, def.organizationId, def.id, stage)
     if (!rule) continue
@@ -194,25 +207,85 @@ export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId:
       for (const recipientUserId of recipientIds) {
         for (const channel of rule.channels) {
           if (channel === 'SMS' && !canSms) continue // SMS is a paid-plan channel
-          const dedupeKey = `${occ.id}:${stage}:${channel}:${recipientUserId}:${i}`
-          const row = await tx.notificationDelivery.upsert({
-            where: { dedupeKey },
-            create: {
-              occurrenceId: occ.id,
-              recurringEventId: def.id,
-              stage,
-              channel,
-              recipientUserId,
-              scheduledFor: when,
-              status: 'SCHEDULED',
-              dedupeKey,
-            },
-            update: {},
+          planned.push({
+            recurringEventId: def.id,
+            stage,
+            channel,
+            recipientUserId,
+            scheduledFor: when,
+            index: i,
           })
-          created.push(row)
         }
       }
     }
+  }
+
+  // Appointment-anchored reminder (mirrors planAppointmentReminder): the visit reminder is
+  // scheduled relative to the booked appointment, not the due date, so the writer does not
+  // produce it here. Preview callers opt in so the overview reflects it too.
+  if (includeAppointment) {
+    const appt = await tx.appointment.findFirst({
+      where: { occurrenceId, status: 'BOOKED' },
+      orderBy: { scheduledAt: 'asc' },
+      select: { scheduledAt: true },
+    })
+    if (appt) {
+      const apptRule = await resolveRule(
+        tx,
+        def.organizationId,
+        def.id,
+        NotificationStage.APPOINTMENT,
+      )
+      if (apptRule) {
+        const when = atLocalTime(
+          addDaysUTC(appt.scheduledAt, -apptRule.leadDays),
+          sendHour,
+          sendMinute,
+          SEND_TZ,
+        )
+        for (const recipientUserId of recipientIds) {
+          for (const channel of apptRule.channels) {
+            if (channel === 'SMS' && !canSms) continue
+            planned.push({
+              recurringEventId: def.id,
+              stage: NotificationStage.APPOINTMENT,
+              channel,
+              recipientUserId,
+              scheduledFor: when,
+              index: 0,
+            })
+          }
+        }
+      }
+    }
+  }
+
+  return planned
+}
+
+// Materializes the notification_deliveries for an occurrence from its rules.
+// Idempotent: the deterministic dedupe_key means re-running never double-creates,
+// and it never resurrects a SUPPRESSED/SENT/CANCELLED row (upsert update:{}).
+export async function planDeliveries(tx: Prisma.TransactionClient, occurrenceId: string) {
+  const planned = await computePlannedDeliveries(tx, occurrenceId)
+  const created = []
+  for (const p of planned) {
+    const dedupeKey = `${occurrenceId}:${p.stage}:${p.channel}:${p.recipientUserId}:${p.index}`
+    const row = await tx.notificationDelivery.upsert({
+      where: { dedupeKey },
+      create: {
+        occurrenceId,
+        recurringEventId: p.recurringEventId,
+        stage: p.stage,
+        channel: p.channel,
+        recipientUserId: p.recipientUserId,
+        scheduledFor: p.scheduledFor,
+        status: 'SCHEDULED',
+        dedupeKey,
+      },
+      update: {},
+    })
+    created.push(row)
   }
   return created
 }
@@ -251,6 +324,22 @@ export async function planAppointmentReminder(
   const sendMinute = org?.notificationSendMinute ?? 30
   const canSms = smsAllowedForTier(org?.tierRelation?.name)
   const when = atLocalTime(addDaysUTC(scheduledAt, -rule.leadDays), sendHour, sendMinute, SEND_TZ)
+
+  // A pre-visit reminder only makes sense before the visit. When the computed send time is
+  // already in the past — a short-notice booking, or a reschedule to an earlier/imminent
+  // date — arming it would make it fire on the next tick (even after the visit). Instead
+  // suppress any existing reminder for this stage and send nothing.
+  if (when.getTime() <= Date.now()) {
+    await tx.notificationDelivery.updateMany({
+      where: {
+        occurrenceId: occ.id,
+        stage: NotificationStage.APPOINTMENT,
+        status: { in: ['SCHEDULED', 'SENDING'] },
+      },
+      data: { status: 'SUPPRESSED', suppressedReason: 'appointment reminder time already passed' },
+    })
+    return []
+  }
 
   const created = []
   for (const recipientUserId of recipientIds) {

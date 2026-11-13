@@ -27,6 +27,14 @@ export async function bookAppointment(
     throw new Error(`cannot book an appointment on a ${occ.status} occurrence`)
   }
 
+  // An occurrence has at most one active booking: replace any previously booked appointment
+  // so re-booking never leaves duplicate BOOKED rows. The pre-visit reminder is keyed to the
+  // occurrence (not the appointment), so planAppointmentReminder below re-arms the single row.
+  await tx.appointment.updateMany({
+    where: { occurrenceId, status: 'BOOKED' },
+    data: { status: 'CANCELLED' },
+  })
+
   const appt = await tx.appointment.create({
     data: {
       occurrenceId,
