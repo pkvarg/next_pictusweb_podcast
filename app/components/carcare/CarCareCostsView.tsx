@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { Wallet, CalendarCheck, Receipt, Gift } from 'lucide-react'
 import { categoryKey } from '@/lib/carcare/labels'
+import { formatDate } from '@/lib/carcare/datetime'
 import FleetExpenseAnalytics from '@/app/components/client/FleetExpenseAnalytics'
 
 export interface CostEntry {
@@ -36,9 +37,6 @@ export interface CostsData {
 
 function eur(n: number) {
   return `${n.toLocaleString('sk-SK', { maximumFractionDigits: 0 })} €`
-}
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('sk-SK')
 }
 
 function Bar({ label, amount, max }: { label: string; amount: number; max: number }) {
