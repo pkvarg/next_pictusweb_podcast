@@ -105,10 +105,14 @@ export async function PUT(request: NextRequest) {
           organizationId: session.organizationId!,
           recurringEventId: null,
           stage: r.stage,
-          leadDays: Math.max(0, Math.round(r.leadDays ?? 0)),
+          leadDays: Math.max(0, Math.round(Number(r.leadDays) || 0)),
           channels: (r.channels ?? []).filter((c) => CHANNELS.has(c)),
           repeatUntilActioned: !!r.repeatUntilActioned,
-          repeatEveryDays: r.repeatEveryDays ?? null,
+          // Repeat needs a positive interval; anything under 1 (or non-numeric) means no repeat.
+          repeatEveryDays:
+            r.repeatUntilActioned && Number(r.repeatEveryDays) >= 1
+              ? Math.round(Number(r.repeatEveryDays))
+              : null,
         },
       })
     }

@@ -4,6 +4,7 @@ import prisma from '@/db/db'
 import { sameOriginOk } from '@/lib/sameOrigin'
 import { resolveCarCareSession } from '@/lib/carcare/apiAuth'
 import { canAccessVehicle, canModifyVehicle } from '@/lib/carcare/garage'
+import { computePlannedDeliveries } from '@/lib/carcare/scheduler'
 
 const num = (d: { toNumber(): number } | null | undefined) => (d ? d.toNumber() : null)
 
@@ -91,6 +92,29 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   const memberName = (u: { firstName: string | null; lastName: string | null; email: string }) =>
     [u.firstName, u.lastName].filter(Boolean).join(' ') || u.email
 
+  // The reminders actually scheduled to go out for the current occurrence, grouped by
+  // send time (one row exists per channel × recipient), so the overview can preview exactly
+  // when notifications are expected.
+  const upcomingRows = (open ? await computePlannedDeliveries(prisma, open.id, true) : [])
+    .filter((d) => d.scheduledFor.getTime() >= now)
+    .sort((a, b) => a.scheduledFor.getTime() - b.scheduledFor.getTime())
+  const byTime = new Map<string, { at: Date; stages: Set<string>; channels: Set<string> }>()
+  for (const d of upcomingRows) {
+    const key = d.scheduledFor.toISOString()
+    let entry = byTime.get(key)
+    if (!entry) {
+      entry = { at: d.scheduledFor, stages: new Set(), channels: new Set() }
+      byTime.set(key, entry)
+    }
+    entry.stages.add(d.stage)
+    entry.channels.add(d.channel)
+  }
+  const upcomingNotifications = [...byTime.values()].map((e) => ({
+    at: e.at,
+    stages: [...e.stages],
+    channels: [...e.channels],
+  }))
+
   return NextResponse.json({
     canModify: session.canModify,
     event: {
@@ -167,6 +191,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     providers,
     recipientIds: recipientRows.map((r) => r.userId),
     excludedRecipientIds: exclusionRows.map((r) => r.userId),
+    upcomingNotifications,
   })
 }
 
@@ -245,4 +270,36 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (ok === 'ok') return NextResponse.json({ ok: true })
   const status = ok === 'not-found' ? 404 : ok === 'bad-member' ? 400 : 403
   return NextResponse.json({ error: ok }, { status })
+}
+
+// DELETE /api/carcare/events/[id] — soft-delete the recurring event and cancel its
+// scheduled reminders. Past occurrences stay for history; no further reminders fire.
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!sameOriginOk(request)) return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  const { id } = await params
+  const session = await resolveCarCareSession()
+  if (!session?.organizationId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const result = await prisma.$transaction(async (tx) => {
+    const event = await tx.recurringEvent.findFirst({
+      where: { id, deletedAt: null },
+      select: { vehicleId: true },
+    })
+    if (!event) return 'not-found'
+    if (!(await canModifyVehicle(tx, session.userId, event.vehicleId))) return 'forbidden'
+
+    await tx.notificationDelivery.updateMany({
+      where: { recurringEventId: id, status: 'SCHEDULED' },
+      data: { status: 'CANCELLED', suppressedReason: 'event deleted' },
+    })
+    await tx.recurringEvent.update({ where: { id }, data: { deletedAt: new Date() } })
+    return 'ok'
+  })
+
+  if (result === 'not-found') return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (result === 'forbidden') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  return NextResponse.json({ ok: true })
 }

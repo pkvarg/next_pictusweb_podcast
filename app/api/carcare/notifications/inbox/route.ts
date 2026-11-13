@@ -86,3 +86,32 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ ok: true })
 }
+
+// DELETE /api/carcare/notifications/inbox — permanently remove the user's in-app
+// notifications. Body: { ids?: string[], all?: boolean }. Scoped to the signed-in
+// user's dispatched IN_APP deliveries, so it never touches scheduled reminders.
+export async function DELETE(request: NextRequest) {
+  if (!sameOriginOk(request)) return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  const session = await resolveCarCareSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = (await request.json().catch(() => ({}))) as { ids?: string[]; all?: boolean }
+  const baseWhere = {
+    recipientUserId: session.userId,
+    channel: 'IN_APP' as const,
+    status: 'SENT' as const,
+  }
+
+  if (body.all) {
+    const { count } = await prisma.notificationDelivery.deleteMany({ where: baseWhere })
+    return NextResponse.json({ ok: true, deleted: count })
+  }
+  if (Array.isArray(body.ids) && body.ids.length > 0) {
+    const ids = body.ids.filter((x) => typeof x === 'string')
+    const { count } = await prisma.notificationDelivery.deleteMany({
+      where: { ...baseWhere, id: { in: ids } },
+    })
+    return NextResponse.json({ ok: true, deleted: count })
+  }
+  return NextResponse.json({ ok: true, deleted: 0 })
+}

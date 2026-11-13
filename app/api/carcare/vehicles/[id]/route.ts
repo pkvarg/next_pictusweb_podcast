@@ -5,6 +5,7 @@ import { sameOriginOk } from '@/lib/sameOrigin'
 import { resolveCarCareSession } from '@/lib/carcare/apiAuth'
 import { canAccessVehicle, canModifyVehicle } from '@/lib/carcare/garage'
 import { suggestTemplatesForVehicle } from '@/lib/carcare/vehicles'
+import { computePlannedDeliveries } from '@/lib/carcare/scheduler'
 
 // GET /api/carcare/vehicles/[id]
 // Full detail for a single vehicle: spec, open events, recent history,
@@ -119,6 +120,22 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   } = result
   const num = (d: { toNumber(): number } | null | undefined) => (d ? d.toNumber() : 0)
 
+  // Earliest reminder scheduled to go out for each open occurrence, computed from the same
+  // planner the cron uses (so it shows even before deliveries are materialized). Done AFTER
+  // the transaction and in parallel — it is read-only and must not run inside the short
+  // interactive-transaction window.
+  const nextByOcc = await Promise.all(
+    open.map(async (o) => {
+      const planned = await computePlannedDeliveries(prisma, o.id, true)
+      const next = planned
+        .map((p) => p.scheduledFor)
+        .filter((d) => d.getTime() >= now.getTime())
+        .sort((a, b) => a.getTime() - b.getTime())[0]
+      return [o.id, next ?? null] as [string, Date | null]
+    }),
+  )
+  const nextNotifByOcc = new Map(nextByOcc)
+
   const yearStartMs = yearStart.getTime()
   type CostEntry = {
     id: string
@@ -183,6 +200,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       dueDate: o.dueDate,
       dueMileage: o.dueMileage,
       overdue: !!o.dueDate && o.dueDate < now && o.status !== 'ARRANGED',
+      nextNotificationAt: nextNotifByOcc.get(o.id) ?? null,
       recurringEvent: o.recurringEvent,
       appointment: o.appointments[0]
         ? {
