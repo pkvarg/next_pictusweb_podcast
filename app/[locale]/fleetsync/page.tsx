@@ -98,6 +98,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
     { title: t('step1Title'), desc: t('step1Description') },
     { title: t('step2Title'), desc: t('step2Description') },
     { title: t('step3Title'), desc: t('step3Description') },
+    { title: t('step4Title'), desc: t('step4Description') },
   ]
 
   return (
@@ -179,7 +180,7 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
               <p>{t('solutionSubtitle')}</p>
             </header>
 
-            <div className="fs-grid-3">
+            <div className="fs-grid-4">
               {steps.map((step, index) => (
                 <div className="fs-step" key={step.title}>
                   <span className="fs-step-num">{index + 1}</span>
