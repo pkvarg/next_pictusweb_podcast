@@ -8,7 +8,7 @@ const KEY = 'fs-theme'
 
 export default function CarCareThemeToggle() {
   const t = useTranslations('CarCare')
-  const [light, setLight] = useState(true)
+  const [light, setLight] = useState(false)
 
   useEffect(() => {
     let stored: string | null = null
@@ -17,7 +17,8 @@ export default function CarCareThemeToggle() {
     } catch {
       stored = null
     }
-    const isLight = stored !== 'dark'
+    // Dark is the default; light only when the user has explicitly chosen it.
+    const isLight = stored === 'light'
     setLight(isLight)
     document.getElementById('fs-scope')?.classList.toggle('fs-light', isLight)
   }, [])

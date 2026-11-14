@@ -15,13 +15,13 @@ export default function CarCareLayout({ children }: { children: React.ReactNode 
   return (
     <>
       <CarCareBottomNav />
-      <div id="fs-scope" className="fs-scope fs-light md:pl-56">
+      <div id="fs-scope" className="fs-scope md:pl-56">
         {children}
       </div>
       <script
         dangerouslySetInnerHTML={{
           __html:
-            "try{if(localStorage.getItem('fs-theme')==='dark'){document.getElementById('fs-scope')&&document.getElementById('fs-scope').classList.remove('fs-light')}}catch(e){}",
+            "try{if(localStorage.getItem('fs-theme')==='light'){document.getElementById('fs-scope')&&document.getElementById('fs-scope').classList.add('fs-light')}}catch(e){}",
         }}
       />
       <CarCareServiceWorker />
