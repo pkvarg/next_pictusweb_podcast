@@ -25,9 +25,18 @@ export async function checkTierLimit(organizationId: string, limitType: LimitTyp
     throw new SubscriptionRequiredError()
   }
 
-  // Benefit org: delegate vehicles/notifications to parent's pool
+  // Benefit org: an optional per-user cap on the sub-org, with the parent's pool as the
+  // ceiling (Option B — a null sub-org limit means "no cap, draw from the shared pool").
   if (org.isBenefitOrg && org.parentOrganizationId) {
     if (limitType === 'vehicles' || limitType === 'notifications') {
+      const subLimit = limitType === 'vehicles' ? org.vehiclesLimit : org.notificationsLimit
+      const subCurrent =
+        limitType === 'vehicles' ? org.currentVehiclesCount : org.currentNotificationsCount
+      if (subLimit !== null && subCurrent >= subLimit) {
+        throw new TierLimitError(
+          `Benefit user has reached their ${limitType} allocation. Current: ${subCurrent}, Limit: ${subLimit}.`,
+        )
+      }
       await checkBenefitParentLimit(org.parentOrganizationId, limitType)
       return
     }

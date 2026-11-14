@@ -63,6 +63,18 @@ export interface GarageData {
   role: 'OWNER' | 'MEMBER' | 'VIEWER' | 'ADMIN'
   canManage: boolean
   canCreateBenefit: boolean
+  benefitCapacity: { vehiclesLeft: number; notificationsLeft: number } | null
+  benefitUsers: {
+    subOrgId: string
+    userId: string | null
+    name: string | null
+    email: string | null
+    active: boolean
+    vehiclesLimit: number | null
+    vehiclesUsed: number
+    notificationsLimit: number | null
+    notificationsUsed: number
+  }[]
   organizationId: string
   organizationName: string | null
   currentUserId: string
@@ -110,6 +122,49 @@ export default function CarCareGarageView({
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [accessBusy, setAccessBusy] = useState<string | null>(null)
   const [benefitOpen, setBenefitOpen] = useState(false)
+  const [benefitEdits, setBenefitEdits] = useState<Record<string, { v: string; n: string }>>({})
+  const [savingBenefit, setSavingBenefit] = useState<string | null>(null)
+
+  const editVal = (subOrgId: string, key: 'v' | 'n', fallback: number | null) =>
+    benefitEdits[subOrgId]?.[key] ?? (fallback != null ? String(fallback) : '')
+  const setEdit = (subOrgId: string, key: 'v' | 'n', value: string, other: number | null) =>
+    setBenefitEdits((prev) => ({
+      ...prev,
+      [subOrgId]: {
+        v: key === 'v' ? value : (prev[subOrgId]?.v ?? (other != null ? String(other) : '')),
+        n: key === 'n' ? value : (prev[subOrgId]?.n ?? (other != null ? String(other) : '')),
+      },
+    }))
+
+  const saveBenefitLimits = async (
+    subOrgId: string,
+    vFallback: number | null,
+    nFallback: number | null,
+  ) => {
+    const toLimit = (s: string) => (s.trim() === '' ? null : Math.max(0, Math.round(Number(s))))
+    const vehiclesLimit = toLimit(editVal(subOrgId, 'v', vFallback))
+    const notificationsLimit = toLimit(editVal(subOrgId, 'n', nFallback))
+    setSavingBenefit(subOrgId)
+    setError(null)
+    setNotice(null)
+    try {
+      const res = await fetch(`/api/carcare/garage/benefit-users/${subOrgId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehiclesLimit, notificationsLimit }),
+      })
+      if (res.ok) {
+        setNotice(t('garage.benefitLimitsSaved'))
+        reload()
+      } else {
+        setError(t('garage.benefitLimitsFailed'))
+      }
+    } catch {
+      setError(t('garage.benefitLimitsFailed'))
+    } finally {
+      setSavingBenefit(null)
+    }
+  }
 
   const [providers, setProviders] = useState<GarageProvider[]>([])
   const [provForm, setProvForm] = useState(false)
@@ -471,23 +526,119 @@ export default function CarCareGarageView({
           </section>
         )}
 
-        {data.canCreateBenefit && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold mb-3">{t('garage.benefitTitle')}</h2>
-            <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 flex flex-col sm:flex-row sm:items-center gap-4">
-              <span className="w-10 h-10 rounded-full bg-amber-400/15 flex items-center justify-center shrink-0 text-amber-400">
-                <Gift className="w-5 h-5" />
-              </span>
-              <p className="min-w-0 flex-1 text-sm text-gray-300">{t('garage.benefitSubtitle')}</p>
-              <button
-                onClick={() => setBenefitOpen(true)}
-                className="inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-5 py-2.5 rounded-xl hover:bg-pictus-lime600 transition-colors shrink-0"
-              >
-                <Gift className="w-4 h-4" /> {t('garage.benefitButton')}
-              </button>
-            </div>
-          </section>
-        )}
+        {data.canCreateBenefit &&
+          (() => {
+            const cap = data.benefitCapacity
+            const hasCapacity = (cap?.vehiclesLeft ?? 0) >= 1 && (cap?.notificationsLeft ?? 0) > 0
+            return (
+              <section className="mb-8">
+                <h2 className="text-xl font-bold mb-3">{t('garage.benefitTitle')}</h2>
+                <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <span className="w-10 h-10 rounded-full bg-amber-400/15 flex items-center justify-center shrink-0 text-amber-400">
+                      <Gift className="w-5 h-5" />
+                    </span>
+                    <p className="min-w-0 flex-1 text-sm text-gray-300">
+                      {t('garage.benefitSubtitle')}
+                    </p>
+                    <button
+                      onClick={() => setBenefitOpen(true)}
+                      disabled={!hasCapacity}
+                      className="inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-5 py-2.5 rounded-xl hover:bg-pictus-lime600 transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed sm:ml-auto"
+                    >
+                      <Gift className="w-4 h-4" /> {t('garage.benefitButton')}
+                    </button>
+                  </div>
+                  {hasCapacity ? (
+                    <p className="text-xs text-pictus-lime">
+                      {t('garage.benefitCapacity', {
+                        vehicles: cap!.vehiclesLeft,
+                        notifications: cap!.notificationsLeft,
+                        users: cap!.vehiclesLeft,
+                      })}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-amber-300">
+                      {t('garage.benefitNoCapacity')}{' '}
+                      <Link
+                        href="/client/upgrade"
+                        className="text-pictus-lime hover:text-pictus-lime600"
+                      >
+                        {t('garage.benefitUpgrade')} →
+                      </Link>
+                    </p>
+                  )}
+
+                  {data.benefitUsers.length > 0 && (
+                    <div className="space-y-2 pt-1 border-t border-white/[0.06]">
+                      <p className="text-xs text-gray-500 pt-2">{t('garage.benefitUsersTitle')}</p>
+                      {data.benefitUsers.map((u) => (
+                        <div
+                          key={u.subOrgId}
+                          className="rounded-xl border border-white/[0.04] bg-pictus-black/20 p-3 flex flex-col sm:flex-row sm:items-end gap-3"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm text-pictus-white truncate">
+                              {u.name || u.email || '—'}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {u.active ? t('garage.benefitActive') : t('garage.benefitPending')}
+                            </p>
+                          </div>
+                          <label className="text-xs text-gray-400">
+                            <span className="block mb-1">
+                              {t('garage.benefitVehCap')}{' '}
+                              <span className="text-gray-600">({u.vehiclesUsed})</span>
+                            </span>
+                            <input
+                              type="number"
+                              min={0}
+                              placeholder="∞"
+                              value={editVal(u.subOrgId, 'v', u.vehiclesLimit)}
+                              onChange={(e) =>
+                                setEdit(u.subOrgId, 'v', e.target.value, u.notificationsLimit)
+                              }
+                              className="w-20 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1 text-sm text-pictus-white focus:border-pictus-lime/50 focus:outline-none"
+                            />
+                          </label>
+                          <label className="text-xs text-gray-400">
+                            <span className="block mb-1">
+                              {t('garage.benefitNotifCap')}{' '}
+                              <span className="text-gray-600">({u.notificationsUsed})</span>
+                            </span>
+                            <input
+                              type="number"
+                              min={0}
+                              placeholder="∞"
+                              value={editVal(u.subOrgId, 'n', u.notificationsLimit)}
+                              onChange={(e) =>
+                                setEdit(u.subOrgId, 'n', e.target.value, u.vehiclesLimit)
+                              }
+                              className="w-24 bg-pictus-black/40 border border-white/10 rounded-lg px-2 py-1 text-sm text-pictus-white focus:border-pictus-lime/50 focus:outline-none"
+                            />
+                          </label>
+                          <button
+                            onClick={() =>
+                              saveBenefitLimits(u.subOrgId, u.vehiclesLimit, u.notificationsLimit)
+                            }
+                            disabled={savingBenefit === u.subOrgId}
+                            className="shrink-0 inline-flex items-center justify-center bg-white/5 hover:bg-white/10 text-pictus-white text-sm px-3 py-1.5 rounded-lg disabled:opacity-50"
+                          >
+                            {savingBenefit === u.subOrgId ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              t('garage.benefitSaveLimits')
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                      <p className="text-[11px] text-gray-500">{t('garage.benefitCapHint')}</p>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )
+          })()}
 
         {data.invitations.length > 0 && (
           <section>

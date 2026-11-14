@@ -52,6 +52,11 @@ export async function GET() {
         canCreateBenefit: true,
         isBenefitOrg: true,
         parentOrganizationId: true,
+        vehiclesLimit: true,
+        notificationsLimit: true,
+        currentVehiclesCount: true,
+        currentNotificationsCount: true,
+        tierRelation: { select: { vehiclesLimit: true, notificationsLimit: true } },
       },
     })
 
@@ -68,10 +73,76 @@ export async function GET() {
     !!data.org?.canCreateBenefit &&
     !data.org?.isBenefitOrg &&
     !data.org?.parentOrganizationId
+
+  // Pooled capacity: benefit sub-orgs share the parent's vehicle/notification limits
+  // (checkBenefitParentLimit). Surface what's left so the UI can show how many more benefit
+  // users can be granted and disable the action when the plan is full.
+  let benefitCapacity: { vehiclesLeft: number; notificationsLeft: number } | null = null
+  let benefitUsers: Array<{
+    subOrgId: string
+    userId: string | null
+    name: string | null
+    email: string | null
+    active: boolean
+    vehiclesLimit: number | null
+    vehiclesUsed: number
+    notificationsLimit: number | null
+    notificationsUsed: number
+  }> = []
+  if (canCreateBenefit && data.org) {
+    const subOrgs = await prisma.organization.findMany({
+      where: {
+        parentOrganizationId: session.organizationId!,
+        isBenefitOrg: true,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        vehiclesLimit: true,
+        notificationsLimit: true,
+        currentVehiclesCount: true,
+        currentNotificationsCount: true,
+        users: {
+          select: { id: true, firstName: true, lastName: true, email: true, active: true },
+          take: 1,
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    })
+    const vehiclesLimit = data.org.vehiclesLimit ?? data.org.tierRelation?.vehiclesLimit ?? 0
+    const notificationsLimit =
+      data.org.notificationsLimit ?? data.org.tierRelation?.notificationsLimit ?? 0
+    const usedVehicles =
+      data.org.currentVehiclesCount + subOrgs.reduce((s, o) => s + o.currentVehiclesCount, 0)
+    const usedNotifications =
+      data.org.currentNotificationsCount +
+      subOrgs.reduce((s, o) => s + o.currentNotificationsCount, 0)
+    benefitCapacity = {
+      vehiclesLeft: Math.max(0, vehiclesLimit - usedVehicles),
+      notificationsLeft: Math.max(0, notificationsLimit - usedNotifications),
+    }
+    benefitUsers = subOrgs.map((o) => {
+      const u = o.users[0]
+      return {
+        subOrgId: o.id,
+        userId: u?.id ?? null,
+        name: u ? [u.firstName, u.lastName].filter(Boolean).join(' ') || null : null,
+        email: u?.email ?? null,
+        active: u?.active ?? false,
+        vehiclesLimit: o.vehiclesLimit,
+        vehiclesUsed: o.currentVehiclesCount,
+        notificationsLimit: o.notificationsLimit,
+        notificationsUsed: o.currentNotificationsCount,
+      }
+    })
+  }
+
   return NextResponse.json({
     role: data.role,
     canManage,
     canCreateBenefit,
+    benefitCapacity,
+    benefitUsers,
     organizationId: session.organizationId,
     organizationName: data.org?.name ?? null,
     currentUserId: session.userId,
