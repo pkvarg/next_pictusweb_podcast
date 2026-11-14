@@ -4,6 +4,7 @@ import prisma from '@/db/db'
 import { dispatchDue, planDeliveries } from '@/lib/carcare/scheduler'
 import { createVehicle } from '@/lib/carcare/vehicles'
 import { assertUserCapacity, TierLimitError } from '@/lib/carcare/limits'
+import { canCreateResource } from '@/lib/tier-limits'
 import type { Channels, DeliveryContext } from '@/lib/carcare/channels'
 
 const PAST = new Date(Date.now() - 60 * 60 * 1000)
@@ -300,5 +301,45 @@ describe('SMS is a paid-plan channel', () => {
   it('BASIC: SMS is planned', async () => {
     const dels = await planWithSmsRule(paidTierId)
     expect(dels.some((d) => d.channel === 'SMS')).toBe(true)
+  })
+})
+
+describe('benefit sub-org limits (Option B: optional cap, parent pool as ceiling)', () => {
+  it('enforces the sub-org cap and the parent pool via checkTierLimit', async () => {
+    const parent = await makeOrg({ tierId: paidTierId, vehiclesLimit: 3, currentVehiclesCount: 0 })
+    const capped = await prisma.organization.create({
+      data: {
+        name: `${tag}-sub-capped`,
+        tierId: paidTierId,
+        isBenefitOrg: true,
+        parentOrganizationId: parent.id,
+        vehiclesLimit: 1,
+        currentVehiclesCount: 1,
+      },
+    })
+    const uncapped = await prisma.organization.create({
+      data: {
+        name: `${tag}-sub-uncapped`,
+        tierId: paidTierId,
+        isBenefitOrg: true,
+        parentOrganizationId: parent.id,
+        vehiclesLimit: null,
+        currentVehiclesCount: 0,
+      },
+    })
+
+    // Capped sub-org at its own cap → blocked, even though the pool still has room.
+    expect(await canCreateResource(capped.id, 'vehicles')).toBe(false)
+    // Uncapped sub-org draws from the shared pool (used 0 + 1 + 0 = 1 < 3) → allowed.
+    expect(await canCreateResource(uncapped.id, 'vehicles')).toBe(true)
+
+    // Fill the pool: parent 2 + capped 1 + uncapped 0 = 3 = limit → uncapped now blocked.
+    await prisma.organization.update({
+      where: { id: parent.id },
+      data: { currentVehiclesCount: 2 },
+    })
+    expect(await canCreateResource(uncapped.id, 'vehicles')).toBe(false)
+
+    await prisma.organization.deleteMany({ where: { id: { in: [capped.id, uncapped.id] } } })
   })
 })

@@ -94,3 +94,46 @@ describe('completeOccurrence (T1 — idempotent completion)', () => {
     expect(all).toHaveLength(2) // the original + exactly one successor
   })
 })
+
+describe('completeOccurrence — misconfigured recurrence is tolerated (session hardening)', () => {
+  it('does not throw and creates no next occurrence when the interval is missing', async () => {
+    const user = await prisma.user.findFirst({ where: { organizationId: { not: null } } })
+    const vehicle = await prisma.myVehicle.create({
+      data: {
+        organizationId: user!.organizationId!,
+        userId: user!.id,
+        type: 'ITEST',
+        registration: `ITEST-MISC-${Date.now()}`,
+      },
+    })
+    const def = await prisma.recurringEvent.create({
+      data: {
+        organizationId: user!.organizationId!,
+        vehicleId: vehicle.id,
+        name: 'ITEST MISCONFIG',
+        category: 'inspection',
+        recurrenceType: 'FIXED_INTERVAL', // no intervalMonths / intervalDays
+      },
+    })
+    const occ = await prisma.eventOccurrence.create({
+      data: {
+        recurringEventId: def.id,
+        vehicleId: vehicle.id,
+        sequenceNo: 1,
+        status: 'ACTION_REQUIRED',
+        dueDate: new Date('2027-01-01T00:00:00Z'),
+      },
+    })
+    await expect(
+      prisma.$transaction((tx) =>
+        completeOccurrence(tx, occ.id, { date: new Date('2027-01-02T00:00:00Z') }),
+      ),
+    ).resolves.toBeDefined()
+    const count = await prisma.eventOccurrence.count({ where: { recurringEventId: def.id } })
+    expect(count).toBe(1) // original only — no next occurrence rolled
+
+    await prisma.eventOccurrence.deleteMany({ where: { recurringEventId: def.id } })
+    await prisma.recurringEvent.deleteMany({ where: { id: def.id } })
+    await prisma.myVehicle.deleteMany({ where: { id: vehicle.id } })
+  })
+})

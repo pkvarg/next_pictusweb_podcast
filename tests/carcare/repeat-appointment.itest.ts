@@ -181,3 +181,34 @@ describe('appointment reminder', () => {
     expect(dropped?.suppressedReason).toBe('appointment cancelled')
   })
 })
+
+describe('appointment booking invariants (session fixes)', () => {
+  it('re-booking replaces the prior appointment — only one BOOKED remains', async () => {
+    const occ = await freshOccurrence()
+    await prisma.$transaction((tx) =>
+      bookAppointment(tx, occ.id, { scheduledAt: new Date(DUE.getTime() - 6 * DAY) }),
+    )
+    await prisma.$transaction((tx) =>
+      bookAppointment(tx, occ.id, { scheduledAt: new Date(DUE.getTime() - 4 * DAY) }),
+    )
+    const booked = await prisma.appointment.findMany({
+      where: { occurrenceId: occ.id, status: 'BOOKED' },
+    })
+    expect(booked).toHaveLength(1)
+    expect(booked[0].scheduledAt.getTime()).toBe(new Date(DUE.getTime() - 4 * DAY).getTime())
+    const cancelled = await prisma.appointment.count({
+      where: { occurrenceId: occ.id, status: 'CANCELLED' },
+    })
+    expect(cancelled).toBe(1)
+  })
+
+  it('does not arm an appointment reminder whose send time is already in the past', async () => {
+    const occ = await freshOccurrence()
+    // Visit today → the reminder (visit − 1 day lead) is already in the past.
+    await prisma.$transaction((tx) => bookAppointment(tx, occ.id, { scheduledAt: new Date() }))
+    const scheduled = await prisma.notificationDelivery.findFirst({
+      where: { occurrenceId: occ.id, stage: 'APPOINTMENT', status: 'SCHEDULED' },
+    })
+    expect(scheduled).toBeNull()
+  })
+})
