@@ -4238,3 +4238,19 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
 .fs-light [class*='calendar-picker-indicator']::-webkit-calendar-picker-indicator {
   filter: none;
 }
+
+/* Browser autofill paints inputs with its own light background, which breaks the dark theme
+   (the whole app is dark). Keep autofilled fields dark with legible text. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #f4f2ee;
+  -webkit-box-shadow: 0 0 0 1000px #17191b inset;
+  box-shadow: 0 0 0 1000px #17191b inset;
+  caret-color: #f4f2ee;
+  border-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 9999s ease-in-out 0s;
+}

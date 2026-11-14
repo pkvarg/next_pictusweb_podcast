@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/routing'
 import { Loader2, Save, CheckCircle, AlertCircle, User as UserIcon, Building2 } from 'lucide-react'
+import { PHONE_PLACEHOLDER, isAcceptablePhone } from '@/lib/phone'
 
 interface AccountData {
   firstName: string
@@ -95,6 +96,10 @@ export default function CarCareAccountSettingsView() {
   }, [status, load])
 
   const handleSave = async () => {
+    if (!isAcceptablePhone(account.phoneNumber)) {
+      setError(t('invalidPhone'))
+      return
+    }
     setSaving(true)
     setSaved(false)
     setError('')
@@ -166,6 +171,9 @@ export default function CarCareAccountSettingsView() {
               <label className={labelClass}>{t('phoneNumber')}</label>
               <input
                 className={inputClass}
+                type="tel"
+                inputMode="tel"
+                placeholder={PHONE_PLACEHOLDER}
                 value={account.phoneNumber}
                 onChange={(e) => setAccField('phoneNumber', e.target.value)}
               />
