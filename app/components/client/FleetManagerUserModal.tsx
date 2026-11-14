@@ -24,6 +24,7 @@ interface FleetManagerUserModalProps {
   organization: string // This will be the organization name for display
   organizationId?: string // Optional: UUID of the organization
   canCreateBenefit?: boolean // Whether this org can create benefit users
+  defaultBenefit?: boolean // Pre-check the benefit option when creating (e.g. from the garage)
 }
 
 export default function FleetManagerUserModal({
@@ -34,6 +35,7 @@ export default function FleetManagerUserModal({
   organization,
   organizationId,
   canCreateBenefit = false,
+  defaultBenefit = false,
 }: FleetManagerUserModalProps) {
   const t = useTranslations('Client')
   const params = useParams()
@@ -47,7 +49,7 @@ export default function FleetManagerUserModal({
     password: '',
     active: true,
     isFleetManager: false,
-    isBenefit: false,
+    isBenefit: defaultBenefit,
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -73,11 +75,11 @@ export default function FleetManagerUserModal({
         password: '',
         active: true,
         isFleetManager: false,
-        isBenefit: false,
+        isBenefit: defaultBenefit,
       })
     }
     setError('')
-  }, [user, isOpen])
+  }, [user, isOpen, defaultBenefit])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

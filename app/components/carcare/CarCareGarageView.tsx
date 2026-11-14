@@ -21,7 +21,9 @@ import {
   ExternalLink,
   MapPin,
   Plus,
+  Gift,
 } from 'lucide-react'
+import FleetManagerUserModal from '@/app/components/client/FleetManagerUserModal'
 
 export interface GarageMember {
   userId: string
@@ -60,6 +62,9 @@ export interface GarageInvitationItem {
 export interface GarageData {
   role: 'OWNER' | 'MEMBER' | 'VIEWER' | 'ADMIN'
   canManage: boolean
+  canCreateBenefit: boolean
+  organizationId: string
+  organizationName: string | null
   currentUserId: string
   members: GarageMember[]
   invitations: GarageInvitationItem[]
@@ -104,6 +109,7 @@ export default function CarCareGarageView({
   const [notice, setNotice] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [accessBusy, setAccessBusy] = useState<string | null>(null)
+  const [benefitOpen, setBenefitOpen] = useState(false)
 
   const [providers, setProviders] = useState<GarageProvider[]>([])
   const [provForm, setProvForm] = useState(false)
@@ -465,6 +471,24 @@ export default function CarCareGarageView({
           </section>
         )}
 
+        {data.canCreateBenefit && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-3">{t('garage.benefitTitle')}</h2>
+            <div className="bg-pictus-onyx900 rounded-2xl border border-white/[0.06] p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+              <span className="w-10 h-10 rounded-full bg-amber-400/15 flex items-center justify-center shrink-0 text-amber-400">
+                <Gift className="w-5 h-5" />
+              </span>
+              <p className="min-w-0 flex-1 text-sm text-gray-300">{t('garage.benefitSubtitle')}</p>
+              <button
+                onClick={() => setBenefitOpen(true)}
+                className="inline-flex items-center justify-center gap-2 bg-pictus-lime text-pictus-black font-semibold px-5 py-2.5 rounded-xl hover:bg-pictus-lime600 transition-colors shrink-0"
+              >
+                <Gift className="w-4 h-4" /> {t('garage.benefitButton')}
+              </button>
+            </div>
+          </section>
+        )}
+
         {data.invitations.length > 0 && (
           <section>
             <h2 className="text-xl font-bold mb-3">{t('garage.pending')}</h2>
@@ -662,6 +686,19 @@ export default function CarCareGarageView({
           )}
         </section>
       </div>
+
+      {data.canCreateBenefit && (
+        <FleetManagerUserModal
+          isOpen={benefitOpen}
+          onClose={() => setBenefitOpen(false)}
+          onSuccess={reload}
+          user={null}
+          organization={data.organizationName ?? ''}
+          organizationId={data.organizationId}
+          canCreateBenefit
+          defaultBenefit
+        />
+      )}
     </div>
   )
 }

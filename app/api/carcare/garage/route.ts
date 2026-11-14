@@ -45,15 +45,35 @@ export async function GET() {
       select: { firstName: true, lastName: true, email: true },
     })
 
-    return { role, isLegacyOwner, memberships, invitations, currentUser, vehicles }
+    const org = await tx.organization.findUnique({
+      where: { id: session.organizationId! },
+      select: {
+        name: true,
+        canCreateBenefit: true,
+        isBenefitOrg: true,
+        parentOrganizationId: true,
+      },
+    })
+
+    return { role, isLegacyOwner, memberships, invitations, currentUser, vehicles, org }
   })
 
   if (!data) return NextResponse.json({ error: 'No access' }, { status: 403 })
 
   const canManage = data.role === 'OWNER' || data.role === 'ADMIN'
+  // Benefit users may only be created by a managing user of a benefit-enabled parent org
+  // (never from a benefit sub-org). Mirrors the guard in POST /api/users.
+  const canCreateBenefit =
+    canManage &&
+    !!data.org?.canCreateBenefit &&
+    !data.org?.isBenefitOrg &&
+    !data.org?.parentOrganizationId
   return NextResponse.json({
     role: data.role,
     canManage,
+    canCreateBenefit,
+    organizationId: session.organizationId,
+    organizationName: data.org?.name ?? null,
     currentUserId: session.userId,
     members:
       data.isLegacyOwner && data.memberships.length === 0
