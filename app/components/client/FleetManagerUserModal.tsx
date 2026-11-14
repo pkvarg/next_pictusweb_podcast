@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { X, Save, Gift, Info } from 'lucide-react'
+import { PHONE_PLACEHOLDER, isAcceptablePhone } from '@/lib/phone'
 
 interface User {
   id: string
@@ -27,6 +28,12 @@ interface FleetManagerUserModalProps {
   defaultBenefit?: boolean // Pre-check the benefit option when creating (e.g. from the garage)
 }
 
+// Match the CarCare modal conventions so the modal themes correctly in both dark and
+// light (fs-light) mode — only these pictus-* / gray-* utilities are remapped for light.
+const inputCls =
+  'w-full bg-pictus-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-pictus-white placeholder:text-gray-500 focus:border-pictus-lime/50 focus:outline-none disabled:opacity-60'
+const labelCls = 'block text-sm text-gray-400 mb-1.5'
+
 export default function FleetManagerUserModal({
   isOpen,
   onClose,
@@ -48,7 +55,7 @@ export default function FleetManagerUserModal({
     phoneNumber: '',
     password: '',
     active: true,
-    isFleetManager: false,
+    isFleetManager: true,
     isBenefit: defaultBenefit,
   })
   const [saving, setSaving] = useState(false)
@@ -74,7 +81,7 @@ export default function FleetManagerUserModal({
         phoneNumber: '',
         password: '',
         active: true,
-        isFleetManager: false,
+        isFleetManager: true,
         isBenefit: defaultBenefit,
       })
     }
@@ -87,6 +94,11 @@ export default function FleetManagerUserModal({
 
     if (!formData.email || !formData.firstName || !formData.lastName) {
       setError(t('modalRequiredFields'))
+      return
+    }
+
+    if (!isAcceptablePhone(formData.phoneNumber)) {
+      setError(t('modalInvalidPhone'))
       return
     }
 
@@ -150,10 +162,10 @@ export default function FleetManagerUserModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-pictus-onyx900 border border-white/[0.06] rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-white">
+          <h3 className="text-2xl font-bold text-pictus-white">
             {user ? t('modalEditUser') : t('modalAddUser')}
           </h3>
           <button
@@ -172,103 +184,74 @@ export default function FleetManagerUserModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              {t('modalOrganization')}
-            </label>
-            <input
-              type="text"
-              value={organization}
-              disabled
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 cursor-not-allowed"
-            />
+            <label className={labelCls}>{t('modalOrganization')}</label>
+            <input type="text" value={organization} disabled className={inputCls} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={labelCls}>
               {t('modalEmail')} <span className="text-red-400">*</span>
             </label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+              className={inputCls}
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={labelCls}>
               {t('modalFirstName')} <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+              className={inputCls}
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={labelCls}>
               {t('modalLastName')} <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+              className={inputCls}
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              {t('modalPhone')}
-            </label>
+            <label className={labelCls}>{t('modalPhone')}</label>
             <input
               type="tel"
+              inputMode="tel"
               value={formData.phoneNumber}
               onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+              placeholder={PHONE_PLACEHOLDER}
+              className={inputCls}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={labelCls}>
               {user ? t('modalPasswordEdit') : t('modalPasswordNew')}
             </label>
             <input
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
+              className={inputCls}
               placeholder={
                 user ? t('modalPasswordEditPlaceholder') : t('modalPasswordNewPlaceholder')
               }
             />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.active}
-                onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                className="w-4 h-4 rounded border-gray-300 text-pictus-lime focus:ring-pictus-lime"
-              />
-              <span className="text-sm text-gray-300">{t('modalActive')}</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.isFleetManager}
-                onChange={(e) => setFormData({ ...formData, isFleetManager: e.target.checked })}
-                className="w-4 h-4 rounded border-gray-300 text-pictus-lime focus:ring-pictus-lime"
-              />
-              <span className="text-sm text-gray-300">{t('modalFleetManager')}</span>
-            </label>
           </div>
 
           {/* Benefit checkbox - only for orgs with canCreateBenefit and only when creating */}
@@ -287,9 +270,9 @@ export default function FleetManagerUserModal({
                 />
               </div>
               {formData.isBenefit && (
-                <div className="flex items-start gap-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-                  <Info className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-blue-300">{t('modalBenefitInfo')}</p>
+                <div className="flex items-start gap-2 p-3 bg-pictus-lime/5 border border-pictus-lime/20 rounded-xl">
+                  <Info className="h-4 w-4 text-pictus-lime mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-gray-300">{t('modalBenefitInfo')}</p>
                 </div>
               )}
             </div>
