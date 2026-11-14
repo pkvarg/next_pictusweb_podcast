@@ -44,6 +44,34 @@ export function smsAllowedForTier(tierName: string | null | undefined): boolean 
 }
 
 // Effective limit = org override ?? tier limit; null means unlimited (no tier, no override).
+// A benefit sub-org's vehicles draw from its parent's shared pool: parent usage plus every
+// active benefit sub-org's usage, against the parent/tier limit. Mirrors checkBenefitParentLimit
+// so the CarCare createVehicle path enforces the pool just like the /api/my-vehicles route.
+async function assertBenefitParentVehicleCapacity(
+  tx: Prisma.TransactionClient,
+  parentOrganizationId: string,
+): Promise<void> {
+  const parent = await tx.organization.findUnique({
+    where: { id: parentOrganizationId },
+    select: {
+      vehiclesLimit: true,
+      currentVehiclesCount: true,
+      tierRelation: { select: { vehiclesLimit: true } },
+    },
+  })
+  if (!parent) return
+  const limit = parent.vehiclesLimit ?? parent.tierRelation?.vehiclesLimit ?? null
+  if (limit == null) return
+  const subs = await tx.organization.findMany({
+    where: { parentOrganizationId, isBenefitOrg: true, deletedAt: null },
+    select: { currentVehiclesCount: true },
+  })
+  const total = parent.currentVehiclesCount + subs.reduce((s, o) => s + o.currentVehiclesCount, 0)
+  if (total >= limit) {
+    throw new TierLimitError('vehicles', limit)
+  }
+}
+
 export async function assertVehicleCapacity(
   tx: Prisma.TransactionClient,
   organizationId: string,
@@ -53,10 +81,23 @@ export async function assertVehicleCapacity(
     select: {
       vehiclesLimit: true,
       currentVehiclesCount: true,
+      isBenefitOrg: true,
+      parentOrganizationId: true,
       tierRelation: { select: { vehiclesLimit: true } },
     },
   })
   if (!org) return
+
+  // Benefit sub-org: enforce its optional own cap (Option B — null means no cap), then the
+  // parent's shared pool ceiling.
+  if (org.isBenefitOrg && org.parentOrganizationId) {
+    if (org.vehiclesLimit !== null && org.currentVehiclesCount >= org.vehiclesLimit) {
+      throw new TierLimitError('vehicles', org.vehiclesLimit)
+    }
+    await assertBenefitParentVehicleCapacity(tx, org.parentOrganizationId)
+    return
+  }
+
   const limit = org.vehiclesLimit ?? org.tierRelation?.vehiclesLimit ?? null
   if (limit != null && org.currentVehiclesCount >= limit) {
     throw new TierLimitError('vehicles', limit)

@@ -343,3 +343,27 @@ describe('benefit sub-org limits (Option B: optional cap, parent pool as ceiling
     await prisma.organization.deleteMany({ where: { id: { in: [capped.id, uncapped.id] } } })
   })
 })
+
+describe('benefit sub-org vehicle creation (dual-path pool fix)', () => {
+  it('createVehicle on an uncapped benefit sub-org is blocked when the parent pool is full', async () => {
+    const parent = await makeOrg({ tierId: paidTierId, vehiclesLimit: 2, currentVehiclesCount: 2 })
+    const sub = await prisma.organization.create({
+      data: {
+        name: `${tag}-sub-pool`,
+        tierId: paidTierId,
+        isBenefitOrg: true,
+        parentOrganizationId: parent.id,
+        vehiclesLimit: null,
+        currentVehiclesCount: 0,
+      },
+    })
+    const u = await prisma.user.create({
+      data: { email: `${tag}-subpool@e.com`, role: 'CLIENT', organizationId: sub.id },
+    })
+    await expect(
+      prisma.$transaction((tx) => createVehicle(tx, sub.id, u.id, { registration: `${tag}-POOL` })),
+    ).rejects.toBeInstanceOf(TierLimitError)
+    await prisma.user.deleteMany({ where: { organizationId: sub.id } })
+    await prisma.organization.deleteMany({ where: { id: sub.id } })
+  })
+})
