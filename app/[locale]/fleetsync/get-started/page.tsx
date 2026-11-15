@@ -24,13 +24,6 @@ import {
 const STEPS = ['organization', 'account', 'verification', 'agreements', 'review'] as const
 type Step = (typeof STEPS)[number]
 
-const COUNTRY_CODES: { code: string; dial: string }[] = [
-  { code: 'SK', dial: '+421' },
-  { code: 'CZ', dial: '+420' },
-  { code: 'HU', dial: '+36' },
-  { code: 'AT', dial: '+43' },
-]
-
 // SMS OTP is attempted for every EU prefix (testing smstools delivery); only the national
 // digit-length rule differs for Slovak numbers.
 
@@ -99,9 +92,8 @@ function GetStartedContent() {
   const [verificationSent, setVerificationSent] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
   // Non-SK fallback: SMS OTP may not be deliverable to every country, so after a short wait
-  // we let a non-Slovak registrant continue without a phone code.
+  // we silently let a non-Slovak registrant continue without a phone code (never surfaced in UI).
   const [phoneSkipAllowed, setPhoneSkipAllowed] = useState(false)
-  const [skipCountdown, setSkipCountdown] = useState(0)
   const [emailToken, setEmailToken] = useState('')
   const [phoneToken, setPhoneToken] = useState('')
   const PRICING: Record<string, { monthly: number; yearly: number }> = {
@@ -175,22 +167,12 @@ function GetStartedContent() {
     const prefix = form.phonePrefix || '+421'
     if (verifyPhase !== 'phone' || prefix === '+421') {
       setPhoneSkipAllowed(false)
-      setSkipCountdown(0)
       return
     }
     setPhoneSkipAllowed(false)
-    setSkipCountdown(60)
     const timer = setTimeout(() => setPhoneSkipAllowed(true), 60000)
     return () => clearTimeout(timer)
   }, [verifyPhase, form.phonePrefix])
-
-  // Visible countdown for the non-SK skip window.
-  useEffect(() => {
-    if (skipCountdown > 0) {
-      const timer = setTimeout(() => setSkipCountdown((s) => Math.max(0, s - 1)), 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [skipCountdown])
 
   // Bring the error banner into view (it sits above the form, out of sight on long steps)
   useEffect(() => {
@@ -843,11 +825,13 @@ function GetStartedContent() {
                 value={form.country}
                 onChange={(e) => updateForm('country', e.target.value)}
               >
-                {COUNTRY_CODES.map((c) => (
-                  <option key={c.code} value={c.code} className="bg-pictus-black">
-                    {regionName(c.code)}
-                  </option>
-                ))}
+                {[...EU_DIAL_CODES]
+                  .sort((a, b) => regionName(a.code).localeCompare(regionName(b.code)))
+                  .map((c) => (
+                    <option key={c.code} value={c.code} className="bg-pictus-black">
+                      {regionName(c.code)}
+                    </option>
+                  ))}
               </select>
             </div>
 
@@ -1065,16 +1049,6 @@ function GetStartedContent() {
                     </p>
                   )}
                 </div>
-
-                {!isSk &&
-                  !form.phoneVerified &&
-                  (phoneSkipAllowed ? (
-                    <p className="text-amber-300 text-sm font-light">{t('skipPhoneNow')}</p>
-                  ) : (
-                    <p className="text-gray-400 text-sm font-light">
-                      {t('skipPhoneWait', { seconds: skipCountdown })}
-                    </p>
-                  ))}
               </>
             )}
 

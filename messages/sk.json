@@ -456,8 +456,6 @@
     "verifyEmailSubtitle": "Zadajte kód, ktorý sme poslali na váš email.",
     "verifyPhoneTitle": "Overenie telefónu",
     "verifyPhoneSubtitle": "Zadajte kód, ktorý sme poslali cez SMS na váš telefón.",
-    "skipPhoneWait": "Ak SMS nepríde, budete môcť pokračovať aj bez kódu o {seconds} s.",
-    "skipPhoneNow": "SMS neprišla? Pokračujte tlačidlom Ďalej aj bez overenia telefónu.",
     "verificationInfoPhoneOnly": "Poslali sme overovací kód cez SMS na vaše telefónne číslo. Zadajte ho nižšie. Je iný ako kód z emailu.",
     "errorPhoneFormat": "Zadajte platné telefónne číslo (pre SK 9 číslic, napr. 912 345 678).",
     "emailCode": "Overovací kód z emailu",
