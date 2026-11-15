@@ -77,6 +77,22 @@ async function sendLimitReachedEmail(params: {
   }
 }
 
+// Effective yearly notification allowance for an organization. An explicit per-org override
+// wins (admin-set). Otherwise, when the tier grants a per-vehicle rate the allowance scales
+// with the org's current vehicle count (perVehicle × vehicles) — so adding a vehicle raises
+// the allowance automatically; a tier without a per-vehicle rate (the FREE trial) uses its
+// flat limit.
+export function resolveNotificationLimit(
+  orgOverride: number | null | undefined,
+  perVehicle: number,
+  vehicleCount: number,
+  tierFlat: number | null | undefined,
+): number {
+  if (orgOverride != null) return orgOverride
+  if (perVehicle > 0) return perVehicle * vehicleCount
+  return tierFlat ?? 0
+}
+
 /**
  * Checks if an organization can create more notifications based on tier limits.
  *
@@ -123,14 +139,12 @@ export async function checkNotificationLimit(
   }
 
   const tierName = org.tierRelation.name.toUpperCase()
-  // Org-level yearly allowance: an explicit org override, else the tier's per-vehicle
-  // rate × the org's vehicle count, else the tier's flat limit (e.g. the FREE trial).
-  const perVehicle = org.tierRelation.notificationsPerVehicle ?? 0
-  const limit =
-    org.notificationsLimit ??
-    (perVehicle > 0
-      ? perVehicle * org.currentVehiclesCount
-      : (org.tierRelation.notificationsLimit ?? 0))
+  const limit = resolveNotificationLimit(
+    org.notificationsLimit,
+    org.tierRelation.notificationsPerVehicle ?? 0,
+    org.currentVehiclesCount,
+    org.tierRelation.notificationsLimit,
+  )
 
   // Keep the org's stored total fresh so admin can see spend / allowance.
   if (org.notificationsAllowance !== limit) {

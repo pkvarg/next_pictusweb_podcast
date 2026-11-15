@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
           billingInterval: billing || 'monthly',
           usersLimit: tierRecord.usersLimit,
           vehiclesLimit: vehicles,
-          notificationsLimit: tierRecord.notificationsLimit,
         },
       })
 
@@ -103,16 +102,22 @@ export async function POST(request: NextRequest) {
       return { organization, user }
     })
 
-    return NextResponse.json({
-      success: true,
-      organization: { id: result.organization.id, name: result.organization.name },
-      user: result.user,
-    }, { status: 201 })
+    return NextResponse.json(
+      {
+        success: true,
+        organization: { id: result.organization.id, name: result.organization.name },
+        user: result.user,
+      },
+      { status: 201 },
+    )
   } catch (error) {
     console.error('Dev skip payment error:', error)
-    return NextResponse.json({
-      error: 'Failed to create account',
-      details: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: 'Failed to create account',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    )
   }
 }

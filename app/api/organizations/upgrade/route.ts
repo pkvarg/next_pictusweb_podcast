@@ -43,12 +43,18 @@ export async function POST(request: NextRequest) {
     }
 
     if (!validPaths[currentTierName]?.includes(targetTier)) {
-      return NextResponse.json({ error: `Cannot upgrade from ${currentTierName} to ${targetTier}` }, { status: 400 })
+      return NextResponse.json(
+        { error: `Cannot upgrade from ${currentTierName} to ${targetTier}` },
+        { status: 400 },
+      )
     }
 
     // Block if subscription is past_due
     if (org.stripeSubscriptionStatus === 'past_due') {
-      return NextResponse.json({ error: 'Please fix your payment method before upgrading' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Please fix your payment method before upgrading' },
+        { status: 400 },
+      )
     }
 
     // Get target tier record
@@ -69,7 +75,10 @@ export async function POST(request: NextRequest) {
       // Cancel existing subscription if any (e.g. upgrading before webhook sets subscriptionId)
       if (org.stripeSubscriptionId) {
         try {
-          await stripe.subscriptions.cancel(org.stripeSubscriptionId, { prorate: true, invoice_now: true })
+          await stripe.subscriptions.cancel(org.stripeSubscriptionId, {
+            prorate: true,
+            invoice_now: true,
+          })
           console.log('Canceled old subscription (prorated credit):', org.stripeSubscriptionId)
         } catch (err) {
           console.error('Failed to cancel old subscription:', err)
@@ -120,7 +129,9 @@ export async function POST(request: NextRequest) {
 
     // If old subscription is no longer active, cancel it and go through checkout
     if (subscription.status === 'canceled' || subscription.status === 'incomplete_expired') {
-      try { await stripe.subscriptions.cancel(org.stripeSubscriptionId) } catch {}
+      try {
+        await stripe.subscriptions.cancel(org.stripeSubscriptionId)
+      } catch {}
       const checkoutSession = await stripe.checkout.sessions.create({
         mode: 'subscription',
         customer: org.stripeCustomerId!,
@@ -150,12 +161,18 @@ export async function POST(request: NextRequest) {
     // Reject yearly subscribers — must contact support for upgrade
     const currentInterval = org.billingInterval || 'monthly'
     if (currentInterval === 'yearly') {
-      return NextResponse.json({ error: 'Yearly subscribers must contact support to upgrade.' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Yearly subscribers must contact support to upgrade.' },
+        { status: 400 },
+      )
     }
 
     // Reject billing interval changes (UI prevents this, but enforce server-side)
     if (currentInterval !== billingInterval) {
-      return NextResponse.json({ error: 'Cannot change billing interval. Contact support.' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Cannot change billing interval. Contact support.' },
+        { status: 400 },
+      )
     }
 
     // Allow vehicle count change during upgrade, capped at 100
@@ -163,11 +180,13 @@ export async function POST(request: NextRequest) {
 
     // Update subscription in-place — new price + quantity kicks in at next billing cycle
     await stripe.subscriptions.update(org.stripeSubscriptionId, {
-      items: [{
-        id: existingItem.id,
-        price: stripePriceId,
-        quantity: newVehicles,
-      }],
+      items: [
+        {
+          id: existingItem.id,
+          price: stripePriceId,
+          quantity: newVehicles,
+        },
+      ],
       proration_behavior: 'none' as any,
     })
 
@@ -179,7 +198,7 @@ export async function POST(request: NextRequest) {
         purchasedVehicles: newVehicles,
         vehiclesLimit: newVehicles,
         usersLimit: targetTierRecord.usersLimit,
-        notificationsLimit: targetTierRecord.notificationsLimit,
+        notificationsLimit: null,
         currentNotificationsCount: 0,
         notificationPeriodStart: new Date(),
         notificationsBlocked: false,
@@ -216,7 +235,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Upgrade error:', error)
     return NextResponse.json(
-      { error: 'Failed to process upgrade', details: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        error: 'Failed to process upgrade',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 },
     )
   }

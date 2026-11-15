@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
                 purchasedVehicles,
                 vehiclesLimit: purchasedVehicles,
                 usersLimit: targetTier.usersLimit,
-                notificationsLimit: targetTier.notificationsLimit,
+                notificationsLimit: null,
                 stripeCustomerId: session.customer as string,
                 stripeSubscriptionId: session.subscription as string,
                 stripeSubscriptionStatus: 'active',
