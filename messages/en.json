@@ -456,6 +456,8 @@
     "verifyEmailSubtitle": "Enter the code we sent to your email.",
     "verifyPhoneTitle": "Verify your phone",
     "verifyPhoneSubtitle": "Enter the code we sent by SMS to your phone.",
+    "skipPhoneWait": "If no SMS arrives, you can continue without a code in {seconds} s.",
+    "skipPhoneNow": "No SMS? Continue with the Next button even without phone verification.",
     "verificationInfoPhoneOnly": "We sent a verification code by SMS to your phone. Enter it below. It is different from the email code.",
     "errorPhoneFormat": "Enter a valid phone number (9 digits for SK, e.g. 912 345 678).",
     "emailCode": "Email Verification Code",

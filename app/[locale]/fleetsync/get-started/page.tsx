@@ -98,6 +98,10 @@ function GetStartedContent() {
   const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null)
   const [verificationSent, setVerificationSent] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
+  // Non-SK fallback: SMS OTP may not be deliverable to every country, so after a short wait
+  // we let a non-Slovak registrant continue without a phone code.
+  const [phoneSkipAllowed, setPhoneSkipAllowed] = useState(false)
+  const [skipCountdown, setSkipCountdown] = useState(0)
   const [emailToken, setEmailToken] = useState('')
   const [phoneToken, setPhoneToken] = useState('')
   const PRICING: Record<string, { monthly: number; yearly: number }> = {
@@ -164,6 +168,29 @@ function GetStartedContent() {
       return () => clearTimeout(timer)
     }
   }, [resendCooldown])
+
+  // Non-SK phone verification: arm a 60s window after which the registrant may continue
+  // without entering an SMS code (covers countries smstools cannot deliver to). SK must verify.
+  useEffect(() => {
+    const prefix = form.phonePrefix || '+421'
+    if (verifyPhase !== 'phone' || prefix === '+421') {
+      setPhoneSkipAllowed(false)
+      setSkipCountdown(0)
+      return
+    }
+    setPhoneSkipAllowed(false)
+    setSkipCountdown(60)
+    const timer = setTimeout(() => setPhoneSkipAllowed(true), 60000)
+    return () => clearTimeout(timer)
+  }, [verifyPhase, form.phonePrefix])
+
+  // Visible countdown for the non-SK skip window.
+  useEffect(() => {
+    if (skipCountdown > 0) {
+      const timer = setTimeout(() => setSkipCountdown((s) => Math.max(0, s - 1)), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [skipCountdown])
 
   // Bring the error banner into view (it sits above the form, out of sight on long steps)
   useEffect(() => {
@@ -322,7 +349,7 @@ function GetStartedContent() {
       }
       case 'verification':
         if (!form.emailVerified) return t('errorVerification')
-        if (smsEnabled && !form.phoneVerified) return t('errorVerification')
+        if (!form.phoneVerified && (isSk || !phoneSkipAllowed)) return t('errorVerification')
         return null
       case 'agreements':
         if (!form.gdprAccepted) return t('errorGdpr')
@@ -396,12 +423,17 @@ function GetStartedContent() {
         // non-SK: no phone verification, fall through to the next step
       } else {
         if (!form.phoneVerified) {
+          const canSkip = !isSk && phoneSkipAllowed
           if (!form.phoneCode) {
-            setError(t('errorVerification'))
-            return
+            // non-SK: after the wait, continue without a code; otherwise require one.
+            if (!canSkip) {
+              setError(t('errorVerification'))
+              return
+            }
+          } else {
+            const ok = await verifyPhone()
+            if (!ok) return
           }
-          const ok = await verifyPhone()
-          if (!ok) return
         }
       }
     }
@@ -1033,6 +1065,16 @@ function GetStartedContent() {
                     </p>
                   )}
                 </div>
+
+                {!isSk &&
+                  !form.phoneVerified &&
+                  (phoneSkipAllowed ? (
+                    <p className="text-amber-300 text-sm font-light">{t('skipPhoneNow')}</p>
+                  ) : (
+                    <p className="text-gray-400 text-sm font-light">
+                      {t('skipPhoneWait', { seconds: skipCountdown })}
+                    </p>
+                  ))}
               </>
             )}
 
