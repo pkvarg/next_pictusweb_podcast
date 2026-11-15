@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
@@ -8,7 +8,7 @@ import PagesHeader from '@/app/components/PagesHeader'
 import Footer from '@/app/components/Footer'
 import { CheckCircle, ShieldCheck, Loader2, ExternalLink } from 'lucide-react'
 
-export default function BenefitActivatePage() {
+function BenefitActivateContent() {
   const t = useTranslations('Home')
   const tb = useTranslations('Benefit')
   const to = useTranslations('FleetSyncOnboarding')
@@ -192,5 +192,13 @@ export default function BenefitActivatePage() {
 
       <Footer />
     </main>
+  )
+}
+
+export default function BenefitActivatePage() {
+  return (
+    <Suspense>
+      <BenefitActivateContent />
+    </Suspense>
   )
 }
