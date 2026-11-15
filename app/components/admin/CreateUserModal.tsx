@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+import PhoneField from '@/app/components/PhoneField'
 import { X, User, Mail, Building, ToggleLeft, Lock, Shield, Phone, Gift, Info } from 'lucide-react'
 
 interface Organization {
@@ -31,7 +32,8 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
   const [error, setError] = useState('')
   const [organizations, setOrganizations] = useState<Organization[]>([])
 
-  const selectedOrgCanBenefit = organizations.find((o) => o.id === formData.organizationId)?.canCreateBenefit || false
+  const selectedOrgCanBenefit =
+    organizations.find((o) => o.id === formData.organizationId)?.canCreateBenefit || false
 
   useEffect(() => {
     if (isOpen) {
@@ -175,13 +177,10 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
               <Phone className="h-4 w-4 inline mr-2" />
               Phone Number
             </label>
-            <input
-              type="tel"
-              name="phoneNumber"
+            <PhoneField
               value={formData.phoneNumber}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              placeholder="+421..."
+              onChange={(v) => setFormData((prev) => ({ ...prev, phoneNumber: v }))}
+              inputClassName="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             />
           </div>
 
@@ -288,7 +287,8 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }: Crea
                 <div className="flex items-start gap-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                   <Info className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
                   <p className="text-xs text-blue-300">
-                    This user will receive an activation email to accept GDPR &amp; Trade Rules. A sub-organization will be created automatically.
+                    This user will receive an activation email to accept GDPR &amp; Trade Rules. A
+                    sub-organization will be created automatically.
                   </p>
                 </div>
               )}

@@ -28,6 +28,37 @@ export function isValidE164(phone: string | null | undefined): boolean {
 // Canonical placeholder shown in every phone input across the app.
 export const PHONE_PLACEHOLDER = '+421 900 123 456'
 
+// EU dial codes for the shared phone-prefix dropdown. Primary markets first, then the rest.
+export const EU_DIAL_CODES: { code: string; dial: string }[] = [
+  { code: 'SK', dial: '+421' },
+  { code: 'CZ', dial: '+420' },
+  { code: 'HU', dial: '+36' },
+  { code: 'AT', dial: '+43' },
+  { code: 'BE', dial: '+32' },
+  { code: 'BG', dial: '+359' },
+  { code: 'HR', dial: '+385' },
+  { code: 'CY', dial: '+357' },
+  { code: 'DK', dial: '+45' },
+  { code: 'EE', dial: '+372' },
+  { code: 'FI', dial: '+358' },
+  { code: 'FR', dial: '+33' },
+  { code: 'DE', dial: '+49' },
+  { code: 'GR', dial: '+30' },
+  { code: 'IE', dial: '+353' },
+  { code: 'IT', dial: '+39' },
+  { code: 'LV', dial: '+371' },
+  { code: 'LT', dial: '+370' },
+  { code: 'LU', dial: '+352' },
+  { code: 'MT', dial: '+356' },
+  { code: 'NL', dial: '+31' },
+  { code: 'PL', dial: '+48' },
+  { code: 'PT', dial: '+351' },
+  { code: 'RO', dial: '+40' },
+  { code: 'SI', dial: '+386' },
+  { code: 'ES', dial: '+34' },
+  { code: 'SE', dial: '+46' },
+]
+
 // National significant number length per dialing code — mirrors the onboarding rule
 // (SK must be exactly 9 digits; CZ/HU/AT between 6 and 12). Countries we don't know fall
 // back to the generic E.164 length check.

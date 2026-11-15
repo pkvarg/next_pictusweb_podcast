@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+import PhoneField from '@/app/components/PhoneField'
 import { X, User, Mail, Building, ToggleLeft, Lock, Shield, Phone } from 'lucide-react'
 
 interface Organization {
@@ -23,7 +24,6 @@ interface User {
   isFleetManager: boolean
   password: string | null
   loginProvider: string | null
-
 }
 
 interface EditUserModalProps {
@@ -193,13 +193,10 @@ export default function EditUserModal({
               <Phone className="h-4 w-4 inline mr-2" />
               Phone Number
             </label>
-            <input
-              type="tel"
-              name="phoneNumber"
+            <PhoneField
               value={formData.phoneNumber}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              placeholder="+421..."
+              onChange={(v) => setFormData((prev) => ({ ...prev, phoneNumber: v }))}
+              inputClassName="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             />
           </div>
 

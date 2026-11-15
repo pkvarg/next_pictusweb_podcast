@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import PagesHeader from '@/app/components/PagesHeader'
 import Footer from '@/app/components/Footer'
+import { EU_DIAL_CODES } from '@/lib/phone'
 import {
   CheckCircle,
   Eye,
@@ -29,8 +30,9 @@ const COUNTRY_CODES: { code: string; dial: string }[] = [
   { code: 'HU', dial: '+36' },
   { code: 'AT', dial: '+43' },
 ]
-// Countries we can currently deliver SMS OTP to.
-const SMS_COUNTRIES = ['SK']
+
+// SMS OTP is attempted for every EU prefix (testing smstools delivery); only the national
+// digit-length rule differs for Slovak numbers.
 
 interface FormData {
   // Step 1 - Organization
@@ -48,6 +50,7 @@ interface FormData {
   lastName: string
   email: string
   phoneNumber: string
+  phonePrefix: string
   password: string
   confirmPassword: string
   // Step 3 - Verification
@@ -117,6 +120,7 @@ function GetStartedContent() {
     lastName: '',
     email: '',
     phoneNumber: '',
+    phonePrefix: '+421',
     password: '',
     confirmPassword: '',
     emailCode: '',
@@ -173,8 +177,11 @@ function GetStartedContent() {
     setError('')
   }
 
-  const phonePrefix = COUNTRY_CODES.find((c) => c.code === form.country)?.dial ?? '+421'
-  const smsEnabled = SMS_COUNTRIES.includes(form.country)
+  const phonePrefix = form.phonePrefix || '+421'
+  const isSk = phonePrefix === '+421'
+  // SMS OTP is attempted for all EU prefixes so delivery can be tested; the +421-only limit
+  // is lifted. The national digit-length rule still differs for Slovak numbers (below).
+  const smsEnabled = true
   const fullPhoneNumber = `${phonePrefix}${form.phoneNumber.replace(/\s/g, '')}`
 
   // Email availability check
@@ -307,9 +314,7 @@ function GetStartedContent() {
         if (!skipEmailCheck && emailAvailable !== true) return t('errorEmailTaken')
         const phoneDigits = form.phoneNumber.replace(/\D/g, '')
         if (!phoneDigits) return t('errorPhone')
-        if (
-          smsEnabled ? phoneDigits.length !== 9 : phoneDigits.length < 6 || phoneDigits.length > 12
-        )
+        if (isSk ? phoneDigits.length !== 9 : phoneDigits.length < 6 || phoneDigits.length > 12)
           return t('errorPhoneFormat')
         if (form.password.length < 8) return t('errorPasswordLength')
         if (form.password !== form.confirmPassword) return t('errorPasswordMatch')
@@ -880,9 +885,18 @@ function GetStartedContent() {
             <div>
               <label className={labelClass}>{t('phoneNumber')} *</label>
               <div className="flex gap-2">
-                <span className="flex items-center px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-gray-400 font-light text-sm select-none">
-                  {phonePrefix}
-                </span>
+                <select
+                  aria-label="Country code"
+                  className="px-3 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-gray-200 text-sm focus:outline-none focus:border-pictus-lime"
+                  value={phonePrefix}
+                  onChange={(e) => updateForm('phonePrefix', e.target.value)}
+                >
+                  {EU_DIAL_CODES.map((p) => (
+                    <option key={p.code} value={p.dial} className="bg-pictus-black">
+                      {p.dial} ({p.code})
+                    </option>
+                  ))}
+                </select>
                 <input
                   type="tel"
                   className={inputClass}
@@ -891,7 +905,7 @@ function GetStartedContent() {
                     const val = e.target.value.replace(/[^\d\s]/g, '')
                     updateForm('phoneNumber', val)
                   }}
-                  placeholder="9XX XXX XXX"
+                  placeholder={isSk ? '9XX XXX XXX' : '123 456 789'}
                 />
               </div>
             </div>

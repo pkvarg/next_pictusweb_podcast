@@ -5,7 +5,8 @@ import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/routing'
 import { Loader2, Save, CheckCircle, AlertCircle, User as UserIcon, Building2 } from 'lucide-react'
-import { PHONE_PLACEHOLDER, isAcceptablePhone } from '@/lib/phone'
+import { isAcceptablePhone } from '@/lib/phone'
+import PhoneField from '@/app/components/PhoneField'
 
 interface AccountData {
   firstName: string
@@ -169,13 +170,10 @@ export default function CarCareAccountSettingsView() {
             </div>
             <div>
               <label className={labelClass}>{t('phoneNumber')}</label>
-              <input
-                className={inputClass}
-                type="tel"
-                inputMode="tel"
-                placeholder={PHONE_PLACEHOLDER}
+              <PhoneField
                 value={account.phoneNumber}
-                onChange={(e) => setAccField('phoneNumber', e.target.value)}
+                onChange={(v) => setAccField('phoneNumber', v)}
+                inputClassName={inputClass}
               />
             </div>
             <div>

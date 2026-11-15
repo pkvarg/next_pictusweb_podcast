@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { X, Save, Gift, Info } from 'lucide-react'
-import { PHONE_PLACEHOLDER, isAcceptablePhone } from '@/lib/phone'
+import { isAcceptablePhone } from '@/lib/phone'
+import PhoneField from '@/app/components/PhoneField'
 
 interface User {
   id: string
@@ -229,13 +230,10 @@ export default function FleetManagerUserModal({
 
           <div>
             <label className={labelCls}>{t('modalPhone')}</label>
-            <input
-              type="tel"
-              inputMode="tel"
+            <PhoneField
               value={formData.phoneNumber}
-              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-              placeholder={PHONE_PLACEHOLDER}
-              className={inputCls}
+              onChange={(v) => setFormData({ ...formData, phoneNumber: v })}
+              inputClassName={inputCls}
             />
           </div>
 
