@@ -176,8 +176,12 @@ describe('user limit', () => {
 })
 
 describe('notification metering', () => {
-  it('counts SMS but not the EMAIL of the same reminder, and blocks over the paid limit', async () => {
-    const org = await makeOrg({ tierId: paidTierId }) // notificationsLimit 2
+  it('counts only SMS; email is unlimited; SMS over the limit is suppressed without a fallback', async () => {
+    const org = await makeOrg({ tierId: paidTierId }) // BASIC, notificationsLimit 2
+    const count = async () =>
+      (await prisma.organization.findUnique({ where: { id: org.id } }))?.currentNotificationsCount
+    const status = async (id: string) =>
+      (await prisma.notificationDelivery.findUnique({ where: { id } }))?.status
     const u = await prisma.user.create({
       data: {
         email: `${tag}-n@e.com`,
@@ -188,39 +192,46 @@ describe('notification metering', () => {
         smsMonthlyLimit: 99,
       },
     })
-    // reminder 1: SMS + EMAIL — only SMS should count (1)
-    const r1 = await makeReminderDelivery(org.id, u.id, 'SMS')
-    await prisma.notificationDelivery.create({
+
+    // EMAIL on a paid tier is free: sent, never counted.
+    const e1 = await makeReminderDelivery(org.id, u.id, 'EMAIL')
+    await dispatchDue(prisma, noopChannels)
+    expect(await count()).toBe(0)
+    expect(await status(e1.delId)).toBe('SENT')
+
+    // SMS counts, up to the limit.
+    await makeReminderDelivery(org.id, u.id, 'SMS')
+    await dispatchDue(prisma, noopChannels)
+    expect(await count()).toBe(1)
+    await makeReminderDelivery(org.id, u.id, 'SMS')
+    await dispatchDue(prisma, noopChannels)
+    expect(await count()).toBe(2) // at the limit
+
+    // EMAIL at the limit still goes out and does not count (email is unlimited).
+    const e2 = await makeReminderDelivery(org.id, u.id, 'EMAIL')
+    await dispatchDue(prisma, noopChannels)
+    expect(await count()).toBe(2)
+    expect(await status(e2.delId)).toBe('SENT')
+
+    // SMS over the limit for an SMS-only recipient (no email to fall back to) is suppressed.
+    const s = await prisma.user.create({
       data: {
-        occurrenceId: r1.occId,
-        recurringEventId: r1.reId,
-        stage: 'BOOKING',
-        channel: 'EMAIL',
-        recipientUserId: u.id,
-        scheduledFor: PAST,
-        status: 'SCHEDULED',
-        dedupeKey: `${tag}-E-${Math.random()}`,
+        email: `${tag}-s@e.com`,
+        role: 'CLIENT',
+        organizationId: org.id,
+        phoneNumber: '+421900000002',
+        channelOptIns: ['SMS'],
+        smsMonthlyLimit: 99,
       },
     })
+    const r = await makeReminderDelivery(org.id, s.id, 'SMS')
     await dispatchDue(prisma, noopChannels)
-    let after = await prisma.organization.findUnique({ where: { id: org.id } })
-    expect(after?.currentNotificationsCount).toBe(1) // SMS counted, its EMAIL did not
-
-    // reminder 2: EMAIL only — counts (2, at limit)
-    await makeReminderDelivery(org.id, u.id, 'EMAIL')
-    await dispatchDue(prisma, noopChannels)
-    after = await prisma.organization.findUnique({ where: { id: org.id } })
-    expect(after?.currentNotificationsCount).toBe(2)
-
-    // reminder 3: EMAIL only — over limit → suppressed, not counted
-    const r3 = await makeReminderDelivery(org.id, u.id, 'EMAIL')
-    await dispatchDue(prisma, noopChannels)
-    const d3 = await prisma.notificationDelivery.findUnique({ where: { id: r3.delId } })
-    expect(d3?.status).toBe('SUPPRESSED')
-    expect(d3?.suppressedReason).toBe('notification limit reached')
+    const dr = await prisma.notificationDelivery.findUnique({ where: { id: r.delId } })
+    expect(dr?.status).toBe('SUPPRESSED')
+    expect(dr?.suppressedReason).toBe('notification limit reached')
   })
 
-  it('FREE tier soft-deletes the org when its lifetime limit is exceeded', async () => {
+  it('FREE tier blocks the org (upgrade required), not deletes, when the lifetime limit is exceeded', async () => {
     const org = await makeOrg({ tierId: freeTierId, currentNotificationsCount: 1 }) // limit 1, already at it
     const u = await prisma.user.create({
       data: {
@@ -234,8 +245,10 @@ describe('notification metering', () => {
     await dispatchDue(prisma, noopChannels)
     const d = await prisma.notificationDelivery.findUnique({ where: { id: r.delId } })
     expect(d?.status).toBe('SUPPRESSED')
+    expect(d?.suppressedReason).toBe('free trial expired')
     const after = await prisma.organization.findUnique({ where: { id: org.id } })
-    expect(after?.deletedAt).not.toBeNull()
+    expect(after?.notificationsBlocked).toBe(true)
+    expect(after?.deletedAt).toBeNull()
   })
 })
 

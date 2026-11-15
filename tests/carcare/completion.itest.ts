@@ -103,7 +103,7 @@ describe('completeOccurrence — misconfigured recurrence is tolerated (session 
         organizationId: user!.organizationId!,
         userId: user!.id,
         type: 'ITEST',
-        registration: `ITEST-MISC-${Date.now()}`,
+        registration: `ITEST-${Date.now() % 100000}`,
       },
     })
     const def = await prisma.recurringEvent.create({
