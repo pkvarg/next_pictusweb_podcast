@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
+import FreeTrialModal from '@/app/components/client/FreeTrialModal'
 import ExpiredBanner from '@/app/components/client/ExpiredBanner'
 import UpgradeBanner from '@/app/components/client/UpgradeBanner'
 import VerifyContactInfo from '@/app/components/client/VerifyContactInfo'
@@ -415,6 +416,13 @@ const ClientZone = () => {
           tierName={organization.tierRelation.name}
           blocked={organization.notificationsBlocked}
           subscriptionStatus={organization.stripeSubscriptionStatus}
+        />
+      )}
+
+      {organization?.tierRelation && (
+        <FreeTrialModal
+          tierName={organization.tierRelation.name}
+          blocked={organization.notificationsBlocked}
         />
       )}
 

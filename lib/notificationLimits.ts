@@ -12,7 +12,7 @@ const messages: Record<string, Record<string, string>> = {
     orgNotFound: 'Organizácia nebola nájdená',
     orgDeactivated: 'Organizácia bola deaktivovaná',
     freeLimitReached:
-      'Dosiahli ste limit {limit} notifikácií pre FREE tier. Organizácia bola deaktivovaná.',
+      'Vyčerpali ste FREE skúšobnú verziu ({limit} notifikácií). Pre pokračovanie prejdite na vyšší plán.',
     paidLimitBlocked:
       'Dosiahli ste ročný limit {limit} notifikácií pre {tier} tier. Limit sa obnoví {date}.',
     paidLimitReached: 'Dosiahli ste ročný limit {limit} notifikácií pre {tier} tier.',
@@ -21,7 +21,7 @@ const messages: Record<string, Record<string, string>> = {
     orgNotFound: 'Organization not found',
     orgDeactivated: 'Organization has been deactivated',
     freeLimitReached:
-      'You have reached the limit of {limit} notifications for the FREE tier. Organization has been deactivated.',
+      'Your FREE trial is used up ({limit} notifications). Upgrade to keep sending reminders.',
     paidLimitBlocked:
       'You have reached the yearly limit of {limit} notifications for the {tier} tier. Limit resets on {date}.',
     paidLimitReached:
@@ -31,7 +31,7 @@ const messages: Record<string, Record<string, string>> = {
     orgNotFound: 'A szervezet nem található',
     orgDeactivated: 'A szervezet deaktiválva lett',
     freeLimitReached:
-      'Elérte a FREE szint {limit} értesítési limitjét. A szervezet deaktiválva lett.',
+      'Elhasználta a FREE próbaverziót ({limit} értesítés). A folytatáshoz váltson magasabb csomagra.',
     paidLimitBlocked:
       'Elérte a(z) {tier} szint éves {limit} értesítési limitjét. A limit {date}-kor újul meg.',
     paidLimitReached: 'Elérte a(z) {tier} szint éves {limit} értesítési limitjét.',
@@ -163,14 +163,18 @@ async function handleFreeTier(
   const currentCount = org.currentNotificationsCount
 
   if (currentCount + countToAdd > limit) {
-    // Soft-delete the organization
-    await prisma.organization.update({
-      where: { id: org.id },
-      data: { deletedAt: new Date() },
-    })
+    // FREE trial is over. Don't delete the org — the user must be able to sign in and
+    // upgrade. Flag it (notificationsBlocked) so the app shows the "trial expired, upgrade"
+    // prompt, and stop further notifications (dispatch suppresses the metered email).
+    if (!org.notificationsBlocked) {
+      await prisma.organization.update({
+        where: { id: org.id },
+        data: { notificationsBlocked: true },
+      })
+    }
 
     console.log(
-      `[NOTIFICATION-LIMIT] FREE org "${org.name}" (${org.id}) reached limit ${limit}. Organization deactivated.`,
+      `[NOTIFICATION-LIMIT] FREE org "${org.name}" (${org.id}) reached trial limit ${limit}. Notifications blocked; upgrade required.`,
     )
 
     return {

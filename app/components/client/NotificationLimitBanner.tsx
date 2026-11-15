@@ -22,7 +22,9 @@ const i18n: Record<string, Record<string, string>> = {
     usage: 'Využili ste {current} z {limit} notifikácií ({percent}%).',
     remaining: 'Zostáva {remaining} notifikácií.',
     limitReached: 'Limit bol dosiahnutý.',
-    freeWarning: 'Po dosiahnutí limitu bude váš účet deaktivovaný.',
+    freeLimitBlocked:
+      'Vyčerpali ste FREE skúšobnú verziu ({limit} notifikácií). Pre pokračovanie prejdite na vyšší plán.',
+    freeWarning: 'Po dosiahnutí limitu bude potrebný upgrade na vyšší plán.',
     paidWarning: 'Kontaktujte administrátora pre navýšenie limitu.',
     upgrade: 'Upgradovať',
   },
@@ -36,7 +38,9 @@ const i18n: Record<string, Record<string, string>> = {
     usage: 'You have used {current} of {limit} notifications ({percent}%).',
     remaining: '{remaining} notifications remaining.',
     limitReached: 'Limit has been reached.',
-    freeWarning: 'Your account will be deactivated when the limit is reached.',
+    freeLimitBlocked:
+      'Your FREE trial is used up ({limit} notifications). Upgrade to keep sending reminders.',
+    freeWarning: 'You will need to upgrade once the limit is reached.',
     paidWarning: 'Contact the administrator to increase the limit.',
     upgrade: 'Upgrade',
   },
@@ -50,7 +54,9 @@ const i18n: Record<string, Record<string, string>> = {
     usage: '{current}/{limit} értesítést használt fel ({percent}%).',
     remaining: '{remaining} értesítés maradt.',
     limitReached: 'A limit elérve.',
-    freeWarning: 'A limit elérésekor a fiókja deaktiválásra kerül.',
+    freeLimitBlocked:
+      'Elhasználta a FREE próbaverziót ({limit} értesítés). A folytatáshoz váltson magasabb csomagra.',
+    freeWarning: 'A limit elérésekor magasabb csomagra kell váltania.',
     paidWarning: 'Lépjen kapcsolatba az adminisztrátorral a limit növeléséhez.',
     upgrade: 'Frissítés',
   },
@@ -107,7 +113,9 @@ export default function NotificationLimitBanner({
               ? t(locale, 'canceled')
               : isPaymentIssue
                 ? t(locale, 'paymentIssue')
-                : t(locale, 'limitBlocked', { limit, tier: tierName })}
+                : isFree
+                  ? t(locale, 'freeLimitBlocked', { limit })
+                  : t(locale, 'limitBlocked', { limit, tier: tierName })}
           </p>
           {upgradeButton}
         </div>

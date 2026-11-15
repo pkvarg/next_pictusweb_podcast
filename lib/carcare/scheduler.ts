@@ -3,6 +3,7 @@ import { addDaysUTC } from './recurrence'
 import { resolveGarageOwner, orgMemberIds } from './garage'
 import { checkNotificationLimit } from '@/lib/notificationLimits'
 import { smsAllowedForTier } from './limits'
+import { planChannel, planQuotaFallback } from './dispatch-policy'
 import type { Channels } from './channels'
 
 export const BOOKING_STAGES: NotificationStage[] = [
@@ -482,57 +483,59 @@ export async function dispatchDue(
     })
     if (!d) continue
 
-    // Never send EMAIL/SMS for a blocked (billing/quota) or deleted organization.
+    // A deleted organization sends nothing (account removed). A paid org that has hit its
+    // SMS quota is NOT blocked here wholesale — email is free and must still go out; that is
+    // handled per channel below via planChannel + the quota fallback.
     const org = d.occurrence.recurringEvent.organization
-    if (
-      (d.channel === 'EMAIL' || d.channel === 'SMS') &&
-      (org.notificationsBlocked || org.deletedAt)
-    ) {
+    if (org.deletedAt) {
       await db.notificationDelivery.update({
         where: { id },
-        data: {
-          status: 'SUPPRESSED',
-          suppressedReason: org.deletedAt ? 'organization deleted' : 'notifications blocked',
-        },
+        data: { status: 'SUPPRESSED', suppressedReason: 'organization deleted' },
       })
       suppressed++
       continue
     }
 
-    if (!isChannelAllowed(d.recipient.channelOptIns, d.channel)) {
-      await db.notificationDelivery.update({
-        where: { id },
-        data: { status: 'SUPPRESSED', suppressedReason: 'channel not opted in' },
-      })
-      suppressed++
-      continue
-    }
-
-    if (d.channel === 'SMS' && !smsAllowedForTier(org.tierRelation?.name)) {
-      await db.notificationDelivery.update({
-        where: { id },
-        data: { status: 'SUPPRESSED', suppressedReason: 'sms not in plan' },
-      })
-      suppressed++
-      continue
-    }
-
-    // Tier notification quota. One reminder bills once: SMS when the reminder uses SMS,
-    // otherwise EMAIL (PUSH / IN_APP never count). checkNotificationLimit enforces the
-    // tier limit (FREE soft-deletes the org, paid blocks with a yearly reset).
+    const tierName = org.tierRelation?.name
     const organizationId = d.occurrence.recurringEvent.organizationId
-    const metered =
-      d.channel === 'SMS' ||
-      (d.channel === 'EMAIL' &&
-        (await db.notificationDelivery.count({
-          where: {
-            occurrenceId: d.occurrenceId,
-            stage: d.stage,
-            recipientUserId: d.recipientUserId,
-            channel: 'SMS',
-          },
-        })) === 0)
 
+    // Does an email already cover this reminder? Then an SMS that cannot send must not
+    // duplicate it by also falling back to email.
+    const hasEmailSibling =
+      d.channel === 'SMS' &&
+      (await db.notificationDelivery.count({
+        where: {
+          occurrenceId: d.occurrenceId,
+          stage: d.stage,
+          recipientUserId: d.recipientUserId,
+          channel: 'EMAIL',
+          status: { in: ['SCHEDULED', 'SENDING', 'SENT'] },
+        },
+      })) > 0
+
+    const plan = planChannel({
+      channel: d.channel,
+      tierName,
+      smsAllowed: smsAllowedForTier(tierName),
+      channelOptIns: d.recipient.channelOptIns,
+      hasEmailSibling,
+    })
+    if (plan.action === 'suppress') {
+      await db.notificationDelivery.update({
+        where: { id },
+        data: { status: 'SUPPRESSED', suppressedReason: plan.reason },
+      })
+      suppressed++
+      continue
+    }
+
+    let channel = plan.channel
+    let metered = plan.metered
+
+    // Metered sends (SMS always; EMAIL only on the FREE trial) check the tier quota. On
+    // exhaustion a paid SMS falls back to free email so the reminder still reaches the
+    // customer; FREE's email IS the trial, so it is suppressed and checkNotificationLimit
+    // flags the org (notificationsBlocked) to drive the in-app upgrade prompt.
     if (metered) {
       const check = await checkNotificationLimit(
         organizationId,
@@ -541,20 +544,30 @@ export async function dispatchDue(
         org.notificationLocale,
       )
       if (!check.allowed) {
-        await db.notificationDelivery.update({
-          where: { id },
-          data: { status: 'SUPPRESSED', suppressedReason: 'notification limit reached' },
+        const fallback = planQuotaFallback({
+          channel,
+          tierName,
+          channelOptIns: d.recipient.channelOptIns,
+          hasEmailSibling,
         })
-        suppressed++
-        continue
+        if (fallback.action === 'suppress') {
+          await db.notificationDelivery.update({
+            where: { id },
+            data: { status: 'SUPPRESSED', suppressedReason: fallback.reason },
+          })
+          suppressed++
+          continue
+        }
+        channel = fallback.channel
+        metered = fallback.metered
       }
     }
 
     try {
-      await channels[d.channel](d)
+      await channels[channel](d)
       await db.notificationDelivery.update({
         where: { id },
-        data: { status: 'SENT', sentAt: now },
+        data: { status: 'SENT', sentAt: now, channel },
       })
       if (metered) {
         await db.organization.update({
