@@ -41,6 +41,7 @@ interface Organization {
   tierId: string | null
   tierRelation?: TierInfo
   currentNotificationsCount: number
+  effectiveNotificationsLimit: number
   notificationsBlocked: boolean
   freeTrialEndDate: string | null
   freeTrialTierId: string | null
@@ -412,7 +413,7 @@ const ClientZone = () => {
       {organization?.tierRelation && (
         <NotificationLimitBanner
           currentCount={organization.currentNotificationsCount}
-          limit={organization.tierRelation.notificationsLimit}
+          limit={organization.effectiveNotificationsLimit}
           tierName={organization.tierRelation.name}
           blocked={organization.notificationsBlocked}
           subscriptionStatus={organization.stripeSubscriptionStatus}

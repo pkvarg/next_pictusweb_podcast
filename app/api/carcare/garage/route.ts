@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { resolveCarCareSession } from '@/lib/carcare/apiAuth'
 import { resolveGarageRole } from '@/lib/carcare/garage'
+import { resolveNotificationLimit } from '@/lib/notificationLimits'
 
 // GET /api/carcare/garage — members, pending invitations, and the caller's role.
 export async function GET() {
@@ -56,7 +57,9 @@ export async function GET() {
         notificationsLimit: true,
         currentVehiclesCount: true,
         currentNotificationsCount: true,
-        tierRelation: { select: { vehiclesLimit: true, notificationsLimit: true } },
+        tierRelation: {
+          select: { vehiclesLimit: true, notificationsLimit: true, notificationsPerVehicle: true },
+        },
       },
     })
 
@@ -110,10 +113,15 @@ export async function GET() {
       orderBy: { createdAt: 'asc' },
     })
     const vehiclesLimit = data.org.vehiclesLimit ?? data.org.tierRelation?.vehiclesLimit ?? 0
-    const notificationsLimit =
-      data.org.notificationsLimit ?? data.org.tierRelation?.notificationsLimit ?? 0
     const usedVehicles =
       data.org.currentVehiclesCount + subOrgs.reduce((s, o) => s + o.currentVehiclesCount, 0)
+    // SMS allowance for the shared pool: per-vehicle rate × pool vehicles (flat for FREE).
+    const notificationsLimit = resolveNotificationLimit(
+      data.org.notificationsLimit,
+      data.org.tierRelation?.notificationsPerVehicle ?? 0,
+      usedVehicles,
+      data.org.tierRelation?.notificationsLimit,
+    )
     const usedNotifications =
       data.org.currentNotificationsCount +
       subOrgs.reduce((s, o) => s + o.currentNotificationsCount, 0)

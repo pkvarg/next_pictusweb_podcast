@@ -36,7 +36,6 @@ interface Organization {
   vehiclesLimit: number | null
   notificationsLimit: number | null
   purchasedVehicles: number | null
-  hiddenFromPictusaci: boolean
   canCreateBenefit: boolean
   bonusBusinessDashboards: boolean
   manuallyPaid: boolean
@@ -188,7 +187,6 @@ export default function OrganizationManager() {
       vehiclesLimit: organization.vehiclesLimit ?? '',
       notificationsLimit: organization.notificationsLimit ?? '',
       purchasedVehicles: organization.purchasedVehicles ?? '',
-      hiddenFromPictusaci: organization.hiddenFromPictusaci || false,
       canCreateBenefit: organization.canCreateBenefit || false,
       bonusBusinessDashboards: organization.bonusBusinessDashboards || false,
       manuallyPaid: organization.manuallyPaid || false,
@@ -216,7 +214,6 @@ export default function OrganizationManager() {
             editingItem.notificationsLimit === '' ? null : editingItem.notificationsLimit,
           purchasedVehicles:
             editingItem.purchasedVehicles === '' ? null : editingItem.purchasedVehicles,
-          hiddenFromPictusaci: editingItem.hiddenFromPictusaci,
           canCreateBenefit: editingItem.canCreateBenefit,
           bonusBusinessDashboards: editingItem.bonusBusinessDashboards,
           manuallyPaid: editingItem.manuallyPaid,
@@ -503,23 +500,6 @@ export default function OrganizationManager() {
                       <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          id={`hidden-${org.id}`}
-                          checked={editingItem.hiddenFromPictusaci}
-                          onChange={(e) =>
-                            setEditingItem({
-                              ...editingItem,
-                              hiddenFromPictusaci: e.target.checked,
-                            })
-                          }
-                          className="w-4 h-4 rounded"
-                        />
-                        <label htmlFor={`hidden-${org.id}`} className="text-sm text-gray-300">
-                          Hidden from PICTUSACI
-                        </label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
                           id={`benefit-${org.id}`}
                           checked={editingItem.canCreateBenefit}
                           onChange={(e) =>
@@ -620,11 +600,6 @@ export default function OrganizationManager() {
                           <span className="px-2 py-1 bg-violet-500/20 text-violet-300 text-xs rounded font-medium">
                             <Gift className="w-3 h-3 inline mr-1" />
                             Sub-org
-                          </span>
-                        )}
-                        {org.hiddenFromPictusaci && (
-                          <span className="px-2 py-1 bg-red-500/20 text-red-300 text-xs rounded font-medium">
-                            Hidden
                           </span>
                         )}
                         {org.freeTrialEndDate &&

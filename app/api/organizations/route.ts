@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/db/db'
 import { isAdminSession } from '@/lib/adminGuard'
 import { sameOriginOk } from '@/lib/sameOrigin'
+import { resolveNotificationLimit } from '@/lib/notificationLimits'
+import { softDeleteOrganization, hardDeleteOrganization } from '@/lib/organization-delete'
 
 export async function GET(request: NextRequest) {
   try {
@@ -109,6 +111,14 @@ export async function GET(request: NextRequest) {
         ...orgData,
         currentVehiclesCount: totalVehicleCount,
         currentUsersCount: totalUserCount,
+        // Effective yearly SMS allowance (per-vehicle × vehicles for paid tiers, flat for the
+        // FREE trial). Always current — scales the moment a vehicle is added.
+        effectiveNotificationsLimit: resolveNotificationLimit(
+          org.notificationsLimit,
+          org.tierRelation?.notificationsPerVehicle ?? 0,
+          totalVehicleCount,
+          org.tierRelation?.notificationsLimit,
+        ),
         childOrganizations: cleanChildren,
       }
     })
@@ -138,7 +148,6 @@ export async function POST(request: NextRequest) {
       vehiclesLimit,
       notificationsLimit,
       purchasedVehicles,
-      hiddenFromPictusaci,
       canCreateBenefit,
     } = body
 
@@ -156,7 +165,6 @@ export async function POST(request: NextRequest) {
         vehiclesLimit: vehiclesLimit != null ? Number(vehiclesLimit) : null,
         notificationsLimit: notificationsLimit != null ? Number(notificationsLimit) : null,
         purchasedVehicles: purchasedVehicles != null ? Number(purchasedVehicles) : null,
-        hiddenFromPictusaci: hiddenFromPictusaci === true,
         canCreateBenefit: canCreateBenefit === true,
       },
       include: {
@@ -205,7 +213,6 @@ export async function PUT(request: NextRequest) {
       vehiclesLimit,
       notificationsLimit,
       purchasedVehicles,
-      hiddenFromPictusaci,
       canCreateBenefit,
       freeTrialEndDate,
       freeTrialTierId,
@@ -232,9 +239,6 @@ export async function PUT(request: NextRequest) {
         vehiclesLimit: toNullableInt(vehiclesLimit),
         notificationsLimit: toNullableInt(notificationsLimit),
         purchasedVehicles: toNullableInt(purchasedVehicles),
-        ...(hiddenFromPictusaci !== undefined && {
-          hiddenFromPictusaci: hiddenFromPictusaci === true,
-        }),
         ...(canCreateBenefit !== undefined && { canCreateBenefit: canCreateBenefit === true }),
         ...(freeTrialEndDate !== undefined && {
           freeTrialEndDate: freeTrialEndDate ? new Date(freeTrialEndDate) : null,
@@ -278,18 +282,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Organization ID is required' }, { status: 400 })
     }
 
-    if (hard) {
-      // Hard delete - permanently remove
-      await prisma.organization.delete({
-        where: { id },
-      })
-    } else {
-      // Soft delete - set deletedAt
-      await prisma.organization.update({
-        where: { id },
-        data: { deletedAt: new Date() },
-      })
-    }
+    await prisma.$transaction(async (tx) => {
+      if (hard) await hardDeleteOrganization(tx, id)
+      else await softDeleteOrganization(tx, id)
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {

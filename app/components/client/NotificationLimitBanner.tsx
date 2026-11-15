@@ -1,5 +1,5 @@
 'use client'
-import { AlertTriangle, XCircle, ArrowUpRight } from 'lucide-react'
+import { AlertTriangle, XCircle, ArrowUpRight, Info } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { Link } from '@/i18n/routing'
 
@@ -17,15 +17,14 @@ const i18n: Record<string, Record<string, string>> = {
       'Vaše predplatné bolo zrušené. Notifikácie sú zablokované. Obnovte predplatné pre pokračovanie.',
     paymentIssue:
       'Máte neuhradenú platbu. Notifikácie sú dočasne zablokované. Aktualizujte platobnú metódu.',
-    limitBlocked:
-      'Dosiahli ste limit {limit} notifikácií pre {tier} tier. Vytváranie notifikácií je zablokované do ďalšieho fakturačného obdobia.',
-    usage: 'Využili ste {current} z {limit} notifikácií ({percent}%).',
-    remaining: 'Zostáva {remaining} notifikácií.',
-    limitReached: 'Limit bol dosiahnutý.',
+    smsBlocked:
+      'Dosiahli ste limit {limit} SMS pripomienok pre toto obdobie. Pripomienky naďalej posielame e-mailom.',
     freeLimitBlocked:
       'Vyčerpali ste FREE skúšobnú verziu ({limit} notifikácií). Pre pokračovanie prejdite na vyšší plán.',
-    freeWarning: 'Po dosiahnutí limitu bude potrebný upgrade na vyšší plán.',
-    paidWarning: 'Kontaktujte administrátora pre navýšenie limitu.',
+    smsUsage: 'Využili ste {current} z {limit} SMS pripomienok ({percent} %).',
+    emailUnlimited: 'E-maily sú neobmedzené.',
+    freeTrialCounter: 'Skúšobná verzia: využili ste {current} z {limit} notifikácií ({percent} %).',
+    freeWarning: 'Po vyčerpaní je potrebný upgrade na vyšší plán.',
     upgrade: 'Upgradovať',
   },
   en: {
@@ -33,15 +32,14 @@ const i18n: Record<string, Record<string, string>> = {
       'Your subscription has been canceled. Notifications are blocked. Renew your subscription to continue.',
     paymentIssue:
       'You have an unpaid invoice. Notifications are temporarily blocked. Update your payment method.',
-    limitBlocked:
-      'You have reached the limit of {limit} notifications for the {tier} tier. Notification creation is blocked until the next billing period.',
-    usage: 'You have used {current} of {limit} notifications ({percent}%).',
-    remaining: '{remaining} notifications remaining.',
-    limitReached: 'Limit has been reached.',
+    smsBlocked:
+      'You have reached the limit of {limit} SMS reminders for this period. Reminders keep going out by email.',
     freeLimitBlocked:
       'Your FREE trial is used up ({limit} notifications). Upgrade to keep sending reminders.',
+    smsUsage: 'You have used {current} of {limit} SMS reminders ({percent}%).',
+    emailUnlimited: 'Emails are unlimited.',
+    freeTrialCounter: 'Trial: you have used {current} of {limit} notifications ({percent}%).',
     freeWarning: 'You will need to upgrade once the limit is reached.',
-    paidWarning: 'Contact the administrator to increase the limit.',
     upgrade: 'Upgrade',
   },
   hu: {
@@ -49,15 +47,14 @@ const i18n: Record<string, Record<string, string>> = {
       'Az előfizetése megszűnt. Az értesítések le vannak tiltva. Újítsa meg az előfizetését a folytatáshoz.',
     paymentIssue:
       'Kifizetetlen számlája van. Az értesítések ideiglenesen le vannak tiltva. Frissítse a fizetési módját.',
-    limitBlocked:
-      'Elérte a(z) {tier} szint {limit} értesítési limitjét. Az értesítések létrehozása a következő számlázási időszakig le van tiltva.',
-    usage: '{current}/{limit} értesítést használt fel ({percent}%).',
-    remaining: '{remaining} értesítés maradt.',
-    limitReached: 'A limit elérve.',
+    smsBlocked:
+      'Elérte a(z) {limit} SMS emlékeztető limitjét erre az időszakra. Az emlékeztetők e-mailben továbbra is mennek.',
     freeLimitBlocked:
       'Elhasználta a FREE próbaverziót ({limit} értesítés). A folytatáshoz váltson magasabb csomagra.',
+    smsUsage: '{current}/{limit} SMS emlékeztetőt használt fel ({percent}%).',
+    emailUnlimited: 'Az e-mailek korlátlanok.',
+    freeTrialCounter: 'Próbaverzió: {current}/{limit} értesítést használt fel ({percent}%).',
     freeWarning: 'A limit elérésekor magasabb csomagra kell váltania.',
-    paidWarning: 'Lépjen kapcsolatba az adminisztrátorral a limit növeléséhez.',
     upgrade: 'Frissítés',
   },
 }
@@ -84,11 +81,9 @@ export default function NotificationLimitBanner({
 
   if (limit <= 0) return null
 
-  const usage = currentCount / limit
   const isFree = tierName.toUpperCase() === 'FREE'
-
-  // Show banner at 80% usage or when blocked
-  if (!blocked && usage < 0.8) return null
+  const usage = currentCount / limit
+  const percent = Math.round(usage * 100)
 
   const upgradeButton = isFree && (
     <Link
@@ -100,22 +95,46 @@ export default function NotificationLimitBanner({
     </Link>
   )
 
+  // Blocked — subscription/billing issue, FREE trial over, or paid SMS quota reached.
   if (blocked) {
     const isCanceled = subscriptionStatus === 'canceled'
     const isPaymentIssue = subscriptionStatus === 'past_due' || subscriptionStatus === 'unpaid'
+    const message = isCanceled
+      ? t(locale, 'canceled')
+      : isPaymentIssue
+        ? t(locale, 'paymentIssue')
+        : isFree
+          ? t(locale, 'freeLimitBlocked', { limit })
+          : t(locale, 'smsBlocked', { limit })
 
     return (
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4">
         <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-300">
           <XCircle size={20} className="flex-shrink-0" />
+          <p className="text-sm flex-1">{message}</p>
+          {upgradeButton}
+        </div>
+      </div>
+    )
+  }
+
+  // FREE: an always-visible trial counter so the user sees how much of the trial is left.
+  if (isFree) {
+    const warn = usage >= 0.8
+    const tone = warn
+      ? 'bg-amber-500/10 border-amber-500/20 text-amber-300'
+      : 'bg-white/5 border-white/10 text-gray-300'
+    return (
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4">
+        <div className={`flex items-center gap-3 px-5 py-4 rounded-2xl border ${tone}`}>
+          {warn ? (
+            <AlertTriangle size={20} className="flex-shrink-0" />
+          ) : (
+            <Info size={20} className="flex-shrink-0" />
+          )}
           <p className="text-sm flex-1">
-            {isCanceled
-              ? t(locale, 'canceled')
-              : isPaymentIssue
-                ? t(locale, 'paymentIssue')
-                : isFree
-                  ? t(locale, 'freeLimitBlocked', { limit })
-                  : t(locale, 'limitBlocked', { limit, tier: tierName })}
+            {t(locale, 'freeTrialCounter', { current: currentCount, limit, percent })}{' '}
+            {warn && t(locale, 'freeWarning')}
           </p>
           {upgradeButton}
         </div>
@@ -123,19 +142,17 @@ export default function NotificationLimitBanner({
     )
   }
 
-  // Warning: approaching limit
-  const remaining = limit - currentCount
-  const percent = Math.round(usage * 100)
+  // Paid (BASIC / BUSINESS): only the SMS allowance is capped (email is unlimited), so show an
+  // SMS usage warning as it runs low. Stays quiet until 80%.
+  if (usage < 0.8) return null
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4">
       <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300">
         <AlertTriangle size={20} className="flex-shrink-0" />
         <p className="text-sm flex-1">
-          {t(locale, 'usage', { current: currentCount, limit, percent })}{' '}
-          {remaining > 0 ? t(locale, 'remaining', { remaining }) : t(locale, 'limitReached')}{' '}
-          {isFree ? t(locale, 'freeWarning') : t(locale, 'paidWarning')}
+          {t(locale, 'smsUsage', { current: currentCount, limit, percent })}{' '}
+          {t(locale, 'emailUnlimited')}
         </p>
-        {upgradeButton}
       </div>
     </div>
   )
