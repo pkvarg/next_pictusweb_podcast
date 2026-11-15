@@ -226,7 +226,7 @@
   },
   "Automatizations": {
     "metaTitle": "Vehicle Notifications & Fleet Management",
-    "metaDescription": "Automated vehicle notifications for Slovak companies. Never miss STK, EK, tire changes, or insurance deadlines. Save time and avoid fines.",
+    "metaDescription": "Automated vehicle notifications for company and household vehicles. Never miss technical inspection, tyre changes, or insurance deadlines. Save time and avoid fines.",
     "contactHero": "I want to get a free demo of the automatic vehicle notification system",
     "contactFree": "I want to start with the Free plan for vehicle notifications",
     "contactBasic": "I want to start with the Basic plan for vehicle notifications (€2/vehicle/month)",
@@ -273,7 +273,7 @@
     "mockupInsuranceStatus": "🚨 Critical!",
     "problemTitle": "Do you know",
     "problemTitleHighlight": "this problem?",
-    "problemSubtitle": "Slovak companies pay thousands of euros annually in fines for missed vehicle maintenance",
+    "problemSubtitle": "Companies and households lose hundreds of euros a year in fines for missed vehicle maintenance",
     "problem1Title": "Tech inspection fines",
     "problem1Price": "€50 - €200 per vehicle",
     "problem1Detail": "With 5 vehicles = up to €1,000 annually",
@@ -381,7 +381,7 @@
     "businessContact": "I want to start with the Business plan for vehicle notifications (€3/vehicle/month)",
     "ctaTitle": "Ready to eliminate",
     "ctaTitleHighlight": "fines?",
-    "ctaSubtitle1": "Get a 15-minute personalized demo of the system for your company.",
+    "ctaSubtitle1": "Get a 15-minute personalized demo of the system for your company or household.",
     "ctaButton1": "Order free demo",
     "ctaButton2": "Start for free"
   },

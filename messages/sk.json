@@ -226,7 +226,7 @@
   },
   "Automatizations": {
     "metaTitle": "Notifikácie pre vozidlá & Správa vozového parku",
-    "metaDescription": "Automatické upozornenia pre vozidlá slovenských firiem. Nezmeškajte STK, EK, výmenu pneumatík či poistenie. Ušetrite čas a vyhýbajte sa pokutám.",
+    "metaDescription": "Automatické upozornenia pre vozidlá firiem aj domácností. Nezmeškajte STK, EK, výmenu pneumatík či poistenie. Ušetrite čas a vyhýbajte sa pokutám.",
     "contactHero": "Chcem získať ukážku systému automatických upozornení pre vozidlá zdarma",
     "contactFree": "Chcem začať so ZDARMA plánom pre notifikácie vozidiel",
     "contactBasic": "Chcem začať s Basic plánom pre notifikácie vozidiel (€2/vozidlo/mesiac)",
@@ -273,7 +273,7 @@
     "mockupInsuranceStatus": "🚨 Kritické!",
     "problemTitle": "Poznáte",
     "problemTitleHighlight": "tento problém?",
-    "problemSubtitle": "Slovenské firmy ročne platia tisíce eur na pokutách za zmeškanú údržbu vozidiel",
+    "problemSubtitle": "Firmy aj domácnosti ročne platia stovky eur na pokutách za zmeškanú údržbu vozidiel",
     "problem1Title": "Pokuty za TK",
     "problem1Price": "€50 - €200 na vozidlo",
     "problem1Detail": "Pri 5 vozidlách = až €1,000 ročne",
@@ -381,7 +381,7 @@
     "businessContact": "Chcem začať s Business plánom pre notifikácie vozidiel (€3/vozidlo/mesiac)",
     "ctaTitle": "Ste Pripravení eliminovať",
     "ctaTitleHighlight": "pokuty?",
-    "ctaSubtitle1": "Získajte 15-minútovú personalizovanú ukážku systému pre vašu firmu.",
+    "ctaSubtitle1": "Získajte 15-minútovú personalizovanú ukážku systému pre vašu firmu či domácnosť.",
     "ctaButton1": "Objednať ukážku zdarma",
     "ctaButton2": "Začať zadarmo"
   },

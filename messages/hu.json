@@ -226,7 +226,7 @@
   },
   "Automatizations": {
     "metaTitle": "Járműértesítések & Flottakezelés",
-    "metaDescription": "Automatikus járműértesítések szlovák vállalatok számára. Ne hagyja ki az STK-t, EK-t, gumiabroncs-cserét vagy biztosítási határidőket. Takarítson meg időt és kerülje el a bírságokat.",
+    "metaDescription": "Automatikus járműértesítések céges és háztartási járművekhez. Ne hagyja ki a műszaki vizsgát, gumiabroncs-cserét vagy biztosítási határidőket. Takarítson meg időt és kerülje el a bírságokat.",
     "contactHero": "Ingyenes bemutatót szeretnék az automatikus járműértesítési rendszerről",
     "contactFree": "Szeretném elkezdeni az Ingyenes csomaggal a járműértesítéseket",
     "contactBasic": "Szeretném elkezdeni a Basic csomaggal a járműértesítéseket (€2/jármű/hónap)",
@@ -273,7 +273,7 @@
     "mockupInsuranceStatus": "🚨 Kritikus!",
     "problemTitle": "Ismeri",
     "problemTitleHighlight": "ezt a problémát?",
-    "problemSubtitle": "A szlovák vállalatok évente több ezer eurót fizetnek bírságban az elmulasztott járműkarbantartás miatt",
+    "problemSubtitle": "A cégek és háztartások évente több száz eurót fizetnek bírságban az elmulasztott járműkarbantartás miatt",
     "problem1Title": "Műszaki bírságok",
     "problem1Price": "€50 - €200 járművenként",
     "problem1Detail": "5 járműnél = akár €1,000 évente",
@@ -381,7 +381,7 @@
     "businessContact": "Szeretném elkezdeni a Business csomaggal a járműértesítéseket (€3/jármű/hónap)",
     "ctaTitle": "Készen áll a bírságok",
     "ctaTitleHighlight": "megszüntetésére?",
-    "ctaSubtitle1": "Kapjon 15 perces személyre szabott bemutatót a rendszerről cége számára.",
+    "ctaSubtitle1": "Kapjon 15 perces személyre szabott bemutatót a rendszerről cége vagy háztartása számára.",
     "ctaButton1": "Ingyenes bemutató rendelése",
     "ctaButton2": "Kezdje el ingyen"
   },
