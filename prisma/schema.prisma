@@ -330,7 +330,6 @@ model Organization {
   vehiclesLimit       Int?    @map("vehicles_limit")
   notificationsLimit  Int?    @map("notifications_limit")
   purchasedVehicles   Int?    @map("purchased_vehicles")
-  hiddenFromPictusaci Boolean @default(false) @map("hidden_from_pictusaci")
 
   // Stripe billing
   stripeCustomerId         String?   @unique @map("stripe_customer_id") @db.VarChar(100)

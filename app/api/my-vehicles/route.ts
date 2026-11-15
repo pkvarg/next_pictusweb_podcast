@@ -20,66 +20,34 @@ export async function GET(request: NextRequest) {
     // Fleet manager features are controlled at the UI/page level, not the API level
 
     let organizationId: string | null = null
-    let isPictusaciUser = false
-
-    // Get organizationId and check if user is PICTUSACI
     if (session.user.id) {
       const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: {
-          organizationId: true,
-          organizationRelation: {
-            select: {
-              name: true
-            }
-          }
-        }
+        select: { organizationId: true },
       })
       organizationId = user?.organizationId || null
-
-      // Check if user is in PICTUSACI organization
-      if (user?.organizationRelation?.name === 'PICTUSACI') {
-        isPictusaciUser = true
-      }
     }
 
-    // If organizationIdParam is provided, use it (for admin calls)
-    // But still check PICTUSACI flag based on logged-in user
+    // An explicit organizationId param (admin calls) overrides the caller's own organization.
     if (organizationIdParam) {
       organizationId = organizationIdParam
     }
 
-    if (!organizationId && !isPictusaciUser) {
+    if (!organizationId) {
       return NextResponse.json({ error: 'No organization assigned' }, { status: 400 })
     }
 
-    // Build the where clause
-    // If organizationIdParam is explicitly provided, always filter by it (used when creating notifications)
-    // If no param provided, PICTUSACI users can view all vehicles, but others see only their organization
     const whereClause: any = {
       deletedAt: null,
     }
 
-    console.log('[MY-VEHICLES GET] User:', session.user.email)
-    console.log('[MY-VEHICLES GET] Organization:', organizationId)
-    console.log('[MY-VEHICLES GET] organizationIdParam:', organizationIdParam)
-    console.log('[MY-VEHICLES GET] Is PICTUSACI user:', isPictusaciUser)
-
-    // If organizationIdParam was explicitly provided, always filter by it (even for PICTUSACI)
+    // Filter by the explicit param, else by the caller's organization. 'all' leaves the
+    // result unfiltered (admin-wide view).
     if (organizationIdParam && organizationIdParam !== 'all') {
       whereClause.organizationId = organizationIdParam
-    }
-    // If no param provided and not PICTUSACI user, filter by user's organization
-    else if (!organizationIdParam && !isPictusaciUser && organizationId) {
+    } else if (!organizationIdParam && organizationId) {
       whereClause.organizationId = organizationId
     }
-    // If no param provided and IS PICTUSACI user, don't filter (show all vehicles)
-    // But exclude organizations hidden from PICTUSACI
-    if (isPictusaciUser && !organizationIdParam) {
-      whereClause.organizationRelation = { hiddenFromPictusaci: false }
-    }
-
-    console.log('[MY-VEHICLES GET] WhereClause:', JSON.stringify(whereClause))
 
     const vehicles = await prisma.myVehicle.findMany({
       where: whereClause,
@@ -96,7 +64,7 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             name: true,
-          }
+          },
         },
         expenses: {
           where: { deletedAt: null },
@@ -131,17 +99,17 @@ export async function POST(request: NextRequest) {
 
     // Allow admins or fleet managers
     if (session.user.role !== 'ADMIN' && !session.user.isFleetManager) {
-      return NextResponse.json({ error: 'Forbidden - Admin or Fleet Manager access required' }, { status: 403 })
+      return NextResponse.json(
+        { error: 'Forbidden - Admin or Fleet Manager access required' },
+        { status: 403 },
+      )
     }
 
     const body = await request.json()
     const { organizationId, type, registration, year, image, note } = body
 
     if (!type || !registration) {
-      return NextResponse.json(
-        { error: 'Type and registration are required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Type and registration are required' }, { status: 400 })
     }
 
     // Get organizationId - prefer provided organizationId, fallback to user's organizationId
@@ -150,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { organizationId: true }
+      select: { organizationId: true },
     })
     const userOrganizationId = user?.organizationId || null
 
@@ -161,7 +129,7 @@ export async function POST(request: NextRequest) {
       if (session.user.role !== 'ADMIN' && vehicleOrganizationId !== userOrganizationId) {
         return NextResponse.json(
           { error: 'Fleet managers can only create vehicles for their own organization' },
-          { status: 403 }
+          { status: 403 },
         )
       }
     } else {
@@ -197,9 +165,9 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     })
 
     // Increment vehicle count on organization

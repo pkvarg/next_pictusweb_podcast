@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 
 /**
- * Proxy to send benefit notification (informational) to PICTUSACI admin via Hono API.
+ * Proxy to send an informational benefit notification to the platform admin via Hono API.
  * Called server-side after creating a benefit user + sub-org.
  */
 export async function POST(request: NextRequest) {
@@ -28,9 +28,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(
-      { error: 'Failed to send benefit notification' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'Failed to send benefit notification' }, { status: 500 })
   }
 }
