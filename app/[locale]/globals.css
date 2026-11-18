@@ -179,6 +179,10 @@ body {
     height: 40px;
     width: 40px;
   }
+
+  body:has(.app-ui) .icon-position {
+    display: none;
+  }
 }
 
 /* With color-scheme: dark the native calendar icon already renders light on

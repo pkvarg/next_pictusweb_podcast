@@ -618,7 +618,7 @@ function GetStartedContent() {
         return (
           <div key={step} className="flex items-center">
             <div
-              className={`flex items-center justify-center w-10 h-10 rounded-lg transition-all ${
+              className={`flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg transition-all ${
                 isActive
                   ? 'bg-gradient-to-r from-pictus-lime to-pictus-lime600 text-pictus-black'
                   : isDone
@@ -630,7 +630,7 @@ function GetStartedContent() {
             </div>
             {i < STEPS.length - 1 && (
               <div
-                className={`w-8 lg:w-16 h-0.5 ${isDone ? 'bg-green-600' : 'bg-pictus-white/10'}`}
+                className={`w-4 sm:w-8 lg:w-16 h-0.5 ${isDone ? 'bg-green-600' : 'bg-pictus-white/10'}`}
               />
             )}
           </div>
@@ -1215,7 +1215,7 @@ function GetStartedContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pictus-black via-pictus-onyx900 to-pictus-black text-pictus-white font-brutal-milk">
       <PagesHeader />
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="app-ui max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back to pricing */}
         <Link
           href="/fleetsync"

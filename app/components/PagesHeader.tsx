@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl'
 import { usePathname, useRouter } from 'next/navigation'
 import { Link } from '@/i18n/routing'
 import Image from 'next/image'
-import { Menu, X } from 'lucide-react'
+import { ChevronDown, Menu, X } from 'lucide-react'
 
 const languages = [
   { code: 'sk', label: 'SK', flag: '🇸🇰' },
@@ -15,6 +15,7 @@ const languages = [
 
 const PagesHeader = () => {
   const t = useTranslations('Home')
+  const tl = useTranslations('Landing')
   const pathname = usePathname()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -46,11 +47,11 @@ const PagesHeader = () => {
 
   return (
     <header className="relative z-40 bg-transparent" aria-label="Site header">
-      <div className="mx-auto flex min-h-[76px] w-[min(100%-2rem,1296px)] items-center justify-between gap-6 md:min-h-[90px]">
+      <div className="mx-auto flex min-h-[76px] w-[min(100%-2rem,1296px)] items-center justify-between gap-3 md:min-h-[90px] md:gap-6">
         {/* Brand */}
         <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Pictus home">
           <Image src="/pictus/pictus-icon.png" width={32} height={32} alt="" />
-          <span className="text-[1.6rem] font-bold leading-none text-pictus-white md:text-[2rem]">
+          <span className="text-[1.35rem] font-bold leading-none text-pictus-white min-[380px]:text-[1.6rem] md:text-[2rem]">
             Pictusweb
           </span>
         </Link>
@@ -71,8 +72,27 @@ const PagesHeader = () => {
         </nav>
 
         {/* Controls */}
-        <div className="flex items-center gap-2.5">
-          <div className="inline-flex h-11 items-center gap-0.5 rounded-full bg-pictus-onyx900 px-1.5">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="relative flex items-center sm:hidden">
+            <select
+              aria-label={tl('nav.changeLanguage')}
+              value={currentLang}
+              onChange={(event) => switchLanguage(event.target.value)}
+              className="h-11 cursor-pointer appearance-none rounded-full bg-pictus-onyx900 pl-3.5 pr-8 text-[0.92rem] font-bold text-pictus-white"
+            >
+              {languages.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden="true"
+              className="pointer-events-none absolute right-2.5 h-4 w-4 text-pictus-white/70"
+            />
+          </div>
+
+          <div className="hidden h-11 items-center gap-0.5 rounded-full bg-pictus-onyx900 px-1.5 sm:inline-flex">
             {languages.map((lang) => {
               const active = currentLang === lang.code
               return (
