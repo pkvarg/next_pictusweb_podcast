@@ -44,6 +44,7 @@ const params = (id: string) => ({ params: Promise.resolve({ id }) })
 
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.stubEnv('DEFAULT_USER_PASSWORD', 'test-default-password')
   db.user.findMany.mockResolvedValue([])
   db.user.create.mockResolvedValue({ id: 'new-user' })
   db.user.update.mockResolvedValue({ id: 'u1' })
