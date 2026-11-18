@@ -122,7 +122,12 @@ export async function POST(request: NextRequest) {
       await fetch(`${HONO_API}/api/pictusweb/client/send-otp-sms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneNumber, code: phoneCode, purpose: 'verify' }),
+        body: JSON.stringify({
+          phone: phoneNumber,
+          code: phoneCode,
+          purpose: 'verify',
+          locale: locale || 'sk',
+        }),
       })
     }
 

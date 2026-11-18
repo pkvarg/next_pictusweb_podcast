@@ -36,11 +36,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { locale } = await request.json().catch(() => ({}) as { locale?: string })
     const userId = session.user.id
 
     // Rate limit: 10 per IP per hour
     const ip = getClientIP(request.headers)
-    const ipLimit = rateLimit({ key: `send_phone_verify:${ip}`, maxAttempts: 10, windowMs: 60 * 60 * 1000 })
+    const ipLimit = rateLimit({
+      key: `send_phone_verify:${ip}`,
+      maxAttempts: 10,
+      windowMs: 60 * 60 * 1000,
+    })
     if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
 
     const user = await prisma.user.findUnique({
@@ -89,10 +94,19 @@ export async function POST(request: NextRequest) {
     await fetch(`${HONO_API}/api/pictusweb/client/send-otp-sms`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone: user.phoneNumber, code, purpose: 'verify' }),
+      body: JSON.stringify({
+        phone: user.phoneNumber,
+        code,
+        purpose: 'verify',
+        locale: locale || 'sk',
+      }),
     })
 
-    return NextResponse.json({ success: true, verificationToken: token, expiresIn: EXPIRES_MINUTES * 60 })
+    return NextResponse.json({
+      success: true,
+      verificationToken: token,
+      expiresIn: EXPIRES_MINUTES * 60,
+    })
   } catch (error: any) {
     console.error('Send phone verification error:', error)
     return NextResponse.json({ error: 'Nepodarilo sa odoslať SMS' }, { status: 500 })

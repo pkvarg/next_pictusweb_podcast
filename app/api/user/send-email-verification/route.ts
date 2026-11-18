@@ -36,12 +36,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { locale } = await request.json().catch(() => ({}) as { locale?: string })
     const userId = session.user.id
     const email = session.user.email
 
     // Rate limit: 10 per IP per hour
     const ip = getClientIP(request.headers)
-    const ipLimit = rateLimit({ key: `send_email_verify:${ip}`, maxAttempts: 10, windowMs: 60 * 60 * 1000 })
+    const ipLimit = rateLimit({
+      key: `send_email_verify:${ip}`,
+      maxAttempts: 10,
+      windowMs: 60 * 60 * 1000,
+    })
     if (!ipLimit.success) return rateLimitResponse(ipLimit.retryAfterMs)
 
     // Rate limit: max 3 sends per 15 minutes
@@ -91,10 +96,15 @@ export async function POST(request: NextRequest) {
         firstName: user?.firstName || 'Zákazník',
         code,
         purpose: 'email',
+        locale: locale || 'sk',
       }),
     })
 
-    return NextResponse.json({ success: true, verificationToken: token, expiresIn: EXPIRES_MINUTES * 60 })
+    return NextResponse.json({
+      success: true,
+      verificationToken: token,
+      expiresIn: EXPIRES_MINUTES * 60,
+    })
   } catch (error: any) {
     console.error('Send email verification error:', error)
     return NextResponse.json({ error: 'Nepodarilo sa odoslať overovací email' }, { status: 500 })

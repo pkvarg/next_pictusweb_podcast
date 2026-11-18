@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Mail, Phone, CheckCircle, ShieldAlert, Loader2, X, Check } from 'lucide-react'
 
@@ -31,6 +32,7 @@ const defaultVerifyState = (): VerifyState => ({
 
 export default function VerifyContactInfo() {
   const t = useTranslations('Client')
+  const params = useParams()
   const [status, setStatus] = useState<VerificationStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState<VerifyState>(defaultVerifyState())
@@ -54,7 +56,11 @@ export default function VerifyContactInfo() {
       type === 'email' ? '/api/user/send-email-verification' : '/api/user/send-phone-verification'
 
     try {
-      const res = await fetch(endpoint, { method: 'POST' })
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ locale: params?.locale ?? 'sk' }),
+      })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || t('verifyContactSendError'))
       setState((s) => ({ ...s, sending: false, verificationToken: data.verificationToken }))
