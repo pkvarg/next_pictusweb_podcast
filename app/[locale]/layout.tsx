@@ -105,7 +105,7 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode
-  params: Promise<{ locale: 'en' | 'sk' | 'hu' | 'de' }>
+  params: Promise<{ locale: string }>
 }>) {
   prodLogger.serverComponentStart('LocaleRootLayout', {
     hasParams: !!params,

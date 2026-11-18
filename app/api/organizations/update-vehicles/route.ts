@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Block reducing below actual vehicle count
-    const actualVehicles = await prisma.vehicle.count({
+    const actualVehicles = await prisma.myVehicle.count({
       where: { organizationId: org.id, deletedAt: null },
     })
     if (newCount < actualVehicles) {

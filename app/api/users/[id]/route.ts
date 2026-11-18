@@ -97,6 +97,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     // If setting login provider to credentials, set default password when no explicit password provided
     if (loginProvider === 'credentials' && (!password || password.trim() === '')) {
       const defaultPassword = process.env.DEFAULT_USER_PASSWORD
+      if (!defaultPassword) {
+        return NextResponse.json({ error: 'DEFAULT_USER_PASSWORD is not configured' }, { status: 500 })
+      }
       updateData.password = await hashPassword(defaultPassword)
     } else if (password !== undefined && password.trim() !== '') {
       updateData.password = await hashPassword(password)

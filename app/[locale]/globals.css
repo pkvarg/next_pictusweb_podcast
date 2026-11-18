@@ -2702,18 +2702,50 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
   box-shadow: inset 0 0 0 1px var(--moss);
 }
 
+.pl .language-select {
+  display: none;
+  height: 40px;
+  padding: 0 30px 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--graphite-2);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b5b2ab' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.pl .login-control {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--graphite-2);
+  color: var(--moss);
+}
+.pl .login-control svg {
+  width: 18px;
+  height: 18px;
+}
+
 @media (max-width: 640px) {
+  .pl .login-control {
+    display: inline-flex;
+  }
   .pl .language-inline {
-    height: 40px;
-    gap: 0;
-  }
-  .pl .language-inline button {
-    height: 32px;
-    padding-inline: 9px;
-    font-size: 0.82rem;
-  }
-  .pl .language-inline .lang-flag {
     display: none;
+  }
+  .pl .language-select {
+    display: inline-block;
   }
 }
 
@@ -3088,9 +3120,42 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
   }
 }
 
+.pl .fs-client-link {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-soft);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 @media (max-width: 640px) {
   .pl .fs-grid-4 {
     grid-template-columns: 1fr;
+  }
+  .pl .fs-client-bar,
+  .pl .fs-lede-extra,
+  .pl .fs-chip-extra {
+    display: none;
+  }
+  .pl .fs-client-link {
+    display: inline-flex;
+    order: 2;
+    min-height: 44px;
+  }
+  .pl .fs-hero-copy h1 {
+    font-size: clamp(1.9rem, 8.6vw, 2.5rem);
+    line-height: 1.02;
+  }
+  .pl .fs-hero-copy .button-row {
+    order: 1;
+  }
+  .pl .fs-hero-copy .fs-chips {
+    order: 3;
+    margin-top: 0;
   }
 }
 

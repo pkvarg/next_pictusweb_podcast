@@ -74,6 +74,18 @@ const PictusHeader = () => {
               </button>
             ))}
           </div>
+          <select
+            className="language-select"
+            aria-label={t('nav.changeLanguage')}
+            value={currentLang}
+            onChange={(event) => switchLanguage(event.target.value)}
+          >
+            {languages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.label}
+              </option>
+            ))}
+          </select>
           <button
             className="menu-control"
             type="button"

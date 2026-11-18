@@ -99,7 +99,7 @@ export const prodLogger = ProdLogger.getInstance()
 
 // Helper function to wrap server components with logging
 export function withServerLogging<T extends Record<string, any>>(
-  Component: React.ComponentType<T>,
+  Component: (props: T) => React.ReactNode | Promise<React.ReactNode>,
   componentName: string
 ) {
   return function LoggedComponent(props: T) {

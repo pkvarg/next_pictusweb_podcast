@@ -19,6 +19,7 @@ import {
   Car,
   Receipt,
   BookOpen,
+  ChevronDown,
 } from 'lucide-react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
@@ -56,6 +57,7 @@ const ClientZone = () => {
   const { data: session } = useSession()
   const t = useTranslations('Client')
   const tcc = useTranslations('CarCare')
+  const tl = useTranslations('Landing')
   const params = useParams()
   const locale = (params?.locale as string) || 'sk'
   const router = useRouter()
@@ -344,7 +346,29 @@ const ClientZone = () => {
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="flex items-center gap-0.5 shrink-0">
+              <div className="relative flex items-center shrink-0 sm:hidden">
+                <select
+                  aria-label={tl('nav.changeLanguage')}
+                  value={locale}
+                  onChange={(event) =>
+                    router.replace(pathname, {
+                      locale: event.target.value as 'sk' | 'en' | 'hu' | 'de',
+                    })
+                  }
+                  className="appearance-none rounded-full border border-white/10 bg-pictus-onyx900/80 py-1.5 pl-3 pr-7 text-xs font-medium text-pictus-white cursor-pointer"
+                >
+                  {(['sk', 'en', 'hu', 'de'] as const).map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  aria-hidden="true"
+                  className="pointer-events-none absolute right-2 h-3.5 w-3.5 text-gray-400"
+                />
+              </div>
+              <div className="hidden sm:flex items-center gap-0.5 shrink-0">
                 {(['sk', 'en', 'hu', 'de'] as const).map((loc) => (
                   <button
                     key={loc}

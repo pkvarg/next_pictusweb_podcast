@@ -124,11 +124,11 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
                   <span className="fs-hl">{t('heroTitle3')}</span>
                 </h1>
                 <p className="section-lede">
-                  {t('heroSubtitle1')} {t('heroSubtitle2')}
+                  {t('heroSubtitle1')} <span className="fs-lede-extra">{t('heroSubtitle2')}</span>
                 </p>
                 <ul className="fs-chips">
-                  {heroFeatures.map((feature) => (
-                    <li className="fs-chip" key={feature}>
+                  {heroFeatures.map((feature, index) => (
+                    <li className={index < 4 ? 'fs-chip' : 'fs-chip fs-chip-extra'} key={feature}>
                       <Check /> {feature}
                     </li>
                   ))}
@@ -141,6 +141,9 @@ export default async function Vehicles({ params }: { params: Promise<{ locale: s
                     {t('ctaButton2')} <span aria-hidden="true">→</span>
                   </Link>
                 </div>
+                <Link className="fs-client-link" href="/client">
+                  {t('alreadyClient')} <span aria-hidden="true">→</span>
+                </Link>
               </div>
             </div>
           </div>

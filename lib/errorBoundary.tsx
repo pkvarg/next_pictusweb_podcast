@@ -27,7 +27,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const isDynamicError = error.message?.includes('DYNAMIC_SERVER_USAGE') || 
-                          error.digest === 'DYNAMIC_SERVER_USAGE' ||
+                          (error as Error & { digest?: string }).digest === 'DYNAMIC_SERVER_USAGE' ||
                           errorInfo.componentStack?.includes('DYNAMIC_SERVER_USAGE')
 
     if (isDynamicError) {

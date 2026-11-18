@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { usePathname, useRouter } from 'next/navigation'
 import { Link } from '@/i18n/routing'
-import { Menu, X } from 'lucide-react'
+import { LogIn, Menu, X } from 'lucide-react'
 
 const languages = [
   { code: 'sk', label: 'SK', flag: '🇸🇰' },
@@ -16,6 +16,7 @@ const languages = [
 const PictusPagesHeader = () => {
   const t = useTranslations('Home')
   const tl = useTranslations('Landing')
+  const tf = useTranslations('Automatizations')
   const router = useRouter()
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -76,6 +77,11 @@ const PictusPagesHeader = () => {
         </nav>
 
         <div className="nav-controls">
+          {cleanPath.startsWith('/fleetsync') && (
+            <Link className="login-control" href="/client" aria-label={tf('alreadyClient')}>
+              <LogIn aria-hidden="true" />
+            </Link>
+          )}
           <div className="language-inline" role="group" aria-label={tl('nav.changeLanguage')}>
             {languages.map((lang) => (
               <button
@@ -92,6 +98,18 @@ const PictusPagesHeader = () => {
               </button>
             ))}
           </div>
+          <select
+            className="language-select"
+            aria-label={tl('nav.changeLanguage')}
+            value={currentLang}
+            onChange={(event) => switchLanguage(event.target.value)}
+          >
+            {languages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.label}
+              </option>
+            ))}
+          </select>
           <button
             className="menu-control"
             type="button"

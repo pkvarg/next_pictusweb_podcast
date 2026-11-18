@@ -95,9 +95,9 @@ export const authOptions = {
             token.id = dbUser.id
             token.role = dbUser.role
             token.email = dbUser.email
-            token.name = dbUser.name || `${dbUser.firstName} ${dbUser.lastName}`
+            token.name = `${dbUser.firstName} ${dbUser.lastName}`
             token.organizationId = dbUser.organizationId
-            token.organization = dbUser.organizationId || dbUser.organization // Use organizationId (UUID) first
+            token.organization = dbUser.organizationId // Use organizationId (UUID) first
             token.isFleetManager = dbUser.isFleetManager
             token.impersonatedBy = isImpersonation ? user.impersonatedBy : undefined
 
@@ -134,7 +134,7 @@ export const authOptions = {
 
           if (dbUser) {
             token.organizationId = dbUser.organizationId
-            token.organization = dbUser.organizationId || dbUser.organization // Use organizationId (UUID) first
+            token.organization = dbUser.organizationId // Use organizationId (UUID) first
             token.isFleetManager = dbUser.isFleetManager
 
             // Check if organization is soft-deleted + load its product dimension

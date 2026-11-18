@@ -27,7 +27,7 @@ beforeAll(async () => {
   const org = await prisma.organization.findFirst({ select: { id: true } })
   if (!org) throw new Error('no organization in dev DB')
   organizationId = org.id
-  const base = { role: 'CLIENT' as const, organizationId, channelOptIns: ['IN_APP'] as const }
+  const base = { role: 'CLIENT' as const, organizationId, channelOptIns: ['IN_APP' as const] }
   const a = await prisma.user.create({
     data: { email: `itest-lcA-${Date.now()}@example.com`, ...base },
   })

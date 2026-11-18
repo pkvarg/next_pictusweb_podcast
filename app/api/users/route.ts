@@ -137,6 +137,9 @@ export async function POST(request: NextRequest) {
     if (password && password.trim() !== '') {
       hashedPassword = await hashPassword(password)
     } else if (!loginProvider || loginProvider === '' || loginProvider === 'credentials') {
+      if (!defaultPassword) {
+        return NextResponse.json({ error: 'DEFAULT_USER_PASSWORD is not configured' }, { status: 500 })
+      }
       hashedPassword = await hashPassword(defaultPassword)
     }
 
