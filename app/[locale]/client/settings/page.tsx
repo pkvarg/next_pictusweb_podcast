@@ -36,6 +36,18 @@ const emptyOrg: OrgData = {
   country: '',
 }
 
+function withoutNulls<T extends { [K in keyof T]: string }>(
+  defaults: T,
+  data?: Partial<Record<keyof T, string | null>>,
+): T {
+  const result = { ...defaults }
+  for (const key of Object.keys(defaults) as (keyof T)[]) {
+    const value = data?.[key]
+    if (value != null) result[key] = value as T[keyof T]
+  }
+  return result
+}
+
 const inputClass =
   'w-full px-4 py-3 bg-pictus-white/5 border border-pictus-white/10 rounded-lg text-pictus-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pictus-lime focus:border-transparent transition-all'
 const labelClass = 'block text-pictus-lime text-sm mb-2 font-light'
@@ -64,8 +76,8 @@ export default function ClientSettingsPage() {
       const res = await fetch('/api/client/settings')
       if (!res.ok) throw new Error('load failed')
       const data = await res.json()
-      setAccount({ ...emptyAccount, ...(data.account || {}) })
-      setOrg({ ...emptyOrg, ...(data.organization || {}) })
+      setAccount(withoutNulls(emptyAccount, data.account))
+      setOrg(withoutNulls(emptyOrg, data.organization))
       setCanEditOrg(Boolean(data.canEditOrg))
     } catch {
       setError(t('settingsLoadError'))

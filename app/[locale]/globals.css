@@ -165,6 +165,22 @@ body {
   }
 }
 
+.app-ui,
+.pl .auth-shell {
+  font-size: 1rem;
+}
+
+@media (max-width: 767px) {
+  .icon-position {
+    right: 16px;
+  }
+
+  .icon-style {
+    height: 40px;
+    width: 40px;
+  }
+}
+
 /* With color-scheme: dark the native calendar icon already renders light on
    dark; just make it a pointer and slightly dim until hover. */
 input[type='date']::-webkit-calendar-picker-indicator {
