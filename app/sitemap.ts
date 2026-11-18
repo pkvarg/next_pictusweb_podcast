@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.pictusweb.sk'
-  const locales = ['en', 'sk', 'hu']
+  const locales = ['en', 'sk', 'hu', 'de']
 
   // Static pages
   const staticPages = ['', '/podcasts', '/contact', '/fleetsync']
@@ -25,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             en: `${baseUrl}/en${page}`,
             sk: `${baseUrl}/sk${page}`,
             hu: `${baseUrl}/hu${page}`,
+            de: `${baseUrl}/de${page}`,
           },
         },
       })
@@ -65,6 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             en: `${baseUrl}/en/podcasts/${podcast.id}`,
             sk: `${baseUrl}/sk/podcasts/${podcast.id}`,
             hu: `${baseUrl}/hu/podcasts/${podcast.id}`,
+            de: `${baseUrl}/de/podcasts/${podcast.id}`,
           },
         },
       })

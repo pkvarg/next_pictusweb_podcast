@@ -29,7 +29,7 @@ export async function generateMetadata({
 
     // Validate locale and enable static rendering
     let validLocale = locale
-    if (!['en', 'sk', 'hu'].includes(locale)) {
+    if (!['en', 'sk', 'hu', 'de'].includes(locale)) {
       prodLogger.warn('generateMetadata: Invalid locale detected', { locale })
       // Fallback to default locale
       validLocale = 'sk'
@@ -79,6 +79,7 @@ export async function generateMetadata({
           en: 'https://www.pictusweb.sk/en',
           sk: 'https://www.pictusweb.sk/sk',
           hu: 'https://www.pictusweb.sk/hu',
+          de: 'https://www.pictusweb.sk/de',
         },
       },
     }
@@ -96,7 +97,7 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  return [{ lang: 'en-US' }, { lang: 'sk' }, { lang: 'hu' }]
+  return [{ lang: 'en-US' }, { lang: 'sk' }, { lang: 'hu' }, { lang: 'de' }]
 }
 
 export default async function RootLayout({
@@ -104,7 +105,7 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode
-  params: Promise<{ locale: 'en' | 'sk' | 'hu' }>
+  params: Promise<{ locale: 'en' | 'sk' | 'hu' | 'de' }>
 }>) {
   prodLogger.serverComponentStart('LocaleRootLayout', {
     hasParams: !!params,
@@ -118,7 +119,7 @@ export default async function RootLayout({
 
     // Validate locale and enable static rendering
     let validLocale = locale
-    if (!['en', 'sk', 'hu'].includes(locale)) {
+    if (!['en', 'sk', 'hu', 'de'].includes(locale)) {
       prodLogger.warn('LocaleRootLayout: Invalid locale detected', { locale })
       // Fallback to default locale
       validLocale = 'sk'

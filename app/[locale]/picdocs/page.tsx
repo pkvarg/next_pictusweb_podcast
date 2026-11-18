@@ -25,6 +25,7 @@ export async function generateMetadata({
         en: 'https://www.pictusweb.sk/en/picdocs',
         sk: 'https://www.pictusweb.sk/sk/picdocs',
         hu: 'https://www.pictusweb.sk/hu/picdocs',
+        de: 'https://www.pictusweb.sk/de/picdocs',
       },
     },
   }

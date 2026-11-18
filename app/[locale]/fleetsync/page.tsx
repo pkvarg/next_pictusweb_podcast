@@ -45,6 +45,7 @@ export async function generateMetadata({
         en: 'https://www.pictusweb.sk/en/fleetsync',
         sk: 'https://www.pictusweb.sk/sk/fleetsync',
         hu: 'https://www.pictusweb.sk/hu/fleetsync',
+        de: 'https://www.pictusweb.sk/de/fleetsync',
       },
     },
   }

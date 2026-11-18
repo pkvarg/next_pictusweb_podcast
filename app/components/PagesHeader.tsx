@@ -10,6 +10,7 @@ const languages = [
   { code: 'sk', label: 'SK', flag: '🇸🇰' },
   { code: 'en', label: 'EN', flag: '🇬🇧' },
   { code: 'hu', label: 'HU', flag: '🇭🇺' },
+  { code: 'de', label: 'DE', flag: '🇩🇪' },
 ]
 
 const PagesHeader = () => {
@@ -20,7 +21,7 @@ const PagesHeader = () => {
 
   const currentLang = pathname.slice(1, 3)
   const langPath = pathname.slice(4)
-  const cleanPath = pathname.replace(/^\/(en|sk|hu)/, '')
+  const cleanPath = pathname.replace(/^\/(en|sk|hu|de)/, '')
 
   const switchLanguage = (code: string) => {
     router.replace(`/${code}/${langPath}`)

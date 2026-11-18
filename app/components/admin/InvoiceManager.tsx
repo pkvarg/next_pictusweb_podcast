@@ -700,6 +700,7 @@ export default function InvoiceManager() {
                     <option value="sk">SK</option>
                     <option value="en">EN</option>
                     <option value="hu">HU</option>
+                    <option value="de">DE</option>
                   </select>
                 </div>
               </div>

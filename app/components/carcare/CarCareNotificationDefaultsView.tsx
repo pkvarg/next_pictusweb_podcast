@@ -43,6 +43,7 @@ const LOCALE_OPTIONS: { value: string; label: string }[] = [
   { value: 'sk', label: 'Slovenčina' },
   { value: 'en', label: 'English' },
   { value: 'hu', label: 'Magyar' },
+  { value: 'de', label: 'Deutsch' },
 ]
 
 const STAGE_UI: { stage: string; labelKey: string; hintKey: string; lead?: boolean }[] = [

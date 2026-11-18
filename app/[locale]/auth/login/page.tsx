@@ -18,7 +18,7 @@ function destinationFor(locale: string, role?: string, product?: string): string
   if (typeof window !== 'undefined') {
     const cb = new URLSearchParams(window.location.search).get('callbackUrl')
     if (cb && cb.startsWith('/') && !cb.startsWith('//')) {
-      return /^\/(en|sk|hu)(\/|$)/.test(cb) ? cb : `/${locale}${cb}`
+      return /^\/(en|sk|hu|de)(\/|$)/.test(cb) ? cb : `/${locale}${cb}`
     }
   }
   return `/${locale}/${targetFor(role, product)}`
@@ -44,7 +44,7 @@ export default function LoginPage() {
   const t = useTranslations('Auth')
   const { data: session } = useSession()
 
-  const locale = pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
+  const locale = pathname.match(/^\/(en|sk|hu|de)/)?.[1] || 'sk'
 
   useEffect(() => {
     if (session?.user && !checking2FA) {

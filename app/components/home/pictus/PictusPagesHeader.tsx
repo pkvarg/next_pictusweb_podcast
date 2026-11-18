@@ -10,6 +10,7 @@ const languages = [
   { code: 'sk', label: 'SK', flag: '🇸🇰' },
   { code: 'en', label: 'EN', flag: '🇬🇧' },
   { code: 'hu', label: 'HU', flag: '🇭🇺' },
+  { code: 'de', label: 'DE', flag: '🇩🇪' },
 ]
 
 const PictusPagesHeader = () => {
@@ -21,7 +22,7 @@ const PictusPagesHeader = () => {
 
   const currentLang = pathname.slice(1, 3)
   const path = pathname.slice(4)
-  const cleanPath = pathname.replace(/^\/(en|sk|hu)/, '')
+  const cleanPath = pathname.replace(/^\/(en|sk|hu|de)/, '')
 
   const switchLanguage = (code: string) => {
     router.replace(`/${code}/${path}`)

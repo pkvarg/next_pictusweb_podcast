@@ -5,7 +5,7 @@ import { getToken } from 'next-auth/jwt'
 
 // Create the internationalization middleware
 const intlMiddleware = createIntlMiddleware({
-  locales: ['en', 'sk', 'hu'],
+  locales: ['en', 'sk', 'hu', 'de'],
   defaultLocale: 'sk',
   // Harden the NEXT_LOCALE cookie (was set without Secure) — the audit flagged it.
   localeCookie: {
@@ -20,19 +20,22 @@ const protectedRoutes = [
   '/en/admin',
   '/sk/admin',
   '/hu/admin',
+  '/de/admin',
   '/client',
   '/en/client',
   '/sk/client',
   '/hu/client',
+  '/de/client',
   '/picdocs/app',
   '/en/picdocs/app',
   '/sk/picdocs/app',
   '/hu/picdocs/app',
+  '/de/picdocs/app',
 ]
 // Routes that require admin role
-const adminRoutes = ['/admin', '/en/admin', '/sk/admin', '/hu/admin']
+const adminRoutes = ['/admin', '/en/admin', '/sk/admin', '/hu/admin', '/de/admin']
 // Routes that should not be processed by auth middleware
-const publicRoutes = ['/auth', '/en/auth', '/sk/auth', '/hu/auth']
+const publicRoutes = ['/auth', '/en/auth', '/sk/auth', '/hu/auth', '/de/auth']
 
 export default async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
@@ -45,7 +48,7 @@ export default async function middleware(req: NextRequest) {
   const isPublicRoute = publicRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
 
   // Extract locale from the path or default to 'sk'
-  const locale = req.nextUrl.pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
+  const locale = req.nextUrl.pathname.match(/^\/(en|sk|hu|de)/)?.[1] || 'sk'
 
   // Skip auth processing for public routes (auth pages, error pages)
   if (isPublicRoute) {
@@ -68,7 +71,7 @@ export default async function middleware(req: NextRequest) {
   // Product guard for logged-in non-admins — keep each product's users in their own workspace.
   // Admins are exempt: they manage both products.
   if (isLoggedIn && userRole !== 'ADMIN' && userRole !== 'admin') {
-    const path = req.nextUrl.pathname.replace(/^\/(en|sk|hu)/, '')
+    const path = req.nextUrl.pathname.replace(/^\/(en|sk|hu|de)/, '')
     // FleetSync workspace, but a PicDocs user → send to PicDocs workspace
     if (path.startsWith('/client') && userProduct === 'PICDOCS') {
       return NextResponse.redirect(new URL(`/${locale}/picdocs/app`, req.url))

@@ -83,6 +83,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         en: `https://www.pictusweb.sk/en/podcast/${podcast.id}`,
         sk: `https://www.pictusweb.sk/sk/podcast/${podcast.id}`,
         hu: `https://www.pictusweb.sk/hu/podcast/${podcast.id}`,
+        de: `https://www.pictusweb.sk/de/podcast/${podcast.id}`,
       },
     },
   }

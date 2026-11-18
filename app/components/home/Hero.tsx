@@ -22,6 +22,7 @@ const Hero = () => {
     { code: 'en', label: 'EN' },
     { code: 'sk', label: 'SK' },
     { code: 'hu', label: 'HU' },
+    { code: 'de', label: 'DE' },
   ]
 
   return (

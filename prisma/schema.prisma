@@ -378,7 +378,7 @@ model Organization {
   notificationSendHour   Int @default(8) @map("notification_send_hour")
   notificationSendMinute Int @default(30) @map("notification_send_minute")
 
-  // CarCare: account-level language for notification content (sk | en | hu).
+  // CarCare: account-level language for notification content (sk | en | hu | de).
   notificationLocale      String  @default("sk") @map("notification_locale")
   bonusBusinessDashboards Boolean @default(false) @map("bonus_business_dashboards")
   manuallyPaid            Boolean @default(false) @map("manually_paid")

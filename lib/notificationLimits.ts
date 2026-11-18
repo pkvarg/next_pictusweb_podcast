@@ -36,6 +36,16 @@ const messages: Record<string, Record<string, string>> = {
       'Elérte a(z) {tier} szint éves {limit} értesítési limitjét. A limit {date}-kor újul meg.',
     paidLimitReached: 'Elérte a(z) {tier} szint éves {limit} értesítési limitjét.',
   },
+  de: {
+    orgNotFound: 'Organisation nicht gefunden',
+    orgDeactivated: 'Die Organisation wurde deaktiviert',
+    freeLimitReached:
+      'Ihre FREE-Testversion ist aufgebraucht ({limit} Benachrichtigungen). Wechseln Sie in einen höheren Tarif, um fortzufahren.',
+    paidLimitBlocked:
+      'Sie haben das Jahreslimit von {limit} Benachrichtigungen für den Tarif {tier} erreicht. Das Limit wird am {date} zurückgesetzt.',
+    paidLimitReached:
+      'Sie haben das Jahreslimit von {limit} Benachrichtigungen für den Tarif {tier} erreicht.',
+  },
 }
 
 function t(locale: string, key: string, params?: Record<string, string | number>): string {
@@ -245,7 +255,8 @@ async function handlePaidTier(
 
   // Check if blocked
   if (org.notificationsBlocked) {
-    const dateLocale = locale === 'hu' ? 'hu-HU' : locale === 'en' ? 'en-GB' : 'sk-SK'
+    const dateLocale =
+      locale === 'hu' ? 'hu-HU' : locale === 'en' ? 'en-GB' : locale === 'de' ? 'de-DE' : 'sk-SK'
     const resetDate = periodEnd.toLocaleDateString(dateLocale)
     return {
       allowed: false,
@@ -283,7 +294,7 @@ async function handlePaidTier(
       tierName,
       limit,
       currentCount,
-      resetDate: emailPeriodEnd.toLocaleDateString('sk-SK'),
+      resetDate: emailPeriodEnd.toLocaleDateString(locale === 'de' ? 'de-DE' : 'sk-SK'),
       contactEmail: org.mainContact || undefined,
       userEmail,
       locale,

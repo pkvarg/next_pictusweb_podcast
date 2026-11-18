@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { X, Plus, Trash2, Gauge } from 'lucide-react'
 
 interface MileageRecord {
@@ -25,6 +26,10 @@ const MileageModal = ({
   vehicleRegistration,
   onSuccess,
 }: MileageModalProps) => {
+  const t = useTranslations('Client')
+  const locale = useLocale()
+  const formatLocale =
+    locale === 'de' ? 'de-DE' : locale === 'hu' ? 'hu-HU' : locale === 'en' ? 'en-GB' : 'sk-SK'
   const [mileageRecords, setMileageRecords] = useState<MileageRecord[]>([])
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -60,7 +65,7 @@ const MileageModal = ({
     setError('')
 
     if (!formData.kilometers || !formData.date) {
-      setError('Kilometre a dátum sú povinné')
+      setError(t('mileageModalRequired'))
       return
     }
 
@@ -94,14 +99,14 @@ const MileageModal = ({
       }
     } catch (err) {
       console.error('Error adding mileage:', err)
-      setError('Nepodarilo sa pridať záznam')
+      setError(t('mileageModalAddFailed'))
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async (mileageId: string) => {
-    if (!confirm('Naozaj chcete odstrániť tento záznam?')) {
+    if (!confirm(t('mileageModalDeleteConfirm'))) {
       return
     }
 
@@ -123,16 +128,16 @@ const MileageModal = ({
       }
     } catch (err) {
       console.error('Error deleting mileage:', err)
-      alert('Nepodarilo sa odstrániť záznam')
+      alert(t('mileageModalDeleteFailed'))
     }
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('sk-SK')
+    return new Date(dateString).toLocaleDateString(formatLocale)
   }
 
   const formatKilometers = (km: number) => {
-    return new Intl.NumberFormat('sk-SK').format(km) + ' km'
+    return new Intl.NumberFormat(formatLocale).format(km) + ' km'
   }
 
   if (!isOpen) return null
@@ -147,7 +152,7 @@ const MileageModal = ({
               <Gauge className="w-8 h-8 text-pictus-lime" />
             </div>
             <div>
-              <h2 className="text-4xl font-light text-pictus-white">Kilometre</h2>
+              <h2 className="text-4xl font-light text-pictus-white">{t('mileageModalTitle')}</h2>
               <p className="text-xl text-pictus-lime">{vehicleRegistration}</p>
             </div>
           </div>
@@ -165,7 +170,7 @@ const MileageModal = ({
           >
             <h3 className="text-2xl font-light text-pictus-white mb-6 flex items-center gap-2">
               <Plus size={28} className="text-pictus-lime" />
-              Pridať záznam
+              {t('mileageModalAdd')}
             </h3>
 
             {error && (
@@ -177,19 +182,21 @@ const MileageModal = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-pictus-white text-lg font-light mb-2">
-                  Kilometre *
+                  {t('mileageModalKm')} *
                 </label>
                 <input
                   type="number"
                   value={formData.kilometers}
                   onChange={(e) => setFormData({ ...formData, kilometers: e.target.value })}
-                  placeholder="napr. 150000"
+                  placeholder={t('mileageModalKmPlaceholder')}
                   className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                   required
                 />
               </div>
               <div>
-                <label className="block text-pictus-white text-lg font-light mb-2">Dátum *</label>
+                <label className="block text-pictus-white text-lg font-light mb-2">
+                  {t('recordModalDate')} *
+                </label>
                 <input
                   type="date"
                   value={formData.date}
@@ -199,12 +206,14 @@ const MileageModal = ({
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-pictus-white text-lg font-light mb-2">Poznámka</label>
+                <label className="block text-pictus-white text-lg font-light mb-2">
+                  {t('recordModalNote')}
+                </label>
                 <input
                   type="text"
                   value={formData.note}
                   onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                  placeholder="Voliteľná poznámka..."
+                  placeholder={t('recordModalNotePlaceholder')}
                   className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                 />
               </div>
@@ -214,7 +223,7 @@ const MileageModal = ({
                   disabled={loading}
                   className="w-full bg-pictus-lime text-pictus-black px-6 py-3 rounded-full hover:bg-pictus-lime600 transition-all disabled:opacity-50 text-lg font-semibold"
                 >
-                  {loading ? 'Ukladám...' : 'Pridať záznam'}
+                  {loading ? t('recordModalSaving') : t('mileageModalAdd')}
                 </button>
               </div>
             </div>
@@ -223,7 +232,7 @@ const MileageModal = ({
           {/* Mileage List */}
           <div>
             <h3 className="text-2xl font-light text-pictus-white mb-6">
-              História ({mileageRecords.length})
+              {t('mileageModalHistory', { count: mileageRecords.length })}
             </h3>
 
             {loading && mileageRecords.length === 0 ? (
@@ -231,7 +240,9 @@ const MileageModal = ({
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime mx-auto"></div>
               </div>
             ) : mileageRecords.length === 0 ? (
-              <div className="text-center py-8 text-pictus-lime text-xl">Zatiaľ žiadne záznamy</div>
+              <div className="text-center py-8 text-pictus-lime text-xl">
+                {t('mileageModalEmpty')}
+              </div>
             ) : (
               <div className="space-y-4">
                 {mileageRecords.map((record) => (

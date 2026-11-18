@@ -3,6 +3,13 @@ import prisma from '@/db/db'
 
 const HONO_API = process.env.NEXT_PUBLIC_HONO_API_URL
 
+const DATE_LOCALES: Record<string, string> = {
+  sk: 'sk-SK',
+  en: 'en-GB',
+  hu: 'hu-HU',
+  de: 'de-DE',
+}
+
 /**
  * Sends "your free/gifted access is ending" reminder emails. Intended to be
  * called once a day by a scheduler (n8n). Emails an org's fleet manager when
@@ -39,6 +46,7 @@ export async function GET(request: NextRequest) {
         id: true,
         freeTrialEndDate: true,
         manuallyPaid: true,
+        notificationLocale: true,
         tierRelation: { select: { name: true } },
       },
     })
@@ -66,7 +74,8 @@ export async function GET(request: NextRequest) {
         continue
       }
 
-      const endDateStr = org.freeTrialEndDate.toLocaleDateString('sk-SK')
+      const locale = DATE_LOCALES[org.notificationLocale] ? org.notificationLocale : 'sk'
+      const endDateStr = org.freeTrialEndDate.toLocaleDateString(DATE_LOCALES[locale])
       const ok = await fetch(`${HONO_API}/api/pictusweb/client/send-trial-expiry-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,8 +85,8 @@ export async function GET(request: NextRequest) {
           tierName: org.tierRelation?.name || 'BASIC',
           endDate: endDateStr,
           daysLeft,
-          loginUrl: `${appUrl}/sk/client`,
-          locale: 'sk',
+          loginUrl: `${appUrl}/${locale}/client`,
+          locale,
           manuallyPaid: org.manuallyPaid,
         }),
       })

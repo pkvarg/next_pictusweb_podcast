@@ -57,6 +57,23 @@ const i18n: Record<string, Record<string, string>> = {
     freeWarning: 'A limit elérésekor magasabb csomagra kell váltania.',
     upgrade: 'Frissítés',
   },
+  de: {
+    canceled:
+      'Ihr Abonnement wurde gekündigt. Benachrichtigungen sind gesperrt. Erneuern Sie Ihr Abonnement, um fortzufahren.',
+    paymentIssue:
+      'Sie haben eine offene Zahlung. Benachrichtigungen sind vorübergehend gesperrt. Aktualisieren Sie Ihre Zahlungsmethode.',
+    smsBlocked:
+      'Sie haben das Limit von {limit} SMS-Erinnerungen für diesen Zeitraum erreicht. Erinnerungen werden weiterhin per E-Mail versendet.',
+    freeLimitBlocked:
+      'Ihre FREE-Testversion ist aufgebraucht ({limit} Benachrichtigungen). Wechseln Sie in einen höheren Tarif, um fortzufahren.',
+    smsUsage: 'Sie haben {current} von {limit} SMS-Erinnerungen genutzt ({percent} %).',
+    emailUnlimited: 'E-Mails sind unbegrenzt.',
+    freeTrialCounter:
+      'Testversion: Sie haben {current} von {limit} Benachrichtigungen genutzt ({percent} %).',
+    freeWarning:
+      'Sobald das Limit erreicht ist, ist ein Upgrade auf einen höheren Tarif erforderlich.',
+    upgrade: 'Upgraden',
+  },
 }
 
 function t(locale: string, key: string, params?: Record<string, string | number>): string {

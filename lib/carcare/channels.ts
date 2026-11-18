@@ -40,6 +40,7 @@ const PUSH_BODY: Record<string, string> = {
   sk: 'Pripomienka FleetSync',
   en: 'FleetSync reminder',
   hu: 'FleetSync emlékeztető',
+  de: 'FleetSync-Erinnerung',
 }
 
 // Real senders. Email and SMS go through the hono_bun service (the prepared delivery

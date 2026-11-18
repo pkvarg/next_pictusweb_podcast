@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { X, Plus, Trash2 } from 'lucide-react'
 import { FaEuroSign } from 'react-icons/fa'
 
@@ -28,6 +29,10 @@ const ExpensesModal = ({
   vehicleRegistration,
   onSuccess,
 }: ExpensesModalProps) => {
+  const t = useTranslations('Client')
+  const locale = useLocale()
+  const formatLocale =
+    locale === 'de' ? 'de-DE' : locale === 'hu' ? 'hu-HU' : locale === 'en' ? 'en-GB' : 'sk-SK'
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -73,7 +78,7 @@ const ExpensesModal = ({
     setError('')
 
     if (!formData.item || !formData.cost || !formData.date) {
-      setError('Všetky polia sú povinné')
+      setError(t('expensesModalRequired'))
       return
     }
 
@@ -109,14 +114,14 @@ const ExpensesModal = ({
       }
     } catch (err) {
       console.error('Error adding expense:', err)
-      setError('Nepodarilo sa pridať výdavok')
+      setError(t('expensesModalAddFailed'))
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async (expenseId: string) => {
-    if (!confirm('Naozaj chcete odstrániť tento výdavok?')) {
+    if (!confirm(t('expensesModalDeleteConfirm'))) {
       return
     }
 
@@ -138,7 +143,7 @@ const ExpensesModal = ({
       }
     } catch (err) {
       console.error('Error deleting expense:', err)
-      alert('Nepodarilo sa odstrániť výdavok')
+      alert(t('expensesModalDeleteFailed'))
     }
   }
 
@@ -171,18 +176,18 @@ const ExpensesModal = ({
       if (onSuccess) onSuccess()
     } catch (err) {
       console.error('Error updating expense:', err)
-      alert('Nepodarilo sa upraviť výdavok')
+      alert(t('expensesModalUpdateFailed'))
     } finally {
       setLoading(false)
     }
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('sk-SK')
+    return new Date(dateString).toLocaleDateString(formatLocale)
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('sk-SK', {
+    return new Intl.NumberFormat(formatLocale, {
       style: 'currency',
       currency: 'EUR',
     }).format(amount)
@@ -204,7 +209,7 @@ const ExpensesModal = ({
               <FaEuroSign className="w-8 h-8 text-pictus-lime" />
             </div>
             <div>
-              <h2 className="text-4xl font-light text-pictus-white">Výdavky</h2>
+              <h2 className="text-4xl font-light text-pictus-white">{t('expensesModalTitle')}</h2>
               <p className="text-xl text-pictus-lime">{vehicleRegistration}</p>
             </div>
           </div>
@@ -222,7 +227,7 @@ const ExpensesModal = ({
           >
             <h3 className="text-2xl font-light text-pictus-white mb-6 flex items-center gap-2">
               <Plus size={28} className="text-pictus-lime" />
-              Pridať výdavok
+              {t('expensesModalAdd')}
             </h3>
 
             {error && (
@@ -233,19 +238,21 @@ const ExpensesModal = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-pictus-white text-lg font-light mb-2">Položka *</label>
+                <label className="block text-pictus-white text-lg font-light mb-2">
+                  {t('expensesModalItem')} *
+                </label>
                 <input
                   type="text"
                   value={formData.item}
                   onChange={(e) => setFormData({ ...formData, item: e.target.value })}
-                  placeholder="napr. Palivo, Servis..."
+                  placeholder={t('expensesModalItemPlaceholder')}
                   className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                   required
                 />
               </div>
               <div>
                 <label className="block text-pictus-white text-lg font-light mb-2">
-                  Suma (€) *
+                  {t('expensesModalAmountLabel')} *
                 </label>
                 <input
                   type="number"
@@ -258,7 +265,9 @@ const ExpensesModal = ({
                 />
               </div>
               <div>
-                <label className="block text-pictus-white text-lg font-light mb-2">Dátum *</label>
+                <label className="block text-pictus-white text-lg font-light mb-2">
+                  {t('recordModalDate')} *
+                </label>
                 <input
                   type="date"
                   value={formData.date}
@@ -268,18 +277,20 @@ const ExpensesModal = ({
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-pictus-white text-lg font-light mb-2">Poznámka</label>
+                <label className="block text-pictus-white text-lg font-light mb-2">
+                  {t('recordModalNote')}
+                </label>
                 <input
                   type="text"
                   value={formData.note}
                   onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                  placeholder="voliteľná poznámka"
+                  placeholder={t('recordModalNotePlaceholder')}
                   className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-pictus-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pictus-lime"
                 />
               </div>
               <div className="md:col-span-3">
                 <label className="block text-pictus-white text-lg font-light mb-2">
-                  Link napr. na obchod
+                  {t('expensesModalLink')}
                 </label>
                 <input
                   type="url"
@@ -295,7 +306,7 @@ const ExpensesModal = ({
                   disabled={loading}
                   className="w-full bg-pictus-lime text-pictus-black px-6 py-3 rounded-full hover:bg-pictus-lime600 transition-all disabled:opacity-50 text-lg font-semibold"
                 >
-                  {loading ? 'Ukladám...' : 'Pridať výdavok'}
+                  {loading ? t('recordModalSaving') : t('expensesModalAdd')}
                 </button>
               </div>
             </div>
@@ -305,11 +316,11 @@ const ExpensesModal = ({
           <div>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-light text-pictus-white">
-                História výdavkov ({expenses.length})
+                {t('expensesModalHistory', { count: expenses.length })}
               </h3>
               {expenses.length > 1 && (
                 <div className="bg-pictus-lime/15 border border-pictus-lime/25 rounded-2xl px-6 py-3">
-                  <p className="text-pictus-lime text-sm">Celkom</p>
+                  <p className="text-pictus-lime text-sm">{t('expensesModalTotal')}</p>
                   <p className="text-3xl font-light text-pictus-white">
                     {formatCurrency(calculateTotal())}
                   </p>
@@ -322,7 +333,9 @@ const ExpensesModal = ({
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pictus-lime mx-auto"></div>
               </div>
             ) : expenses.length === 0 ? (
-              <div className="text-center py-8 text-pictus-lime text-xl">Zatiaľ žiadne výdavky</div>
+              <div className="text-center py-8 text-pictus-lime text-xl">
+                {t('expensesModalEmpty')}
+              </div>
             ) : (
               <div className="space-y-4">
                 {expenses.map((expense) => (
@@ -340,7 +353,7 @@ const ExpensesModal = ({
                               setEditFormData({ ...editFormData, item: e.target.value })
                             }
                             className="col-span-2 px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
-                            placeholder="Položka"
+                            placeholder={t('expensesModalItem')}
                           />
                           <input
                             type="number"
@@ -350,7 +363,7 @@ const ExpensesModal = ({
                               setEditFormData({ ...editFormData, cost: e.target.value })
                             }
                             className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
-                            placeholder="Suma"
+                            placeholder={t('expensesModalAmount')}
                           />
                         </div>
                         <div className="grid grid-cols-3 gap-3">
@@ -369,7 +382,7 @@ const ExpensesModal = ({
                               setEditFormData({ ...editFormData, note: e.target.value })
                             }
                             className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pictus-lime"
-                            placeholder="Poznámka"
+                            placeholder={t('recordModalNote')}
                           />
                           <input
                             type="url"
@@ -386,13 +399,13 @@ const ExpensesModal = ({
                             onClick={handleSaveEdit}
                             className="px-5 py-2 bg-pictus-lime hover:bg-pictus-lime600 text-pictus-black font-semibold rounded-full transition text-sm"
                           >
-                            Uložiť
+                            {t('recordModalSave')}
                           </button>
                           <button
                             onClick={() => setEditingExpenseId(null)}
                             className="px-5 py-2 bg-white/5 hover:bg-white/10 text-pictus-white rounded-full transition text-sm"
                           >
-                            Zrušiť
+                            {t('recordModalCancel')}
                           </button>
                         </div>
                       </div>

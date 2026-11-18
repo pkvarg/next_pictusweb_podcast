@@ -11,7 +11,7 @@ export default function AuthErrorPage() {
   const pathname = usePathname()
   const error = searchParams.get('error')
   const t = useTranslations('Error')
-  const locale = pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
+  const locale = pathname.match(/^\/(en|sk|hu|de)/)?.[1] || 'sk'
 
   const isAccessDenied = error === 'ACCESS_DENIED'
 

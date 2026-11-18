@@ -16,6 +16,7 @@ const LanguageBar = () => {
     { code: 'en', name: 'English', flag: '🇬🇧', label: 'EN' },
     { code: 'sk', name: 'Slovenčina', flag: '🇸🇰', label: 'SK' },
     { code: 'hu', name: 'Magyar', flag: '🇭🇺', label: 'HU' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪', label: 'DE' },
   ]
 
   const handleLanguage = (lang: string) => {

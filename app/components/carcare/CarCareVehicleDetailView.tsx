@@ -16,7 +16,7 @@ import {
   Trash2,
   Bell,
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
 import { Link, useRouter } from '@/i18n/routing'
 import { templateKey, powertrainKey, categoryKey } from '@/lib/carcare/labels'
@@ -148,6 +148,7 @@ export default function CarCareVehicleDetailView({
   reload?: () => void
 }) {
   const t = useTranslations('CarCare')
+  const numberLocale = useLocale() === 'de' ? 'de-DE' : 'sk-SK'
   const { data: authSession } = useSession()
   const { vehicle } = data
   const canModify = data.canModify !== false
@@ -387,7 +388,7 @@ export default function CarCareVehicleDetailView({
               </div>
               <div className="text-2xl font-bold text-pictus-white">
                 {data.latestMileage
-                  ? `${data.latestMileage.kilometers.toLocaleString('sk-SK')}`
+                  ? `${data.latestMileage.kilometers.toLocaleString(numberLocale)}`
                   : '—'}
                 <span className="text-base font-normal text-gray-400"> km</span>
               </div>
@@ -443,7 +444,9 @@ export default function CarCareVehicleDetailView({
                             : o.dueDate
                               ? t('vehicle.due', { date: formatDate(o.dueDate) })
                               : o.dueMileage
-                                ? t('vehicle.atKm', { km: o.dueMileage.toLocaleString('sk-SK') })
+                                ? t('vehicle.atKm', {
+                                    km: o.dueMileage.toLocaleString(numberLocale),
+                                  })
                                 : t('vehicle.noDue')}
                         </p>
                         {o.nextNotificationAt && (
@@ -550,7 +553,7 @@ export default function CarCareVehicleDetailView({
                     <p className="text-sm text-gray-400 truncate">
                       {formatDate(h.completedAt)}
                       {h.completedMileage
-                        ? ` · ${h.completedMileage.toLocaleString('sk-SK')} km`
+                        ? ` · ${h.completedMileage.toLocaleString(numberLocale)} km`
                         : ''}
                     </p>
                   </div>

@@ -7,6 +7,7 @@ const LOCALES = [
   { code: 'sk', label: 'SK' },
   { code: 'en', label: 'EN' },
   { code: 'hu', label: 'HU' },
+  { code: 'de', label: 'DE' },
 ] as const
 
 export default function CarCareLangSwitcher({ className = '' }: { className?: string }) {

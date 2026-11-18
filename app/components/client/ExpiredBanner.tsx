@@ -17,7 +17,7 @@ export default function ExpiredBanner({ tierName, endDate, manuallyPaid }: Expir
   const locale = (params?.locale as string) || 'sk'
 
   const formattedDate = new Date(endDate).toLocaleDateString(
-    locale === 'sk' ? 'sk-SK' : locale === 'hu' ? 'hu-HU' : 'en-GB',
+    locale === 'sk' ? 'sk-SK' : locale === 'hu' ? 'hu-HU' : locale === 'de' ? 'de-DE' : 'en-GB',
   )
 
   return (

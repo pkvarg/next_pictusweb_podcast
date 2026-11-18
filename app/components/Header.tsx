@@ -14,7 +14,7 @@ const Header = () => {
 
   const isActive = (path: string) => {
     // Remove locale prefix from pathname for comparison
-    const cleanPath = pathname.replace(/^\/(en|sk|hu)/, '')
+    const cleanPath = pathname.replace(/^\/(en|sk|hu|de)/, '')
 
     return cleanPath.startsWith(path)
   }

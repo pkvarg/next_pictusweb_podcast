@@ -157,7 +157,9 @@ export async function PUT(request: NextRequest) {
       orgData.notificationSendMinute = body.sendMinute === 30 ? 30 : 0 // whole or half hours only
     }
     if (body.locale !== undefined) {
-      orgData.notificationLocale = ['sk', 'en', 'hu'].includes(body.locale) ? body.locale : 'sk'
+      orgData.notificationLocale = ['sk', 'en', 'hu', 'de'].includes(body.locale)
+        ? body.locale
+        : 'sk'
     }
     if (Object.keys(orgData).length > 0) {
       await tx.organization.update({ where: { id: session.organizationId! }, data: orgData })

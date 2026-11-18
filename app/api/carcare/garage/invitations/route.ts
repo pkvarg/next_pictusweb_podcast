@@ -11,7 +11,7 @@ const ROLES: GarageRole[] = ['MEMBER', 'VIEWER']
 function localeFromReferer(referer: string | null): string {
   const m = referer?.match(/^https?:\/\/[^/]+\/([a-z]{2})(\/|$)/)
   const loc = m?.[1]
-  return loc && ['sk', 'en', 'hu'].includes(loc) ? loc : 'sk'
+  return loc && ['sk', 'en', 'hu', 'de'].includes(loc) ? loc : 'sk'
 }
 
 async function sendInviteEmail(params: {

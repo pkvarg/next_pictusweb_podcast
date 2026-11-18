@@ -24,6 +24,11 @@ const i18n: Record<string, { title: string; body: string; upgrade: string }> = {
     body: 'Elérte a FREE csomag értesítési limitjét, ezért az emlékeztetők szünetelnek. Váltson magasabb csomagra a folytatáshoz.',
     upgrade: 'Frissítés most',
   },
+  de: {
+    title: 'Ihre FREE-Testversion ist aufgebraucht',
+    body: 'Sie haben das Benachrichtigungslimit des FREE-Tarifs erreicht, daher wurden die Erinnerungen pausiert. Wechseln Sie in einen höheren Tarif, um ohne Unterbrechung fortzufahren.',
+    upgrade: 'Jetzt upgraden',
+  },
 }
 
 export default function FreeTrialModal({ tierName, blocked }: FreeTrialModalProps) {

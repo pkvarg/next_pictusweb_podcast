@@ -74,7 +74,7 @@ export default function CarCareGetStartedView() {
   const gr = (k: string) => t.rich(`getStarted.${k}`, B)
   const krok = g('krok')
   const locale = useLocale()
-  const loc = ['sk', 'en', 'hu'].includes(locale) ? locale : 'sk'
+  const loc = ['sk', 'en', 'hu', 'de'].includes(locale) ? locale : 'sk'
   const img = (n: number) => `/carcare/guide/${loc}/step${n}.png`
 
   return (

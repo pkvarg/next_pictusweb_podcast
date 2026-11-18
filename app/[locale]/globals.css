@@ -2651,8 +2651,10 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
 /* Longer EN/HU display strings must wrap instead of clipping (Slovak Length Rule) */
 .pl[data-locale='en'] .hero h1,
 .pl[data-locale='hu'] .hero h1,
+.pl[data-locale='de'] .hero h1,
 .pl[data-locale='en'] #about h2,
-.pl[data-locale='hu'] #about h2 {
+.pl[data-locale='hu'] #about h2,
+.pl[data-locale='de'] #about h2 {
   white-space: normal;
   text-wrap: balance;
 }
@@ -3910,7 +3912,8 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
 /* Desktop EN/HU hero: the longer titles simply wrap within the left column. */
 @media (min-width: 981px) {
   .pl[data-locale='en'] .hero h1,
-  .pl[data-locale='hu'] .hero h1 {
+  .pl[data-locale='hu'] .hero h1,
+  .pl[data-locale='de'] .hero h1 {
     font-size: clamp(3.4rem, 6.4vw, 7.4rem);
     max-width: 16ch;
   }

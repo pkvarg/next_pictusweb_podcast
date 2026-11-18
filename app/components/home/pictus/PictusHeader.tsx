@@ -10,6 +10,7 @@ const languages = [
   { code: 'sk', label: 'SK', flag: '🇸🇰' },
   { code: 'en', label: 'EN', flag: '🇬🇧' },
   { code: 'hu', label: 'HU', flag: '🇭🇺' },
+  { code: 'de', label: 'DE', flag: '🇩🇪' },
 ]
 
 const PictusHeader = () => {

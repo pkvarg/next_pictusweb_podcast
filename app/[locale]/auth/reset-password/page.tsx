@@ -23,7 +23,7 @@ function ResetPasswordContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  const locale = pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
+  const locale = pathname.match(/^\/(en|sk|hu|de)/)?.[1] || 'sk'
 
   useEffect(() => {
     const tk = searchParams.get('token')

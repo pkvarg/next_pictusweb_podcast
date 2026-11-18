@@ -28,6 +28,13 @@ const MESSAGES: Record<string, Record<LimitedResource, string>> = {
     users: 'Elérte a csomag felhasználói limitjét ({limit}). Váltson magasabb csomagra.',
     notifications: 'Elérte a csomag értesítési limitjét ({limit}).',
   },
+  de: {
+    vehicles:
+      'Sie haben das Fahrzeuglimit Ihres Tarifs erreicht ({limit}). Wechseln Sie in einen höheren Tarif.',
+    users:
+      'Sie haben das Benutzerlimit Ihres Tarifs erreicht ({limit}). Wechseln Sie in einen höheren Tarif.',
+    notifications: 'Sie haben das Benachrichtigungslimit Ihres Tarifs erreicht ({limit}).',
+  },
 }
 
 export function limitMessage(err: TierLimitError, locale = 'sk'): string {

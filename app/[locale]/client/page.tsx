@@ -345,7 +345,7 @@ const ClientZone = () => {
 
             <div className="flex items-center space-x-2 sm:space-x-4">
               <div className="flex items-center gap-0.5 shrink-0">
-                {(['sk', 'en', 'hu'] as const).map((loc) => (
+                {(['sk', 'en', 'hu', 'de'] as const).map((loc) => (
                   <button
                     key={loc}
                     onClick={() => router.replace(pathname, { locale: loc })}

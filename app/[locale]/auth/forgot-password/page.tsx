@@ -15,7 +15,7 @@ export default function ForgotPasswordPage() {
   const t = useTranslations('Auth')
   const pathname = usePathname()
 
-  const locale = pathname.match(/^\/(en|sk|hu)/)?.[1] || 'sk'
+  const locale = pathname.match(/^\/(en|sk|hu|de)/)?.[1] || 'sk'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -245,6 +245,7 @@ const Contact = () => {
     en: 'Message from pictusweb.sk',
     sk: 'Správa z pictusweb.sk',
     hu: 'Üzenet a pictusweb.sk-ról',
+    de: 'Nachricht von pictusweb.sk',
   }
 
   const subject =
