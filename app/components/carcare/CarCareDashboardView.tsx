@@ -17,6 +17,7 @@ import { useTranslations } from 'next-intl'
 import AddEventModal from './AddEventModal'
 import AddExpenseModal, { type VehicleOption } from './AddExpenseModal'
 import CarCareNotificationBell from './CarCareNotificationBell'
+import FeedbackButton from '@/app/components/client/FeedbackButton'
 
 export interface DashOccurrence {
   id: string
@@ -182,7 +183,10 @@ export default function CarCareDashboardView({
               </p>
             </div>
           </div>
-          <CarCareNotificationBell />
+          <div className="flex items-center gap-3">
+            <FeedbackButton />
+            <CarCareNotificationBell />
+          </div>
         </header>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">

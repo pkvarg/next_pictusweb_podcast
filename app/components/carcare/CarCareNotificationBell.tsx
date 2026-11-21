@@ -128,7 +128,7 @@ export default function CarCareNotificationBell() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={t('dash.bellAria')}
-        className="relative text-gray-300 hover:text-pictus-white transition-colors"
+        className="relative flex h-6 w-6 items-center justify-center text-gray-300 hover:text-pictus-white transition-colors"
       >
         <Bell className="w-6 h-6" />
         {unread > 0 && (

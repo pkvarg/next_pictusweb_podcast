@@ -24,6 +24,7 @@ import {
 import { useEffect, useRef, useState, useCallback } from 'react'
 import NotificationLimitBanner from '@/app/components/client/NotificationLimitBanner'
 import FreeTrialModal from '@/app/components/client/FreeTrialModal'
+import FeedbackButton from '@/app/components/client/FeedbackButton'
 import ExpiredBanner from '@/app/components/client/ExpiredBanner'
 import UpgradeBanner from '@/app/components/client/UpgradeBanner'
 import VerifyContactInfo from '@/app/components/client/VerifyContactInfo'
@@ -394,6 +395,9 @@ const ClientZone = () => {
                     <span className="hidden sm:inline">{t('upgrade')}</span>
                   </Link>
                 )}
+              <div className="hidden sm:flex items-center p-2 shrink-0">
+                <FeedbackButton />
+              </div>
               <Link
                 href="/client/settings"
                 className="hidden sm:flex items-center text-pictus-white hover:text-pictus-lime transition-colors p-2 rounded-full hover:bg-white/10 shrink-0"
@@ -543,10 +547,13 @@ const ClientZone = () => {
         {/* User Info Section */}
         <section className="py-8">
           <div className="bg-pictus-onyx900 rounded-3xl p-6 sm:p-8 border border-white/[0.06]">
-            <div className="mb-6">
+            <div className="mb-6 flex items-center justify-between gap-3">
               <h2 className="text-2xl sm:text-3xl font-bold text-pictus-white">
                 {t('accountInfo')}
               </h2>
+              <div className="sm:hidden">
+                <FeedbackButton />
+              </div>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               {/* User Profile */}

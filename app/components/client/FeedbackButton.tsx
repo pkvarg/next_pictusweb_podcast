@@ -72,7 +72,7 @@ const i18n: Record<string, Copy> = {
   },
 }
 
-export default function FeedbackButton() {
+export default function FeedbackButton({ variant = 'icon' }: { variant?: 'icon' | 'nav' }) {
   const params = useParams()
   const locale = (params?.locale as string) || 'sk'
   const t = i18n[locale] ?? i18n.sk
@@ -122,15 +122,26 @@ export default function FeedbackButton() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full bg-pictus-lime px-4 py-3 text-sm font-semibold text-pictus-black shadow-lg transition hover:bg-pictus-lime600"
-        aria-label={t.button}
-      >
-        <MessageSquarePlus size={18} />
-        <span className="hidden sm:inline">{t.button}</span>
-      </button>
+      {variant === 'nav' ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-pictus-white"
+        >
+          <MessageSquarePlus className="h-5 w-5 text-pictus-lime" />
+          {t.button}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex h-6 w-6 shrink-0 items-center justify-center text-pictus-lime transition-colors hover:text-pictus-lime600"
+          aria-label={t.button}
+          title={t.button}
+        >
+          <MessageSquarePlus className="h-6 w-6" />
+        </button>
+      )}
 
       {open && (
         <div
