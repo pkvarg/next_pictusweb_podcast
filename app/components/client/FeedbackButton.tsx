@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
-import { MessageSquarePlus, X, Loader2, CheckCircle } from 'lucide-react'
+import { MessageSquarePlus, X, Loader2, CheckCircle, ChevronDown } from 'lucide-react'
 
 interface Copy {
   button: string
@@ -185,17 +185,20 @@ export default function FeedbackButton({ variant = 'icon' }: { variant?: 'icon' 
                 <label className="mb-1 block text-xs font-medium text-gray-400">
                   {t.categoryLabel}
                 </label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="mb-3 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-200 focus:border-pictus-lime focus:outline-none"
-                >
-                  {t.cats.map((c) => (
-                    <option key={c} value={c} className="bg-pictus-black">
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative mb-3">
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full appearance-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 pr-9 text-sm text-gray-200 focus:border-pictus-lime focus:outline-none"
+                  >
+                    {t.cats.map((c) => (
+                      <option key={c} value={c} className="bg-pictus-black">
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                </div>
 
                 <textarea
                   value={message}
