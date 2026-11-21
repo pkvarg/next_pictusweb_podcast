@@ -3,7 +3,7 @@ import { signIn, useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { LogIn, ShieldCheck } from 'lucide-react'
+import { LogIn, ShieldCheck, Eye, EyeOff } from 'lucide-react'
 import PictusPagesHeader from '@/app/components/home/pictus/PictusPagesHeader'
 import PictusFooter from '@/app/components/home/pictus/PictusFooter'
 import { Link } from '@/i18n/routing'
@@ -27,6 +27,7 @@ function destinationFor(locale: string, role?: string, product?: string): string
 export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [step, setStep] = useState<Step>('credentials')
@@ -246,15 +247,26 @@ export default function LoginPage() {
                       {t('forgotPassword')}
                     </Link>
                   </div>
-                  <input
-                    id="password"
-                    type="password"
-                    className="auth-input"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder={t('passwordPlaceholder')}
-                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      className="auth-input pr-11"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      placeholder={t('passwordPlaceholder')}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-400 transition-colors hover:text-pictus-white"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
                 </div>
 
                 {error && <div className="auth-alert is-error">{error}</div>}
