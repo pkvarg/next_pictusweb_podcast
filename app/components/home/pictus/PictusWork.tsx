@@ -74,13 +74,13 @@ const slides: { variant: 'a' | 'b'; primary: Project; supporting: [Project, Proj
       {
         title: 'kvalitnamontaz.sk',
         href: 'https://kvalitnamontaz.sk',
-        image: '/projects/kvalitnamontaz.webp',
+        image: '/projects/kvalitnamontaz-3d.webp',
         position: 'center top',
       },
       {
-        title: 'cestazivota.sk',
-        href: 'https://cestazivota.sk',
-        image: '/projects/cestazivota.webp',
+        title: 'tvojservis.pictusweb.sk',
+        href: 'https://tvojservis.pictusweb.sk',
+        image: '/projects/tvojservis.webp',
         position: 'center top',
       },
     ],

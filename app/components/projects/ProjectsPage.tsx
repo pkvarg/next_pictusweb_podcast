@@ -32,15 +32,15 @@ const projects = [
   },
   {
     title: 'kvalitnamontaz.sk',
-    image: '/projects/kvalitnamontaz.webp',
+    image: '/projects/kvalitnamontaz-3d.webp',
     href: 'https://kvalitnamontaz.sk',
     descriptionKey: 'projectKvalitnamontazDesc',
   },
   {
-    title: 'cestazivota.sk',
-    image: '/projects/cestazivota.webp',
-    href: 'https://cestazivota.sk',
-    descriptionKey: 'projectCestazivotaDesc',
+    title: 'tvojservis.pictusweb.sk',
+    image: '/projects/tvojservis.webp',
+    href: 'https://tvojservis.pictusweb.sk',
+    descriptionKey: 'projectTvojservisDesc',
   },
   {
     title: 'prud.sk',
@@ -53,6 +53,12 @@ const projects = [
     image: '/projects/michaldovala.webp',
     descriptionKey: 'projectMichaldovalaDesc',
   },
+  // {
+  //   title: 'beorthodox.pictusweb.sk',
+  //   image: '/projects/beorthodox.webp',
+  //   href: 'https://beorthodox.pictusweb.sk',
+  //   descriptionKey: 'projectBeorthodoxDesc',
+  // },
   {
     title: 'librosophia.sk',
     image: '/projects/librosophia.webp',
