@@ -28,7 +28,7 @@ const projects = [
   },
   {
     title: 'kvalitnamontaz.sk',
-    image: '/projects/kvalitnamontaz.webp',
+    image: '/projects/kvalitnamontaz-3d.webp',
     href: 'https://kvalitnamontaz.sk',
   },
   {
